@@ -1,0 +1,60 @@
+\documentclass{article}
+\usepackage{CJK}
+\usepackage{amssymb}
+\begin{document}
+\begin{CJK}{UTF8}{gbsn}
+\title{根据国网检测大纲整理的故障指示器功能}
+\maketitle
+根据国网检测大纲2018故障指示器的功能整理如下：
+检测大纲中故障指示器按照工作原理分成两种，一种是传统型，一种是暂态录波型。
+
+\section{传统型功能要求}
+\begin{enumerate}
+\item	短路故障检测
+\par
+	原理：
+	\begin{equation}
+		I_x>I_{dz}
+	\end{equation}
+\item	要求能够自动检测故障
+\par
+	原理：
+	\begin{equation}	
+		\left\{ \begin{array}{c}
+			\Delta I_x>I_{dz} \\
+			\Delta t>T_{dz} \\
+			I_z<5A\\ 
+			\Delta U>U_{dz}
+		\end{array}
+		\right .
+	\end{equation}
+	这里$I_x$是任意相电流，$I_z$是残余电流，U是场强。
+\item	接地故障检测和告警
+	\par
+	要求能够根据外施加信号，暂态特征，稳态特征识别故障。\\
+	外施加信号和稳态特征就是检测$I_0$的大小，暂态特征参见暂态型说明。\\
+	稳态特征识别原理：
+	\begin{equation}
+		\left\{
+			\begin{array}{ccc}
+				I_0>I_{dz}\\
+				\Delta t>T_{dz}
+			\end{array}
+			\right .
+	\end{equation}
+\item	复归
+	\par
+
+
+
+
+	
+	
+\end{enumerate}
+\section{暂态录波型功能要求}
+
+
+相关文件：'F:/document/其他资料/规范性引用文件/国网规范/配电自动化/配电自动化招标技术规范/专业检测2017/故障指示器'
+\end{CJK}
+\end{document}
+
