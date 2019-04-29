@@ -13,5 +13,5 @@ a.pdf:a.ps
 function.pdf:function.tex
 	pdflatex $<
 clean:
-	rm -f *.dvi *.ps *.pdf *.log *.toc *.aux
+	rm -f *.dvi *.ps *.log *.toc *.aux
 
