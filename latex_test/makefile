@@ -1,10 +1,10 @@
-target=a.pdf 
+target=test.pdf 
 all:$(target)
 %.dvi:%.tex
 	latex $<
 %.ps:%.dvi
 	dvips $<
-a.pdf:a.ps
+%.pdf:%.ps
 	ps2pdf $<
 clean:
 	rm -f *.fls *.idx *.ind *.dvi *.ps *.log *.toc *.aux $(target)
