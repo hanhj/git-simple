@@ -7,5 +7,5 @@ all:$(target)
 %.pdf:%.ps
 	ps2pdf $<
 clean:
-	rm -f *.fls *.idx *.ind *.dvi *.ps *.log *.toc *.aux $(target)
+	rm -f *.fls *.idx *.ind *.dvi *.ps *.log *.toc *.aux *.ilg *.lof *.lot $(target)
 
