@@ -411,27 +411,29 @@ class message{
 };
 #define VAR_FRAME 1
 #define FIX_FRAME 2
+#define FRAME_BUFF 300
 class frame{
 	public:
 		int len;
 		int valid;
 		int type;
-		unsigned char data[300];
+		unsigned char data[FRAME_BUFF];
+		frame(){
+			valid=0;
+			len=0;
+			memset(&data,0,sizeof(data));
+		}
 };
 class var_frame:public frame{
 	public:
 		var_frame(){
 			type=VAR_FRAME;
-			valid=0;
-			len=0;
 		}
 };
 class fix_frame:public frame{
 	public:
 		fix_frame(){
 			type=FIX_FRAME;
-			valid=0;
-			len=0;
 		}
 };
 class timer{
@@ -471,19 +473,20 @@ int timer::stop(){
 	}
 	return -1;
 }
+//dir:0 is master,1 is terminal
 typedef struct _prm_ctl{
 		unsigned char fc:4;
 		unsigned char fcv:1;
 		unsigned char fcb:1;
 		unsigned char prm:1;
-		unsigned char dir:1;
+		unsigned char rev_dir:1;//unbalance is reverse/balance is dir
 }prm_ctl;
 typedef struct _slv_ctl{
 		unsigned char fc:4;
 		unsigned char dfc:1;
-		unsigned char rev:1;
+		unsigned char acd_rev:1;//unbalance is acd/balance is reverse
 		unsigned char prm:1;
-		unsigned char dir:1;
+		unsigned char rev_dir:1;//unbalance is reverse/balance is dir
 }slv_ctl;
 typedef union _ctrl_word{
 	prm_ctl pm;
@@ -719,15 +722,10 @@ class link_layer_101:public link_layer{
 	public:
 		link_layer_101(){
 			balance=0;
-			memset(&last_send_frame.data,0,sizeof(last_send_frame.data));
-			memset(&r_var_frame.data,0,sizeof(r_var_frame.data));
-			memset(&s_var_frame.data,0,sizeof(s_var_frame.data));
 			start_rcv_var_flag=0;
 			r_var_pos=0;
 			s_var_pos=0;
 
-			memset(&r_fix_frame.data,0,sizeof(r_fix_frame.data));
-			memset(&s_fix_frame.data,0,sizeof(s_fix_frame.data));
 			start_rcv_fix_flag=0;
 			r_fix_pos=0;
 			s_fix_pos=0;
@@ -767,6 +765,7 @@ class link_layer_101:public link_layer{
 		int build_ack(int has_data=0);//fc0	,fix frame,has_data indicator if have class 1 data for no balance.
 		int build_nak();//fc1, fix frame
 		int build_err_rep(frame *,int err);//?
+		int build_link_ack();//fc11,fix frame,
 		int build_link_req();//fc9,fix frame,for balance.
 		int build_link_fini();//fc3,var frame 
 		int build_reset_link();//fc0,fix frame,for balance
@@ -779,12 +778,84 @@ class link_layer_101:public link_layer{
 		int save_frame(frame *);
 };
 int link_layer_101::build_ack(int has_data){
+	int i;
+	i=0;
+	if(!balance){
+		ctl_wd_lo.sl.fc=0;
+		ctl_wd_lo.sl.dfc=0;
+		ctl_wd_lo.sl.acd_rev=has_data;
+		ctl_wd_lo.sl.prm=0;
+		ctl_wd_lo.sl.rev_dir=0;
+		s_fix_frame.data[i++]=0x10;
+		s_fix_frame.data[i++]=ctl_wd_lo.data;
+		s_fix_frame.data[i++]=addr&0x00ff;
+		if(addr_size==2){
+			s_fix_frame.data[i++]=addr>>8&0x00ff;
+		}
+		s_fix_frame.data[i++]=sum(&s_fix_frame.data[1],addr_size+1);
+		s_fix_frame.data[i++]=0x16;
+		s_fix_frame.len=i;
+		s_fix_frame.valid=1;
+	}else if(balance==1){
+		ctl_wd_lo.sl.fc=0;
+		ctl_wd_lo.sl.dfc=0;
+		ctl_wd_lo.sl.acd_rev=0;
+		ctl_wd_lo.sl.prm=0;
+		ctl_wd_lo.sl.rev_dir=1;
+		s_fix_frame.data[i++]=0x10;
+		s_fix_frame.data[i++]=ctl_wd_lo.data;
+		s_fix_frame.data[i++]=addr&0x00ff;
+		if(addr_size==2){
+			s_fix_frame.data[i++]=addr>>8&0x00ff;
+		}
+		s_fix_frame.data[i++]=sum(&s_fix_frame.data[1],addr_size+1);
+		s_fix_frame.data[i++]=0x16;
+		s_fix_frame.len=i;
+		s_fix_frame.valid=1;
+	}
 	return 0;
 }
 int link_layer_101::build_nak(){
 	return 0;
 }
-int link_layer_101::build_link_req(){
+int link_layer_101::build_link_ack(){
+	int i;
+	i=0;
+	if(!balance){
+		ctl_wd_lo.sl.fc=11;
+		ctl_wd_lo.sl.dfc=0;
+		ctl_wd_lo.sl.acd_rev=0;
+		ctl_wd_lo.sl.prm=0;
+		ctl_wd_lo.sl.rev_dir=0;
+		s_fix_frame.data[i++]=0x10;
+		s_fix_frame.data[i++]=ctl_wd_lo.data;
+		s_fix_frame.data[i++]=addr&0x00ff;
+		if(addr_size==2){
+			s_fix_frame.data[i++]=addr>>8&0x00ff;
+		}
+		s_fix_frame.data[i++]=sum(&s_fix_frame.data[1],addr_size+1);
+		s_fix_frame.data[i++]=0x16;
+		s_fix_frame.len=i;
+		s_fix_frame.valid=1;
+	}else if(balance==1){
+		ctl_wd_lo.sl.fc=11;
+		ctl_wd_lo.sl.dfc=0;
+		ctl_wd_lo.sl.acd_rev=0;
+		ctl_wd_lo.sl.prm=0;
+		ctl_wd_lo.sl.rev_dir=1;
+		s_fix_frame.data[i++]=0x10;
+		s_fix_frame.data[i++]=ctl_wd_lo.data;
+		s_fix_frame.data[i++]=addr&0x00ff;
+		if(addr_size==2){
+			s_fix_frame.data[i++]=addr>>8&0x00ff;
+		}
+		s_fix_frame.data[i++]=sum(&s_fix_frame.data[1],addr_size+1);
+		s_fix_frame.data[i++]=0x16;
+		s_fix_frame.len=i;
+		s_fix_frame.valid=1;
+	}
+	return 0;
+}int link_layer_101::build_link_req(){
 	return 0;
 }
 int link_layer_101::build_link_fini(){
@@ -1144,7 +1215,7 @@ int link_layer_101::fc_9(frame*f){
 	process=PROCESS_LINK;
 	link_step=1;
 	link_state=LINK_NOCONNECT;
-	build_ack();
+	build_link_ack();
 	send_frame(&s_fix_frame);
 	link_step++;//2
 	return 0;
