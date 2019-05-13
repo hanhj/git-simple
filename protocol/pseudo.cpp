@@ -10,18 +10,63 @@ using namespace std;
 #include<unistd.h>
 #include<string.h>
 #include<time.h>
+#include<stdio.h>
+#include<stdlib.h>
+#include<stdarg.h>
 //the physical layer
-#define MAX_COMM_BUFFER 1000
+#define MAX_COM_BUFFER 1000
 #define TYPE_SERIAL 1
 #define TYPE_ETHERNET 2
 #define TYPE_WIRELESS 3
 
-
-unsigned char sum(unsigned char *data,int len);
-time_t get_system_time();
+unsigned char sum(unsigned char *data,int len){
+	int i;
+	unsigned char _sum;
+	_sum=0;
+	i=0;
+	if(len<0)
+		return 0;
+	while(len--){
+		_sum+=*(data+i);
+		i++;
+	}
+	return _sum;
+}
+time_t get_system_time(){
+	return time(NULL);
+}
+#define DEBUG_ERROR 0
+#define DEBUG_WARNING 1
+#define DEBUG_INFO 2
+#define DEBUG_NORMAL 3
+#define DEBUG_BUFF 1000
+char debug_buff[DEBUG_BUFF];
+void debug(int mode,const char *fmt...){
+	const char *color="";
+	const char *default_col="\033[0;m";
+	switch(mode){
+		case DEBUG_ERROR:
+			color="\033[031m";
+			break;
+		case DEBUG_WARNING:
+			color="\033[033m";
+			break;
+		case DEBUG_INFO:
+			color="\033[032m";
+			break;
+		case DEBUG_NORMAL:
+			color="\033[0;m";
+			break;
+	}
+	va_list arg;
+	va_start(arg,fmt);
+	vsnprintf(debug_buff,DEBUG_BUFF,fmt,arg);
+	va_end(arg);
+	fprintf(stderr,"%s%s%s",color,debug_buff,default_col);
+}
 
 class basic_com{
-	private:
+	protected:
 		int read_produce;
 		int read_consume;
 		int send_produce;
@@ -57,11 +102,11 @@ class basic_com{
 		virtual int get_set(void *)=0;
 };
 int basic_com::get_byte(char *c){
-	cout<<"get byte"<<endl;
 	if(read_produce!=read_consume){
 		*c=read_buff_ptr[read_consume];
 		read_consume++;
-		read_consume=(read_consume) % MAX_COMM_BUFFER;
+		read_consume=(read_consume) % MAX_COM_BUFFER;
+		printf("get byte:%02x\n",*c);
 		return 0;
 	}
 	return -1;
@@ -79,6 +124,7 @@ ostream & operator<<(ostream &os,serial_set &a){
 class serial:public basic_com{
 	private:
 		serial_set set;
+		FILE *f;
 	public:	
 		serial(){
 			com_type=TYPE_SERIAL;
@@ -99,19 +145,50 @@ int	serial::init(void *para){
 }
 int serial::connect(){
 	cout<<"connect serial"<<endl;
+	f=fopen("test.dat","rt");
 	return 0;
 
 }
 int serial::close(){
 	cout<<"close serial"<<endl;
+	fclose(f);
 	return 0;
 }
 int serial::read(int len){
 	cout<<"read serial:"<<len<<endl;
-	return len;
+	int l;
+	int i;
+	int c;
+	char *ret;
+	char buff[100];
+	ret=fgets(buff,len,f);
+	if(ret==NULL)
+		return -1;
+	if(buff[0]=='R')
+		return -1;
+	l=strlen(buff);
+	debug(DEBUG_NORMAL,"read:");
+	for(i=0;i<l;i++){
+		if(buff[i]=='T'||buff[i]=='X'||buff[i]==':'||buff[i]==' ')
+			continue;
+
+		c=strtol(&buff[i],NULL,16);
+		debug(DEBUG_INFO,"%02x ",c);
+		i++;
+		*(read_buff_ptr+read_produce)=c;
+		read_produce++;
+		read_produce=read_produce % MAX_COM_BUFFER;
+	}
+	debug(DEBUG_NORMAL,"\n");
+	return l;
 }
 int serial::send(unsigned char *data,int len){
 	cout<<"send serial:"<<len<<endl;
+	int i;
+	for(i=0;i<len;i++){
+		printf("%x ",*((char*)&data[i]));
+	}
+	cout<<endl;
 	return len;
 }
 int serial::get_com_state(){
@@ -260,15 +337,17 @@ int wireless::get_set(void *){
 class com_port{
 	public:
 		int port_no;//port number
-		int com_type;//1:serial,2:wireless net(gprs or cdma),3:enthtnet
+		int com_type;//1:serial,3:wireless net(gprs or cdma),2:enthtnet
 		basic_com *com_handle;
-		unsigned char read_buff[MAX_COMM_BUFFER];
-		unsigned char send_buff[MAX_COMM_BUFFER];
+		unsigned char read_buff[MAX_COM_BUFFER];
+		unsigned char send_buff[MAX_COM_BUFFER];
 	public:
 		com_port(){
 			port_no=0;
 			com_type=0;
 			com_handle=NULL;
+			memset(&read_buff,0,sizeof(read_buff));
+			memset(&send_buff,0,sizeof(send_buff));
 		}
 		void set_com_handle(basic_com*handle){
 			com_handle=handle;
@@ -292,21 +371,33 @@ class com_port{
 			return -1;
 		}
 		int connect(){
+			if(com_handle==NULL)
+				return -1;
 			return com_handle->connect();
 		};
 		int close(){
+			if(com_handle==NULL)
+				return -1;
 			return com_handle->close();
 		}
 		int read(int len){
+			if(com_handle==NULL)
+				return -1;
 			return com_handle->read(len);
 		};
 		int get_byte(char*c){
+			if(com_handle==NULL)
+				return -1;
 			return com_handle->get_byte(c);
 		};
 		int send(unsigned char *data,int len){
+			if(com_handle==NULL)
+				return -1;
 			return com_handle->send(data,len);
 		};
 		int get_com_state(){
+			if(com_handle==NULL)
+				return -1;
 			return com_handle->get_com_state();
 		};
 };
@@ -331,17 +422,18 @@ class var_frame:public frame{
 	public:
 		var_frame(){
 			type=VAR_FRAME;
+			valid=0;
+			len=0;
 		}
 };
 class fix_frame:public frame{
 	public:
 		fix_frame(){
 			type=FIX_FRAME;
+			valid=0;
+			len=0;
 		}
 };
-time_t get_system_time(){
-	return time(NULL);
-}
 class timer{
 	public:
 		timer(){
@@ -483,9 +575,7 @@ int link_layer::set_link_com(com_port*c,int p){
 	return -1;
 }
 int link_layer::send_frame(frame *f){
-	if(com==NULL)
-		return -1;
-	if(f==NULL)
+	if(com==NULL||f==NULL)
 		return -1;
 	cout<<"send frame of link "<<port<<",physical port :"<<com->port_no<<endl;
 	return com->send(f->data,f->len);
@@ -533,6 +623,62 @@ typedef struct _fc_table{
 #define COMMAND_SUMMON_ACC	101//累计量
 #define COMMAND_UPDATE		211
 
+//宏定义传送原因中的CODE
+#define CAUSE_Per_Cyc      1
+#define CAUSE_Back    2
+#define CAUSE_Spont    3
+#define CAUSE_Init    4
+#define CAUSE_Req    5
+#define CAUSE_Act    6
+#define CAUSE_Actcon   7
+#define CAUSE_Deact    8
+#define CAUSE_Deactcon   9
+#define CAUSE_Actterm   10
+#define CAUSE_Retrem   11
+#define CAUSE_Retloc   12
+#define CAUSE_File    13
+/*
+#define PRESERVATION   14
+#define PRESERVATION   15
+#define PRESERVATION   16
+#define PRESERVATION   17
+#define PRESERVATION   18
+#define PRESERVATION   19
+*/
+#define CAUSE_Introgen   20
+#define CAUSE_Intro1   21
+#define CAUSE_Intro2   22
+#define CAUSE_Intro3   23
+#define CAUSE_Intro4   24
+#define CAUSE_Intro5   25
+#define CAUSE_Intro6   26
+#define CAUSE_Intro7   27
+#define CAUSE_Intro8   28
+#define CAUSE_Intro9   29
+#define CAUSE_Intro10   30
+#define CAUSE_Intro11   31
+#define CAUSE_Intro12   32
+#define CAUSE_Intro13   33
+#define CAUSE_Intro14   34
+#define CAUSE_Intro15   35
+#define CAUSE_Intro16   36
+#define CAUSE_Reqcogen   37
+#define CAUSE_Reqco1   38
+#define CAUSE_Reqco2   39
+#define CAUSE_Reqco3   40
+#define CAUSE_Reqco4   41
+/*
+#define PRESERVATION   42
+#define PRESERVATION   43
+*/
+#define CAUSE_Unknowntype  44
+#define CAUSE_Unknowncause  45
+#define CAUSE_Unknownmasteraddr  46
+#define CAUSE_Unknowndataaddr  47
+/*
+#define PRESERVATION   48~63
+*/
+
 #define REP_TIMES 3
 #define REP_TIME  1
 class link_layer_101:public link_layer{
@@ -554,6 +700,7 @@ class link_layer_101:public link_layer{
 
 		ctrl_word ctl_wd_rm;//saved control word from remote.
 		ctrl_word ctl_wd_lo;
+		send_cause cause_lo;
 		int offset_len;
 		int offset_control;
 		int offset_addr;
@@ -572,15 +719,15 @@ class link_layer_101:public link_layer{
 	public:
 		link_layer_101(){
 			balance=0;
-			memset(&last_send_frame,0,sizeof(last_send_frame));
-			memset(&r_var_frame,0,sizeof(r_var_frame));
-			memset(&s_var_frame,0,sizeof(s_var_frame));
+			memset(&last_send_frame.data,0,sizeof(last_send_frame.data));
+			memset(&r_var_frame.data,0,sizeof(r_var_frame.data));
+			memset(&s_var_frame.data,0,sizeof(s_var_frame.data));
 			start_rcv_var_flag=0;
 			r_var_pos=0;
 			s_var_pos=0;
 
-			memset(&r_fix_frame,0,sizeof(r_fix_frame));
-			memset(&s_fix_frame,0,sizeof(s_fix_frame));
+			memset(&r_fix_frame.data,0,sizeof(r_fix_frame.data));
+			memset(&s_fix_frame.data,0,sizeof(s_fix_frame.data));
 			start_rcv_fix_flag=0;
 			r_fix_pos=0;
 			s_fix_pos=0;
@@ -617,23 +764,21 @@ class link_layer_101:public link_layer{
 		int fc_11(frame *);
 	public:
 		int process;//which process is in.
-		int build_ack();
-		int build_nak();
-		int build_ack_data();
-		int build_nak_data();
-		int build_link_ack(int has_data);
-		int build_link_req();
-		int build_link_fini();
-		int build_reset_link();
+		int build_ack(int has_data=0);//fc0	,fix frame,has_data indicator if have class 1 data for no balance.
+		int build_nak();//fc1, fix frame
+		int build_err_rep(frame *,int err);//?
+		int build_link_req();//fc9,fix frame,for balance.
+		int build_link_fini();//fc3,var frame 
+		int build_reset_link();//fc0,fix frame,for balance
+		int on_req_class_1(frame *);//fc8 or fc9,response fc10,for no balance
+		int on_req_class_2(frame *);//fc8 or fc9,response fc11,for no balance
+		int on_req(frame*,int balance);//fc0 or fc1,response fc3
 		int get_frame();
-		int active_send();//only for balance
+		int active_send();//for balance
 		int deal_frame(frame *);
-		int on_req_class_1(frame *);
-		int on_req_class_2(frame *);
-		int on_req(frame*,int balance);
 		int save_frame(frame *);
 };
-int link_layer_101::build_ack(){
+int link_layer_101::build_ack(int has_data){
 	return 0;
 }
 int link_layer_101::build_nak(){
@@ -645,23 +790,12 @@ int link_layer_101::build_link_req(){
 int link_layer_101::build_link_fini(){
 	return 0;
 }
-int link_layer_101::build_link_ack(int h){
-	return 0;
-}
 int link_layer_101::build_reset_link(){
 	return 0;
 }
-int link_layer_101::build_ack_data(){
-	return 0;
-}
-int link_layer_101::build_nak_data(){
-	return 0;
-}
-int link_layer_101::on_req_class_1(frame*f){
-	cout<<"on_req_class_1"<<endl;
-	return 0;
-}
 int link_layer_101::on_req(frame*f,int balance){
+	int ret;
+	ret=0;
 	int ti;
 	ti=f->data[offset_ti];
 	int cause;
@@ -715,7 +849,14 @@ int link_layer_101::on_req(frame*f,int balance){
 		case COMMAND_UPDATE:
 			process=PROCESS_UPDATE;
 			break;
+		default:
+			ret=-1;
+			break;
 	}
+	return ret;
+}
+int link_layer_101::on_req_class_1(frame*f){
+	cout<<"on_req_class_1"<<endl;
 	return 0;
 }
 int link_layer_101::on_req_class_2(frame *f){
@@ -750,8 +891,9 @@ int link_layer_101::get_frame(){
 		r_fix_frame.data[r_fix_pos]=c;
 		r_fix_pos++;
 		if(r_fix_pos==(addr_size+4)){
-			if(r_fix_frame.data[r_fix_pos]==0x16){
-				if(sum(&r_fix_frame.data[0],4)==r_fix_frame.data[r_fix_pos-2]){
+			if(r_fix_frame.data[r_fix_pos-1]==0x16){
+				if(sum(&r_fix_frame.data[1],addr_size+1)==r_fix_frame.data[r_fix_pos-2]){
+					debug(DEBUG_WARNING,"get fix frame\n");
 					r_fix_frame.len=r_fix_pos;
 					r_fix_frame.valid=1;
 					rcv_fix_timer.stop();
@@ -791,17 +933,18 @@ int link_layer_101::get_frame(){
 		r_var_frame.data[r_var_pos]=c;
 		r_var_pos++;
 		if(r_var_pos==3){
-			exp_len=(r_var_frame.data[r_var_pos]+5);
+			exp_len=(r_var_frame.data[r_var_pos]+6);
 		}
 		if(r_var_pos==exp_len){
 			if(r_var_frame.data[r_var_pos]==0x16&&r_var_frame.data[offset_len]==r_var_frame.data[offset_len+1]){
-				if(r_var_frame.data[r_var_pos-2]==sum(&r_var_frame.data[offset_control],exp_len-5)){
+				if(r_var_frame.data[r_var_pos-2]==sum(&r_var_frame.data[offset_control],exp_len-6)){
 					r_var_frame.len=r_var_pos;
 					r_var_frame.valid=1;
 					r_var_pos=0;
 					start_rcv_var_flag=0;
 					rcv_var_timer.stop();
 					deal_frame(&r_var_frame);
+					debug(DEBUG_WARNING,"get var frame\n");
 					return 1;
 				}else{
 					fail=1;
@@ -825,7 +968,7 @@ int link_layer_101::get_frame(){
 	return 0;		
 }
 int link_layer_101::active_send(){
-	cout<<"active send  101 frame of link "<<port<<" len="<<s_var_frame.len<<endl;
+	cout<<"active send  101 frame of link "<<port<<endl;
 	if(rep_timer.is_reached()==1){
 		send_frame(&last_send_frame);
 		rep_times++;
@@ -838,7 +981,10 @@ int link_layer_101::active_send(){
 int link_layer_101::deal_frame(frame*f){
 	int ret;
 	ctrl_word ctl;
-	ctl.data=f->data[offset_control];
+	if(f->type==FIX_FRAME){
+		ctl.data=f->data[1];
+	}else
+		ctl.data=f->data[offset_control];
 	ret=0;
 	switch(ctl.pm.fc){
 		case 0:
@@ -900,8 +1046,6 @@ int link_layer_101::fc_0(frame*f){
 			link_step++;//5
 		}else if(link_step==7){
 			link_step++;//8
-			build_ack();
-			send_frame(&s_fix_frame);
 			build_link_fini();
 			send_frame(&s_var_frame);
 			link_step++;//9
@@ -930,34 +1074,43 @@ int link_layer_101::fc_3(frame *f){
 	int ret;
 	ret=0;
 	ctl.data=f->data[offset_control];
-	if(balance==BALANCE){
+	if(balance!=BALANCE){
 		if(ctl.pm.fcv){
 			if(ctl.pm.fcb!=ctl_wd_rm.pm.fcb){
 				ctl_wd_rm.data=ctl.data;//save control
-				build_ack();
-				send_frame(&s_fix_frame);//ack
 				ret=on_req(f,balance);
-				if(ret==1){
-					send_frame(&s_var_frame);
-					save_frame(&s_var_frame);//save frame
-					rep_timer.start(REP_TIME);
+				if(ret==0){
+					build_ack(has_data);
+					send_frame(&s_fix_frame);//ack
+				}else{
+					build_nak();
+					send_frame(&s_fix_frame);
 				}
 			}else{
-				send_frame(&last_send_frame);
+				build_nak();
+				send_frame(&s_fix_frame);
 			}
 		}else{
 			build_nak();
 			send_frame(&s_fix_frame);
 		}
-	}else if(balance!=BALANCE){
+	}else if(balance==BALANCE){
 		if(ctl.pm.fcv){
 			if(ctl.pm.fcb!=ctl_wd_rm.pm.fcb){
 				ctl_wd_rm.data=ctl.data;//save control
-				build_ack();
-				send_frame(&s_fix_frame);//ack
+				ret=on_req(f,balance);
+				if(ret==0){
+					build_ack();
+					send_frame(&s_fix_frame);//ack
+					send_frame(&s_var_frame);
+					save_frame(&s_var_frame);//save frame
+					rep_timer.start(REP_TIME);
+				}else{
+					build_nak();
+					send_frame(&s_fix_frame);
+				}
 			}else{
-				build_nak();
-				send_frame(&s_fix_frame);
+				send_frame(&last_send_frame);
 			}
 		}else{
 			build_nak();
@@ -991,7 +1144,7 @@ int link_layer_101::fc_9(frame*f){
 	process=PROCESS_LINK;
 	link_step=1;
 	link_state=LINK_NOCONNECT;
-	build_link_ack(0);
+	build_ack();
 	send_frame(&s_fix_frame);
 	link_step++;//2
 	return 0;
@@ -1015,7 +1168,7 @@ int link_layer_101::fc_10(frame*f){
 				if(ctl.pm.fcb!=ctl_wd_rm.pm.fcb){
 					ctl_wd_rm.data=ctl.data;//save control
 					ret=on_req_class_1(f);
-					if(ret==1){
+					if(ret==0){
 						send_frame(&s_var_frame);
 						save_frame(&s_var_frame);//save frame
 					}
@@ -1023,13 +1176,8 @@ int link_layer_101::fc_10(frame*f){
 					send_frame(&last_send_frame);
 				}
 			}else{
-				if(has_data){
-					build_ack_data();
-					send_frame(&s_fix_frame);
-				}else{
-					build_nak_data();
-					send_frame(&s_fix_frame);
-				}
+				build_nak();
+				send_frame(&s_fix_frame);
 			}
 		}
 	}
@@ -1041,19 +1189,12 @@ int link_layer_101::fc_11(frame *f){
 	int ret;
 	ret=0;
 	ctl.data=f->data[offset_control];
-	if(balance==BALANCE){
-		if(link_step==5){
-			link_step++;//6
-			build_reset_link();
-			send_frame(&s_fix_frame);
-			link_step++;//7
-		}
-	}else if(balance!=BALANCE){
+	if(balance!=BALANCE){
 		if(ctl.pm.fcv){
 			if(ctl.pm.fcb!=ctl_wd_rm.pm.fcb){
 				ctl_wd_rm.data=ctl.data;//save control
 				ret=on_req_class_2(f);
-				if(ret==1){
+				if(ret==0){
 					send_frame(&s_var_frame);
 					save_frame(&s_var_frame);//save frame
 				}
@@ -1061,28 +1202,18 @@ int link_layer_101::fc_11(frame *f){
 				send_frame(&last_send_frame);
 			}
 		}else{
-			if(has_data){
-				build_ack_data();
-				send_frame(&s_fix_frame);
-			}else{
-				build_nak_data();
-				send_frame(&s_fix_frame);
-			}
+			build_nak();
+			send_frame(&s_fix_frame);
 		}
-	}
+	}else if(balance==BALANCE){
+		if(link_step==5){
+			link_step++;//6
+			build_reset_link();
+			send_frame(&s_fix_frame);
+			link_step++;//7
+		}
+	}	
 	return 0;
-}
-unsigned char sum(unsigned char *data,int len){
-	int i;
-	unsigned char _sum;
-	_sum=0;
-	i=0;
-	if(len<0)
-		return 0;
-	while(len--){
-		_sum+=*(data+i);
-	}
-	return _sum;
 }
 int main(){
 	int i;
@@ -1108,14 +1239,14 @@ int main(){
 		link[i].set_link_com(&com[i],i+1);
 	}
 	int loops=0;
-	
+	for(i=0;i<3;i++){
+			com[i].connect();
+	}
 	while(1){
-
 		cout<<endl<<"run loop:"<<loops<<endl;
 		loops++;
-		sleep(2);
+		sleep(1);
 		for(i=0;i<3;i++){
-			com[i].connect();
 			com[i].read(100);
 		}
 		for(i=0;i<3;i++){
