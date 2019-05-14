@@ -13,12 +13,24 @@ using namespace std;
 #include<stdio.h>
 #include<stdlib.h>
 #include<stdarg.h>
+
+#include<sys/select.h>
+#include<sys/time.h>
+#include<sys/types.h>
+#include<unistd.h>
+int g_balance=0;
+char g_filename[20];
 //the physical layer
 #define MAX_COM_BUFFER 1000
 #define TYPE_SERIAL 1
 #define TYPE_ETHERNET 2
 #define TYPE_WIRELESS 3
-
+void sleep_ms(int t){
+	struct timeval tm;
+	tm.tv_sec=t/1000;
+	tm.tv_usec=t*1000;
+	select(4,NULL,NULL,NULL,&tm);
+}
 unsigned char sum(unsigned char *data,int len){
 	int i;
 	unsigned char _sum;
@@ -40,7 +52,7 @@ time_t get_system_time(){
 #define DEBUG_INFO 2
 #define DEBUG_NORMAL 3
 #define DEBUG_BUFF 1000
-char debug_buff[DEBUG_BUFF];
+unsigned char debug_buff[DEBUG_BUFF];
 void debug(int mode,const char *fmt...){
 	const char *color="";
 	const char *default_col="\033[0;m";
@@ -60,11 +72,24 @@ void debug(int mode,const char *fmt...){
 	}
 	va_list arg;
 	va_start(arg,fmt);
-	vsnprintf(debug_buff,DEBUG_BUFF,fmt,arg);
+	vsnprintf((char*)&debug_buff[0],DEBUG_BUFF,fmt,arg);
 	va_end(arg);
 	fprintf(stderr,"%s%s%s",color,debug_buff,default_col);
 }
-
+void dump(unsigned char *data,int len,const char *head=NULL){
+	int i;
+	i=0;
+	if(head!=NULL){
+		debug(DEBUG_INFO,"%s:",head);
+	}
+	while(len--){
+		debug(DEBUG_INFO,"%02hhx ",*(data+i));
+		i++;
+		if(i%16==0)
+			debug(DEBUG_INFO,"\n");
+	}
+	debug(DEBUG_INFO,"\n");
+}
 class basic_com{
 	protected:
 		int read_produce;
@@ -145,7 +170,7 @@ int	serial::init(void *para){
 }
 int serial::connect(){
 	cout<<"connect serial"<<endl;
-	f=fopen("test.dat","rt");
+	f=fopen(g_filename,"rt");
 	return 0;
 
 }
@@ -159,8 +184,10 @@ int serial::read(int len){
 	int l;
 	int i;
 	int c;
+	int m;
 	char *ret;
 	char buff[100];
+	m=0;
 	ret=fgets(buff,len,f);
 	if(ret==NULL)
 		return -1;
@@ -173,8 +200,11 @@ int serial::read(int len){
 			continue;
 
 		c=strtol(&buff[i],NULL,16);
-		debug(DEBUG_INFO,"%02x ",c);
+		debug(DEBUG_INFO,"%02hhx ",c);
 		i++;
+		m++;
+		if(m%16==0)
+			debug(DEBUG_INFO,"\n");
 		*(read_buff_ptr+read_produce)=c;
 		read_produce++;
 		read_produce=read_produce % MAX_COM_BUFFER;
@@ -183,12 +213,8 @@ int serial::read(int len){
 	return l;
 }
 int serial::send(unsigned char *data,int len){
-	cout<<"send serial:"<<len<<endl;
-	int i;
-	for(i=0;i<len;i++){
-		printf("%x ",*((char*)&data[i]));
-	}
-	cout<<endl;
+	debug(DEBUG_NORMAL,"send serial %d:",len);
+	dump(data,len);
 	return len;
 }
 int serial::get_com_state(){
@@ -493,104 +519,41 @@ typedef union _ctrl_word{
 	slv_ctl sl;
 	unsigned char data;
 }ctrl_word;
-
-typedef struct _Vsq {
+typedef struct _vsq_bit{
 	unsigned char n:7;
 	unsigned char sq:1;
-}Vsq;
+}vsq_bit;
+typedef union _vsq {
+	vsq_bit	bit;
+	unsigned char data;
+}vsq;
 typedef struct _send_cause_bit{
 	unsigned char cause:6;
 	unsigned char p_n:1;
 	unsigned char iv:1;
+	unsigned char src:8;//可选的源地址。指的是主站地址
 }send_cause_bit;
 typedef union _send_cause{
-	send_cause_bit scb;
-	unsigned char  scd;
+	send_cause_bit bit;
+	unsigned short  data;
 }send_cause;
+/*
 typedef struct _asdu_header{
 	unsigned char ti;
-	Vsq vsq;
+	vsq vsq;
 	send_cause cause;
 	unsigned short pub_addr;
 	unsigned short data_id;
 }asdu_header;
+*/
+//gb101中的传输规则：
+//线路上低位在前，高位在后；低字节在前，高字节在后。
 //define link state
 #define LINK_NOCONNECT 0
 #define LINK_CONNECT 1
 #define ADDR_SIZE 2
 #define CAUSE_SIZE 2
 #define MSG_ID_SIZE 2			
-class link_layer{
-	public:
-		int port;
-		com_port *com;
-
-		int protocol;//101 104
-		int addr_size;//default 2,value 1 or 2
-		int cause_size;//default 2,value 1 or 2
-		int all_call_data_type;//default 11,value 9 guiyi,11 biaodu,13 float
-		int msg_id_size;//default 2,value 2 or 3
-		int addr;
-
-		int link_state;
-		int link_step;
-		asdu_header asdu;
-
-		timer rep_timer;
-		int rep_times;
-	public:
-		link_layer(){
-			port=0;
-			com=NULL;
-			protocol=101;
-			addr_size=ADDR_SIZE;
-			cause_size=CAUSE_SIZE;
-			msg_id_size=MSG_ID_SIZE;
-			all_call_data_type=11;
-			addr=1;
-
-			link_state=0;
-			link_step=0;
-			addr=0;
-			memset(&asdu,0,sizeof(asdu));
-			
-			rep_times=0;
-			rep_timer.stop();
-		}
-		int set_link_com(com_port*,int port);
-		virtual int get_frame()=0;//get a valid frame from port .if ok notify uplayer;
-		virtual int active_send()=0;//when receive message from uplayer ,analyze data and fill control word,len,cs.and save last frame.start timer.
-		virtual int deal_frame(frame *)=0;
-		int check_state();//cycle check link.do resend 
-		int send_frame(frame *);
-	public:
-		void on_notify(message *msg);
-		void notify(message *msg);
-};
-
-int link_layer::set_link_com(com_port*c,int p){
-	if(c!=NULL){
-		port=p;
-		com=c;
-		cout<<"link link_layer "<<port<<" to com_port "<<c->port_no<<endl;
-		return 0;
-	}
-	return -1;
-}
-int link_layer::send_frame(frame *f){
-	if(com==NULL||f==NULL)
-		return -1;
-	cout<<"send frame of link "<<port<<",physical port :"<<com->port_no<<endl;
-	return com->send(f->data,f->len);
-}
-int link_layer::check_state(){
-	cout<<"check state of link "<<port<<",state:"<<link_state<<endl;
-	return 0;
-}
-typedef struct _fc_table{
-	int fc;
-	int (*func)(frame*);
-}fc_table;
 
 #define BALANCE 1
 
@@ -616,6 +579,7 @@ typedef struct _fc_table{
 #define COMMAND_CLOCK		103
 #define COMMAND_RM_CTL		45
 #define COMMAND_RM_CTL_D	46
+#define COMMAND_LINK_FINI	70
 #define COMMAND_TEST_LINK	104
 #define COMMAND_RESET		105
 #define COMMAND_FILE		210
@@ -682,6 +646,78 @@ typedef struct _fc_table{
 #define PRESERVATION   48~63
 */
 
+class link_layer{
+	public:
+		int port;
+		com_port *com;
+
+		int protocol;//101 104
+		int addr_size;//default 2,value 1 or 2
+		int cause_size;//default 2,value 1 or 2
+		int all_call_data_type;//default 11,value 9 guiyi,11 biaodu,13 float
+		int msg_id_size;//default 2,value 2 or 3
+		int addr;
+		int rm_addr;
+
+		int link_state;
+		int link_step;
+
+		timer rep_timer;
+		int rep_times;
+	public:
+		link_layer(){
+			port=0;
+			com=NULL;
+			protocol=101;
+			addr_size=ADDR_SIZE;
+			cause_size=CAUSE_SIZE;
+			msg_id_size=MSG_ID_SIZE;
+			all_call_data_type=11;
+
+			link_state=0;
+			link_step=0;
+			addr=18;
+			rm_addr=0;
+			
+			rep_times=0;
+			rep_timer.stop();
+		}
+		int set_link_com(com_port*,int port);
+		virtual int get_frame()=0;//get a valid frame from port .if ok notify uplayer;
+		virtual int active_send()=0;//when receive message from uplayer ,analyze data and fill control word,len,cs.and save last frame.start timer.
+		virtual int deal_frame(frame *)=0;
+		int check_state();//cycle check link.do resend 
+		int send_frame(frame *);
+	public:
+		void on_notify(message *msg);
+		void notify(message *msg);
+};
+
+int link_layer::set_link_com(com_port*c,int p){
+	if(c!=NULL){
+		port=p;
+		com=c;
+		cout<<"link link_layer "<<port<<" to com_port "<<c->port_no<<endl;
+		return 0;
+	}
+	return -1;
+}
+int link_layer::send_frame(frame *f){
+	if(com==NULL||f==NULL)
+		return -1;
+	cout<<"send frame of link "<<port<<",physical port :"<<com->port_no<<endl;
+	return com->send(f->data,f->len);
+}
+int link_layer::check_state(){
+	cout<<"check state of link "<<port<<",state:"<<link_state<<endl;
+	return 0;
+}
+typedef struct _fc_table{
+	int fc;
+	int (*func)(frame*);
+}fc_table;
+
+
 #define REP_TIMES 3
 #define REP_TIME  1
 class link_layer_101:public link_layer{
@@ -703,7 +739,10 @@ class link_layer_101:public link_layer{
 
 		ctrl_word ctl_wd_rm;//saved control word from remote.
 		ctrl_word ctl_wd_lo;
+		send_cause cause_rm;
 		send_cause cause_lo;
+		vsq vsq_rm;
+		vsq vsq_lo;
 		int offset_len;
 		int offset_control;
 		int offset_addr;
@@ -721,7 +760,7 @@ class link_layer_101:public link_layer{
 		timer rcv_fix_timer;//接收数据超时计时器
 	public:
 		link_layer_101(){
-			balance=0;
+			balance=g_balance;
 			start_rcv_var_flag=0;
 			r_var_pos=0;
 			s_var_pos=0;
@@ -786,6 +825,7 @@ int link_layer_101::build_ack(int has_data){
 		ctl_wd_lo.sl.acd_rev=has_data;
 		ctl_wd_lo.sl.prm=0;
 		ctl_wd_lo.sl.rev_dir=0;
+
 		s_fix_frame.data[i++]=0x10;
 		s_fix_frame.data[i++]=ctl_wd_lo.data;
 		s_fix_frame.data[i++]=addr&0x00ff;
@@ -802,6 +842,7 @@ int link_layer_101::build_ack(int has_data){
 		ctl_wd_lo.sl.acd_rev=0;
 		ctl_wd_lo.sl.prm=0;
 		ctl_wd_lo.sl.rev_dir=1;
+
 		s_fix_frame.data[i++]=0x10;
 		s_fix_frame.data[i++]=ctl_wd_lo.data;
 		s_fix_frame.data[i++]=addr&0x00ff;
@@ -827,6 +868,7 @@ int link_layer_101::build_link_ack(){
 		ctl_wd_lo.sl.acd_rev=0;
 		ctl_wd_lo.sl.prm=0;
 		ctl_wd_lo.sl.rev_dir=0;
+
 		s_fix_frame.data[i++]=0x10;
 		s_fix_frame.data[i++]=ctl_wd_lo.data;
 		s_fix_frame.data[i++]=addr&0x00ff;
@@ -855,13 +897,100 @@ int link_layer_101::build_link_ack(){
 		s_fix_frame.valid=1;
 	}
 	return 0;
-}int link_layer_101::build_link_req(){
+}
+int link_layer_101::build_link_req(){
+	int i=0;
+	if(balance==1){
+		ctl_wd_lo.sl.fc=9;
+		ctl_wd_lo.sl.dfc=0;
+		ctl_wd_lo.sl.acd_rev=0;
+		ctl_wd_lo.sl.prm=1;
+		ctl_wd_lo.sl.rev_dir=1;
+		s_fix_frame.data[i++]=0x10;
+		s_fix_frame.data[i++]=ctl_wd_lo.data;
+		s_fix_frame.data[i++]=addr&0x00ff;
+		if(addr_size==2){
+			s_fix_frame.data[i++]=addr>>8&0x00ff;
+		}
+		s_fix_frame.data[i++]=sum(&s_fix_frame.data[1],addr_size+1);
+		s_fix_frame.data[i++]=0x16;
+		s_fix_frame.len=i;
+		s_fix_frame.valid=1;
+	}	
 	return 0;
 }
 int link_layer_101::build_link_fini(){
+	int i=0;
+	int len;
+	if(!balance){
+		ctl_wd_lo.sl.fc=3;
+		ctl_wd_lo.sl.dfc=0;
+		ctl_wd_lo.sl.acd_rev=1;
+		ctl_wd_lo.sl.prm=0;
+		ctl_wd_lo.sl.rev_dir=0;
+
+	}else if(balance==BALANCE){
+		ctl_wd_lo.sl.fc=3;
+		ctl_wd_lo.sl.dfc=0;
+		ctl_wd_lo.sl.acd_rev=0;
+		ctl_wd_lo.sl.prm=1;
+		ctl_wd_lo.sl.rev_dir=1;
+	}
+	vsq_lo.bit.n=1;
+	vsq_lo.bit.sq=0;
+	cause_lo.bit.cause=CAUSE_Init;
+
+	s_var_frame.data[i++]=0x68;
+	i++;//for l
+	i++;//for l
+	s_var_frame.data[i++]=0x68;
+	s_var_frame.data[i++]=ctl_wd_lo.data;
+	s_var_frame.data[i++]=addr&0x00ff;
+	if(addr_size==2){
+		s_var_frame.data[i++]=addr>>8&0x00ff;
+	}
+	s_var_frame.data[i++]=COMMAND_LINK_FINI;
+	s_var_frame.data[i++]=vsq_lo.data;
+	s_var_frame.data[i++]=cause_lo.data;
+	if(cause_size==2){
+		s_var_frame.data[i++]=(cause_lo.data>>8&0x00ff);
+	}
+	s_var_frame.data[i++]=addr&0x00ff;
+	if(addr_size==2){
+		s_var_frame.data[i++]=addr>>8&0x00ff;
+	}
+	s_var_frame.data[i++]=0x0;
+	s_var_frame.data[i++]=0x0;
+	s_var_frame.data[i++]=0x0;
+	i++;//for cs
+	s_var_frame.data[i++]=0x16;
+	s_var_frame.len=i;
+	len=i;
+	s_var_frame.data[len-2]=sum(&s_var_frame.data[offset_control],len-6);
+	s_var_frame.data[1]=len-6;
+	s_var_frame.data[2]=len-6;
+	s_var_frame.valid=1;		
 	return 0;
 }
 int link_layer_101::build_reset_link(){
+	int i=0;
+	if(balance==1){
+		ctl_wd_lo.sl.fc=0;
+		ctl_wd_lo.sl.dfc=0;
+		ctl_wd_lo.sl.acd_rev=0;
+		ctl_wd_lo.sl.prm=1;
+		ctl_wd_lo.sl.rev_dir=1;
+		s_fix_frame.data[i++]=0x10;
+		s_fix_frame.data[i++]=ctl_wd_lo.data;
+		s_fix_frame.data[i++]=addr&0x00ff;
+		if(addr_size==2){
+			s_fix_frame.data[i++]=addr>>8&0x00ff;
+		}
+		s_fix_frame.data[i++]=sum(&s_fix_frame.data[1],addr_size+1);
+		s_fix_frame.data[i++]=0x16;
+		s_fix_frame.len=i;
+		s_fix_frame.valid=1;
+	}	
 	return 0;
 }
 int link_layer_101::on_req(frame*f,int balance){
@@ -964,12 +1093,13 @@ int link_layer_101::get_frame(){
 		if(r_fix_pos==(addr_size+4)){
 			if(r_fix_frame.data[r_fix_pos-1]==0x16){
 				if(sum(&r_fix_frame.data[1],addr_size+1)==r_fix_frame.data[r_fix_pos-2]){
-					debug(DEBUG_WARNING,"get fix frame\n");
 					r_fix_frame.len=r_fix_pos;
 					r_fix_frame.valid=1;
 					rcv_fix_timer.stop();
 					start_rcv_fix_flag=0;
 					r_fix_pos=0;
+					debug(DEBUG_NORMAL,"get fix frame %d:",r_fix_frame.len);
+					dump(&r_fix_frame.data[0],r_fix_frame.len);
 					deal_frame(&r_fix_frame);
 					return 1;
 				}else{
@@ -1014,8 +1144,9 @@ int link_layer_101::get_frame(){
 					r_var_pos=0;
 					start_rcv_var_flag=0;
 					rcv_var_timer.stop();
+					debug(DEBUG_INFO,"get var frame %d:",r_var_frame.len);
+					dump(&r_var_frame.data[0],r_var_frame.len);
 					deal_frame(&r_var_frame);
-					debug(DEBUG_WARNING,"get var frame\n");
 					return 1;
 				}else{
 					fail=1;
@@ -1049,13 +1180,41 @@ int link_layer_101::active_send(){
 	}
 	return 0;
 }
+#define BROADCASET_ADDR 0xffff
 int link_layer_101::deal_frame(frame*f){
 	int ret;
+	int tmp;
 	ctrl_word ctl;
+	int req_addr;
 	if(f->type==FIX_FRAME){
 		ctl.data=f->data[1];
-	}else
+		ctl_wd_rm.data=ctl.data;
+		req_addr=f->data[2];
+		if(addr_size==2){
+			tmp=f->data[3];
+			req_addr|=(tmp<<8&0xff00);
+		}
+		if(req_addr!=addr&&req_addr!=BROADCASET_ADDR)
+			return -1;
+
+	}else{
 		ctl.data=f->data[offset_control];
+		ctl_wd_rm.data=ctl.data;
+		vsq_rm.data=f->data[offset_vsq];
+		cause_rm.data=f->data[offset_cause];
+		if(cause_size==2){
+			tmp=f->data[offset_cause+1];
+			cause_rm.data|=(tmp<<8&0xff00);
+			rm_addr=cause_rm.bit.src;
+		}
+		req_addr=f->data[offset_addr];
+		if(addr_size==2){
+			tmp=f->data[offset_addr+1];
+			req_addr|=(tmp<<8&0xff00);
+		}
+		if(req_addr!=addr&&req_addr!=BROADCASET_ADDR)
+			return -1;
+	}
 	ret=0;
 	switch(ctl.pm.fc){
 		case 0:
@@ -1124,6 +1283,7 @@ int link_layer_101::fc_0(frame*f){
 			link_step++;//10
 			link_state=LINK_CONNECT;
 			process=0;
+			debug(DEBUG_ERROR,"connect\n");
 		}else{//receive ack frame
 			rep_timer.stop();
 			rep_times=0;
@@ -1233,6 +1393,7 @@ int link_layer_101::fc_10(frame*f){
 			send_frame(&s_var_frame);
 			link_step++;//6
 			link_state=LINK_CONNECT;
+			debug(DEBUG_ERROR,"connect\n");
 			process=0;
 		}else{
 			if(ctl.pm.fcv){
@@ -1286,7 +1447,17 @@ int link_layer_101::fc_11(frame *f){
 	}	
 	return 0;
 }
-int main(){
+int main(int arg,char **argv){
+	if(arg<=1){
+		g_balance=1;
+		strcpy(g_filename,"test.dat");
+	}else if(arg<=2){
+		g_balance=atoi(argv[1]);
+		strcpy(g_filename,"test.dat");
+	}else if(arg<=3){
+		g_balance=atoi(argv[1]);
+		strcpy(g_filename,argv[2]);
+	}
 	int i;
 	com_port com[3];
 	serial_set serial_set_1;
@@ -1316,7 +1487,7 @@ int main(){
 	while(1){
 		cout<<endl<<"run loop:"<<loops<<endl;
 		loops++;
-		sleep(1);
+		sleep_ms(10);
 		for(i=0;i<3;i++){
 			com[i].read(100);
 		}
