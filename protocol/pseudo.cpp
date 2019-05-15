@@ -6,7 +6,6 @@
  ************************************************************************/
 
 #include<iostream>
-using namespace std;
 #include<unistd.h>
 #include<string.h>
 #include<time.h>
@@ -18,6 +17,7 @@ using namespace std;
 #include<sys/time.h>
 #include<sys/types.h>
 #include<unistd.h>
+using namespace std;
 int g_balance=0;
 char g_filename[20];
 //the physical layer
@@ -194,13 +194,13 @@ int serial::read(int len){
 	if(buff[0]=='R')
 		return -1;
 	l=strlen(buff);
-	debug(DEBUG_NORMAL,"read:");
+	//debug(DEBUG_NORMAL,"read:");
 	for(i=0;i<l;i++){
 		if(buff[i]=='T'||buff[i]=='X'||buff[i]==':'||buff[i]==' ')
 			continue;
 
 		c=strtol(&buff[i],NULL,16);
-		debug(DEBUG_INFO,"%02hhx ",c);
+		//debug(DEBUG_INFO,"%02hhx ",c);
 		i++;
 		m++;
 		if(m%16==0)
@@ -209,7 +209,7 @@ int serial::read(int len){
 		read_produce++;
 		read_produce=read_produce % MAX_COM_BUFFER;
 	}
-	debug(DEBUG_NORMAL,"\n");
+	//debug(DEBUG_NORMAL,"\n");
 	return l;
 }
 int serial::send(unsigned char *data,int len){
@@ -463,6 +463,12 @@ class fix_frame:public frame{
 			type=FIX_FRAME;
 		}
 };
+class frame_104:public frame{
+	public:
+		frame_104(){
+			type=FRAME_104;
+		}
+};
 class timer{
 	public:
 		timer(){
@@ -488,6 +494,7 @@ int timer::start(int T){
 		cout<<"timer has started"<<endl;
 		return -1;
 	}
+	start_flag=1;
 	exp_time=get_system_time()+T;
 	cout<<"start timer"<<endl;
 	return 0;
@@ -538,15 +545,7 @@ typedef union _send_cause{
 	send_cause_bit bit;
 	unsigned short  data;
 }send_cause;
-/*
-typedef struct _asdu_header{
-	unsigned char ti;
-	vsq vsq;
-	send_cause cause;
-	unsigned short pub_addr;
-	unsigned short data_id;
-}asdu_header;
-*/
+
 //gb101中的传输规则：
 //线路上低位在前，高位在后；低字节在前，高字节在后。
 //define link state
@@ -558,23 +557,23 @@ typedef struct _asdu_header{
 
 #define BALANCE 1
 
-#define PROCESS_LINK		1
-#define PROCESS_SUMMON		2
-#define PROCESS_CLOCKSYN	3
-#define PROCESS_CLOCKRD		4
-#define PROCESS_RM_CTL		5
-#define PROCESS_TEST_LINK	6
-#define PROCESS_HART		7
-#define PROCESS_RESET		8
-#define PROCESS_RD_DIR		9
-#define PROCESS_RD_FILE		10 
-#define PROCESS_WR_FILE		11
-#define PROCESS_RD_DZ		12
-#define PROCESS_WR_DZ		13
-#define PROCESS_RD_DZ_UNIT	14
-#define PROCESS_WR_DZ_UNIT	15
-#define PROCESS_SUMMON_ACC	16//累计量
-#define PROCESS_UPDATE		17
+#define PROCESS_LINK		1<<0
+#define PROCESS_SUMMON		1<<1
+#define PROCESS_CLOCKSYN	1<<2
+#define PROCESS_CLOCKRD		1<<3
+#define PROCESS_RM_CTL		1<<4
+#define PROCESS_TEST_LINK	1<<5
+#define PROCESS_HART		1<<6
+#define PROCESS_RESET		1<<7
+#define PROCESS_RD_DIR		1<<8
+#define PROCESS_RD_FILE		1<<9
+#define PROCESS_WR_FILE		1<<10
+#define PROCESS_RD_DZ		1<<11
+#define PROCESS_WR_DZ		1<<12
+#define PROCESS_RD_DZ_UNIT	1<<13
+#define PROCESS_WR_DZ_UNIT	1<<14
+#define PROCESS_SUMMON_ACC	1<<15//累计量
+#define PROCESS_UPDATE		1<<16
 
 #define COMMAND_SUMMON		100
 #define COMMAND_CLOCK		103
@@ -646,11 +645,25 @@ typedef struct _asdu_header{
 /*
 #define PRESERVATION   48~63
 */
-
+class link_layer;
+//app_layer is only deal asdu part
+class app_layer{
+	public:
+		vsq vsq_lo;
+		send_cause cause_lo;
+	public:
+		app_layer(){
+			vsq_lo.data=0;
+			cause_lo.data=0;
+		}
+		int build_link_fini(frame *out,link_layer *link);
+		int build_summon_ack(frame *out,link_layer *link);
+};
 class link_layer{
 	public:
 		int port;
 		com_port *com;
+		app_layer*app;
 
 		int protocol;//101 104
 		int addr_size;//default 2,value 1 or 2
@@ -663,10 +676,6 @@ class link_layer{
 		int link_state;
 		int link_step;
 
-		vsq vsq_rm;
-		vsq vsq_lo;
-		send_cause cause_rm;
-		send_cause cause_lo;
 		//101的可变帧与104的帧用同一缓冲区
 		var_frame last_send_frame;
 		var_frame r_var_frame;
@@ -674,6 +683,10 @@ class link_layer{
 		int start_rcv_var_flag;
 		int r_var_pos;
 		int s_var_pos;
+		int exp_len;
+
+		vsq vsq_rm;
+		send_cause cause_rm;
 
 		int offset_asdu;
 		int offset_ti;
@@ -685,6 +698,7 @@ class link_layer{
 
 		timer rep_timer;
 		int rep_times;
+		timer rcv_var_timer;//接收数据超时计时器
 	public:
 		link_layer(){
 			port=0;
@@ -692,7 +706,7 @@ class link_layer{
 			protocol=101;
 			addr_size=ADDR_SIZE;
 			cause_size=CAUSE_SIZE;
-			msg_id_size=MSG_ID_SIZE;
+			msg_id_size=MSG_ID_SIZE;//101 is 2,104 is 3,so generation class 104 need redefine it.----- 
 			all_call_data_type=11;
 
 			link_state=0;
@@ -703,25 +717,107 @@ class link_layer{
 			start_rcv_var_flag=0;
 			r_var_pos=0;
 			s_var_pos=0;
+
+			vsq_rm.data=0;
+			cause_rm.data=0;
 	
 			rep_times=0;
 			rep_timer.stop();
+			rcv_var_timer.stop();
 		}
 		int set_link_com(com_port*,int port);
+		int set_app(app_layer*);
 		virtual int get_frame()=0;//get a valid frame from port.
 		virtual int active_send()=0;
 		virtual int deal_frame(frame *)=0;
-		int check_state();//cycle check link.do resend 
+		int check_state();//cycle check link state
 		int send_frame(frame *);
 	public:
-		virtual int build_link_layer(int)=0;
-		virtual int build_link_fini()=0;
+		virtual int build_link_layer(frame *out,int)=0;
+		virtual int build_link_fini(frame *out)=0;
+		virtual int build_summon_ack(frame *out)=0;
 
-		int _build_link_fini();//build asdu
 		void on_notify(message *msg);
 		void notify(message *msg);
 };
+//build asdu of link_fini command 
+int app_layer::build_link_fini(frame*out,link_layer*link){
+	int i;
+	int offset;
+	int addr_size;
+	int cause_size;
+	int msg_id_size;
+	int addr;
+	offset=link->offset_asdu;
+	addr_size=link->addr_size;
+	cause_size=link->cause_size;
+	msg_id_size=link->msg_id_size;
+	addr=link->addr;
 
+	vsq_lo.bit.n=1;
+	vsq_lo.bit.sq=0;
+	cause_lo.bit.cause=CAUSE_Init;
+
+	i=0;
+	out->data[offset+i++]=COMMAND_LINK_FINI;
+	out->data[offset+i++]=vsq_lo.data;
+	out->data[offset+i++]=cause_lo.data;
+	if(cause_size==2){
+		out->data[offset+i++]=(cause_lo.data>>8&0x00ff);
+	}
+	out->data[offset+i++]=addr&0x00ff;
+	if(addr_size==2){
+		out->data[offset+i++]=addr>>8&0x00ff;
+	}
+	out->data[offset+i++]=0x0;
+	out->data[offset+i++]=0x0;
+	if(msg_id_size==3)
+		out->data[offset+i++]=0x0;
+	out->data[offset+i++]=0x0;
+	return i;
+}
+int app_layer::build_summon_ack(frame*out,link_layer*link){
+	int i;
+	int offset;
+	int addr_size;
+	int cause_size;
+	int msg_id_size;
+	int addr;
+	offset=link->offset_asdu;
+	addr_size=link->addr_size;
+	cause_size=link->cause_size;
+	msg_id_size=link->msg_id_size;
+	addr=link->addr;
+
+	vsq_lo.bit.n=1;
+	vsq_lo.bit.sq=0;
+	cause_lo.bit.cause=CAUSE_Actcon;
+
+	i=0;
+	out->data[offset+i++]=COMMAND_SUMMON;
+	out->data[offset+i++]=vsq_lo.data;
+	out->data[offset+i++]=cause_lo.data;
+	if(cause_size==2){
+		out->data[offset+i++]=(cause_lo.data>>8&0x00ff);
+	}
+	out->data[offset+i++]=addr&0x00ff;
+	if(addr_size==2){
+		out->data[offset+i++]=addr>>8&0x00ff;
+	}
+	out->data[offset+i++]=0x0;
+	out->data[offset+i++]=0x0;
+	if(msg_id_size==3)
+		out->data[offset+i++]=0;
+	out->data[offset+i++]=20;
+	return i;
+}
+typedef struct _fc_table{
+	int fc;
+	int (*func)(frame*);
+}fc_table;
+
+#define REP_TIMES 3
+#define REP_TIME  1
 int link_layer::set_link_com(com_port*c,int p){
 	if(c!=NULL){
 		port=p;
@@ -731,50 +827,29 @@ int link_layer::set_link_com(com_port*c,int p){
 	}
 	return -1;
 }
+int link_layer::set_app(app_layer*ap){
+	app=ap;
+	return 0;
+}
 int link_layer::send_frame(frame *f){
+	int ret;
 	if(com==NULL||f==NULL)
 		return -1;
 	cout<<"send frame of link "<<port<<",physical port :"<<com->port_no<<endl;
-	return com->send(f->data,f->len);
+	if(f->valid==1){
+		ret=com->send(f->data,f->len);
+		f->valid=0;
+	}
+	return ret;
 }
 int link_layer::check_state(){
 	cout<<"check state of link "<<port<<",state:"<<link_state<<endl;
 	return 0;
 }
-int link_layer::_build_link_fini(){
-	int i=0;
-	vsq_lo.bit.n=1;
-	vsq_lo.bit.sq=0;
-	cause_lo.bit.cause=CAUSE_Init;
-	i=0;
-	s_var_frame.data[offset_asdu+i++]=COMMAND_LINK_FINI;
-	s_var_frame.data[offset_asdu+i++]=vsq_lo.data;
-	s_var_frame.data[offset_asdu+i++]=cause_lo.data;
-	if(cause_size==2){
-		s_var_frame.data[offset_asdu+i++]=(cause_lo.data>>8&0x00ff);
-	}
-	s_var_frame.data[offset_asdu+i++]=addr&0x00ff;
-	if(addr_size==2){
-		s_var_frame.data[offset_asdu+i++]=addr>>8&0x00ff;
-	}
-	s_var_frame.data[offset_asdu+i++]=0x0;
-	s_var_frame.data[offset_asdu+i++]=0x0;
-	s_var_frame.data[offset_asdu+i++]=0x0;
-	return i;
-}
-typedef struct _fc_table{
-	int fc;
-	int (*func)(frame*);
-}fc_table;
-
-
-#define REP_TIMES 3
-#define REP_TIME  1
 class link_layer_101:public link_layer{
 	public:
 		int balance;//1 balance,0 no balance
-		
-
+		//fix frame is only for 101,so i define it in this.
 		fix_frame r_fix_frame;
 		fix_frame s_fix_frame;
 		int start_rcv_fix_flag;
@@ -789,7 +864,6 @@ class link_layer_101:public link_layer{
 
 		int has_data;
 		
-		timer rcv_var_timer;//接收数据超时计时器
 		timer rcv_fix_timer;//接收数据超时计时器
 	public:
 		link_layer_101(){
@@ -799,7 +873,6 @@ class link_layer_101:public link_layer{
 			r_fix_pos=0;
 			s_fix_pos=0;
 
-			rcv_var_timer.stop();
 			rcv_fix_timer.stop();
 
 			ctl_rm.data=0;
@@ -831,24 +904,58 @@ class link_layer_101:public link_layer{
 		int fc_10(frame *);
 		int fc_11(frame *);
 	public:
-		int process;//which process is in.
-		int build_link_layer(int asdu_len);//by asdu build link frame.
-		int build_ack(int has_data=0);//fc0	,fix frame,has_data indicator if have class 1 data for no balance.
-		int build_nak();//fc1, fix frame
-		int build_err_rep(frame *,int err);//?
-		int build_link_ack();//fc11,fix frame,
-		int build_link_req();//fc9,fix frame,for balance.
-		int build_link_fini();//fc3,var frame 
-		int build_reset_link();//fc0,fix frame,for balance
-		int on_req_class_1(frame *);//fc8 or fc9,response fc10,for no balance
-		int on_req_class_2(frame *);//fc8 or fc9,response fc11,for no balance
-		int on_req(frame*,int balance);//fc0 or fc1,response fc3
+		long process;//which process is in.
+		int build_link_layer(frame *out,int asdu_len);//by asdu build link frame.
+		int build_ack(frame *out,int has_data=0);//set fc=0,fix frame,has_data indicator if have class 1 data,used for unbalance.
+		int build_nak(frame *out);//set fc=1, fix frame
+		int build_err_rep(frame *out,int err);//?
+		int build_link_ack(frame *out);//set fc=11,fix frame,
+		int build_link_req(frame *out);//set fc=9,fix frame,for balance.
+		int build_link_fini(frame *out);//set fc=3(balance) or fc=8(unbalance),var frame 
+		int build_summon_ack(frame *out);//set fc=3(balance) or fc=8(unbalance),var frame 
+		int build_reset_link(frame *out);//set fc=0,fix frame,for balance
+		int on_req_class_1(frame *in,frame *out);//set fc=8 or fc=9,response fc10,for unbalance
+		int on_req_class_2(frame *in,frame *out);//set fc=8 or fc=9,response fc11,for unbalance
+		int on_req(frame *in,frame *out);//set fc=0 or fc=1,response fc3
 		int get_frame();
 		int active_send();//for balance
-		int deal_frame(frame *);
+		int deal_frame(frame *in);
 		int save_frame(frame *);
 };
-int link_layer_101::build_ack(int has_data){
+int link_layer_101::build_link_layer(frame*out,int asdu_len){
+	int l;
+	int len;
+	switch(addr_size){
+		case 0:
+			l=asdu_len+1;
+			break;
+		case 1:
+			l=asdu_len+2;
+			break;
+		case 2:
+			l=asdu_len+3;
+			break;
+		default:
+			debug(DEBUG_ERROR,"error addr_size:%d",addr_size);
+			return -1;
+	}
+	len=l+6;
+	out->data[0]=0x68;
+	out->data[1]=l;
+	out->data[2]=l;
+	out->data[3]=0x68;
+	out->data[4]=ctl_lo.data;
+	out->data[5]=addr&0x00ff;
+	if(addr_size==2){
+		out->data[6]=addr>>8&0x00ff;
+	}
+	out->data[len-2]=sum(&out->data[offset_control],l);
+	out->data[len-1]=0x16;
+	out->len=len;
+	out->valid=1;
+	return len;
+}
+int link_layer_101::build_ack(frame*out,int has_data){
 	int i;
 	i=0;
 	if(!balance){
@@ -864,19 +971,19 @@ int link_layer_101::build_ack(int has_data){
 		ctl_lo.sl.prm=0;
 		ctl_lo.sl.rev_dir=1;
 	}
-	s_fix_frame.data[i++]=0x10;
-	s_fix_frame.data[i++]=ctl_lo.data;
-	s_fix_frame.data[i++]=addr&0x00ff;
+	out->data[i++]=0x10;
+	out->data[i++]=ctl_lo.data;
+	out->data[i++]=addr&0x00ff;
 	if(addr_size==2){
-		s_fix_frame.data[i++]=addr>>8&0x00ff;
+		out->data[i++]=addr>>8&0x00ff;
 	}
-	s_fix_frame.data[i++]=sum(&s_fix_frame.data[1],addr_size+1);
-	s_fix_frame.data[i++]=0x16;
-	s_fix_frame.len=i;
-	s_fix_frame.valid=1;
+	out->data[i++]=sum(&out->data[1],addr_size+1);
+	out->data[i++]=0x16;
+	out->len=i;
+	out->valid=1;
 	return i;
 }
-int link_layer_101::build_nak(){
+int link_layer_101::build_nak(frame*out){
 	int i;
 	i=0;
 	if(!balance){
@@ -892,19 +999,19 @@ int link_layer_101::build_nak(){
 		ctl_lo.sl.prm=0;
 		ctl_lo.sl.rev_dir=1;
 	}
-	s_fix_frame.data[i++]=0x10;
-	s_fix_frame.data[i++]=ctl_lo.data;
-	s_fix_frame.data[i++]=addr&0x00ff;
+	out->data[i++]=0x10;
+	out->data[i++]=ctl_lo.data;
+	out->data[i++]=addr&0x00ff;
 	if(addr_size==2){
-		s_fix_frame.data[i++]=addr>>8&0x00ff;
+		out->data[i++]=addr>>8&0x00ff;
 	}
-	s_fix_frame.data[i++]=sum(&s_fix_frame.data[1],addr_size+1);
-	s_fix_frame.data[i++]=0x16;
-	s_fix_frame.len=i;
-	s_fix_frame.valid=1;
+	out->data[i++]=sum(&out->data[1],addr_size+1);
+	out->data[i++]=0x16;
+	out->len=i;
+	out->valid=1;
 	return i;
 }
-int link_layer_101::build_link_ack(){
+int link_layer_101::build_link_ack(frame*out){
 	int i;
 	i=0;
 	if(!balance){
@@ -920,19 +1027,19 @@ int link_layer_101::build_link_ack(){
 		ctl_lo.sl.prm=0;
 		ctl_lo.sl.rev_dir=1;
 	}
-	s_fix_frame.data[i++]=0x10;
-	s_fix_frame.data[i++]=ctl_lo.data;
-	s_fix_frame.data[i++]=addr&0x00ff;
+	out->data[i++]=0x10;
+	out->data[i++]=ctl_lo.data;
+	out->data[i++]=addr&0x00ff;
 	if(addr_size==2){
-		s_fix_frame.data[i++]=addr>>8&0x00ff;
+		out->data[i++]=addr>>8&0x00ff;
 	}
-	s_fix_frame.data[i++]=sum(&s_fix_frame.data[1],addr_size+1);
-	s_fix_frame.data[i++]=0x16;
-	s_fix_frame.len=i;
-	s_fix_frame.valid=1;
+	out->data[i++]=sum(&out->data[1],addr_size+1);
+	out->data[i++]=0x16;
+	out->len=i;
+	out->valid=1;
 	return i;
 }
-int link_layer_101::build_link_req(){
+int link_layer_101::build_link_req(frame*out){
 	int i=0;
 	if(balance==1){
 		ctl_lo.pm.fc=9;
@@ -940,55 +1047,23 @@ int link_layer_101::build_link_req(){
 		ctl_lo.pm.fcv=0;
 		ctl_lo.pm.prm=1;
 		ctl_lo.pm.rev_dir=1;
-		s_fix_frame.data[i++]=0x10;
-		s_fix_frame.data[i++]=ctl_lo.data;
-		s_fix_frame.data[i++]=addr&0x00ff;
+		out->data[i++]=0x10;
+		out->data[i++]=ctl_lo.data;
+		out->data[i++]=addr&0x00ff;
 		if(addr_size==2){
-			s_fix_frame.data[i++]=addr>>8&0x00ff;
+			out->data[i++]=addr>>8&0x00ff;
 		}
-		s_fix_frame.data[i++]=sum(&s_fix_frame.data[1],addr_size+1);
-		s_fix_frame.data[i++]=0x16;
-		s_fix_frame.len=i;
-		s_fix_frame.valid=1;
+		out->data[i++]=sum(&out->data[1],addr_size+1);
+		out->data[i++]=0x16;
+		out->len=i;
+		out->valid=1;
 	}	
 	return 0;
 }
-int link_layer_101::build_link_layer(int asdu_len){
-	int l;
-	int len;
-	switch(addr_size){
-		case 0:
-			l=asdu_len+1;
-			break;
-		case 1:
-			l=asdu_len+2;
-			break;
-		case 2:
-			l=asdu_len+3;
-			break;
-		default:
-			return -1;
-	}
-	len=l+6;
-	s_var_frame.data[0]=0x68;
-	s_var_frame.data[1]=l;
-	s_var_frame.data[2]=l;
-	s_var_frame.data[3]=0x68;
-	s_var_frame.data[4]=ctl_lo.data;
-	s_var_frame.data[5]=addr&0x00ff;
-	if(addr_size==2){
-		s_var_frame.data[6]=addr>>8&0x00ff;
-	}
-	s_var_frame.data[len-2]=sum(&s_var_frame.data[offset_control],l);
-	s_var_frame.data[len-1]=0x16;
-	s_var_frame.len=len;
-	s_var_frame.valid=1;
-	return len;
-}
-int link_layer_101::build_link_fini(){
+int link_layer_101::build_link_fini(frame *out){
 	int ret;
 	if(!balance){
-		ctl_lo.sl.fc=3;
+		ctl_lo.sl.fc=8;
 		ctl_lo.sl.dfc=0;
 		ctl_lo.sl.acd_rev=1;
 		ctl_lo.sl.prm=0;
@@ -1001,13 +1076,29 @@ int link_layer_101::build_link_fini(){
 		ctl_lo.pm.prm=1;
 		ctl_lo.pm.rev_dir=1;
 	}
-	ret=_build_link_fini();
-	if(ret==-1)
-		return ret;
-	return build_link_layer(ret);
+	ret=app->build_link_fini(out,this);
+	return build_link_layer(out,ret);
 }
+int link_layer_101::build_summon_ack(frame *out){
+	int ret;
+	if(!balance){
+		ctl_lo.sl.fc=8;
+		ctl_lo.sl.dfc=0;
+		ctl_lo.sl.acd_rev=1;
+		ctl_lo.sl.prm=0;
+		ctl_lo.sl.rev_dir=0;
 
-int link_layer_101::build_reset_link(){
+	}else if(balance==BALANCE){
+		ctl_lo.pm.fc=3;
+		ctl_lo.pm.fcv=1;
+		ctl_lo.pm.fcb=!ctl_lo.pm.fcb;
+		ctl_lo.pm.prm=1;
+		ctl_lo.pm.rev_dir=1;
+	}
+	ret=app->build_summon_ack(out,this);
+	return build_link_layer(out,ret);
+}
+int link_layer_101::build_reset_link(frame*out){
 	int i=0;
 	if(balance==1){
 		ctl_lo.pm.fc=0;
@@ -1015,74 +1106,75 @@ int link_layer_101::build_reset_link(){
 		ctl_lo.pm.fcb=0;
 		ctl_lo.pm.prm=1;
 		ctl_lo.pm.rev_dir=1;
-		s_fix_frame.data[i++]=0x10;
-		s_fix_frame.data[i++]=ctl_lo.data;
-		s_fix_frame.data[i++]=addr&0x00ff;
+		out->data[i++]=0x10;
+		out->data[i++]=ctl_lo.data;
+		out->data[i++]=addr&0x00ff;
 		if(addr_size==2){
-			s_fix_frame.data[i++]=addr>>8&0x00ff;
+			out->data[i++]=addr>>8&0x00ff;
 		}
-		s_fix_frame.data[i++]=sum(&s_fix_frame.data[1],addr_size+1);
-		s_fix_frame.data[i++]=0x16;
-		s_fix_frame.len=i;
-		s_fix_frame.valid=1;
+		out->data[i++]=sum(&out->data[1],addr_size+1);
+		out->data[i++]=0x16;
+		out->len=i;
+		out->valid=1;
 	}	
 	return 0;
 }
-int link_layer_101::on_req(frame*f,int balance){
+int link_layer_101::on_req(frame *in,frame *out){
 	int ret;
 	ret=0;
 	int ti;
-	ti=f->data[offset_ti];
+	ti=in->data[offset_ti];
 	int cause;
-	cause=f->data[offset_cause];
+	cause=in->data[offset_cause];
 	int act=0;//for file command
 	switch(ti){
 		case COMMAND_SUMMON://total sum
-			process=PROCESS_SUMMON;
+			process|=PROCESS_SUMMON;
+			build_summon_ack(out);
 			break;
 		case COMMAND_CLOCK://clock 
 			if(cause==6){
-				process=PROCESS_CLOCKSYN;
+				process|=PROCESS_CLOCKSYN;
 			}else if(cause==5){
-				process=PROCESS_CLOCKRD;
+				process|=PROCESS_CLOCKRD;
 			}
 			break;
 		case COMMAND_RM_CTL:
 		case COMMAND_RM_CTL_D:
-			process=PROCESS_RM_CTL;
+			process|=PROCESS_RM_CTL;
 			break;
 		case COMMAND_TEST_LINK:
-			process=PROCESS_TEST_LINK;
+			process|=PROCESS_TEST_LINK;
 			break;
 		case COMMAND_RESET:
-			process=PROCESS_RESET;
+			process|=PROCESS_RESET;
 			break;
 		case COMMAND_FILE:
 			if(act==1){
-				process=PROCESS_RD_DIR;
+				process|=PROCESS_RD_DIR;
 			}else if(act==3){
-				process=PROCESS_RD_FILE;
+				process|=PROCESS_RD_FILE;
 			}else if(act==7){
-				process=PROCESS_WR_FILE;
+				process|=PROCESS_WR_FILE;
 			}
 			break;
 		case COMMAND_RD_DZ_UNIT:
-			process=PROCESS_RD_DZ_UNIT;
+			process|=PROCESS_RD_DZ_UNIT;
 			break;
 		case COMMAND_RD_DZ:
-			process=PROCESS_RD_DZ;
+			process|=PROCESS_RD_DZ;
 			break;
 		case COMMAND_WR_DZ:
-			process=PROCESS_WR_DZ;
+			process|=PROCESS_WR_DZ;
 			break;
 		case COMMAND_WR_DZ_UNIT:
-			process=PROCESS_WR_DZ_UNIT;
+			process|=PROCESS_WR_DZ_UNIT;
 			break;
 		case COMMAND_SUMMON_ACC:
-			process=PROCESS_SUMMON_ACC;
+			process|=PROCESS_SUMMON_ACC;
 			break;
 		case COMMAND_UPDATE:
-			process=PROCESS_UPDATE;
+			process|=PROCESS_UPDATE;
 			break;
 		default:
 			ret=-1;
@@ -1090,11 +1182,11 @@ int link_layer_101::on_req(frame*f,int balance){
 	}
 	return ret;
 }
-int link_layer_101::on_req_class_1(frame*f){
+int link_layer_101::on_req_class_1(frame *in,frame *out){
 	cout<<"on_req_class_1"<<endl;
 	return 0;
 }
-int link_layer_101::on_req_class_2(frame *f){
+int link_layer_101::on_req_class_2(frame *in,frame *out){
 	cout<<"on_req_class_2"<<endl;
 	return 0;
 }
@@ -1107,7 +1199,6 @@ int link_layer_101::save_frame(frame *f){
 int link_layer_101::get_frame(){
 	int ret;
 	char c;
-	int exp_len;
 	int fail=0;
 	if(com==NULL)
 		return -1;
@@ -1162,17 +1253,17 @@ int link_layer_101::get_frame(){
 			start_rcv_var_flag=1;
 			rcv_var_timer.start(3);
 			r_var_pos=0;
-			exp_len=0;
+			exp_len=3;
 		}
 	}
 	if(start_rcv_var_flag){
 		r_var_frame.data[r_var_pos]=c;
 		r_var_pos++;
 		if(r_var_pos==3){
-			exp_len=(r_var_frame.data[r_var_pos]+6);
+			exp_len=(r_var_frame.data[r_var_pos-1]+6);
 		}
 		if(r_var_pos==exp_len){
-			if(r_var_frame.data[r_var_pos]==0x16&&r_var_frame.data[offset_len]==r_var_frame.data[offset_len+1]){
+			if(r_var_frame.data[r_var_pos-1]==0x16&&r_var_frame.data[offset_len]==r_var_frame.data[offset_len+1]){
 				if(r_var_frame.data[r_var_pos-2]==sum(&r_var_frame.data[offset_control],exp_len-6)){
 					r_var_frame.len=r_var_pos;
 					r_var_frame.valid=1;
@@ -1206,11 +1297,15 @@ int link_layer_101::get_frame(){
 }
 int link_layer_101::active_send(){
 	cout<<"active send  101 frame of link "<<port<<endl;
+	if(balance==0)
+		return -1;
 	if(rep_timer.is_reached()==1){
 		send_frame(&last_send_frame);
 		rep_times++;
-		if(rep_times==REP_TIMES){
+		if(rep_times>=REP_TIMES){
 			link_state=LINK_NOCONNECT;
+		}else{
+			rep_timer.start(REP_TIME);
 		}
 	}
 	return 0;
@@ -1219,36 +1314,42 @@ int link_layer_101::active_send(){
 int link_layer_101::deal_frame(frame*f){
 	int ret;
 	int tmp;
-	ctrl_word ctl;
+	ctrl_word ctl;//tmp ctl  
+	send_cause cause;//tmp cause.
 	int req_addr;
 	if(f->type==FIX_FRAME){
 		ctl.data=f->data[1];
-		ctl_rm.data=ctl.data;
 		req_addr=f->data[2];
 		if(addr_size==2){
 			tmp=f->data[3];
 			req_addr|=(tmp<<8&0xff00);
 		}
-		if(req_addr!=addr&&req_addr!=BROADCASET_ADDR)
+		if(req_addr!=addr&&req_addr!=BROADCASET_ADDR){
+			debug(DEBUG_ERROR,"invalid address\n");
 			return -1;
-
-	}else{
+		}
+	}else if(f->type==VAR_FRAME){
 		ctl.data=f->data[offset_control];
-		ctl_rm.data=ctl.data;
-		vsq_rm.data=f->data[offset_vsq];
-		cause_rm.data=f->data[offset_cause];
+		//next routine for get src addr 
+		cause.data=f->data[offset_cause];
 		if(cause_size==2){
 			tmp=f->data[offset_cause+1];
-			cause_rm.data|=(tmp<<8&0xff00);
-			rm_addr=cause_rm.bit.src;
+			cause.data|=(tmp<<8&0xff00);
+			rm_addr=cause.bit.src;
 		}
+
 		req_addr=f->data[offset_addr];
 		if(addr_size==2){
 			tmp=f->data[offset_addr+1];
 			req_addr|=(tmp<<8&0xff00);
 		}
-		if(req_addr!=addr&&req_addr!=BROADCASET_ADDR)
+		if(req_addr!=addr&&req_addr!=BROADCASET_ADDR){
+			debug(DEBUG_ERROR,"invalid address\n");
 			return -1;
+		}
+	}else{
+		debug(DEBUG_ERROR,"invalid frame type\n");
+		return -1;
 	}
 	ret=0;
 	switch(ctl.pm.fc){
@@ -1295,29 +1396,33 @@ int link_layer_101::fc_0(frame*f){
 	cout<<"fc_0"<<endl;
 	if(balance!=BALANCE){
 		if(link_step==2){
-			ctl_lo.pm.fcb=0;
-			ctl_rm.pm.fcb=1;//because remote first fcv valid frame's fcb is 0,so at this time rever it.
 			link_step++;//3
-			build_ack();
+			//because remote reset link so reset ctl_lo and ctl_rm
+			ctl_lo.pm.fcb=0;
+			ctl_rm.pm.fcb=0;
+			build_ack(&s_fix_frame,1);
 			send_frame(&s_fix_frame);
 			link_step++;//4
 		}
 	}else if(balance==BALANCE){
 		if(link_step==2){
+			//because remote reset link so reset ctl_lo and ctl_rm
 			ctl_lo.pm.fcb=0;
-			ctl_rm.pm.fcb=1;//because remote first fcv valid frame's fcb is 0,so at this time rever it.
+			ctl_rm.pm.fcb=0;
 			link_step++;//3
-			build_ack();
+			build_ack(&s_fix_frame);
 			send_frame(&s_fix_frame);
 			link_step++;//4
-			build_link_req();
+			build_link_req(&s_fix_frame);
 			send_frame(&s_fix_frame);
 			link_step++;//5
 		}else if(link_step==7){
 			link_step++;//8
-			build_link_fini();
+			build_link_fini(&s_var_frame);
 			send_frame(&s_var_frame);
 			link_step++;//9
+			save_frame(&s_var_frame);//save frame
+			rep_timer.start(REP_TIME);
 		}else if(link_step==9){
 			link_step++;//10
 			link_state=LINK_CONNECT;
@@ -1348,42 +1453,42 @@ int link_layer_101::fc_3(frame *f){
 		if(ctl.pm.fcv){
 			if(ctl.pm.fcb!=ctl_rm.pm.fcb){
 				ctl_rm.data=ctl.data;//save control
-				ret=on_req(f,balance);
+				ret=on_req(f,&s_var_frame);
 				if(ret==0){
-					build_ack(has_data);
+					build_ack(&s_fix_frame,has_data);
 					send_frame(&s_fix_frame);//ack
 				}else{
-					build_nak();
+					build_nak(&s_fix_frame);
 					send_frame(&s_fix_frame);
 				}
 			}else{
-				build_nak();
+				build_nak(&s_fix_frame);
 				send_frame(&s_fix_frame);
 			}
 		}else{
-			build_nak();
+			build_nak(&s_fix_frame);
 			send_frame(&s_fix_frame);
 		}
 	}else if(balance==BALANCE){
 		if(ctl.pm.fcv){
 			if(ctl.pm.fcb!=ctl_rm.pm.fcb){
 				ctl_rm.data=ctl.data;//save control
-				ret=on_req(f,balance);
+				ret=on_req(f,&s_var_frame);
 				if(ret==0){
-					build_ack();
+					build_ack(&s_fix_frame);
 					send_frame(&s_fix_frame);//ack
 					send_frame(&s_var_frame);
 					save_frame(&s_var_frame);//save frame
 					rep_timer.start(REP_TIME);
 				}else{
-					build_nak();
+					build_nak(&s_fix_frame);
 					send_frame(&s_fix_frame);
 				}
 			}else{
 				send_frame(&last_send_frame);
 			}
 		}else{
-			build_nak();
+			build_nak(&s_fix_frame);
 			send_frame(&s_fix_frame);
 		}
 	}
@@ -1414,7 +1519,7 @@ int link_layer_101::fc_9(frame*f){
 	process=PROCESS_LINK;
 	link_step=1;
 	link_state=LINK_NOCONNECT;
-	build_link_ack();
+	build_link_ack(&s_fix_frame);
 	send_frame(&s_fix_frame);
 	link_step++;//2
 	return 0;
@@ -1428,7 +1533,7 @@ int link_layer_101::fc_10(frame*f){
 	if(balance!=BALANCE){
 		if(link_step==4){
 			link_step++;//5
-			build_link_fini();
+			build_link_fini(&s_var_frame);
 			send_frame(&s_var_frame);
 			link_step++;//6
 			link_state=LINK_CONNECT;
@@ -1438,7 +1543,7 @@ int link_layer_101::fc_10(frame*f){
 			if(ctl.pm.fcv){
 				if(ctl.pm.fcb!=ctl_rm.pm.fcb){
 					ctl_rm.data=ctl.data;//save control
-					ret=on_req_class_1(f);
+					ret=on_req_class_1(f,&s_var_frame);
 					if(ret==0){
 						send_frame(&s_var_frame);
 						save_frame(&s_var_frame);//save frame
@@ -1447,7 +1552,7 @@ int link_layer_101::fc_10(frame*f){
 					send_frame(&last_send_frame);
 				}
 			}else{
-				build_nak();
+				build_nak(&s_fix_frame);
 				send_frame(&s_fix_frame);
 			}
 		}
@@ -1464,7 +1569,7 @@ int link_layer_101::fc_11(frame *f){
 		if(ctl.pm.fcv){
 			if(ctl.pm.fcb!=ctl_rm.pm.fcb){
 				ctl_rm.data=ctl.data;//save control
-				ret=on_req_class_2(f);
+				ret=on_req_class_2(f,&s_var_frame);
 				if(ret==0){
 					send_frame(&s_var_frame);
 					save_frame(&s_var_frame);//save frame
@@ -1473,13 +1578,13 @@ int link_layer_101::fc_11(frame *f){
 				send_frame(&last_send_frame);
 			}
 		}else{
-			build_nak();
+			build_nak(&s_fix_frame);
 			send_frame(&s_fix_frame);
 		}
 	}else if(balance==BALANCE){
 		if(link_step==5){
 			link_step++;//6
-			build_reset_link();
+			build_reset_link(&s_fix_frame);
 			send_frame(&s_fix_frame);
 			link_step++;//7
 		}
@@ -1506,6 +1611,7 @@ int main(int arg,char **argv){
 	wireless_set wire_set_1;
 	wireless wire_1;
 	link_layer_101 link[3];
+	app_layer app;
 
 	com[0].set_com_handle(&serial_1);
 	com[0].set_com_para((void *)&serial_set_1,1);
@@ -1518,6 +1624,7 @@ int main(int arg,char **argv){
 	com[2].init();
 	for(i=0;i<3;i++){
 		link[i].set_link_com(&com[i],i+1);
+		link[i].set_app(&app);
 	}
 	int loops=0;
 	for(i=0;i<3;i++){
@@ -1526,7 +1633,7 @@ int main(int arg,char **argv){
 	while(1){
 		cout<<endl<<"run loop:"<<loops<<endl;
 		loops++;
-		sleep_ms(10);
+		sleep_ms(1);
 		for(i=0;i<3;i++){
 			com[i].read(100);
 		}
