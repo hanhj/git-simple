@@ -47,15 +47,20 @@ unsigned char sum(unsigned char *data,int len){
 time_t get_system_time(){
 	return time(NULL);
 }
-#define DEBUG_ERROR 0
-#define DEBUG_WARNING 1
-#define DEBUG_INFO 2
-#define DEBUG_NORMAL 3
+#define DEBUG_LEVEL		4
+#define DEBUG_ERROR		1
+#define DEBUG_WARNING	2
+#define DEBUG_INFO		3
+#define DEBUG_NORMAL	4
 #define DEBUG_BUFF 1000
 unsigned char debug_buff[DEBUG_BUFF];
-void debug(int mode,const char *fmt...){
+#define pfunc(mode,msg...) debug(mode,__FILE__,__func__,__LINE__,msg)
+#define pdump(mode,head,data,len) dump(mode,__FILE__,__func__,__LINE__,data,len,head)
+void debug(int mode,const char*file,const char*func,int line,const char *fmt...){
 	const char *color="";
 	const char *default_col="\033[0;m";
+	if(mode>DEBUG_LEVEL)
+		return;
 	switch(mode){
 		case DEBUG_ERROR:
 			color="\033[031m";
@@ -74,21 +79,39 @@ void debug(int mode,const char *fmt...){
 	va_start(arg,fmt);
 	vsnprintf((char*)&debug_buff[0],DEBUG_BUFF,fmt,arg);
 	va_end(arg);
-	fprintf(stderr,"%s%s%s",color,debug_buff,default_col);
+	fprintf(stderr,"[%s %s %d]%s%s%s",file,func,line,color,debug_buff,default_col);
 }
-void dump(unsigned char *data,int len,const char *head=NULL){
+void dump(int mode,const char*file,const char*func,int line,unsigned char *data,int len,const char *head=NULL){
 	int i;
 	i=0;
+	const char *color="";
+	const char *default_col="\033[0;m";
+	if(mode>DEBUG_LEVEL)
+		return;
+	switch(mode){
+		case DEBUG_ERROR:
+			color="\033[031m";
+			break;
+		case DEBUG_WARNING:
+			color="\033[033m";
+			break;
+		case DEBUG_INFO:
+			color="\033[032m";
+			break;
+		case DEBUG_NORMAL:
+			color="\033[0;m";
+			break;
+	}
 	if(head!=NULL){
-		debug(DEBUG_INFO,"%s:",head);
+		fprintf(stderr,"[%s %s %d]%s%s %d:%s",file,func,line,color,head,len,default_col);
 	}
 	while(len--){
-		debug(DEBUG_INFO,"%02hhx ",*(data+i));
+		fprintf(stderr,"%02hhx ",*(data+i));
 		i++;
 		if(i%16==0)
-			debug(DEBUG_INFO,"\n");
+			fprintf(stderr,"\n");
 	}
-	debug(DEBUG_INFO,"\n");
+	fprintf(stderr,"\n");
 }
 class basic_com{
 	protected:
@@ -120,18 +143,18 @@ class basic_com{
 		virtual int connect()=0;
 		virtual int close()=0;
 		virtual int read(int len)=0;
-		virtual int get_byte(char*);
+		virtual int get_byte(unsigned char*);
 		virtual int send(unsigned char *data,int len)=0;
 		virtual int get_com_state()=0;
 		virtual int set_set(void *)=0;
 		virtual int get_set(void *)=0;
 };
-int basic_com::get_byte(char *c){
+int basic_com::get_byte(unsigned char *c){
 	if(read_produce!=read_consume){
 		*c=read_buff_ptr[read_consume];
 		read_consume++;
 		read_consume=(read_consume) % MAX_COM_BUFFER;
-		printf("get byte:%02x\n",*c);
+		printf("get byte:%02hhx\n",*c);
 		return 0;
 	}
 	return -1;
@@ -194,27 +217,26 @@ int serial::read(int len){
 	if(buff[0]=='R')
 		return -1;
 	l=strlen(buff);
-	//debug(DEBUG_NORMAL,"read:");
+	pfunc(DEBUG_NORMAL,"read:");
 	for(i=0;i<l;i++){
 		if(buff[i]=='T'||buff[i]=='X'||buff[i]==':'||buff[i]==' ')
 			continue;
 
 		c=strtol(&buff[i],NULL,16);
-		//debug(DEBUG_INFO,"%02hhx ",c);
+		fprintf(stderr,"%02hhx ",c);
 		i++;
 		m++;
 		if(m%16==0)
-			debug(DEBUG_INFO,"\n");
+			fprintf(stderr,"\n");
 		*(read_buff_ptr+read_produce)=c;
 		read_produce++;
 		read_produce=read_produce % MAX_COM_BUFFER;
 	}
-	//debug(DEBUG_NORMAL,"\n");
+	fprintf(stderr,"\n");
 	return l;
 }
 int serial::send(unsigned char *data,int len){
-	debug(DEBUG_NORMAL,"send serial %d:",len);
-	dump(data,len);
+	pdump(DEBUG_INFO,"send serial",data,len);
 	return len;
 }
 int serial::get_com_state(){
@@ -411,7 +433,7 @@ class com_port{
 				return -1;
 			return com_handle->read(len);
 		};
-		int get_byte(char*c){
+		int get_byte(unsigned char*c){
 			if(com_handle==NULL)
 				return -1;
 			return com_handle->get_byte(c);
@@ -936,7 +958,7 @@ int link_layer_101::build_link_layer(frame*out,int asdu_len){
 			l=asdu_len+3;
 			break;
 		default:
-			debug(DEBUG_ERROR,"error addr_size:%d",addr_size);
+			pfunc(DEBUG_ERROR,"error addr_size:%d",addr_size);
 			return -1;
 	}
 	len=l+6;
@@ -1198,7 +1220,7 @@ int link_layer_101::save_frame(frame *f){
 }
 int link_layer_101::get_frame(){
 	int ret;
-	char c;
+	unsigned char c;
 	int fail=0;
 	if(com==NULL)
 		return -1;
@@ -1224,8 +1246,7 @@ int link_layer_101::get_frame(){
 					rcv_fix_timer.stop();
 					start_rcv_fix_flag=0;
 					r_fix_pos=0;
-					debug(DEBUG_NORMAL,"get fix frame %d:",r_fix_frame.len);
-					dump(&r_fix_frame.data[0],r_fix_frame.len);
+					pdump(DEBUG_INFO,"get fix frame",&r_fix_frame.data[0],r_fix_frame.len);
 					deal_frame(&r_fix_frame);
 					return 1;
 				}else{
@@ -1270,8 +1291,7 @@ int link_layer_101::get_frame(){
 					r_var_pos=0;
 					start_rcv_var_flag=0;
 					rcv_var_timer.stop();
-					debug(DEBUG_INFO,"get var frame %d:",r_var_frame.len);
-					dump(&r_var_frame.data[0],r_var_frame.len);
+					pdump(DEBUG_INFO,"get var frame",&r_var_frame.data[0],r_var_frame.len);
 					deal_frame(&r_var_frame);
 					return 1;
 				}else{
@@ -1325,7 +1345,7 @@ int link_layer_101::deal_frame(frame*f){
 			req_addr|=(tmp<<8&0xff00);
 		}
 		if(req_addr!=addr&&req_addr!=BROADCASET_ADDR){
-			debug(DEBUG_ERROR,"invalid address\n");
+			pfunc(DEBUG_ERROR,"invalid address\n");
 			return -1;
 		}
 	}else if(f->type==VAR_FRAME){
@@ -1344,11 +1364,11 @@ int link_layer_101::deal_frame(frame*f){
 			req_addr|=(tmp<<8&0xff00);
 		}
 		if(req_addr!=addr&&req_addr!=BROADCASET_ADDR){
-			debug(DEBUG_ERROR,"invalid address\n");
+			pfunc(DEBUG_ERROR,"invalid address\n");
 			return -1;
 		}
 	}else{
-		debug(DEBUG_ERROR,"invalid frame type\n");
+		pfunc(DEBUG_ERROR,"invalid frame type\n");
 		return -1;
 	}
 	ret=0;
@@ -1427,7 +1447,7 @@ int link_layer_101::fc_0(frame*f){
 			link_step++;//10
 			link_state=LINK_CONNECT;
 			process=0;
-			debug(DEBUG_ERROR,"connect\n");
+			pfunc(DEBUG_ERROR,"connect\n");
 		}else{//receive ack frame
 			rep_timer.stop();
 			rep_times=0;
@@ -1537,7 +1557,7 @@ int link_layer_101::fc_10(frame*f){
 			send_frame(&s_var_frame);
 			link_step++;//6
 			link_state=LINK_CONNECT;
-			debug(DEBUG_ERROR,"connect\n");
+			pfunc(DEBUG_ERROR,"connect\n");
 			process=0;
 		}else{
 			if(ctl.pm.fcv){
