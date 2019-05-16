@@ -20,11 +20,9 @@
 using namespace std;
 int g_balance=0;
 char g_filename[20];
-//the physical layer
-#define MAX_COM_BUFFER 1000
-#define TYPE_SERIAL 1
-#define TYPE_ETHERNET 2
-#define TYPE_WIRELESS 3
+/****************************
+ * utilty
+ * ***************************/
 void sleep_ms(int t){
 	struct timeval tm;
 	tm.tv_sec=t/1000;
@@ -47,7 +45,45 @@ unsigned char sum(unsigned char *data,int len){
 time_t get_system_time(){
 	return time(NULL);
 }
-#define DEBUG_LEVEL		4
+class timer{
+	public:
+		timer(){
+			start_flag=0;
+		}
+		int exp_time;
+		int start_flag;
+		int start(int T);
+		int stop();
+		int is_reached();
+};
+int timer::is_reached(){
+	if(!start_flag)
+		return -1;
+	if(get_system_time()>exp_time){
+		stop();
+		return 1;
+	}
+	return 0;
+}
+int timer::start(int T){
+	if(start_flag == 1){
+		cout<<"timer has started"<<endl;
+		return -1;
+	}
+	start_flag=1;
+	exp_time=get_system_time()+T;
+	cout<<"start timer"<<endl;
+	return 0;
+}
+int timer::stop(){
+	if(start_flag == 1){
+		cout<<"stop timer"<<endl;
+		start_flag =0;
+		return 0;
+	}
+	return -1;
+}
+#define DEBUG_LEVEL		3
 #define DEBUG_ERROR		1
 #define DEBUG_WARNING	2
 #define DEBUG_INFO		3
@@ -113,6 +149,14 @@ void dump(int mode,const char*file,const char*func,int line,unsigned char *data,
 	}
 	fprintf(stderr,"\n");
 }
+/********************************
+ * physical layer
+ * ****************************/
+#define MAX_COM_BUFFER 1000
+#define TYPE_SERIAL 1
+#define TYPE_ETHERNET 2
+#define TYPE_WIRELESS 3
+
 class basic_com{
 	protected:
 		int read_produce;
@@ -210,6 +254,11 @@ int serial::read(int len){
 	int m;
 	char *ret;
 	char buff[100];
+	unsigned char tmpbuf[100];
+	if(len>100){
+		pfunc(DEBUG_ERROR,"too many read size,limit to 100");
+		len=100;
+	}
 	m=0;
 	ret=fgets(buff,len,f);
 	if(ret==NULL)
@@ -217,22 +266,19 @@ int serial::read(int len){
 	if(buff[0]=='R')
 		return -1;
 	l=strlen(buff);
-	pfunc(DEBUG_NORMAL,"read:");
 	for(i=0;i<l;i++){
 		if(buff[i]=='T'||buff[i]=='X'||buff[i]==':'||buff[i]==' ')
 			continue;
 
 		c=strtol(&buff[i],NULL,16);
-		fprintf(stderr,"%02hhx ",c);
+		tmpbuf[m]=c;
 		i++;
 		m++;
-		if(m%16==0)
-			fprintf(stderr,"\n");
 		*(read_buff_ptr+read_produce)=c;
 		read_produce++;
 		read_produce=read_produce % MAX_COM_BUFFER;
 	}
-	fprintf(stderr,"\n");
+	pdump(DEBUG_NORMAL,"read serial",&tmpbuf[0],m);
 	return l;
 }
 int serial::send(unsigned char *data,int len){
@@ -381,7 +427,6 @@ int wireless::get_set(void *){
 	cout<<"get set of wireless"<<endl;
 	return 0;
 }
-
 class com_port{
 	public:
 		int port_no;//port number
@@ -449,6 +494,9 @@ class com_port{
 			return com_handle->get_com_state();
 		};
 };
+/******************************
+ * protocol macros
+ * **************************/
 class message{
 	public:
 		int type;
@@ -491,44 +539,7 @@ class frame_104:public frame{
 			type=FRAME_104;
 		}
 };
-class timer{
-	public:
-		timer(){
-			start_flag=0;
-		}
-		int exp_time;
-		int start_flag;
-		int start(int T);
-		int stop();
-		int is_reached();
-};
-int timer::is_reached(){
-	if(!start_flag)
-		return -1;
-	if(get_system_time()>exp_time){
-		stop();
-		return 1;
-	}
-	return 0;
-}
-int timer::start(int T){
-	if(start_flag == 1){
-		cout<<"timer has started"<<endl;
-		return -1;
-	}
-	start_flag=1;
-	exp_time=get_system_time()+T;
-	cout<<"start timer"<<endl;
-	return 0;
-}
-int timer::stop(){
-	if(start_flag == 1){
-		cout<<"stop timer"<<endl;
-		start_flag =0;
-		return 0;
-	}
-	return -1;
-}
+
 //dir:0 is master,1 is terminal
 typedef struct _prm_ctl{
 		unsigned char fc:4;
@@ -571,13 +582,12 @@ typedef union _send_cause{
 //gb101中的传输规则：
 //线路上低位在前，高位在后；低字节在前，高字节在后。
 //define link state
-#define LINK_NOCONNECT 0
-#define LINK_CONNECT 1
-#define ADDR_SIZE 2
-#define CAUSE_SIZE 2
-#define MSG_ID_SIZE 2			
-
-#define BALANCE 1
+#define LINK_NOCONNECT		0
+#define LINK_CONNECT		1
+#define ADDR_SIZE			2
+#define CAUSE_SIZE			2
+#define MSG_ID_SIZE			2
+#define BALANCE				1
 
 #define PROCESS_LINK		1<<0
 #define PROCESS_SUMMON		1<<1
@@ -613,19 +623,19 @@ typedef union _send_cause{
 #define COMMAND_UPDATE		211
 
 //宏定义传送原因中的CODE
-#define CAUSE_Per_Cyc      1
-#define CAUSE_Back    2
-#define CAUSE_Spont    3
-#define CAUSE_Init    4
-#define CAUSE_Req    5
-#define CAUSE_Act    6
-#define CAUSE_Actcon   7
-#define CAUSE_Deact    8
-#define CAUSE_Deactcon   9
-#define CAUSE_Actterm   10
-#define CAUSE_Retrem   11
-#define CAUSE_Retloc   12
-#define CAUSE_File    13
+#define CAUSE_Per_Cyc	1
+#define CAUSE_Back		2
+#define CAUSE_Spont		3
+#define CAUSE_Init		4
+#define CAUSE_Req		5//请求，响应
+#define CAUSE_Act		6//激活
+#define CAUSE_Actcon	7//激活确认
+#define CAUSE_Deact		8//停止激活
+#define CAUSE_Deactcon	9//停止激活确认
+#define CAUSE_Actterm	10//激活终止
+#define CAUSE_Retrem	11
+#define CAUSE_Retloc	12
+#define CAUSE_File		13
 /*
 #define PRESERVATION   14
 #define PRESERVATION   15
@@ -634,53 +644,171 @@ typedef union _send_cause{
 #define PRESERVATION   18
 #define PRESERVATION   19
 */
-#define CAUSE_Introgen   20
-#define CAUSE_Intro1   21
-#define CAUSE_Intro2   22
-#define CAUSE_Intro3   23
-#define CAUSE_Intro4   24
-#define CAUSE_Intro5   25
-#define CAUSE_Intro6   26
-#define CAUSE_Intro7   27
-#define CAUSE_Intro8   28
-#define CAUSE_Intro9   29
-#define CAUSE_Intro10   30
-#define CAUSE_Intro11   31
-#define CAUSE_Intro12   32
-#define CAUSE_Intro13   33
-#define CAUSE_Intro14   34
-#define CAUSE_Intro15   35
-#define CAUSE_Intro16   36
-#define CAUSE_Reqcogen   37
-#define CAUSE_Reqco1   38
-#define CAUSE_Reqco2   39
-#define CAUSE_Reqco3   40
-#define CAUSE_Reqco4   41
+#define CAUSE_Introgen	20
+#define CAUSE_Intro1	21
+#define CAUSE_Intro2	22
+#define CAUSE_Intro3	23
+#define CAUSE_Intro4	24
+#define CAUSE_Intro5	25
+#define CAUSE_Intro6	26
+#define CAUSE_Intro7	27
+#define CAUSE_Intro8	28
+#define CAUSE_Intro9	29
+#define CAUSE_Intro10	30
+#define CAUSE_Intro11	31
+#define CAUSE_Intro12	32
+#define CAUSE_Intro13	33
+#define CAUSE_Intro14	34
+#define CAUSE_Intro15	35
+#define CAUSE_Intro16	36
+#define CAUSE_Reqcogen	37
+#define CAUSE_Reqco1	38
+#define CAUSE_Reqco2	39
+#define CAUSE_Reqco3	40
+#define CAUSE_Reqco4	41
 /*
 #define PRESERVATION   42
 #define PRESERVATION   43
 */
-#define CAUSE_Unknowntype  44
-#define CAUSE_Unknowncause  45
-#define CAUSE_Unknownmasteraddr  46
-#define CAUSE_Unknowndataaddr  47
+#define CAUSE_Unknowntype		44
+#define CAUSE_Unknowncause		45
+#define CAUSE_Unknownmasteraddr	46
+#define CAUSE_Unknowndataaddr	47
 /*
 #define PRESERVATION   48~63
 */
+class cp56time2a{
+	public:
+
+};
+class event{
+	public:
+		int id;
+		cp56time2a time;
+		int state;
+		int read_flag;
+};
+#include <list>
+typedef list<event> event_list;
+class dir{//directory
+	public:
+		char file_name[30];
+		int file_id;
+		int file_size;
+};
+typedef list<dir> dir_list;
+typedef list<float>cg_yc_list;
+class file_segment{
+	public:
+		int pos;
+		char content[300];
+};
+class buffer{
+	public:
+		int len;
+		char content[300];
+};
 class link_layer;
 //app_layer is only deal asdu part
 class app_layer{
 	public:
 		vsq vsq_lo;
 		send_cause cause_lo;
+		int offset;
+		int addr_size;
+		int cause_size;
+		int msg_id_size;
+		int addr;
 	public:
 		app_layer(){
 			vsq_lo.data=0;
 			cause_lo.data=0;
+			get_yx_data=NULL;
+			get_yc_data=NULL;
+			get_event_list=NULL;
+			get_clock=NULL;
+			do_yk=NULL;
+			get_yc_cg_data=NULL;
+			get_dir_list=NULL;
+			get_file_segment=NULL;
+			save_file_segment=NULL;
+			get_dz_unit=NULL;
+			set_dz_unit=NULL;
+			get_dz_data=NULL;
+			set_dz=NULL;
+			get_summon_acc_data=NULL;
+			save_update_file=NULL;
 		}
+		void get_link_info();
+		//abbreviation: 
+		//act->activation
+		//deact->stop active
+		//con->confirm
+		//resp->response
+		//term->termination
+		//fini->finish
+		//cg->change
 		int build_link_fini(frame *out,link_layer *link);
-		int build_summon_ack(frame *out,link_layer *link);
+		int build_summon_con(frame *out,link_layer *link);
+		int build_summon_term(frame *out,link_layer *link);
+		int (*get_yx_data)(buffer*data);
+		int build_yx_data(frame *out,link_layer *link,buffer*data);//cause 20
+		int (*get_yc_data)(buffer*data);
+		int build_yc_data(frame *out,link_layer *link,buffer*data);//cause 20
+
+		int (*get_event_list)(event_list*from,int pos,buffer *data);
+		int build_event_data(frame *out,link_layer *link,buffer *data);//cause 3
+
+		int build_clock_con(frame *out,link_layer *link);//cause 7
+		int (*get_clock)(buffer*data);
+		int build_clock_resp(frame *out,link_layer *link,buffer *data);//cause 5
+		
+		int on_yk(frame *in,link_layer *link);//deal yk command in
+		int (*do_yk)(int id,int sel);
+		int build_yk_con(frame *out,link_layer *link,int sel);//cause=7,sel=0 or 1
+		int build_yk_deact_con(frame *out,link_layer *link);//cause=9,sel=0
+		
+		int build_link_test_con(frame *out,link_layer *link);//cause 7
+		
+		int (*get_yc_cg_data)(cg_yc_list *list,int pos,buffer*data);
+		int build_yc_cg_data(frame *out,link_layer *link,buffer*data);//cause 3
+		
+		int build_reset_con(frame *out,link_layer *link);//reset terminal cause 7
+		
+		int on_file(frame *in,link_layer *link);
+		int (*get_dir_list)(dir_list *list,buffer*data);
+		int build_rd_dir_resp(frame *out,link_layer *link,buffer *data);//cause 5
+		int build_rd_file_con(frame *out,link_layer *link);//cause 7
+		int (*get_file_segment)(char *filename,int pos,file_segment *file);
+		int build_rd_file_resp(frame *out,link_layer *link,file_segment *file);//cause 5
+		int build_wr_file_con(frame *out,link_layer *link);//cause 7
+		int build_wr_file_resp(frame *out,link_layer *link);//cause 5
+		int (*save_file_segment)(char *filename,int pos,file_segment *file);
+		
+		int (*get_dz_unit)(buffer*data);
+		int build_rd_dz_unit_con(frame *out,link_layer *link,buffer*data);//cause 7
+		int (*set_dz_unit)(int);
+		int build_wr_dz_unit_con(frame *out,link_layer *link);//cause 7
+
+		int (*get_dz_data)(int id,buffer*data);
+		int build_rd_dz_con(frame *out,link_layer *link,buffer*data);//cause 7
+		int on_set_dz(frame *in,link_layer *link);
+		int (*set_dz)(int id,int sel,buffer*data);
+		int build_dz_con(frame *out,link_layer *link,int sel);//cause 7,sel =0 or 1 ,cr=0
+		int build_dz_dact_con(frame *out,link_layer *link);//cause 9,sel=0,cr=1
+
+		int build_summon_acc_con(frame *out,link_layer *link);//cause 7
+		int build_summon_acc_term(frame *out,link_layer *link);//cause 10
+		int build_summon_acc_resp(frame *out,link_layer *link,buffer*data);//cause 37
+		int (*get_summon_acc_data)(buffer*data);
+
+		int on_update(frame *in,link_layer *link);
+		int (*save_update_file)(char *filename,file_segment *file);
+		int build_update_con(frame *out,link_layer *link,int sel);//cause 7 sel=1 start,0 stop
 };
+/***********************************
+ * common link_layer
+ * *********************************/
 class link_layer{
 	public:
 		int port;
@@ -755,89 +883,41 @@ class link_layer{
 		int check_state();//cycle check link state
 		int send_frame(frame *);
 	public:
-		virtual int build_link_layer(frame *out,int)=0;
+//the next function will build link layer frame by call app_layer same name function.
+//different link layer has different link frame(eg 101 and 104).but they have same app_layer frame(asdu).
+//the inheritance class must realize these virtual function.
+		virtual int build_link_layer(frame *out,int)=0;//by asdu build link frame 
 		virtual int build_link_fini(frame *out)=0;
-		virtual int build_summon_ack(frame *out)=0;
+		virtual int build_summon_con(frame *out)=0;
+		virtual int build_summon_term(frame *out)=0;
+		virtual int build_yx_data(frame *out,buffer*data)=0;
+		virtual int build_yc_data(frame *out,buffer*data)=0;
+		virtual int build_event_data(frame *out,buffer *data)=0;
+		virtual int build_clock_con(frame *out)=0;
+		virtual int build_clock_resp(frame *out,buffer *data)=0;
+		virtual int build_yk_con(frame *out,int sel)=0;
+		virtual int build_yk_deact_con(frame *out)=0;
+		virtual int build_link_test_con(frame *out)=0;
+		virtual int build_yc_cg_data(frame *out,buffer*data)=0;
+		virtual int build_reset_con(frame *out)=0;
+		virtual int build_rd_dir_resp(frame *out,buffer *data)=0;
+		virtual int build_rd_file_con(frame *out)=0;
+		virtual int build_rd_file_resp(frame *out,file_segment *file)=0;
+		virtual int build_wr_file_con(frame *out)=0;
+		virtual int build_wr_file_resp(frame *out)=0;
+		virtual int build_rd_dz_unit_con(frame *out,buffer*data)=0;
+		virtual int build_wr_dz_unit_con(frame *out)=0;
+		virtual int build_rd_dz_con(frame *out,buffer*data)=0;
+		virtual int build_dz_con(frame *out,int sel)=0;
+		virtual int build_dz_dact_con(frame *out)=0;
+		virtual int build_summon_acc_con(frame *out)=0;
+		virtual int build_summon_acc_term(frame *out)=0;
+		virtual int build_summon_acc_resp(frame *out,buffer*data)=0;
+		virtual int build_update_con(frame *out,int sel)=0;
 
 		void on_notify(message *msg);
 		void notify(message *msg);
 };
-//build asdu of link_fini command 
-int app_layer::build_link_fini(frame*out,link_layer*link){
-	int i;
-	int offset;
-	int addr_size;
-	int cause_size;
-	int msg_id_size;
-	int addr;
-	offset=link->offset_asdu;
-	addr_size=link->addr_size;
-	cause_size=link->cause_size;
-	msg_id_size=link->msg_id_size;
-	addr=link->addr;
-
-	vsq_lo.bit.n=1;
-	vsq_lo.bit.sq=0;
-	cause_lo.bit.cause=CAUSE_Init;
-
-	i=0;
-	out->data[offset+i++]=COMMAND_LINK_FINI;
-	out->data[offset+i++]=vsq_lo.data;
-	out->data[offset+i++]=cause_lo.data;
-	if(cause_size==2){
-		out->data[offset+i++]=(cause_lo.data>>8&0x00ff);
-	}
-	out->data[offset+i++]=addr&0x00ff;
-	if(addr_size==2){
-		out->data[offset+i++]=addr>>8&0x00ff;
-	}
-	out->data[offset+i++]=0x0;
-	out->data[offset+i++]=0x0;
-	if(msg_id_size==3)
-		out->data[offset+i++]=0x0;
-	out->data[offset+i++]=0x0;
-	return i;
-}
-int app_layer::build_summon_ack(frame*out,link_layer*link){
-	int i;
-	int offset;
-	int addr_size;
-	int cause_size;
-	int msg_id_size;
-	int addr;
-	offset=link->offset_asdu;
-	addr_size=link->addr_size;
-	cause_size=link->cause_size;
-	msg_id_size=link->msg_id_size;
-	addr=link->addr;
-
-	vsq_lo.bit.n=1;
-	vsq_lo.bit.sq=0;
-	cause_lo.bit.cause=CAUSE_Actcon;
-
-	i=0;
-	out->data[offset+i++]=COMMAND_SUMMON;
-	out->data[offset+i++]=vsq_lo.data;
-	out->data[offset+i++]=cause_lo.data;
-	if(cause_size==2){
-		out->data[offset+i++]=(cause_lo.data>>8&0x00ff);
-	}
-	out->data[offset+i++]=addr&0x00ff;
-	if(addr_size==2){
-		out->data[offset+i++]=addr>>8&0x00ff;
-	}
-	out->data[offset+i++]=0x0;
-	out->data[offset+i++]=0x0;
-	if(msg_id_size==3)
-		out->data[offset+i++]=0;
-	out->data[offset+i++]=20;
-	return i;
-}
-typedef struct _fc_table{
-	int fc;
-	int (*func)(frame*);
-}fc_table;
-
 #define REP_TIMES 3
 #define REP_TIME  1
 int link_layer::set_link_com(com_port*c,int p){
@@ -927,56 +1007,55 @@ class link_layer_101:public link_layer{
 		int fc_11(frame *);
 	public:
 		long process;//which process is in.
-		int build_link_layer(frame *out,int asdu_len);//by asdu build link frame.
+		int get_frame();
+		int active_send();//for balance
+		int deal_frame(frame *in);
+		int save_frame(frame *);
+		//build fix frame
 		int build_ack(frame *out,int has_data=0);//set fc=0,fix frame,has_data indicator if have class 1 data,used for unbalance.
 		int build_nak(frame *out);//set fc=1, fix frame
 		int build_err_rep(frame *out,int err);//?
 		int build_link_ack(frame *out);//set fc=11,fix frame,
 		int build_link_req(frame *out);//set fc=9,fix frame,for balance.
-		int build_link_fini(frame *out);//set fc=3(balance) or fc=8(unbalance),var frame 
-		int build_summon_ack(frame *out);//set fc=3(balance) or fc=8(unbalance),var frame 
 		int build_reset_link(frame *out);//set fc=0,fix frame,for balance
-		int on_req_class_1(frame *in,frame *out);//set fc=8 or fc=9,response fc10,for unbalance
-		int on_req_class_2(frame *in,frame *out);//set fc=8 or fc=9,response fc11,for unbalance
-		int on_req(frame *in,frame *out);//set fc=0 or fc=1,response fc3
-		int get_frame();
-		int active_send();//for balance
-		int deal_frame(frame *in);
-		int save_frame(frame *);
+		int on_req_class_1(frame *in,frame *out);//set fc=8 or fc=9,response fc10,for unbalance,fix frame or var frame
+		int on_req_class_2(frame *in,frame *out);//set fc=8 or fc=9,response fc11,for unbalance,fix frame or var frame
+		int on_req(frame *in,frame *out);//set fc=0 or fc=1,response fc3,fix frame or var frame
+		//set respose frame's control word.
+		void set_loc_ctl();
+//the next function  is implement of parent virtual function. inheritance 继承
+		int build_link_layer(frame *out,int asdu_len);//by asdu build link frame.
+		int build_link_fini(frame *out);//set fc=3(balance) or fc=8(unbalance),var frame
+		int build_summon_con(frame *out);//set fc=3(balance) or fc=8(unbalance),var frame
+		int build_summon_term(frame *out);
+		int build_yx_data(frame *out,buffer*data);
+		int build_yc_data(frame *out,buffer*data);
+		int build_event_data(frame *out,buffer *data);
+		int build_clock_con(frame *out);
+		int build_clock_resp(frame *out,buffer *data);
+		int build_yk_con(frame *out,int sel);
+		int build_yk_deact_con(frame *out);
+		int build_link_test_con(frame *out);
+		int build_yc_cg_data(frame *out,buffer*data);
+		int build_reset_con(frame *out);
+		int build_rd_dir_resp(frame *out,buffer *data);
+		int build_rd_file_con(frame *out);
+		int build_rd_file_resp(frame *out,file_segment *file);
+		int build_wr_file_con(frame *out);
+		int build_wr_file_resp(frame *out);
+		int build_rd_dz_unit_con(frame *out,buffer*data);
+		int build_wr_dz_unit_con(frame *out);
+		int build_rd_dz_con(frame *out,buffer*data);
+		int build_dz_con(frame *out,int sel);
+		int build_dz_dact_con(frame *out);
+		int build_summon_acc_con(frame *out);
+		int build_summon_acc_term(frame *out);
+		int build_summon_acc_resp(frame *out,buffer*data);
+		int build_update_con(frame *out,int sel);
 };
-int link_layer_101::build_link_layer(frame*out,int asdu_len){
-	int l;
-	int len;
-	switch(addr_size){
-		case 0:
-			l=asdu_len+1;
-			break;
-		case 1:
-			l=asdu_len+2;
-			break;
-		case 2:
-			l=asdu_len+3;
-			break;
-		default:
-			pfunc(DEBUG_ERROR,"error addr_size:%d",addr_size);
-			return -1;
-	}
-	len=l+6;
-	out->data[0]=0x68;
-	out->data[1]=l;
-	out->data[2]=l;
-	out->data[3]=0x68;
-	out->data[4]=ctl_lo.data;
-	out->data[5]=addr&0x00ff;
-	if(addr_size==2){
-		out->data[6]=addr>>8&0x00ff;
-	}
-	out->data[len-2]=sum(&out->data[offset_control],l);
-	out->data[len-1]=0x16;
-	out->len=len;
-	out->valid=1;
-	return len;
-}
+/*********************************
+ *  link_layer_101
+ *  *******************************/
 int link_layer_101::build_ack(frame*out,int has_data){
 	int i;
 	i=0;
@@ -1082,44 +1161,6 @@ int link_layer_101::build_link_req(frame*out){
 	}	
 	return 0;
 }
-int link_layer_101::build_link_fini(frame *out){
-	int ret;
-	if(!balance){
-		ctl_lo.sl.fc=8;
-		ctl_lo.sl.dfc=0;
-		ctl_lo.sl.acd_rev=1;
-		ctl_lo.sl.prm=0;
-		ctl_lo.sl.rev_dir=0;
-
-	}else if(balance==BALANCE){
-		ctl_lo.pm.fc=3;
-		ctl_lo.pm.fcv=1;
-		ctl_lo.pm.fcb=0;
-		ctl_lo.pm.prm=1;
-		ctl_lo.pm.rev_dir=1;
-	}
-	ret=app->build_link_fini(out,this);
-	return build_link_layer(out,ret);
-}
-int link_layer_101::build_summon_ack(frame *out){
-	int ret;
-	if(!balance){
-		ctl_lo.sl.fc=8;
-		ctl_lo.sl.dfc=0;
-		ctl_lo.sl.acd_rev=1;
-		ctl_lo.sl.prm=0;
-		ctl_lo.sl.rev_dir=0;
-
-	}else if(balance==BALANCE){
-		ctl_lo.pm.fc=3;
-		ctl_lo.pm.fcv=1;
-		ctl_lo.pm.fcb=!ctl_lo.pm.fcb;
-		ctl_lo.pm.prm=1;
-		ctl_lo.pm.rev_dir=1;
-	}
-	ret=app->build_summon_ack(out,this);
-	return build_link_layer(out,ret);
-}
 int link_layer_101::build_reset_link(frame*out){
 	int i=0;
 	if(balance==1){
@@ -1141,6 +1182,242 @@ int link_layer_101::build_reset_link(frame*out){
 	}	
 	return 0;
 }
+int link_layer_101::build_link_layer(frame*out,int asdu_len){
+	int l;
+	int len;
+	switch(addr_size){
+		case 0:
+			l=asdu_len+1;
+			break;
+		case 1:
+			l=asdu_len+2;
+			break;
+		case 2:
+			l=asdu_len+3;
+			break;
+		default:
+			pfunc(DEBUG_ERROR,"error addr_size:%d",addr_size);
+			return -1;
+	}
+	len=l+6;
+	out->data[0]=0x68;
+	out->data[1]=l;
+	out->data[2]=l;
+	out->data[3]=0x68;
+	out->data[4]=ctl_lo.data;
+	out->data[5]=addr&0x00ff;
+	if(addr_size==2){
+		out->data[6]=addr>>8&0x00ff;
+	}
+	out->data[len-2]=sum(&out->data[offset_control],l);
+	out->data[len-1]=0x16;
+	out->len=len;
+	out->valid=1;
+	return len;
+}
+void link_layer_101::set_loc_ctl(){
+	if(!balance){
+		ctl_lo.sl.fc=8;
+		ctl_lo.sl.dfc=0;
+		ctl_lo.sl.acd_rev=1;
+		ctl_lo.sl.prm=0;
+		ctl_lo.sl.rev_dir=0;
+
+	}else if(balance==BALANCE){
+		ctl_lo.pm.fc=3;
+		ctl_lo.pm.fcv=1;
+		ctl_lo.pm.fcb=!ctl_lo.pm.fcb;
+		ctl_lo.pm.prm=1;
+		ctl_lo.pm.rev_dir=1;
+	}
+}
+int link_layer_101::build_link_fini(frame *out){
+	int ret;
+	if(!balance){
+		ctl_lo.sl.fc=8;
+		ctl_lo.sl.dfc=0;
+		ctl_lo.sl.acd_rev=1;
+		ctl_lo.sl.prm=0;
+		ctl_lo.sl.rev_dir=0;
+
+	}else if(balance==BALANCE){
+		ctl_lo.pm.fc=3;
+		ctl_lo.pm.fcv=1;
+		ctl_lo.pm.fcb=0;
+		ctl_lo.pm.prm=1;
+		ctl_lo.pm.rev_dir=1;
+	}
+	ret=app->build_link_fini(out,this);
+	return build_link_layer(out,ret);
+}
+int link_layer_101::build_summon_con(frame *out){
+	int ret;
+	set_loc_ctl();
+	ret=app->build_summon_con(out,this);
+	return build_link_layer(out,ret);
+}
+int link_layer_101::build_summon_term(frame *out){	
+	int ret;
+	set_loc_ctl();
+	if(!balance){
+		ctl_lo.sl.acd_rev=0;//no more data;
+	}
+	ret=app->build_summon_term(out,this);
+	return build_link_layer(out,ret);	
+}
+int link_layer_101::build_yx_data(frame *out,buffer*data){
+	int ret;
+	set_loc_ctl();
+	ret=app->build_yx_data(out,this,data);
+	return build_link_layer(out,ret);		
+}
+int link_layer_101::build_yc_data(frame *out,buffer*data){	
+	int ret;
+	set_loc_ctl();
+	ret=app->build_yc_data(out,this,data);
+	return build_link_layer(out,ret);			
+}
+int link_layer_101::build_event_data(frame *out,buffer *data){	
+	int ret;
+	set_loc_ctl();
+	ret=app->build_event_data(out,this,data);
+	return build_link_layer(out,ret);				
+}
+int link_layer_101::build_clock_con(frame *out){	
+	int ret;
+	set_loc_ctl();
+	ret=app->build_clock_con(out,this);
+	return build_link_layer(out,ret);				
+}
+int link_layer_101::build_clock_resp(frame *out,buffer *data){	
+	int ret;
+	set_loc_ctl();
+	ret=app->build_clock_resp(out,this,data);
+	return build_link_layer(out,ret);				
+}
+int link_layer_101::build_yk_con(frame *out,int sel){	
+	int ret;
+	set_loc_ctl();
+	ret=app->build_yk_con(out,this,sel);
+	return build_link_layer(out,ret);				
+}
+int link_layer_101::build_yk_deact_con(frame *out){	
+	int ret;
+	set_loc_ctl();
+	ret=app->build_yk_deact_con(out,this);
+	return build_link_layer(out,ret);				
+}
+int link_layer_101::build_link_test_con(frame *out){	
+	int ret;
+	set_loc_ctl();
+	ret=app->build_link_test_con(out,this);
+	return build_link_layer(out,ret);				
+}
+int link_layer_101::build_yc_cg_data(frame *out,buffer*data){
+	int ret;
+	set_loc_ctl();
+	ret=app->build_yc_cg_data(out,this,data);
+	return build_link_layer(out,ret);					
+}
+int link_layer_101::build_reset_con(frame *out){
+	int ret;
+	set_loc_ctl();
+	ret=app->build_reset_con(out,this);
+	return build_link_layer(out,ret);					
+}
+int link_layer_101::build_rd_dir_resp(frame *out,buffer *data){
+	int ret;
+	set_loc_ctl();
+	ret=app->build_rd_dir_resp(out,this,data);
+	return build_link_layer(out,ret);					
+}
+int link_layer_101::build_rd_file_con(frame *out){
+	int ret;
+	set_loc_ctl();
+	ret=app->build_rd_file_con(out,this);
+	return build_link_layer(out,ret);				
+}
+int link_layer_101::build_rd_file_resp(frame *out,file_segment *file){
+	int ret;
+	set_loc_ctl();
+	ret=app->build_rd_file_resp(out,this,file);
+	return build_link_layer(out,ret);								
+}
+int link_layer_101::build_wr_file_con(frame *out){
+	int ret;
+	set_loc_ctl();
+	ret=app->build_wr_file_con(out,this);
+	return build_link_layer(out,ret);					
+}
+int link_layer_101::build_wr_file_resp(frame *out){
+	int ret;
+	set_loc_ctl();
+	ret=app->build_wr_file_resp(out,this);
+	return build_link_layer(out,ret);					
+}
+int link_layer_101::build_rd_dz_unit_con(frame *out,buffer*data){
+	int ret;
+	set_loc_ctl();
+	ret=app->build_rd_dz_unit_con(out,this,data);
+	return build_link_layer(out,ret);
+}
+int link_layer_101::build_wr_dz_unit_con(frame *out){	
+	int ret;
+	set_loc_ctl();
+	ret=app->build_wr_dz_unit_con(out,this);
+	return build_link_layer(out,ret);
+}
+int link_layer_101::build_rd_dz_con(frame *out,buffer*data){	
+	int ret;
+	set_loc_ctl();
+	ret=app->build_rd_dz_con(out,this,data);
+	return build_link_layer(out,ret);
+}
+int link_layer_101::build_dz_con(frame *out,int sel){	
+	int ret;
+	set_loc_ctl();
+	ret=app->build_dz_con(out,this,sel);
+	return build_link_layer(out,ret);
+}
+int link_layer_101::build_dz_dact_con(frame *out){	
+	int ret;
+	set_loc_ctl();
+	ret=app->build_dz_dact_con(out,this);
+	return build_link_layer(out,ret);
+}
+int link_layer_101::build_summon_acc_con(frame *out){	
+	int ret;
+	set_loc_ctl();
+	ret=app->build_summon_acc_con(out,this);
+	return build_link_layer(out,ret);
+}
+int link_layer_101::build_summon_acc_term(frame *out){	
+	int ret;
+	set_loc_ctl();
+	ret=app->build_summon_acc_term(out,this);
+	return build_link_layer(out,ret);
+}
+int link_layer_101::build_summon_acc_resp(frame *out,buffer*data){	
+	int ret;
+	set_loc_ctl();
+	ret=app->build_summon_acc_resp(out,this,data);
+	return build_link_layer(out,ret);
+}
+int link_layer_101::build_update_con(frame *out,int sel){	
+	int ret;
+	set_loc_ctl();
+	ret=app->build_update_con(out,this,sel);
+	return build_link_layer(out,ret);
+}
+
+int link_layer_101::on_req_class_1(frame *in,frame *out){
+	cout<<"on_req_class_1"<<endl;
+	return 0;
+}
+int link_layer_101::on_req_class_2(frame *in,frame *out){
+	cout<<"on_req_class_2"<<endl;
+	return 0;
+}
 int link_layer_101::on_req(frame *in,frame *out){
 	int ret;
 	ret=0;
@@ -1152,7 +1429,7 @@ int link_layer_101::on_req(frame *in,frame *out){
 	switch(ti){
 		case COMMAND_SUMMON://total sum
 			process|=PROCESS_SUMMON;
-			build_summon_ack(out);
+			build_summon_con(out);
 			break;
 		case COMMAND_CLOCK://clock 
 			if(cause==6){
@@ -1203,14 +1480,6 @@ int link_layer_101::on_req(frame *in,frame *out){
 			break;
 	}
 	return ret;
-}
-int link_layer_101::on_req_class_1(frame *in,frame *out){
-	cout<<"on_req_class_1"<<endl;
-	return 0;
-}
-int link_layer_101::on_req_class_2(frame *in,frame *out){
-	cout<<"on_req_class_2"<<endl;
-	return 0;
 }
 int link_layer_101::save_frame(frame *f){
 	if(f->type==VAR_FRAME){
@@ -1611,6 +1880,386 @@ int link_layer_101::fc_11(frame *f){
 	}	
 	return 0;
 }
+/**************************************
+ *	app_layer 
+ ************************************/
+void app_layer::get_link_info(){
+	offset=link->offset_asdu;
+	addr_size=link->addr_size;
+	cause_size=link->cause_size;
+	msg_id_size=link->msg_id_size;
+	addr=link->addr;
+}
+//build asdu of link_fini command 
+int app_layer::build_link_fini(frame*out,link_layer*link){
+	int i;
+	get_link_info();
+
+	vsq_lo.bit.n=1;
+	vsq_lo.bit.sq=0;
+	cause_lo.bit.cause=CAUSE_Init;
+
+	i=0;
+	out->data[offset+i++]=COMMAND_LINK_FINI;
+	out->data[offset+i++]=vsq_lo.data;
+	out->data[offset+i++]=cause_lo.data;
+	if(cause_size==2){
+		out->data[offset+i++]=(cause_lo.data>>8&0x00ff);
+	}
+	out->data[offset+i++]=addr&0x00ff;
+	if(addr_size==2){
+		out->data[offset+i++]=addr>>8&0x00ff;
+	}
+	out->data[offset+i++]=0x0;
+	out->data[offset+i++]=0x0;
+	if(msg_id_size==3)
+		out->data[offset+i++]=0x0;
+	out->data[offset+i++]=0x0;
+	return i;
+}
+
+int app_layer::build_summon_con(frame*out,link_layer*link){
+	int i;
+	get_link_info(link);
+
+	vsq_lo.bit.n=1;
+	vsq_lo.bit.sq=0;
+	cause_lo.bit.cause=CAUSE_Actcon;
+
+	i=0;
+	out->data[offset+i++]=COMMAND_SUMMON;
+	out->data[offset+i++]=vsq_lo.data;
+	out->data[offset+i++]=cause_lo.data;
+	if(cause_size==2){
+		out->data[offset+i++]=(cause_lo.data>>8&0x00ff);
+	}
+	out->data[offset+i++]=addr&0x00ff;
+	if(addr_size==2){
+		out->data[offset+i++]=addr>>8&0x00ff;
+	}
+	out->data[offset+i++]=0x0;
+	out->data[offset+i++]=0x0;
+	if(msg_id_size==3)
+		out->data[offset+i++]=0;
+	out->data[offset+i++]=20;
+	return i;
+}
+int app_layer::build_summon_term(frame *out,link_layer *link){
+	int i;
+	set_loc_ctl();	
+
+	vsq_lo.bit.n=1;
+	vsq_lo.bit.sq=0;
+	cause_lo.bit.cause=CAUSE_Actterm;
+
+	i=0;
+	out->data[offset+i++]=COMMAND_SUMMON;
+	out->data[offset+i++]=vsq_lo.data;
+	out->data[offset+i++]=cause_lo.data;
+	if(cause_size==2){
+		out->data[offset+i++]=(cause_lo.data>>8&0x00ff);
+	}
+	out->data[offset+i++]=addr&0x00ff;
+	if(addr_size==2){
+		out->data[offset+i++]=addr>>8&0x00ff;
+	}
+	out->data[offset+i++]=0x0;
+	out->data[offset+i++]=0x0;
+	if(msg_id_size==3)
+		out->data[offset+i++]=0;
+	out->data[offset+i++]=20;
+	return i;
+}
+int app_layer::build_yx_data(frame *out,link_layer *link,buffer*data){//cause 20
+	int i;
+	set_lo_ctl();
+
+	return i;
+	
+}
+int app_layer::build_yc_data(frame *out,link_layer *link,buffer*data){//cause 20
+	int i;
+	set_lo_ctl();
+
+	return i;
+
+}
+int app_layer::build_event_data(frame *out,link_layer *link,buffer *data){//cause 3
+	int i;
+	set_lo_ctl();
+
+	return i;
+
+}
+int app_layer::build_clock_con(frame *out,link_layer *link){//cause 7
+	int i;
+	set_lo_ctl();
+
+	return i;
+
+}
+int app_layer::build_clock_resp(frame *out,link_layer *link,buffer *data){//cause 5
+	int i;
+	set_lo_ctl();
+
+	return i;
+
+}
+int app_layer::on_yk(frame *in,link_layer *link){//deal yk command in
+	int i;
+	set_lo_ctl();
+
+	return i;
+
+}
+int app_layer::build_yk_con(frame *out,link_layer *link,int sel){//cause=7,sel=0 or 1
+	int i;
+	set_lo_ctl();
+
+	return i;
+
+}
+int app_layer::build_yk_deact_con(frame *out,link_layer *link){//cause=9,sel=0
+	int i;
+	set_lo_ctl();
+
+	return i;
+
+}
+int app_layer::build_link_test_con(frame *out,link_layer *link){//cause 7
+	int i;
+	set_lo_ctl();
+
+	return i;
+
+}
+int app_layer::build_yc_cg_data(frame *out,link_layer *link,buffer*data){//cause 3
+	int i;
+	set_lo_ctl();
+
+	return i;
+
+}
+int app_layer::build_reset_con(frame *out,link_layer *link){//reset terminal cause 7
+	int i;
+	set_lo_ctl();
+
+	return i;
+
+}
+int app_layer::on_file(frame *in,link_layer *link){
+	int i;
+	set_lo_ctl();
+
+	return i;
+
+}
+int app_layer::build_rd_dir_resp(frame *out,link_layer *link,buffer *data){//cause 5
+	int i;
+	set_lo_ctl();
+
+	return i;
+}
+int app_layer::build_rd_file_con(frame *out,link_layer *link){//cause 7
+	int i;
+	set_lo_ctl();
+
+	return i;
+
+}
+int app_layer::build_rd_file_resp(frame *out,link_layer *link,file_segment *file){//cause 5
+	int i;
+	set_lo_ctl();
+
+	return i;
+
+}
+int app_layer::build_wr_file_con(frame *out,link_layer *link){//cause 7
+	int i;
+	set_lo_ctl();
+
+	return i;
+
+}
+int app_layer::build_wr_file_resp(frame *out,link_layer *link){//cause 5
+	int i;
+	set_lo_ctl();
+
+	return i;
+
+}
+int app_layer::build_rd_dz_unit_con(frame *out,link_layer *link,buffer*data){//cause 7
+	int i;
+	set_lo_ctl();
+
+	return i;
+
+}
+int app_layer::build_wr_dz_unit_con(frame *out,link_layer *link){//cause 7
+	int i;
+	set_lo_ctl();
+
+	return i;
+
+}
+int app_layer::build_rd_dz_con(frame *out,link_layer *link,buffer*data){//cause 7
+	int i;
+	set_lo_ctl();
+
+	return i;
+
+}
+int app_layer::on_set_dz(frame *in,link_layer *link){
+	int i;
+	set_lo_ctl();
+
+	return i;
+
+}
+int app_layer::build_dz_con(frame *out,link_layer *link,int sel){//cause 7,sel =0 or 1 ,cr=0
+	int i;
+	set_lo_ctl();
+
+	return i;
+
+}
+int app_layer::build_dz_dact_con(frame *out,link_layer *link){//cause 9,sel=0,cr=1
+	int i;
+	set_lo_ctl();
+
+	return i;
+
+}
+int app_layer::build_summon_acc_con(frame *out,link_layer *link){//cause 7
+	int i;
+	set_lo_ctl();
+
+	return i;
+
+}
+int app_layer::build_summon_acc_term(frame *out,link_layer *link){//cause 10
+	int i;
+	set_lo_ctl();
+
+	return i;
+
+}
+int app_layer::build_summon_acc_resp(frame *out,link_layer *link,buffer*data){//cause 37
+	int i;
+	set_lo_ctl();
+
+	return i;
+
+}
+int app_layer::on_update(frame *in,link_layer *link){
+	int i;
+	set_lo_ctl();
+
+	return i;
+
+}
+int app_layer::build_update_con(frame *out,link_layer *link,int sel){//cause 7 sel=1 start,0 stop
+	int i;
+	set_lo_ctl();
+
+	return i;
+
+}
+//extern interface function
+int get_yx_data(buffer*data){
+	debug(DEBUG_NORMAL,"\n");
+	return 0;
+}
+int get_yc_data(buffer*data){
+	debug(DEBUG_NORMAL,"\n");
+	return 0;
+}
+int get_event_list(event_list*from,int pos,buffer *data){
+	debug(DEBUG_NORMAL,"\n");
+	return 0;
+}
+int get_clock(buffer*data){
+	debug(DEBUG_NORMAL,"\n");
+	return 0;
+}
+int do_yk(int id,int sel){
+	debug(DEBUG_NORMAL,"\n");
+	return 0;
+}
+int get_yc_cg_data(cg_yc_list *list,int pos,buffer*data){
+	debug(DEBUG_NORMAL,"\n");
+	return 0;
+}
+int get_dir_list(dir_list *list,buffer*data){
+	debug(DEBUG_NORMAL,"\n");
+	return 0;
+}
+int get_file_segment(char *filename,int pos,file_segment *file){
+	debug(DEBUG_NORMAL,"\n");
+	return 0;
+}
+int save_file_segment(char *filename,int pos,file_segment *file){
+	debug(DEBUG_NORMAL,"\n");
+	return 0;
+}
+int get_dz_unit(buffer*data){
+	debug(DEBUG_NORMAL,"\n");
+	return 0;
+}
+int set_dz_unit(int){
+	debug(DEBUG_NORMAL,"\n");
+	return 0;
+}
+int get_dz_data(int id,buffer*data){
+	debug(DEBUG_NORMAL,"\n");
+	return 0;
+}
+int set_dz(int id,int sel,buffer*data){
+	debug(DEBUG_NORMAL,"\n");
+	return 0;
+}
+int get_summon_acc_data(buffer*data){
+	debug(DEBUG_NORMAL,"\n");
+	return 0;
+}
+int save_update_file(char *filename,file_segment *file){
+	debug(DEBUG_NORMAL,"\n");
+	return 0;
+}
+/*
+int get_yx_data(buffer*data);
+int get_yc_data(buffer*data);
+int get_event_list(event_list*from,int pos,buffer *data);
+int get_clock(buffer*data);
+int do_yk(int id,int sel);
+int get_yc_cg_data(cg_yc_list *list,int pos,buffer*data);
+int get_dir_list(dir_list *list,buffer*data);
+int get_file_segment(char *filename,int pos,file_segment *file);
+int save_file_segment(char *filename,int pos,file_segment *file);
+int get_dz_unit(buffer*data);
+int set_dz_unit(int);
+int get_dz_data(int id,buffer*data);
+int set_dz(int id,int sel,buffer*data);
+int get_summon_acc_data(buffer*data);
+int save_update_file(char *filename,file_segment *file);
+*/
+void set_app_interface(app_layer *app){
+	app->get_yx_data=get_yx_data;
+	app->get_yc_data=get_yc_data;
+	app->get_event_list=get_event_list;
+	app->get_clock=get_clock;
+	app->do_yk=do_yk;
+	app->get_yc_cg_data=get_yc_cg_data;
+	app->get_dir_list=get_dir_list;
+	app->get_file_segment=get_file_segment;
+	app->save_file_segment=save_file_segment;
+	app->get_dz_unit=get_dz_unit;
+	app->set_dz_unit=set_dz_unit;
+	app->get_dz_data=get_dz_data;
+	app->set_dz=set_dz;
+	app->get_summon_acc_data=get_summon_acc_data;
+	app->save_update_file=save_update_file;
+}
 int main(int arg,char **argv){
 	if(arg<=1){
 		g_balance=1;
@@ -1632,6 +2281,7 @@ int main(int arg,char **argv){
 	wireless wire_1;
 	link_layer_101 link[3];
 	app_layer app;
+	set_app_interface();
 
 	com[0].set_com_handle(&serial_1);
 	com[0].set_com_para((void *)&serial_set_1,1);
