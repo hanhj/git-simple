@@ -8,5 +8,5 @@ all:$(target)
 function.pdf:function.tex
 	$(LATEX) $< && $(LATEX) $<
 clean:
-	rm -f *.idx *.ind *.fls *.dvi *.ps *.log *.toc *.aux $(target)
+	rm -f *.idx *.ind *.fls *.dvi *.ps *.log *.toc *.aux 
 
