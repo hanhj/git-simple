@@ -17,8 +17,16 @@
 #include<sys/types.h>
 #include<unistd.h>
 using namespace std;
+
+//error code define
+#define ERR_BUILD_LINK_FR -1 
+#define ERR_BUILD_APP_FR -2 
+#define ERR_SEND_FR -3
+
+
 int g_balance=0;
 char g_filename[20];
+int errno;
 /****************************
  * utilty
 ****************************/
@@ -886,7 +894,7 @@ class link_layer{
 		int check_state();//cycle check link state
 		int send_frame(frame *);
 	public:
-//the next function will build link layer frame by call app_layer same name function.
+//the next functions will build link layer frame by call same name function in app_layer.
 //different link layer has different link frame(eg 101 and 104).but they have same app_layer frame(asdu).
 //the inheritance class must realize these virtual function.
 		virtual int build_link_layer(frame *out,int)=0;//by asdu build link frame 
@@ -923,6 +931,10 @@ class link_layer{
 };
 #define REP_TIMES 3
 #define REP_TIME  1
+
+/****************************
+ * relaize link_layer
+****************************/
 int link_layer::set_link_com(com_port*c,int p){
 	if(c!=NULL){
 		port=p;
@@ -1063,6 +1075,8 @@ class link_layer_101:public link_layer{
  *  relaize link_layer_101
 ****************************/
 int link_layer_101::build_ack(frame*out,int has_data){
+	int ret;
+	ret=0;
 	int i;
 	i=0;
 	if(!balance){
@@ -1088,9 +1102,12 @@ int link_layer_101::build_ack(frame*out,int has_data){
 	out->data[i++]=0x16;
 	out->len=i;
 	out->valid=1;
-	return i;
+	ret=i;
+	return ret;
 }
 int link_layer_101::build_nak(frame*out){
+	int ret;
+	ret=0;
 	int i;
 	i=0;
 	if(!balance){
@@ -1116,9 +1133,12 @@ int link_layer_101::build_nak(frame*out){
 	out->data[i++]=0x16;
 	out->len=i;
 	out->valid=1;
-	return i;
+	ret=i;
+	return ret;
 }
 int link_layer_101::build_link_ack(frame*out){
+	int ret;
+	ret=0;
 	int i;
 	i=0;
 	if(!balance){
@@ -1144,9 +1164,12 @@ int link_layer_101::build_link_ack(frame*out){
 	out->data[i++]=0x16;
 	out->len=i;
 	out->valid=1;
-	return i;
+	ret=i;
+	return ret;
 }
 int link_layer_101::build_link_req(frame*out){
+	int ret;
+	ret=0;
 	int i=0;
 	if(balance==1){
 		ctl_lo.pm.fc=9;
@@ -1165,9 +1188,12 @@ int link_layer_101::build_link_req(frame*out){
 		out->len=i;
 		out->valid=1;
 	}	
-	return 0;
+	ret=i;
+	return ret;
 }
 int link_layer_101::build_reset_link(frame*out){
+	int ret;
+	ret=0;
 	int i=0;
 	if(balance==1){
 		ctl_lo.pm.fc=0;
@@ -1186,9 +1212,12 @@ int link_layer_101::build_reset_link(frame*out){
 		out->len=i;
 		out->valid=1;
 	}	
-	return 0;
+	ret=i;
+	return ret;
 }
 int link_layer_101::build_link_layer(frame*out,int asdu_len){
+	int ret;
+	ret=0;
 	int l;
 	int len;
 	switch(addr_size){
@@ -1203,7 +1232,8 @@ int link_layer_101::build_link_layer(frame*out,int asdu_len){
 			break;
 		default:
 			pfunc(DEBUG_ERROR,"error addr_size:%d",addr_size);
-			return -1;
+			ret=ERR_BUILD_LINK_FR;
+			goto err;
 	}
 	len=l+6;
 	out->data[0]=0x68;
@@ -1219,7 +1249,8 @@ int link_layer_101::build_link_layer(frame*out,int asdu_len){
 	out->data[len-1]=0x16;
 	out->len=len;
 	out->valid=1;
-	return len;
+	ret=len;
+	err:return ret;
 }
 void link_layer_101::set_loc_ctl(){
 	if(!balance){
@@ -1239,6 +1270,7 @@ void link_layer_101::set_loc_ctl(){
 }
 int link_layer_101::build_link_fini(frame *out){
 	int ret;
+	ret=0;
 	if(!balance){
 		ctl_lo.sl.fc=8;
 		ctl_lo.sl.dfc=0;
@@ -1254,13 +1286,24 @@ int link_layer_101::build_link_fini(frame *out){
 		ctl_lo.pm.rev_dir=1;
 	}
 	ret=app->build_link_fini(out,this);
-	return build_link_layer(out,ret);
+	if(ret<0)
+		goto err;
+	ret=build_link_layer(out,ret);
+	if(ret<0)
+		goto err;
+	err:return ret;
 }
 int link_layer_101::build_summon_con(frame *out){
 	int ret;
+	ret=0;
 	set_loc_ctl();
 	ret=app->build_summon_con(out,this);
-	return build_link_layer(out,ret);
+	if(ret<0)
+		goto err;
+	ret=build_link_layer(out,ret);
+	if(ret<0)
+		goto err;
+	err:return ret;
 }
 int link_layer_101::build_summon_term(frame *out){	
 	int ret;
@@ -1269,151 +1312,274 @@ int link_layer_101::build_summon_term(frame *out){
 		ctl_lo.sl.acd_rev=0;//no more data;
 	}
 	ret=app->build_summon_term(out,this);
-	return build_link_layer(out,ret);	
+	if(ret<0)
+		goto err;
+	ret=build_link_layer(out,ret);	
+	err:return ret;
 }
 int link_layer_101::build_yx_data(frame *out,buffer*data){
 	int ret;
 	set_loc_ctl();
 	ret=app->build_yx_data(out,this,data);
-	return build_link_layer(out,ret);		
+	if(ret<0)
+		goto err;
+	ret=build_link_layer(out,ret);		
+	if(ret<0)
+		goto err;
+	err:return ret;
 }
 int link_layer_101::build_yc_data(frame *out,buffer*data){	
 	int ret;
 	set_loc_ctl();
 	ret=app->build_yc_data(out,this,data);
-	return build_link_layer(out,ret);			
+	if(ret<0)
+		goto err;
+	ret=build_link_layer(out,ret);			
+	if(ret<0)
+		goto err;
+	err:return ret;
 }
 int link_layer_101::build_event_data(frame *out,buffer *data){	
 	int ret;
 	set_loc_ctl();
 	ret=app->build_event_data(out,this,data);
-	return build_link_layer(out,ret);				
+	if(ret<0)
+		goto err;
+	ret=build_link_layer(out,ret);				
+	if(ret<0)
+		goto err;
+	err:return ret;
 }
 int link_layer_101::build_clock_con(frame *out){	
 	int ret;
 	set_loc_ctl();
 	ret=app->build_clock_con(out,this);
-	return build_link_layer(out,ret);				
+	if(ret<0)
+		goto err;
+	if(ret<0)
+		goto err;
+	ret=build_link_layer(out,ret);				
+	err:return ret;
 }
 int link_layer_101::build_clock_resp(frame *out,buffer *data){	
 	int ret;
 	set_loc_ctl();
 	ret=app->build_clock_resp(out,this,data);
-	return build_link_layer(out,ret);				
+	if(ret<0)
+		goto err;
+	if(ret<0)
+		goto err;
+	ret=build_link_layer(out,ret);				
+	err:return ret;
 }
 int link_layer_101::build_yk_con(frame *out,int sel){	
 	int ret;
 	set_loc_ctl();
 	ret=app->build_yk_con(out,this,sel);
-	return build_link_layer(out,ret);				
+	if(ret<0)
+		goto err;
+	ret=build_link_layer(out,ret);				
+	if(ret<0)
+		goto err;
+	err:return ret;
 }
 int link_layer_101::build_yk_deact_con(frame *out){	
 	int ret;
 	set_loc_ctl();
 	ret=app->build_yk_deact_con(out,this);
-	return build_link_layer(out,ret);				
+	if(ret<0)
+		goto err;
+	ret=build_link_layer(out,ret);				
+	if(ret<0)
+		goto err;
+	err:return ret;
 }
 int link_layer_101::build_link_test_con(frame *out){	
 	int ret;
 	set_loc_ctl();
 	ret=app->build_link_test_con(out,this);
-	return build_link_layer(out,ret);				
+	if(ret<0)
+		goto err;
+	ret=build_link_layer(out,ret);				
+	if(ret<0)
+		goto err;
+	err:return ret;
 }
 int link_layer_101::build_yc_cg_data(frame *out,buffer*data){
 	int ret;
 	set_loc_ctl();
 	ret=app->build_yc_cg_data(out,this,data);
-	return build_link_layer(out,ret);					
+	if(ret<0)
+		goto err;
+	ret=build_link_layer(out,ret);					
+	if(ret<0)
+		goto err;
+	err:return ret;
 }
 int link_layer_101::build_reset_con(frame *out){
 	int ret;
 	set_loc_ctl();
 	ret=app->build_reset_con(out,this);
-	return build_link_layer(out,ret);					
+	if(ret<0)
+		goto err;
+	ret=build_link_layer(out,ret);					
+	if(ret<0)
+		goto err;
+	err:return ret;
 }
 int link_layer_101::build_rd_dir_resp(frame *out,buffer *data){
 	int ret;
 	set_loc_ctl();
 	ret=app->build_rd_dir_resp(out,this,data);
-	return build_link_layer(out,ret);					
+	if(ret<0)
+		goto err;
+	ret=build_link_layer(out,ret);					
+	if(ret<0)
+		goto err;
+	err:return ret;
 }
 int link_layer_101::build_rd_file_con(frame *out){
 	int ret;
 	set_loc_ctl();
 	ret=app->build_rd_file_con(out,this);
-	return build_link_layer(out,ret);				
+	if(ret<0)
+		goto err;
+	ret=build_link_layer(out,ret);				
+	if(ret<0)
+		goto err;
+	err:return ret;
 }
 int link_layer_101::build_rd_file_resp(frame *out,file_segment *file){
 	int ret;
 	set_loc_ctl();
 	ret=app->build_rd_file_resp(out,this,file);
-	return build_link_layer(out,ret);								
+	if(ret<0)
+		goto err;
+	ret=build_link_layer(out,ret);								
+	if(ret<0)
+		goto err;
+	err:return ret;
 }
 int link_layer_101::build_wr_file_con(frame *out){
 	int ret;
 	set_loc_ctl();
 	ret=app->build_wr_file_con(out,this);
-	return build_link_layer(out,ret);					
+	if(ret<0)
+		goto err;
+	ret=build_link_layer(out,ret);					
+	if(ret<0)
+		goto err;
+	err:return ret;
 }
 int link_layer_101::build_wr_file_resp(frame *out){
 	int ret;
 	set_loc_ctl();
 	ret=app->build_wr_file_resp(out,this);
-	return build_link_layer(out,ret);					
+	if(ret<0)
+		goto err;
+	ret=build_link_layer(out,ret);					
+	if(ret<0)
+		goto err;
+	err:return ret;
 }
 int link_layer_101::build_rd_dz_unit_con(frame *out,buffer*data){
 	int ret;
 	set_loc_ctl();
 	ret=app->build_rd_dz_unit_con(out,this,data);
-	return build_link_layer(out,ret);
+	if(ret<0)
+		goto err;
+	ret=build_link_layer(out,ret);
+	if(ret<0)
+		goto err;
+	err:return ret;
 }
 int link_layer_101::build_wr_dz_unit_con(frame *out){	
 	int ret;
 	set_loc_ctl();
 	ret=app->build_wr_dz_unit_con(out,this);
-	return build_link_layer(out,ret);
+	if(ret<0)
+		goto err;
+	ret=build_link_layer(out,ret);
+	if(ret<0)
+		goto err;
+	err:return ret;
 }
 int link_layer_101::build_rd_dz_con(frame *out,buffer*data){	
 	int ret;
 	set_loc_ctl();
 	ret=app->build_rd_dz_con(out,this,data);
-	return build_link_layer(out,ret);
+	if(ret<0)
+		goto err;
+	ret=build_link_layer(out,ret);
+	if(ret<0)
+		goto err;
+	err:return ret;
 }
 int link_layer_101::build_dz_con(frame *out,int sel){	
 	int ret;
 	set_loc_ctl();
 	ret=app->build_dz_con(out,this,sel);
-	return build_link_layer(out,ret);
+	if(ret<0)
+		goto err;
+	ret=build_link_layer(out,ret);
+	if(ret<0)
+		goto err;
+	err:return ret;
 }
 int link_layer_101::build_dz_dact_con(frame *out){	
 	int ret;
 	set_loc_ctl();
 	ret=app->build_dz_dact_con(out,this);
-	return build_link_layer(out,ret);
+	if(ret<0)
+		goto err;
+	ret=build_link_layer(out,ret);
+	if(ret<0)
+		goto err;
+	err:return ret;
 }
 int link_layer_101::build_summon_acc_con(frame *out){	
 	int ret;
 	set_loc_ctl();
 	ret=app->build_summon_acc_con(out,this);
-	return build_link_layer(out,ret);
+	if(ret<0)
+		goto err;
+	ret=build_link_layer(out,ret);
+	if(ret<0)
+		goto err;
+	err:return ret;
 }
 int link_layer_101::build_summon_acc_term(frame *out){	
 	int ret;
 	set_loc_ctl();
 	ret=app->build_summon_acc_term(out,this);
-	return build_link_layer(out,ret);
+	if(ret<0)
+		goto err;
+	ret=build_link_layer(out,ret);
+	if(ret<0)
+		goto err;
+	err:return ret;
 }
 int link_layer_101::build_summon_acc_resp(frame *out,buffer*data){	
 	int ret;
 	set_loc_ctl();
 	ret=app->build_summon_acc_resp(out,this,data);
-	return build_link_layer(out,ret);
+	if(ret<0)
+		goto err;
+	ret=build_link_layer(out,ret);
+	if(ret<0)
+		goto err;
+	err:return ret;
 }
 int link_layer_101::build_update_con(frame *out,int sel){	
 	int ret;
 	set_loc_ctl();
 	ret=app->build_update_con(out,this,sel);
-	return build_link_layer(out,ret);
+	if(ret<0)
+		goto err;
+	ret=build_link_layer(out,ret);
+	if(ret<0)
+		goto err;
+	err:return ret;
 }
 
 int link_layer_101::on_req_class_1(frame *in,frame *out){
@@ -1687,7 +1853,10 @@ int link_layer_101::deal_frame(frame*f){
 	}
 	return ret;
 }
+
 int link_layer_101::fc_0(frame*f){
+	int ret;
+	ret=0;
 	cout<<"fc_0"<<endl;
 	if(balance!=BALANCE){
 		if(link_step==2){
@@ -1695,7 +1864,9 @@ int link_layer_101::fc_0(frame*f){
 			//because remote reset link so reset ctl_lo and ctl_rm
 			ctl_lo.pm.fcb=0;
 			ctl_rm.pm.fcb=0;
-			build_ack(&s_fix_frame,1);
+			ret=build_ack(&s_fix_frame,1);
+			if(ret<0)
+				goto err;
 			send_frame(&s_fix_frame);
 			link_step++;//4
 		}
@@ -1705,15 +1876,21 @@ int link_layer_101::fc_0(frame*f){
 			ctl_lo.pm.fcb=0;
 			ctl_rm.pm.fcb=0;
 			link_step++;//3
-			build_ack(&s_fix_frame);
+			ret=build_ack(&s_fix_frame);
+			if(ret<0)
+				goto err;
 			send_frame(&s_fix_frame);
 			link_step++;//4
-			build_link_req(&s_fix_frame);
+			ret=build_link_req(&s_fix_frame);
+			if(ret<0)
+				goto err;
 			send_frame(&s_fix_frame);
 			link_step++;//5
 		}else if(link_step==7){
 			link_step++;//8
-			build_link_fini(&s_var_frame);
+			ret=build_link_fini(&s_var_frame);
+			if(ret<0)
+				goto err;
 			send_frame(&s_var_frame);
 			link_step++;//9
 			save_frame(&s_var_frame);//save frame
@@ -1728,21 +1905,25 @@ int link_layer_101::fc_0(frame*f){
 			rep_times=0;
 		}
 	}
-	return 0;
+	err:return ret;
 }
 int link_layer_101::fc_1(frame*f){
-	cout<<"fc_1"<<endl;
-	return 0;
-}
-int link_layer_101::fc_2(frame*f){
-	cout<<"fc_2"<<endl;
-	return 0;
-}
-int link_layer_101::fc_3(frame *f){
-	cout<<"fc_3"<<endl;
-	ctrl_word ctl;
 	int ret;
 	ret=0;
+	cout<<"fc_1"<<endl;
+	err:return ret;
+}
+int link_layer_101::fc_2(frame*f){
+	int ret;
+	ret=0;
+	cout<<"fc_2"<<endl;
+	err:return ret;
+}
+int link_layer_101::fc_3(frame *f){
+	int ret;
+	ret=0;
+	cout<<"fc_3"<<endl;
+	ctrl_word ctl;
 	ctl.data=f->data[offset_control];
 	if(balance!=BALANCE){
 		if(ctl.pm.fcv){
@@ -1750,18 +1931,26 @@ int link_layer_101::fc_3(frame *f){
 				ctl_rm.data=ctl.data;//save control
 				ret=on_req(f,&s_var_frame);
 				if(ret==0){
-					build_ack(&s_fix_frame,has_data);
+					ret=build_ack(&s_fix_frame,has_data);
+					if(ret<0)
+						goto err;
 					send_frame(&s_fix_frame);//ack
 				}else{
-					build_nak(&s_fix_frame);
+					ret=build_nak(&s_fix_frame);
+					if(ret<0)
+						goto err;
 					send_frame(&s_fix_frame);
 				}
 			}else{
-				build_nak(&s_fix_frame);
+				ret=build_nak(&s_fix_frame);
+				if(ret<0)
+					goto err;
 				send_frame(&s_fix_frame);
 			}
 		}else{
-			build_nak(&s_fix_frame);
+			ret=build_nak(&s_fix_frame);
+			if(ret<0)
+				goto err;
 			send_frame(&s_fix_frame);
 		}
 	}else if(balance==BALANCE){
@@ -1770,65 +1959,87 @@ int link_layer_101::fc_3(frame *f){
 				ctl_rm.data=ctl.data;//save control
 				ret=on_req(f,&s_var_frame);
 				if(ret==0){
-					build_ack(&s_fix_frame);
+					ret=build_ack(&s_fix_frame);
+					if(ret<0)
+						goto err;
 					send_frame(&s_fix_frame);//ack
 					send_frame(&s_var_frame);
 					save_frame(&s_var_frame);//save frame
 					rep_timer.start(REP_TIME);
 				}else{
-					build_nak(&s_fix_frame);
+					ret=build_nak(&s_fix_frame);
+					if(ret<0)
+						goto err;
 					send_frame(&s_fix_frame);
 				}
 			}else{
 				send_frame(&last_send_frame);
 			}
 		}else{
-			build_nak(&s_fix_frame);
+			ret=build_nak(&s_fix_frame);
+			if(ret<0)
+				goto err;
 			send_frame(&s_fix_frame);
 		}
 	}
-	return 0;
+	err:return ret;
 }
 int link_layer_101::fc_4(frame*f){
+	int ret;
+	ret=0;
 	cout<<"fc_4"<<endl;
-	return 0;
+	err:return ret;
 }
 int link_layer_101::fc_5(frame*f){
+	int ret;
+	ret=0;
 	cout<<"fc_5"<<endl;
-	return 0;
+	err:return ret;
 }
 int link_layer_101::fc_6(frame*f){
+	int ret;
+	ret=0;
 	cout<<"fc_6"<<endl;
-	return 0;
+	err:return ret;
 }
 int link_layer_101::fc_7(frame*f){
+	int ret;
+	ret=0;
 	cout<<"fc_7"<<endl;
-	return 0;
+	err:return ret;
 }
 int link_layer_101::fc_8(frame*f){
+	int ret;
+	ret=0;
 	cout<<"fc_8"<<endl;
-	return 0;
+	err:return ret;
 }
 int link_layer_101::fc_9(frame*f){
+	int ret;
+	ret=0;
 	cout<<"fc_9"<<endl;
 	process=PROCESS_LINK;
 	link_step=1;
 	link_state=LINK_NOCONNECT;
-	build_link_ack(&s_fix_frame);
+	ret=build_link_ack(&s_fix_frame);
+	if(ret<0)
+		goto err;
 	send_frame(&s_fix_frame);
 	link_step++;//2
-	return 0;
+	err:return ret;
 }
 int link_layer_101::fc_10(frame*f){
-	cout<<"fc_10"<<endl;
-	ctrl_word ctl;
 	int ret;
 	ret=0;
+	cout<<"fc_10"<<endl;
+	ctrl_word ctl;
 	ctl.data=f->data[offset_control];
 	if(balance!=BALANCE){
 		if(link_step==4){
 			link_step++;//5
-			build_link_fini(&s_var_frame);
+			ret=build_link_fini(&s_var_frame);
+			if(ret<0)
+				goto err;
 			send_frame(&s_var_frame);
 			link_step++;//6
 			link_state=LINK_CONNECT;
@@ -1847,18 +2058,20 @@ int link_layer_101::fc_10(frame*f){
 					send_frame(&last_send_frame);
 				}
 			}else{
-				build_nak(&s_fix_frame);
+				ret=build_nak(&s_fix_frame);
+				if(ret<0)
+					goto err;
 				send_frame(&s_fix_frame);
 			}
 		}
 	}
-	return 0;
+	err:return ret;
 }
 int link_layer_101::fc_11(frame *f){
-	cout<<"fc_11"<<endl;
-	ctrl_word ctl;
 	int ret;
 	ret=0;
+	cout<<"fc_11"<<endl;
+	ctrl_word ctl;
 	ctl.data=f->data[offset_control];
 	if(balance!=BALANCE){
 		if(ctl.pm.fcv){
@@ -1873,18 +2086,22 @@ int link_layer_101::fc_11(frame *f){
 				send_frame(&last_send_frame);
 			}
 		}else{
-			build_nak(&s_fix_frame);
+			ret=build_nak(&s_fix_frame);
+			if(ret<0)
+				goto err;
 			send_frame(&s_fix_frame);
 		}
 	}else if(balance==BALANCE){
 		if(link_step==5){
 			link_step++;//6
-			build_reset_link(&s_fix_frame);
+			ret=build_reset_link(&s_fix_frame);
+			if(ret<0)
+				goto err;
 			send_frame(&s_fix_frame);
 			link_step++;//7
 		}
 	}	
-	return 0;
+	err:return ret;
 }
 /****************************
  *	relaize app_layer 
