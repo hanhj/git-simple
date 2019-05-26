@@ -288,6 +288,17 @@ int serial::read(int len){
 	pdump(DEBUG_NORMAL,"read serial",&tmpbuf[0],m);
 	return l;
 }
+/**
+***********************************************************************
+*  @brief	send data by serial
+*  @param[in] data data buffer 
+*  @param[in] len data len 
+*  @return upon successful return number of actiual send.\n
+*	if fail a negative value returned.
+*  @note	
+*  @see		
+***********************************************************************
+*/
 int serial::send(unsigned char *data,int len){
 	pdump(DEBUG_INFO,"send serial",data,len);
 	return len;
@@ -354,6 +365,17 @@ int ethernet::read(int len){
 	cout<<"read ethernet:"<<len<<endl;
 	return len;
 }
+/**
+***********************************************************************
+*  @brief	send data by ethernet	
+*  @param[in]  
+*  @param[out]  
+*  @return upon successful \n
+*	if fail a negative value returned.
+*  @note	
+*  @see		
+***********************************************************************
+*/
 int ethernet::send(unsigned char *data,int len){
 	cout<<"send ethernet:"<<len<<endl;
 	return len;
@@ -418,6 +440,17 @@ int wireless::read(int len){
 	cout<<"read wireless:"<<len<<endl;
 	return len;
 }
+/**
+***********************************************************************
+*  @brief send data by wireless	
+*  @param[in]  
+*  @param[out]  
+*  @return upon successful \n
+*	if fail a negative value returned.
+*  @note	
+*  @see		
+***********************************************************************
+*/
 int wireless::send(unsigned char *data,int len){
 	cout<<"send wireless:"<<len<<endl;
 	return len;
@@ -935,6 +968,17 @@ class link_layer{
 /****************************
  * relaize link_layer
 ****************************/
+/**
+***********************************************************************
+*  @brief	link link_layer with physical com_port	
+*  @param[in]  
+*  @param[out]  
+*  @return upon successful \n
+*	if fail a negative value returned.
+*  @note	
+*  @see		
+***********************************************************************
+*/
 int link_layer::set_link_com(com_port*c,int p){
 	if(c!=NULL){
 		port=p;
@@ -942,6 +986,7 @@ int link_layer::set_link_com(com_port*c,int p){
 		cout<<"link link_layer "<<port<<" to com_port "<<c->port_no<<endl;
 		return 0;
 	}
+	pfunc(DEBUG_ERROR,"invalid para\r");
 	return -1;
 }
 int link_layer::set_app(app_layer*ap){
@@ -950,14 +995,22 @@ int link_layer::set_app(app_layer*ap){
 }
 int link_layer::send_frame(frame *f){
 	int ret;
-	if(com==NULL||f==NULL)
-		return -1;
+	ret=0;
+	if(com==NULL||f==NULL){
+		ret=ERR_SEND_FR;
+		pfunc(DEBUG_ERROR,"invalid para\r");
+		goto err;
+	}
 	cout<<"send frame of link "<<port<<",physical port :"<<com->port_no<<endl;
 	if(f->valid==1){
 		ret=com->send(f->data,f->len);
 		f->valid=0;
+	}else{
+		ret=ERR_SEND_FR;
+		pfunc(DEBUG_ERROR,"invalid frame\r");
+		goto err;
 	}
-	return ret;
+	err:return ret;
 }
 int link_layer::check_state(){
 	cout<<"check state of link "<<port<<",state:"<<link_state<<endl;
@@ -1041,7 +1094,7 @@ class link_layer_101:public link_layer{
 		int on_req(frame *in,frame *out);//set fc=0 or fc=1,response fc3,fix frame or var frame
 		//set respose frame's control word.
 		void set_loc_ctl();
-//the next function  is implement of parent virtual function. inheritance 继承
+//the next functions  is implement of parent virtual function. inheritance 继承
 		int build_link_layer(frame *out,int asdu_len);//by asdu build link frame.
 		int build_link_fini(frame *out);//set fc=3(balance) or fc=8(unbalance),var frame
 		int build_summon_con(frame *out);//set fc=3(balance) or fc=8(unbalance),var frame
@@ -2333,7 +2386,7 @@ int app_layer::build_update_con(frame *out,link_layer *link,int sel){//cause 7 s
 	return i;
 }
 /****************************
- * extern interface functio 
+ * extern interface functions
 ****************************/
 int get_yx_data(buffer*data){
 	pfunc(DEBUG_NORMAL,"\n");
