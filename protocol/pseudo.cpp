@@ -636,11 +636,12 @@ typedef union _send_cause{
 //define link state
 #define LINK_NOCONNECT		0
 #define LINK_CONNECT		1
+//规约系统参数
 #define ADDR_SIZE			2
 #define CAUSE_SIZE			2
 #define MSG_ID_SIZE			2
 #define BALANCE				1
-
+//正在执行的过程
 #define PROCESS_LINK		1<<0
 #define PROCESS_SUMMON		1<<1
 #define PROCESS_CLOCKSYN	1<<2
@@ -658,7 +659,7 @@ typedef union _send_cause{
 #define PROCESS_WR_DZ_UNIT	1<<14
 #define PROCESS_SUMMON_ACC	1<<15//累计量
 #define PROCESS_UPDATE		1<<16
-
+//功能码
 #define COMMAND_SUMMON		100
 #define COMMAND_CLOCK		103
 #define COMMAND_RM_CTL		45
@@ -939,9 +940,9 @@ class link_layer{
 		int check_state();//cycle check link state
 		int send_frame(frame *);
 	public:
-//the next functions will build link layer frame by call same name function in app_layer.
-//different link layer has different link frame(eg 101 and 104).but they have same app_layer frame(asdu).
-//the inheritance class must realize these virtual function.
+		//the next functions will build link layer frame by call same name function in app_layer.
+		//different link layer has different link frame(eg 101 and 104).but they have same app_layer frame(asdu).
+		//the inheritance class must realize these virtual function.
 		virtual int build_link_layer(frame *out,int)=0;//by asdu build link frame 
 		virtual int build_link_fini(frame *out)=0;
 		virtual int build_summon_con(frame *out)=0;
@@ -2598,7 +2599,8 @@ err:
 *  @note	
 *  @see		
 ***********************************************************************
-*/int app_layer::build_summon_term(frame *out,link_layer *link){
+*/
+int app_layer::build_summon_term(frame *out,link_layer *link){
 	int i;
 	int ret;
 	get_link_info(link);
@@ -2655,7 +2657,8 @@ err:
 *  @note	
 *  @see		
 ***********************************************************************
-*/int app_layer::build_yx_data(frame *out,link_layer *link,buffer*data){//cause 20
+*/
+int app_layer::build_yx_data(frame *out,link_layer *link,buffer*data){//cause 20
 	int i;
 	i=0;
 	int ret;
@@ -2733,7 +2736,8 @@ err:
 *  @note	
 *  @see		
 ***********************************************************************
-*/int app_layer::build_event_data(frame *out,link_layer *link,buffer *data){//cause 3
+*/
+int app_layer::build_event_data(frame *out,link_layer *link,buffer *data){//cause 3
 	int i;
 	i=0;
 	int ret;
@@ -2772,7 +2776,8 @@ err:
 *  @note	
 *  @see		
 ***********************************************************************
-*/int app_layer::build_clock_con(frame *out,link_layer *link){//cause 7
+*/
+int app_layer::build_clock_con(frame *out,link_layer *link){//cause 7
 	int i;
 	i=0;
 	int ret;
@@ -2811,7 +2816,8 @@ err:
 *  @note	
 *  @see		
 ***********************************************************************
-*/int app_layer::build_clock_resp(frame *out,link_layer *link,buffer *data){//cause 5
+*/
+int app_layer::build_clock_resp(frame *out,link_layer *link,buffer *data){//cause 5
 	int i;
 	i=0;
 	int ret;
