@@ -795,7 +795,7 @@ class app_layer{
 			get_summon_acc_data=NULL;
 			save_update_file=NULL;
 		}
-		void get_link_info(link_layer*);
+		int get_link_info(link_layer*);
 		//abbreviation: 
 		//act->activation
 		//deact->stop active
@@ -2465,28 +2465,14 @@ int save_update_file(char *filename,file_segment *file);
 /****************************
  *	realize app_layer 
 ****************************/
-void app_layer::get_link_info(link_layer*link){
+int app_layer::get_link_info(link_layer*link){
+	int ret;
+	ret=0;
 	offset=link->offset_asdu;
 	addr_size=link->addr_size;
 	cause_size=link->cause_size;
 	msg_id_size=link->msg_id_size;
 	addr=link->addr;
-}
-/**
-***********************************************************************
-*  @brief	build asdu of link_fini command 
-*  @param[in] link point to link_layer  
-*  @param[out]  out point to out frame 
-*  @return upon successful return number of asdu size\n
-*	if fail a negative value returned.
-*  @note	
-*  @see		
-***********************************************************************
-*/
-int app_layer::build_link_fini(frame*out,link_layer*link){
-	int i;
-	int ret;
-	get_link_info(link);
 	if(addr_size>2){
 		ret=ERR_BUILD_APP_FR;
 		errno=ret;
@@ -2505,6 +2491,27 @@ int app_layer::build_link_fini(frame*out,link_layer*link){
 		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",msg_id_size);
 		goto err;
 	}
+err:
+	return ret;
+}
+/**
+***********************************************************************
+*  @brief	build asdu of link_fini command 
+*  @param[in] link point to link_layer  
+*  @param[out]  out point to out frame 
+*  @return upon successful return number of asdu size\n
+*	if fail a negative value returned.
+*  @note	
+*  @see		
+***********************************************************************
+*/
+int app_layer::build_link_fini(frame*out,link_layer*link){
+	int i;
+	int ret;
+
+	ret=get_link_info(link);
+	if(ret<0)
+		goto err;
 
 	vsq_lo.bit.n=1;
 	vsq_lo.bit.sq=0;
@@ -2532,7 +2539,7 @@ err:
 }
 /**
 ***********************************************************************
-*  @brief	build asdu of link_fini command 
+*  @brief	build asdu of summon confirm command
 *  @param[in] link point to link_layer  
 *  @param[out]  out point to out frame 
 *  @return upon successful return number of asdu size\n
@@ -2544,26 +2551,10 @@ err:
 int app_layer::build_summon_con(frame*out,link_layer*link){
 	int i;
 	int ret;
-	ret=0;
-	get_link_info(link);
-	if(addr_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",addr_size);
+
+	ret=get_link_info(link);
+	if(ret<0)
 		goto err;
-	}
-	if(cause_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",cause_size);
-		goto err;
-	}
-	if(msg_id_size>3){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",msg_id_size);
-		goto err;
-	}
 
 	vsq_lo.bit.n=1;
 	vsq_lo.bit.sq=0;
@@ -2591,7 +2582,7 @@ err:
 }
 /**
 ***********************************************************************
-*  @brief	build asdu of link_fini command 
+*  @brief	build asdu of summon terminal command 
 *  @param[in] link point to link_layer  
 *  @param[out]  out point to out frame 
 *  @return upon successful return number of asdu size\n
@@ -2603,25 +2594,10 @@ err:
 int app_layer::build_summon_term(frame *out,link_layer *link){
 	int i;
 	int ret;
-	get_link_info(link);
-	if(addr_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",addr_size);
+
+	ret=get_link_info(link);
+	if(ret<0)
 		goto err;
-	}
-	if(cause_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",cause_size);
-		goto err;
-	}
-	if(msg_id_size>3){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",msg_id_size);
-		goto err;
-	}
 
 	vsq_lo.bit.n=1;
 	vsq_lo.bit.sq=0;
@@ -2649,7 +2625,7 @@ err:
 }
 /**
 ***********************************************************************
-*  @brief	build asdu of link_fini command 
+*  @brief	build asdu of yx data command 
 *  @param[in] link point to link_layer  
 *  @param[out]  out point to out frame 
 *  @return upon successful return number of asdu size\n
@@ -2662,34 +2638,17 @@ int app_layer::build_yx_data(frame *out,link_layer *link,buffer*data){//cause 20
 	int i;
 	i=0;
 	int ret;
-	ret=0;
 	
-	get_link_info(link);
-	if(addr_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",addr_size);
+	ret=get_link_info(link);
+	if(ret<0)
 		goto err;
-	}
-	if(cause_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",cause_size);
-		goto err;
-	}
-	if(msg_id_size>3){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",msg_id_size);
-		goto err;
-	}
 	ret=i;
 err:
 	return ret;
 }
 /**
 ***********************************************************************
-*  @brief	build asdu of link_fini command 
+*  @brief	build asdu of yc data command 
 *  @param[in] link point to link_layer  
 *  @param[out]  out point to out frame 
 *  @return upon successful return number of asdu size\n
@@ -2701,34 +2660,17 @@ err:
 	int i;
 	i=0;
 	int ret;
-	ret=0;
 	
-	get_link_info(link);
-	if(addr_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",addr_size);
+	ret=get_link_info(link);
+	if(ret<0)
 		goto err;
-	}
-	if(cause_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",cause_size);
-		goto err;
-	}
-	if(msg_id_size>3){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",msg_id_size);
-		goto err;
-	}
 	ret=i;
 err:
 	return ret;
 }
 /**
 ***********************************************************************
-*  @brief	build asdu of link_fini command 
+*  @brief	build asdu of event data command 
 *  @param[in] link point to link_layer  
 *  @param[out]  out point to out frame 
 *  @return upon successful return number of asdu size\n
@@ -2741,34 +2683,17 @@ int app_layer::build_event_data(frame *out,link_layer *link,buffer *data){//caus
 	int i;
 	i=0;
 	int ret;
-	ret=0;
 	
-	get_link_info(link);
-	if(addr_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",addr_size);
+	ret=get_link_info(link);
+	if(ret<0)
 		goto err;
-	}
-	if(cause_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",cause_size);
-		goto err;
-	}
-	if(msg_id_size>3){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",msg_id_size);
-		goto err;
-	}
 	ret=i;
 err:
 	return ret;
 }
 /**
 ***********************************************************************
-*  @brief	build asdu of link_fini command 
+*  @brief	build asdu of clock confirm command 
 *  @param[in] link point to link_layer  
 *  @param[out]  out point to out frame 
 *  @return upon successful return number of asdu size\n
@@ -2781,27 +2706,33 @@ int app_layer::build_clock_con(frame *out,link_layer *link){//cause 7
 	int i;
 	i=0;
 	int ret;
-	ret=0;
 	
-	get_link_info(link);
-	if(addr_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",addr_size);
+	ret=get_link_info(link);
+	if(ret<0)
 		goto err;
-	}
-	if(cause_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",cause_size);
+	ret=i;
+err:
+	return ret;
+}
+/**
+***********************************************************************
+*  @brief	build asdu of clock synchronism response command 
+*  @param[in] link point to link_layer  
+*  @param[out]  out point to out frame 
+*  @return upon successful return number of asdu size\n
+*	if fail a negative value returned.
+*  @note	
+*  @see		
+***********************************************************************
+*/
+int app_layer::build_clock_resp(frame *out,link_layer *link,buffer *data){//cause 5
+	int i;
+	i=0;
+	int ret;
+	
+	ret=get_link_info(link);
+	if(ret<0)
 		goto err;
-	}
-	if(msg_id_size>3){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",msg_id_size);
-		goto err;
-	}
 	ret=i;
 err:
 	return ret;
@@ -2817,31 +2748,37 @@ err:
 *  @see		
 ***********************************************************************
 */
-int app_layer::build_clock_resp(frame *out,link_layer *link,buffer *data){//cause 5
+int app_layer::on_yk(frame *in,link_layer *link){//deal yk command in
 	int i;
 	i=0;
 	int ret;
-	ret=0;
 	
-	get_link_info(link);
-	if(addr_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",addr_size);
+	ret=get_link_info(link);
+	if(ret<0)
 		goto err;
-	}
-	if(cause_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",cause_size);
+	ret=i;
+err:
+	return ret;
+}
+/**
+***********************************************************************
+*  @brief	build asdu of yk confirm command 
+*  @param[in] link point to link_layer  
+*  @param[out]  out point to out frame 
+*  @return upon successful return number of asdu size\n
+*	if fail a negative value returned.
+*  @note	
+*  @see		
+***********************************************************************
+*/
+int app_layer::build_yk_con(frame *out,link_layer *link,int sel){//cause=7,sel=0 or 1
+	int i;
+	i=0;
+	int ret;
+	
+	ret=get_link_info(link);
+	if(ret<0)
 		goto err;
-	}
-	if(msg_id_size>3){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",msg_id_size);
-		goto err;
-	}
 	ret=i;
 err:
 	return ret;
@@ -2856,31 +2793,15 @@ err:
 *  @note	
 *  @see		
 ***********************************************************************
-*/int app_layer::on_yk(frame *in,link_layer *link){//deal yk command in
+*/
+int app_layer::build_yk_deact_con(frame *out,link_layer *link){//cause=9,sel=0
 	int i;
 	i=0;
 	int ret;
-	ret=0;
 	
-	get_link_info(link);
-	if(addr_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",addr_size);
+	ret=get_link_info(link);
+	if(ret<0)
 		goto err;
-	}
-	if(cause_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",cause_size);
-		goto err;
-	}
-	if(msg_id_size>3){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",msg_id_size);
-		goto err;
-	}
 	ret=i;
 err:
 	return ret;
@@ -2895,109 +2816,15 @@ err:
 *  @note	
 *  @see		
 ***********************************************************************
-*/int app_layer::build_yk_con(frame *out,link_layer *link,int sel){//cause=7,sel=0 or 1
+*/
+int app_layer::build_link_test_con(frame *out,link_layer *link){//cause 7
 	int i;
 	i=0;
 	int ret;
-	ret=0;
 	
-	get_link_info(link);
-	if(addr_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",addr_size);
+	ret=get_link_info(link);
+	if(ret<0)
 		goto err;
-	}
-	if(cause_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",cause_size);
-		goto err;
-	}
-	if(msg_id_size>3){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",msg_id_size);
-		goto err;
-	}
-	ret=i;
-err:
-	return ret;
-}
-/**
-***********************************************************************
-*  @brief	build asdu of link_fini command 
-*  @param[in] link point to link_layer  
-*  @param[out]  out point to out frame 
-*  @return upon successful return number of asdu size\n
-*	if fail a negative value returned.
-*  @note	
-*  @see		
-***********************************************************************
-*/int app_layer::build_yk_deact_con(frame *out,link_layer *link){//cause=9,sel=0
-	int i;
-	i=0;
-	int ret;
-	ret=0;
-	
-	get_link_info(link);
-	if(addr_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",addr_size);
-		goto err;
-	}
-	if(cause_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",cause_size);
-		goto err;
-	}
-	if(msg_id_size>3){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",msg_id_size);
-		goto err;
-	}
-	ret=i;
-err:
-	return ret;
-}
-/**
-***********************************************************************
-*  @brief	build asdu of link_fini command 
-*  @param[in] link point to link_layer  
-*  @param[out]  out point to out frame 
-*  @return upon successful return number of asdu size\n
-*	if fail a negative value returned.
-*  @note	
-*  @see		
-***********************************************************************
-*/int app_layer::build_link_test_con(frame *out,link_layer *link){//cause 7
-	int i;
-	i=0;
-	int ret;
-	ret=0;
-	
-	get_link_info(link);
-	if(addr_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",addr_size);
-		goto err;
-	}
-	if(cause_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",cause_size);
-		goto err;
-	}
-	if(msg_id_size>3){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",msg_id_size);
-		goto err;
-	}
 	ret=i;
 err:
 	return ret;
@@ -3016,27 +2843,10 @@ err:
 	int i;
 	i=0;
 	int ret;
-	ret=0;
 	
-	get_link_info(link);
-	if(addr_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",addr_size);
+	ret=get_link_info(link);
+	if(ret<0)
 		goto err;
-	}
-	if(cause_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",cause_size);
-		goto err;
-	}
-	if(msg_id_size>3){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",msg_id_size);
-		goto err;
-	}
 	ret=i;
 err:
 	return ret;
@@ -3055,27 +2865,10 @@ err:
 	int i;
 	i=0;
 	int ret;
-	ret=0;
 	
-	get_link_info(link);
-	if(addr_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",addr_size);
+	ret=get_link_info(link);
+	if(ret<0)
 		goto err;
-	}
-	if(cause_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",cause_size);
-		goto err;
-	}
-	if(msg_id_size>3){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",msg_id_size);
-		goto err;
-	}
 	ret=i;
 err:
 	return ret;
@@ -3095,27 +2888,10 @@ int app_layer::on_file(frame *in,link_layer *link){
 	int i;
 	i=0;
 	int ret;
-	ret=0;
 	
-	get_link_info(link);
-	if(addr_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",addr_size);
+	ret=get_link_info(link);
+	if(ret<0)
 		goto err;
-	}
-	if(cause_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",cause_size);
-		goto err;
-	}
-	if(msg_id_size>3){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",msg_id_size);
-		goto err;
-	}
 	ret=i;
 err:
 	return ret;
@@ -3135,27 +2911,10 @@ int app_layer::build_rd_dir_resp(frame *out,link_layer *link,buffer *data){//cau
 	int i;
 	i=0;
 	int ret;
-	ret=0;
 	
-	get_link_info(link);
-	if(addr_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",addr_size);
+	ret=get_link_info(link);
+	if(ret<0)
 		goto err;
-	}
-	if(cause_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",cause_size);
-		goto err;
-	}
-	if(msg_id_size>3){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",msg_id_size);
-		goto err;
-	}
 	ret=i;
 err:
 	return ret;
@@ -3175,27 +2934,10 @@ int app_layer::build_rd_file_con(frame *out,link_layer *link){//cause 7
 	int i;
 	i=0;
 	int ret;
-	ret=0;
 	
-	get_link_info(link);
-	if(addr_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",addr_size);
+	ret=get_link_info(link);
+	if(ret<0)
 		goto err;
-	}
-	if(cause_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",cause_size);
-		goto err;
-	}
-	if(msg_id_size>3){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",msg_id_size);
-		goto err;
-	}
 	ret=i;
 err:
 	return ret;
@@ -3215,27 +2957,10 @@ int app_layer::build_rd_file_resp(frame *out,link_layer *link,file_segment *file
 	int i;
 	i=0;
 	int ret;
-	ret=0;
 	
-	get_link_info(link);
-	if(addr_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",addr_size);
+	ret=get_link_info(link);
+	if(ret<0)
 		goto err;
-	}
-	if(cause_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",cause_size);
-		goto err;
-	}
-	if(msg_id_size>3){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",msg_id_size);
-		goto err;
-	}
 	ret=i;
 err:
 	return ret;
@@ -3255,27 +2980,10 @@ int app_layer::build_wr_file_con(frame *out,link_layer *link){//cause 7
 	int i;
 	i=0;
 	int ret;
-	ret=0;
 	
-	get_link_info(link);
-	if(addr_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",addr_size);
+	ret=get_link_info(link);
+	if(ret<0)
 		goto err;
-	}
-	if(cause_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",cause_size);
-		goto err;
-	}
-	if(msg_id_size>3){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",msg_id_size);
-		goto err;
-	}
 	ret=i;
 err:
 	return ret;
@@ -3295,27 +3003,10 @@ int app_layer::build_wr_file_resp(frame *out,link_layer *link){//cause 5
 	int i;
 	i=0;
 	int ret;
-	ret=0;
 	
-	get_link_info(link);
-	if(addr_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",addr_size);
+	ret=get_link_info(link);
+	if(ret<0)
 		goto err;
-	}
-	if(cause_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",cause_size);
-		goto err;
-	}
-	if(msg_id_size>3){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",msg_id_size);
-		goto err;
-	}
 	ret=i;
 err:
 	return ret;
@@ -3335,27 +3026,10 @@ int app_layer::build_rd_dz_unit_con(frame *out,link_layer *link,buffer*data){//c
 	int i;
 	i=0;
 	int ret;
-	ret=0;
 	
-	get_link_info(link);
-	if(addr_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",addr_size);
+	ret=get_link_info(link);
+	if(ret<0)
 		goto err;
-	}
-	if(cause_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",cause_size);
-		goto err;
-	}
-	if(msg_id_size>3){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",msg_id_size);
-		goto err;
-	}
 	ret=i;
 err:
 	return ret;
@@ -3375,27 +3049,10 @@ int app_layer::build_wr_dz_unit_con(frame *out,link_layer *link){//cause 7
 	int i;
 	i=0;
 	int ret;
-	ret=0;
 	
-	get_link_info(link);
-	if(addr_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",addr_size);
+	ret=get_link_info(link);
+	if(ret<0)
 		goto err;
-	}
-	if(cause_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",cause_size);
-		goto err;
-	}
-	if(msg_id_size>3){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",msg_id_size);
-		goto err;
-	}
 	ret=i;
 err:
 	return ret;
@@ -3415,27 +3072,10 @@ int app_layer::build_rd_dz_con(frame *out,link_layer *link,buffer*data){//cause 
 	int i;
 	i=0;
 	int ret;
-	ret=0;
 	
-	get_link_info(link);
-	if(addr_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",addr_size);
+	ret=get_link_info(link);
+	if(ret<0)
 		goto err;
-	}
-	if(cause_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",cause_size);
-		goto err;
-	}
-	if(msg_id_size>3){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",msg_id_size);
-		goto err;
-	}
 	ret=i;
 err:
 	return ret;
@@ -3455,27 +3095,10 @@ int app_layer::on_set_dz(frame *in,link_layer *link){
 	int i;
 	i=0;
 	int ret;
-	ret=0;
 	
-	get_link_info(link);
-	if(addr_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",addr_size);
+	ret=get_link_info(link);
+	if(ret<0)
 		goto err;
-	}
-	if(cause_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",cause_size);
-		goto err;
-	}
-	if(msg_id_size>3){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",msg_id_size);
-		goto err;
-	}
 	ret=i;
 err:
 	return ret;
@@ -3495,27 +3118,10 @@ int app_layer::build_dz_con(frame *out,link_layer *link,int sel){//cause 7,sel =
 	int i;
 	i=0;
 	int ret;
-	ret=0;
 	
-	get_link_info(link);
-	if(addr_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",addr_size);
+	ret=get_link_info(link);
+	if(ret<0)
 		goto err;
-	}
-	if(cause_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",cause_size);
-		goto err;
-	}
-	if(msg_id_size>3){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",msg_id_size);
-		goto err;
-	}
 	ret=i;
 err:
 	return ret;
@@ -3535,27 +3141,10 @@ int app_layer::build_dz_dact_con(frame *out,link_layer *link){//cause 9,sel=0,cr
 	int i;
 	i=0;
 	int ret;
-	ret=0;
 	
-	get_link_info(link);
-	if(addr_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",addr_size);
+	ret=get_link_info(link);
+	if(ret<0)
 		goto err;
-	}
-	if(cause_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",cause_size);
-		goto err;
-	}
-	if(msg_id_size>3){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",msg_id_size);
-		goto err;
-	}
 	ret=i;
 err:
 	return ret;
@@ -3575,27 +3164,10 @@ int app_layer::build_summon_acc_con(frame *out,link_layer *link){//cause 7
 	int i;
 	i=0;
 	int ret;
-	ret=0;
 	
-	get_link_info(link);
-	if(addr_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",addr_size);
+	ret=get_link_info(link);
+	if(ret<0)
 		goto err;
-	}
-	if(cause_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",cause_size);
-		goto err;
-	}
-	if(msg_id_size>3){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",msg_id_size);
-		goto err;
-	}
 	ret=i;
 err:
 	return ret;
@@ -3615,27 +3187,10 @@ int app_layer::build_summon_acc_term(frame *out,link_layer *link){//cause 10
 	int i;
 	i=0;
 	int ret;
-	ret=0;
 	
-	get_link_info(link);
-	if(addr_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",addr_size);
+	ret=get_link_info(link);
+	if(ret<0)
 		goto err;
-	}
-	if(cause_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",cause_size);
-		goto err;
-	}
-	if(msg_id_size>3){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",msg_id_size);
-		goto err;
-	}
 	ret=i;
 err:
 	return ret;
@@ -3655,27 +3210,10 @@ int app_layer::build_summon_acc_resp(frame *out,link_layer *link,buffer*data){//
 	int i;
 	i=0;
 	int ret;
-	ret=0;
 	
-	get_link_info(link);
-	if(addr_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",addr_size);
+	ret=get_link_info(link);
+	if(ret<0)
 		goto err;
-	}
-	if(cause_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",cause_size);
-		goto err;
-	}
-	if(msg_id_size>3){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",msg_id_size);
-		goto err;
-	}
 	ret=i;
 err:
 	return ret;
@@ -3695,27 +3233,10 @@ int app_layer::on_update(frame *in,link_layer *link){
 	int i;
 	i=0;
 	int ret;
-	ret=0;
 	
-	get_link_info(link);
-	if(addr_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",addr_size);
+	ret=get_link_info(link);
+	if(ret<0)
 		goto err;
-	}
-	if(cause_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",cause_size);
-		goto err;
-	}
-	if(msg_id_size>3){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",msg_id_size);
-		goto err;
-	}
 	ret=i;
 err:
 	return ret;
@@ -3735,27 +3256,10 @@ int app_layer::build_update_con(frame *out,link_layer *link,int sel){//cause 7 s
 	int i;
 	i=0;
 	int ret;
-	ret=0;
 	
-	get_link_info(link);
-	if(addr_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",addr_size);
+	ret=get_link_info(link);
+	if(ret<0)
 		goto err;
-	}
-	if(cause_size>2){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",cause_size);
-		goto err;
-	}
-	if(msg_id_size>3){
-		ret=ERR_BUILD_APP_FR;
-		errno=ret;
-		pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",msg_id_size);
-		goto err;
-	}
 	ret=i;
 err:
 	return ret;
