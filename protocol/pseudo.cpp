@@ -1010,8 +1010,8 @@ int link_layer::send_frame(frame *f){
 	int ret;
 	ret=0;
 	if(com==NULL||f==NULL){
-		ret=ERR_SEND_FR;
-		errno=ERR_INVALID_PARA;
+		ret=ERR_INVALID_PARA;
+		errno=ret;
 		pfunc(DEBUG_ERROR,"invalid para\r");
 		goto err;
 	}
@@ -1023,7 +1023,7 @@ int link_layer::send_frame(frame *f){
 		}
 		f->valid=0;
 	}else{
-		ret=ERR_SEND_FR;
+		ret=ERR_INVALID_PARA;
 		errno=ret;
 		pfunc(DEBUG_ERROR,"invalid frame\r");
 		goto err;
@@ -1170,7 +1170,7 @@ int link_layer_101::build_ack(frame*out,int has_data){
 	if(addr_size==2){
 		out->data[i++]=addr>>8&0x00ff;
 	}else if(addr_size>2){
-		ret=ERR_BUILD_APP_FR;
+		ret=ERR_BUILD_LINK_FR;
 		errno=ret;
 		pfunc(DEBUG_ERROR,"invalid addr_size\n");
 		goto err;
@@ -1334,9 +1334,9 @@ int link_layer_101::build_link_layer(frame*out,int asdu_len){
 			l=asdu_len+3;
 			break;
 		default:
-			pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",addr_size);
 			ret=ERR_BUILD_APP_FR;
 			errno=ret;
+			pfunc(DEBUG_ERROR,"invalid addr_size:%d\n",addr_size);
 			goto err;
 	}
 	len=l+6;
@@ -1432,6 +1432,10 @@ int link_layer_101::build_summon_term(frame *out){
 		goto err;
 	}
 	ret=build_link_layer(out,ret);	
+	if(ret<0){
+		errno=ret;
+		goto err;
+	}
 err:
 	return ret;
 }
