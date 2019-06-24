@@ -42,57 +42,66 @@ typedef struct user_data{
 //	,c可以取1,则每次计算时是将当前hash地址向后移一位。c也可以取2,4.。。
 //	di 可以取 1^2,-1^,2^2,-2^2...
 //	di 可以取随机数
+//2) 再哈希
+//
+//3）链地址
+//
+int Hash(const char * key,int size,int count){
+	int hash;
+	hash=((key[0]^2)+((key[1]<<4)^2))%size+count;
+	return hash;
+}
 int make_hash(const char * key,user_data * data,int size,int *r){
 	int hash;
-	int next_hash;
 	int ret;
+	int count=0;
 	ret=-1;
-	hash=((key[0]^2)+((key[1]<<4)^2))%size;
+	hash=Hash(key,size,count);
 	if(data[hash].use==0){
 		data[hash].use=1;
-		strcpy(data[hash].data,key);
+		strcpy(data[hash].data,key);//copy data
 		ret=0;
 		*r=hash;
 	}else{
-		int i=1;
 		while(1){
-			next_hash=hash+i;
-			i++;
-			if(data[next_hash].use==0){
-				data[next_hash].use=1;
+			hash=Hash(key,size,++count);
+			if(data[hash].use==0){
+				data[hash].use=1;
 				strcpy(data[hash].data,key);
 				ret=0;
-				*r=next_hash;
+				*r=hash;
 				break;
 			}
-			if(next_hash>size-1)
+			if(hash>size-1)
 				break;
 		}
 	}
+	cout<<"collision:"<<count<<endl;
 	return ret;
 }
+/*
+ * 1) caculate hash
+ * 2) if data is not exist return false
+ * 3) if data equal key return true,otherwise calculate next_hash repeat
+ * to 2)
+ *
+ */
 int search_hash(const char *key,user_data *data,int size,int *r){
 	int hash;
-	int next_hash;
 	int ret;
+	int count;
+	count=0;
 	ret=0;
-	hash=(key[0]+(key[1]<<4))%size;
-	if(strcmp(data[hash].data,key)==0){
+	hash=Hash(key,size,count);
+	while(data[hash].use!=0&&(strcmp(data[hash].data,key)!=0)){
+		hash=Hash(key,size,++count);
+	}
+	if(data[hash].use==0)//not find
+		return ret;
+	else if(strcmp(data[hash].data,key)==0){//find
 		ret=1;
 		*r=hash;
-	}else{
-		int i=1;
-		while(1){
-			next_hash=hash+i;
-			i++;
-			if(strcmp(data[next_hash].data,key)==0){
-				ret=1;
-				*r=next_hash;
-				break;
-			}
-			if(next_hash>size-1)
-				break;
-		}
+		return ret;
 	}
 	return ret;
 }
@@ -169,7 +178,8 @@ void test_search(){
 		ret=make_hash(key_map[i],use_data,TableSize,&hash);
 		if(ret==0){
 			cout<<key_map[i]<<" hash is:"<<hash<<endl;
-		}
+		}else
+			cout<<"fail make hash for"<<key_map[i]<<endl;
 	}
 	char strkey[]="1";
 	ret=search_hash(strkey,use_data,TableSize,&pos);
