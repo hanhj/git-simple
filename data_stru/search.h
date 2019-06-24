@@ -96,6 +96,7 @@ template <class T>
 int index_search(IndexTable<T>*ls,DataTable<T>*s,T key,int m,int *pos){
 	int i,j;
 	i=0;
+	cout<<"test index search"<<endl;
 	while(i<m && key>ls[i].key)/* in index table:key1<key2<key3,so if
 		key is < ls[i].key ,this means data is in this block.*/
 		i++;

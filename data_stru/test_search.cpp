@@ -10,17 +10,6 @@ typedef struct user_data{
 	char data[10];
 	char use;
 }user_data;
-user_data use_data[100];
-char key_map[][100]={
-	{"1"},
-	{"3"},
-	{"10"},
-	{"4"},
-	{"6"},
-	{"7"},
-	{"9"},
-	{"2"}
-};
 //哈希查找是将关键字与地址建立一一映射关系，从而使得查找时间复杂度为O(1)
 //哈希函数建立的映射关系是一种压缩存储，容易引起冲突，即不同关键字具有相同地址，因此需要解决冲突问题。
 //哈希函数评价：1）计算简单;2）地址均匀分布，冲突少。
@@ -58,7 +47,7 @@ int make_hash(const char * key,user_data * data,int size,int *r){
 	int next_hash;
 	int ret;
 	ret=-1;
-	hash=(key[0]+(key[1]<<4))%size;
+	hash=((key[0]^2)+((key[1]<<4)^2))%size;
 	if(data[hash].use==0){
 		data[hash].use=1;
 		strcpy(data[hash].data,key);
@@ -107,10 +96,43 @@ int search_hash(const char *key,user_data *data,int size,int *r){
 	}
 	return ret;
 }
+#define TableSize 100
 void test_search(){
+	//for array search,binary_search
 	int array[]={
 		0,1,2,3,4,6,9,10,12
 	};	
+	//for index search
+	DataTable<int> data[]={
+		{1,0},
+		{2,0},
+		{3,0},
+		{4,0},
+		{5,0},
+		{6,0},
+		{7,0},
+		{8,0},
+		{9,0},
+	};
+	IndexTable<int> index[]={
+		{3,0},
+		{6,3},
+		{9,6},
+		{9,9}//extern index 
+	};
+	//for hash search 
+	user_data use_data[100];
+	char key_map[][100]={
+		{"1"},
+		{"3"},
+		{"10"},
+		{"4"},
+		{"6"},
+		{"7"},
+		{"9"},
+		{"2"}
+	};
+	
 	cout<<"\ntest search ............................"<<endl;
 	int pos;
 	int key;
@@ -133,40 +155,24 @@ void test_search(){
 		cout<<"find key:"<<key<<" at "<<pos<<endl;
 	}else
 		cout<<"not find key:"<<key<<endl;
-	DataTable<int> data[]={
-		{1,0},
-		{2,0},
-		{3,0},
-		{4,0},
-		{5,0},
-		{6,0},
-		{7,0},
-		{8,0},
-		{9,0},
-	};
-	IndexTable<int> index[]={
-		{3,0},
-		{6,3},
-		{9,6},
-		{9,9}
-	};
 	key=19;
 	ret=index_search<int>(index,data,key,3,&pos);
 	if(ret){
 		cout<<"find key:"<<key<<" at "<<pos<<endl;
 	}else
 		cout<<"not find key:"<<key<<endl;
+	cout<<"test hash search_hash"<<endl;
 	int hash;
-	int size;
-	size=(int)sizeof(key_map)/(int)sizeof(key_map[0]);
-	for(i=0;i<size;i++){
-		ret=make_hash(key_map[i],use_data,100,&hash);
+	int key_map_size;
+	key_map_size=(int)sizeof(key_map)/(int)sizeof(key_map[0]);
+	for(i=0;i<key_map_size;i++){
+		ret=make_hash(key_map[i],use_data,TableSize,&hash);
 		if(ret==0){
 			cout<<key_map[i]<<" hash is:"<<hash<<endl;
 		}
 	}
 	char strkey[]="1";
-	ret=search_hash(strkey,use_data,100,&pos);
+	ret=search_hash(strkey,use_data,TableSize,&pos);
 	if(ret){
 		cout<<"find key:"<<strkey<<" at "<<pos<<endl;
 	}else
