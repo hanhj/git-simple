@@ -17,13 +17,5 @@ int main()
 	case3();
 	test_search();
 	test_sort();
-
-	string str;
-	str="abc";
-	cout<<str<<" "<<str[2]<<endl;
-	int ret;
-	ret=(str=="aaaa");
-	cout<<ret<<endl;
     return 0;
-
 }

@@ -114,6 +114,31 @@ int index_search(IndexTable<T>*ls,DataTable<T>*s,T key,int m,int *pos){
 	}
 	return 0;
 }
+//1 use open addr for collision;2 use link addr for collision
+#define HashType 2  
+#define TableSize 16 
+#if HashType==1 //use extend address
+typedef struct _HashMap{
+	string key;
+	int  hash;
+}HashMap;
+#elif HashType==2 //use link address
+typedef struct _HashAddr{
+	int hash;
+	string key;
+	struct _HashAddr *next;
+}HashAddr;
+typedef struct _HashMap{
+	HashAddr *hashs;
+}HashMap;
+#endif 
+void init_hash_map(HashMap *map,int size);
+void clear_hash_map(HashMap *map,int size);
+void dump_hash_map(HashMap *map,int size);
+int Hash(const char * key,int size,int count);
+int make_hash(const char *  key,HashMap * map,int size,int *r);
+int search_hash(const char *key,HashMap *map,int size,int *r);
+
 void test_search();
 #endif
 // vim:tw=72 
