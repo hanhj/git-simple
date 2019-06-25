@@ -6,6 +6,7 @@
 */
 #ifndef __search_h
 #define __search_h
+#include "data_type.h"
 #include "common.h"
 /* type means :
   0 means all da is used for data

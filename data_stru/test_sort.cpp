@@ -8,9 +8,9 @@
 void test_sort(){
 	cout<<"\ntest sort............"<<endl;
 	int tmp_data[]={
-		//0,4,5,3,2,1,9,21,8,18
+		0,4,5,3,2,1,9,21,8,18
 		//21,18,9,8,5,4,3,2,1,0
-		0,1,2,3,4,5,8,9,18,21
+		//0,1,2,3,4,5,8,9,18,21
 	};
 	int data[10];
 	memcpy(data,tmp_data,sizeof(tmp_data));
