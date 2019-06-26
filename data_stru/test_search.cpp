@@ -60,11 +60,14 @@
  * size is data table size
  * count is collision
  */
-void init_hash_map(HashMap*map,int size){
+void init_hash_map(HashMap**m,int size){
 	int i;
+	HashMap *map;
+	map=new HashMap();
 	for(i=0;i<size;i++){
 		map[i].hash=-1;
 	}
+	*m=map;
 }
 void dump_hash_map(HashMap *map,int size){
 	int i;
@@ -75,6 +78,8 @@ void dump_hash_map(HashMap *map,int size){
 	}
 }
 void clear_hash_map(HashMap *map,int size){
+	if(map)
+		delete map;
 }
 int Hash(const char * key,int size,int count){
 	int hash;
@@ -142,11 +147,14 @@ int search_hash(const char *key,HashMap *map,int size,int *r){
  * size is data table size
  * count is collision
  */
-void init_hash_map(HashMap*map,int size){
+void init_hash_map(HashMap**m,int size){
 	int i;
+	HashMap *map;
+	map=new HashMap();
 	for(i=0;i<size;i++){
 		map[i].hashs=NULL;
 	}
+	*m=map;
 }
 void dump_hash_map(HashMap *map,int size){
 	int i;
@@ -176,6 +184,7 @@ void clear_hash_map(HashMap *map,int size){
 			delete tp;
 		}
 	}
+	delete map;
 }
 int Hash(const char * key,int size,int count){
 	int hash;
@@ -287,7 +296,7 @@ void test_search(){
 	cout<<"test hash search_hash"<<endl;
 	
 	//for hash search 
-	HashMap key_map[TableSize];
+	HashMap *key_map;
 	char key_str[][10]={
 		{"101"},
 		{"3"  },
@@ -302,7 +311,7 @@ void test_search(){
 	int hash;
 	int key_map_size;
 	key_map_size=(int)sizeof(key_str)/(int)sizeof(key_str[0]);
-	init_hash_map(key_map,TableSize);
+	init_hash_map(&key_map,TableSize);
 	for(i=0;i<key_map_size;i++){
 		make_hash(key_str[i],key_map,TableSize,&hash);
 	}

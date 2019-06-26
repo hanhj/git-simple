@@ -115,7 +115,7 @@ int index_search(IndexTable<T>*ls,DataTable<T>*s,T key,int m,int *pos){
 	return 0;
 }
 //1 use open addr for collision;2 use link addr for collision
-#define HashType 2  
+#define HashType 1  
 #define TableSize 16 
 #if HashType==1 //use extend address
 typedef struct _HashMap{
@@ -132,7 +132,7 @@ typedef struct _HashMap{
 	HashAddr *hashs;
 }HashMap;
 #endif 
-void init_hash_map(HashMap *map,int size);
+void init_hash_map(HashMap **map,int size);
 void clear_hash_map(HashMap *map,int size);
 void dump_hash_map(HashMap *map,int size);
 int Hash(const char * key,int size,int count);
