@@ -60,16 +60,18 @@
  * size is data table size
  * count is collision
  */
-void init_hash_map(HashMap**m,int size){
+template <class T>
+void init_hash_map(HashMap<T>**m,int size){
 	int i;
-	HashMap *map;
-	map=new HashMap();
+	HashMap<T> *map;
+	map=(HashMap<T>*)malloc(sizeof(HashMap<T>)*size);
 	for(i=0;i<size;i++){
 		map[i].hash=-1;
 	}
 	*m=map;
 }
-void dump_hash_map(HashMap *map,int size){
+template <class T>
+void dump_hash_map(HashMap<T> *map,int size){
 	int i;
 	cout<<"dump key map:"<<endl;
 	cout<<"pos\tkey\thash"<<endl;
@@ -77,9 +79,11 @@ void dump_hash_map(HashMap *map,int size){
 		cout<<i<<"\t"<<map[i].key<<"\t"<<map[i].hash<<endl;
 	}
 }
-void clear_hash_map(HashMap *map,int size){
-	if(map)
-		delete map;
+template <class T>
+void clear_hash_map(HashMap<T> *map,int size){
+	if(map){
+			free(map);
+	}
 }
 int Hash(const char * key,int size,int count){
 	int hash;
@@ -89,7 +93,8 @@ int Hash(const char * key,int size,int count){
 	return hash;
 }
 
-int make_hash(const char *  key,HashMap * map,int size,int *r){
+template <class T>
+int make_hash(const char *  key,HashMap<T> * map,int size,int *r){
 	int hash;
 	int count=0;
 	hash=Hash(key,size,count);
@@ -113,7 +118,8 @@ int make_hash(const char *  key,HashMap * map,int size,int *r){
  * to 2)
  *
  */
-int search_hash(const char *key,HashMap *map,int size,int *r){
+template <class T>
+int search_hash(const char *key,HashMap<T> *map,int size,int *r){
 	int hash;
 	int ret;
 	int count;
@@ -147,22 +153,24 @@ int search_hash(const char *key,HashMap *map,int size,int *r){
  * size is data table size
  * count is collision
  */
-void init_hash_map(HashMap**m,int size){
+template <class T>
+void init_hash_map(HashMap<T>**m,int size){
 	int i;
-	HashMap *map;
-	map=new HashMap();
+	HashMap<T> *map;
+	map=(HashMap<T>*)malloc(sizeof(HashMap<T>)*size);
 	for(i=0;i<size;i++){
 		map[i].hashs=NULL;
 	}
 	*m=map;
 }
-void dump_hash_map(HashMap *map,int size){
+template <class T>
+void dump_hash_map(HashMap<T> *map,int size){
 	int i;
 	cout<<"dump key map:"<<endl;
 	cout<<"hash\tkey1\tkey2..."<<endl;
 	for(i=0;i<size;i++){
 		cout<<i<<"\t";
-		HashAddr *node;
+		HashAddr<T> *node;
 		node=map[i].hashs;
 		while(node){
 			cout<<node->key<<"\t";
@@ -171,12 +179,13 @@ void dump_hash_map(HashMap *map,int size){
 		cout<<endl;
 	}
 }
-void clear_hash_map(HashMap *map,int size){
+template <class T>
+void clear_hash_map(HashMap<T> *map,int size){
 	int i;
 	cout<<"clean key map"<<endl;
 	for(i=0;i<size;i++){
-		HashAddr *node;
-		HashAddr *tp;
+		HashAddr<T> *node;
+		HashAddr<T> *tp;
 		node=map[i].hashs;
 		while(node){
 			tp=node;
@@ -184,7 +193,7 @@ void clear_hash_map(HashMap *map,int size){
 			delete tp;
 		}
 	}
-	delete map;
+		free(map);
 }
 int Hash(const char * key,int size,int count){
 	int hash;
@@ -193,16 +202,17 @@ int Hash(const char * key,int size,int count){
 		return -1;
 	return hash;
 }
-int make_hash(const char *  key,HashMap * map,int size,int *r){
+template <class T>
+int make_hash(const char *  key,HashMap<T> * map,int size,int *r){
 	int hash;
 	int count=0;
 	hash=Hash(key,size,count);
-	HashAddr *node;
+	HashAddr<T> *node;
 	node=map[hash].hashs;
 	while(node!=NULL){
 		node=node->next;
 	}
-	node=new HashAddr;
+	node=new HashAddr<T>;
 	node->hash=hash;
 	node->key=key;
 	node->next=map[hash].hashs;
@@ -218,11 +228,12 @@ int make_hash(const char *  key,HashMap * map,int size,int *r){
  * to 2)
  *
  */
-int search_hash(const char *key,HashMap *map,int size,int *r){
+template <class T>
+int search_hash(const char *key,HashMap<T> *map,int size,int *r){
 	int hash;
 	int ret;
 	int count;
-	HashAddr *node;
+	HashAddr<T> *node;
 	count=0;
 	ret=0;
 	hash=Hash(key,size,count);
@@ -296,7 +307,7 @@ void test_search(){
 	cout<<"test hash search_hash"<<endl;
 	
 	//for hash search 
-	HashMap *key_map;
+	HashMap<string> *key_map;
 	char key_str[][10]={
 		{"101"},
 		{"3"  },
@@ -311,13 +322,13 @@ void test_search(){
 	int hash;
 	int key_map_size;
 	key_map_size=(int)sizeof(key_str)/(int)sizeof(key_str[0]);
-	init_hash_map(&key_map,TableSize);
+	init_hash_map<string>(&key_map,TableSize);
 	for(i=0;i<key_map_size;i++){
-		make_hash(key_str[i],key_map,TableSize,&hash);
+		make_hash<string>(key_str[i],key_map,TableSize,&hash);
 	}
-	dump_hash_map(key_map,TableSize);
+	dump_hash_map<string>(key_map,TableSize);
 	char strkey[]="10";
-	search_hash(strkey,key_map,TableSize,&hash);
-	clear_hash_map(key_map,TableSize);
+	search_hash<string>(strkey,key_map,TableSize,&hash);
+	clear_hash_map<string>(key_map,TableSize);
 }
 // vim:tw=72 
