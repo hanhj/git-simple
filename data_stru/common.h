@@ -7,9 +7,10 @@
 #ifndef __common_h
 #define __common_h
 #include<iostream>
+using namespace std;
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-using namespace std;
+#include "utils.h"
 #endif
 // vim:tw=72 

@@ -4,6 +4,7 @@
 #include "queue.h"
 #include "search.h"
 #include "sort.h"
+#include "recurse.h"
 extern void case1();
 extern void case2();
 extern void case3();
@@ -17,5 +18,6 @@ int main()
 	case3();
 	test_search();
 	test_sort();
+	test_recurse();
     return 0;
 }
