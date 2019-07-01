@@ -86,7 +86,6 @@ void test_sort(){
 	quick_sort<int>(data,size);
 	gettimeofday(&t2,NULL);
 	diff=t2.tv_sec*1000+(float)t2.tv_usec/1000-(t1.tv_sec*1000+(float)t1.tv_usec/1000);
-	dump<int>(data,size,"sort:");
 	cout<<"run time(us):"<<diff<<endl<<endl;
 	free(data);
 	free(tmp_data);
