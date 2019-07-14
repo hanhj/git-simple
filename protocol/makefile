@@ -5,7 +5,8 @@ objs=pseudo.o
 	g++ -g -c -Wall $< -o $@
 $(target):$(objs)
 	g++ $(objs) -o $@
-
+help:
+	doxygen
 clean:
-	rm -f $(objs) $(target)
+	rm -fr $(objs) $(target) html latex logfile
 

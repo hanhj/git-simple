@@ -29,7 +29,6 @@ void insert_sort(T *data,int size){
 	T tp;
 	int counts;
 	counts=0;
-	cout<<"insert_sort T(n)=O(n^2) "<<endl;
 	for(i=1;i<size;i++){//assume ordered list is first data
 		tp=data[i];
 		j=i-1;
@@ -41,7 +40,7 @@ void insert_sort(T *data,int size){
 		data[j+1]=tp;
 		counts++;
 	}
-	cout<<"counts:"<<counts<<endl;
+	//cout<<"counts:"<<counts<<endl;
 //	dump<T>(data,size,"result:");
 }
 /*
@@ -66,7 +65,6 @@ void shell_sort(T *data,int size){
 	j=0;
 	k=0;
 	counts=0;
-	cout<<"shell_sort "<<endl;
 	while(k<loops){
 		for(i=d[k];i<size;i++){
 			tp=data[i];
@@ -81,7 +79,7 @@ void shell_sort(T *data,int size){
 		k++;
 		counts++;
 	}
-	cout<<"counts:"<<counts<<endl;
+	//cout<<"counts:"<<counts<<endl;
 //	dump<T>(data,size,"result:");
 }
 /* 
@@ -96,7 +94,6 @@ void select_sort(T *data,int size){
 	int k;
 	int counts=0;
 	T x;
-	cout<<"select sort T(n)=O(n^2)"<<endl;
 	for(i=0;i<size-1;i++){
 		k=i;
 		for(j=i+1;j<size;j++){
@@ -111,7 +108,7 @@ void select_sort(T *data,int size){
 		}
 		counts++;
 	}
-	cout<<"counts:"<<counts<<endl;
+	//cout<<"counts:"<<counts<<endl;
 //	dump<T>(data,size,"result:");
 }
 //merge sort theory:
@@ -181,12 +178,11 @@ template <class T>
 void merge_sort(T *data,int size){
 	T *tmp;
 	int counts=0;
-	cout<<"merge sort T(n)=O(nlog2(n))"<<endl;
 	tmp=(T*)malloc(sizeof(T)*size);
 	if(tmp!=NULL){
 		msort(data,tmp,0,size-1,counts);
 		free(tmp);
-		cout<<"counts:"<<counts<<endl;
+	//	cout<<"counts:"<<counts<<endl;
 //		dump<T>(data,size,"result:");
 	}else
 		cout<<"fail malloc"<<endl;
@@ -194,7 +190,6 @@ void merge_sort(T *data,int size){
 
 template <class T>
 void bubble_sort(T *data,int size){
-	cout<<"bubble_sort "<<endl;
 	int counts;
 	counts=0;
 	int m;
@@ -222,11 +217,11 @@ void bubble_sort(T *data,int size){
 		//dump(data,size);
 		m=lastEx;
 	}
-	cout<<"counts:"<<counts<<endl;
+	//cout<<"counts:"<<counts<<endl;
 //	dump<T>(data,size,"result:");
 }
 template <class T>
-T search_mid(T a,T b,T c){
+T get_mid(T a,T b,T c){
 	if(a>b&&b>c)
 		return b;
 	if(a<b&&b>c&&a>c)
@@ -238,6 +233,13 @@ T search_mid(T a,T b,T c){
 	return a;
 }
 template <class T>
+void swap(T*a,T*b){
+	T c;
+	c=*a;
+	*a=*b;
+	*b=c;
+}
+template <class T>
 void _quick_sort(T *data,int left,int right){
 	T x;
 	int i;
@@ -246,8 +248,8 @@ void _quick_sort(T *data,int left,int right){
 		return;
 	i=left;
 	j=right;
-	//int mid=(left+right)/2;
-	//x=search_mid<T>(data[left],data[mid],data[right]);
+//	int mid=(left+right)/2;
+//	x=get_mid(data[left],data[mid],data[right]);
 	x=data[left];
 	while(i<j){
 		while(i<j&&data[j]>x)
@@ -265,9 +267,27 @@ void _quick_sort(T *data,int left,int right){
 			j--;
 		}
 	}
-
 	_quick_sort(data,left,j-1);
 	_quick_sort(data,j+1,right);
+}
+template <class T>
+void _quick_sort2(T *data,int left,int right){
+	int i,j;
+	T x;
+	if(left>right)
+		return;
+	x=data[left];
+	i=left;
+	j=right+1;
+	while(1){
+		while(i<right && data[++i]<x);
+		while(j>left && data[--j]>x);
+		if(i>=j)break;
+		swap(&data[i],&data[j]);
+	}
+	swap(&data[left],&data[j]);
+	_quick_sort2(data,left,j-1);
+	_quick_sort2(data,j+1,right);
 }
 template <class T>
 void quick_sort(T *data,int size){

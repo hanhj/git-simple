@@ -63,7 +63,7 @@ int norc_isPalindrome(const string &s){
 	return 1;
 }
 void test_recurse(){
-	cout<<"test_recurse....."<<endl;
+	cout<<"\ntest_recurse....."<<endl;
 	cout<<"recurse fact(6)="<<fact(6)<<endl;
 	cout<<"norecurse fact(6)="<<norc_fact(6)<<endl;
 	int i;

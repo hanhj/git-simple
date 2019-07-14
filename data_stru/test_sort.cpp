@@ -7,6 +7,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include "sort.h"
+#include "tree.h"
 static int compare(const void *a,const void *b){
 	return *(int*)a>*(int *)b;
 }
@@ -32,62 +33,78 @@ void test_sort(){
 		tmp_data[i]=rand()*1.0/RAND_MAX*100;
 	}
 
-	cout<<"sort:"<<size<<endl;
+	cout<<"sort:"<<size<<" elements"<<endl;
+	
 	memcpy(data,tmp_data,sizeof(int)*size);
 	//dump<int>(data,size,"\norigin:");
+	cout<<"insert_sort:T(n)=O(n^2) "<<endl;
 	gettimeofday(&t1,NULL);
-	insert_sort<int>(data,size);
+	insert_sort(data,size);
 	gettimeofday(&t2,NULL);
 	diff=t2.tv_sec*1000+(float)t2.tv_usec/1000-(t1.tv_sec*1000+(float)t1.tv_usec/1000);
-	cout<<"run time(us):"<<diff<<endl<<endl;
+	cout<<"run time(ms):"<<diff<<endl;
 
 	memcpy(data,tmp_data,sizeof(int)*size);
-	//dump<int>(data,size,"\norigin:");
+	//dump<int>(data,size,"\norigin:"  );
+	cout<<"shell_sort:T(n)=O(n^2) "<<endl;
 	gettimeofday(&t1,NULL);
-	shell_sort<int>(data,size);
+	shell_sort(data,size);
 	gettimeofday(&t2,NULL);
 	diff=t2.tv_sec*1000+(float)t2.tv_usec/1000-(t1.tv_sec*1000+(float)t1.tv_usec/1000);
-	cout<<"run time(us):"<<diff<<endl<<endl;
-
-	memcpy(data,tmp_data,sizeof(int)*size);
-	//dump<int>(data,size,"\norigin:");
-	gettimeofday(&t1,NULL);
-	select_sort<int>(data,size);
-	gettimeofday(&t2,NULL);
-	diff=t2.tv_sec*1000+(float)t2.tv_usec/1000-(t1.tv_sec*1000+(float)t1.tv_usec/1000);
-	cout<<"run time(us):"<<diff<<endl<<endl;
+	cout<<"run time(ms):"<<diff<<endl;
 
 	memcpy(data,tmp_data,sizeof(int)*size);
 	//dump<int>(data,size,"\norigin:");
+	cout<<"select_sort:T(n)=O(n^2) "<<endl;
 	gettimeofday(&t1,NULL);
-	merge_sort<int>(data,size);
+	select_sort(data,size);
 	gettimeofday(&t2,NULL);
 	diff=t2.tv_sec*1000+(float)t2.tv_usec/1000-(t1.tv_sec*1000+(float)t1.tv_usec/1000);
-	cout<<"run time(us):"<<diff<<endl<<endl;
+	cout<<"run time(ms):"<<diff<<endl;
 
 	memcpy(data,tmp_data,sizeof(int)*size);
+	cout<<"merge_sort:T(n)=O(nlogn) "<<endl;
+	//dump<int>(data,size,"\norigin:");
 	gettimeofday(&t1,NULL);
-	bubble_sort<int>(data,size);
+	merge_sort(data,size);
 	gettimeofday(&t2,NULL);
 	diff=t2.tv_sec*1000+(float)t2.tv_usec/1000-(t1.tv_sec*1000+(float)t1.tv_usec/1000);
-	cout<<"run time(us):"<<diff<<endl<<endl;
+	cout<<"run time(ms):"<<diff<<endl;
 
-	cout<<"qsort"<<endl;
 	memcpy(data,tmp_data,sizeof(int)*size);
+	cout<<"bubble_sort:T(n)=O(n^2) "<<endl;
+	gettimeofday(&t1,NULL);
+	bubble_sort(data,size);
+	gettimeofday(&t2,NULL);
+	diff=t2.tv_sec*1000+(float)t2.tv_usec/1000-(t1.tv_sec*1000+(float)t1.tv_usec/1000);
+	cout<<"run time(ms):"<<diff<<endl;
+
+	memcpy(data,tmp_data,sizeof(int)*size);
+	cout<<"qsort:T(n)=O(nlogn) "<<endl;
 	gettimeofday(&t1,NULL);
 	qsort(data,size,sizeof(int*),compare);
 	gettimeofday(&t2,NULL);
 	diff=t2.tv_sec*1000+(float)t2.tv_usec/1000-(t1.tv_sec*1000+(float)t1.tv_usec/1000);
-	cout<<"run time(us):"<<diff<<endl<<endl;
+	cout<<"run time(ms):"<<diff<<endl;
 
-	cout<<"myqsort"<<endl;
 	memcpy(data,tmp_data,sizeof(int)*size);
+	//dump(data,size);
+	cout<<"myqsort: T(n)=O(nlogn)"<<endl;
 	gettimeofday(&t1,NULL);
-	quick_sort<int>(data,size);
+	quick_sort(data,size);
 	gettimeofday(&t2,NULL);
 	diff=t2.tv_sec*1000+(float)t2.tv_usec/1000-(t1.tv_sec*1000+(float)t1.tv_usec/1000);
-	dump<int>(data,size,"sort:");
-	cout<<"run time(us):"<<diff<<endl<<endl;
+	//dump(data,size,"sort:");
+	cout<<"run time(ms):"<<diff<<endl;
+
+	cout<<"heap sort...."<<endl;
+	Heap<int> heap;
+	gettimeofday(&t1,NULL);
+	heap.sort(data,size);
+	gettimeofday(&t2,NULL);
+	diff=t2.tv_sec*1000+(float)t2.tv_usec/1000-(t1.tv_sec*1000+(float)t1.tv_usec/1000);
+	cout<<"run time(ms):"<<diff<<endl;
+
 	free(data);
 	free(tmp_data);
 }

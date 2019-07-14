@@ -5,6 +5,7 @@
 #include "search.h"
 #include "sort.h"
 #include "recurse.h"
+#include "tree.h"
 extern void case1();
 extern void case2();
 extern void case3();
@@ -19,5 +20,6 @@ int main()
 	test_search();
 	test_sort();
 	test_recurse();
+	test_tree();
     return 0;
 }

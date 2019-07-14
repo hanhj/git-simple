@@ -22,6 +22,16 @@ mystring::~mystring(){
 	if(data!=NULL)
 		free(data);
 }
+mystring::mystring(const mystring &da){
+//	if(data!=NULL)
+//		free(data);
+	int size;
+	size=strlen(da.data);
+	data=(char *)malloc(size);
+	if(data!=NULL){
+		strcpy(data,da.data);
+	}
+}
 mystring & mystring::operator = (const char *da){
 	if(data!=NULL)
 		free(data);
@@ -32,10 +42,28 @@ mystring & mystring::operator = (const char *da){
 	return *this;
 }
 int mystring::operator ==(const char *b){
-	return strcmp(data,b)?0:1;
+	return strcmp(data,b)==0?1:0;
 }
 int mystring::operator !=(const char *b){
 	return strcmp(data,b)?1:0;
+}
+int mystring::operator >(const char *b){
+	return strcmp(data,b)>0?1:0;
+}
+int mystring::operator <(const char *b){
+	return strcmp(data,b)<0?1:0;
+}
+int mystring::operator ==(const mystring &b){
+	return strcmp(data,b.data)==0?1:0;
+}
+int mystring::operator !=(const mystring &b){
+	return strcmp(data,b.data)?1:0;
+}
+int mystring::operator >(const mystring &b){
+	return strcmp(data,b.data)>0?1:0;
+}
+int mystring::operator <(const mystring &b){
+	return strcmp(data,b.data)<0?1:0;
 }
 ostream & operator<<(ostream &os,mystring &da){
 	return os<<da.data;
