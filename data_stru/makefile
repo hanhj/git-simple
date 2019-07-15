@@ -1,6 +1,6 @@
 target=test data_stu.pdf
 all:$(target)
-objs=main.o test_list.o test_queue.o test_stack.o test_search.o test_sort.o  case.o data_type.o utils.o test_recurse.o test_tree.o
+objs=main.o test_list.o test_queue.o test_stack.o test_search.o test_sort.o  case.o data_type.o utils.o test_recurse.o test_tree.o test_graph.o
 #depend=$(patsubst,%o,%d,$(objs))
 depend=$(objs:%.o=%.d)
 -include $(depend)
