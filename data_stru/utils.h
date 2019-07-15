@@ -10,6 +10,7 @@
 using namespace std;
 #include<stdarg.h>
 #include <iomanip>
+#include <stdio.h>
 //for debug message 
 #define DEBUG_LEVEL		3
 #define DEBUG_ERROR		1

@@ -34,8 +34,8 @@ void test_tree(){
 	};
 	BstTree<int> bst_tree;
 */	
-	int bst_order[]={7,9,10,2,3,1};//用这个会有问题
-//	int bst_order[]={7,9,2,3,10,1};//用这个会有问题
+//	int bst_order[]={7,9,10,2,3,1};//用这个会有问题
+	int bst_order[]={7,9,2,3,10,1};//用这个会有问题
 //	int bst_order[]={1,2,3,4,5,6};
 	BstTree<int> bst_tree;
 	int i;

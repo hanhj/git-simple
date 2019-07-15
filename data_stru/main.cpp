@@ -6,6 +6,7 @@
 #include "sort.h"
 #include "recurse.h"
 #include "tree.h"
+#include "graph.h"
 extern void case1();
 extern void case2();
 extern void case3();
@@ -21,5 +22,6 @@ int main()
 	test_sort();
 	test_recurse();
 	test_tree();
+	test_graph();
     return 0;
 }

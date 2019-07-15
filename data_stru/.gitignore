@@ -1,0 +1,12 @@
+*.o
+*.d
+*.idx
+*.log
+*.out
+*.pdf
+*.toc
+*.aux
+logfile
+tags
+test
+
