@@ -37,8 +37,12 @@ class MGraph{
 			for(int i=0;i<size;i++){
 				edge[i]=new int [size];
 				visitor[i]=0;
-				for(int j=0;j<size;j++)
-					edge[i][j]=INFI;
+				for(int j=0;j<size;j++){
+					if(i==j)
+						edge[i][j]=0;
+					else
+						edge[i][j]=INFI;
+				}
 			}
 		}
 		~MGraph(){
@@ -81,11 +85,69 @@ class MGraph{
 			edge[v][w]=weight;
 			e++;
 		}
+		void create_edge(int *e[],int size){
+			n=size;
+			for(int i=0;i<n;i++){
+				for(int j=0;j<n;j++)
+					edge[i][j]=e[i][j];
+			}
+		}
+		int _dfs(int root){
+			int i;
+			int weight;
+			visit(root);
+			for(i=0;i<n;i++){
+				weight=edge[root][i];
+				if(weight!=INFI && weight!=0){
+					if(visitor[i]==0)
+						_dfs(i);
+				}
+			}
+			return 1;
+		}
 		void dfs(){
-
+			int count=0;
+			int ret;
+			for(int i=0;i<n;i++){
+				if(visitor[i]==0){
+					ret=_dfs(i);
+					count=count+ret;
+				}
+			}
+			cout<<"max connect child graph:"<<count;
+		}
+		int _bfs(int root){
+			int i;
+			int p;
+			int weight;
+			int ret=0;
+			queue<int> queue;
+			queue.push(root);
+			while(queue.empty()==false){
+				p=queue.front();
+				queue.pop();
+				visit(p);
+				for(i=0;i<n;i++){
+					weight=edge[p][i];
+					if(weight!=INFI && weight !=0){
+						if(visitor[i]==0)
+							queue.push(i);
+					}
+				}
+				ret=1;
+			}
+			return ret;
 		}
 		void bfs(){
-
+			int count=0;
+			int ret;
+			for(int i=0;i<n;i++){
+				if(visitor[i]==0){
+					ret=_bfs(i);
+					count=count+ret;
+				}
+			}
+			cout<<"max connect child graph:"<<count;
 		}
 };
 template <class T>
@@ -97,6 +159,8 @@ ostream & operator <<(ostream &os,MGraph<T>&g ){
 		for(j=0;j<g.n;j++){
 			if(g.edge[i][j]!=INFI)
 				os<<g.vec[j]<<"("<<g.edge[i][j]<<")"<<",";
+			else
+				os<<"INFI,";
 		}
 		os<<endl;
 	}
@@ -109,7 +173,7 @@ class EdgeNode{
 		EdgeNode *next;
 };
 template <class T>
-class AdjNode{
+class VecNode{
 	public:
 		T data;
 		int no;
@@ -119,13 +183,11 @@ class AdjNode{
 template <class T>
 class AdjGraph{
 	public:
-		vector<AdjNode<T> *> vec;
+		vector<VecNode<T> *> vec;
 		int n,e;
-		int nn;
 		AdjGraph(){
 			n=0;
 			e=0;
-			nn=0;
 		}
 		~AdjGraph(){
 			int i;
@@ -144,8 +206,8 @@ class AdjGraph{
 			e=0;
 		}
 		void insert_element(T da){
-			AdjNode<T> *p;
-			p=new AdjNode<T>;
+			VecNode<T> *p;
+			p=new VecNode<T>;
 			p->data=da;
 			p->first=NULL;
 			p->vis=0;
@@ -158,34 +220,51 @@ class AdjGraph{
 				return ;
 			if(w>n-1||w<0)
 				return ;
-			EdgeNode *p,*q;
+			EdgeNode *p;
 			p=new EdgeNode;
 			p->no=w;
 			p->weight=weight;
-			p->next=NULL;
-			q=vec[v]->first;
-			if(q==NULL){
-				vec[v]->first=p;
-				return ;
-			}
-			while(q->next!=NULL){
-				q=q->next;
-			}
-			q->next=p;
+			p->next=vec[v]->first;
+			vec[v]->first=p;
+			e++;
 		}
-		void visit(AdjNode<T> *root){
-			root->vis=1;
-			cout<<root->data<<",";
+		void create_edge(int *e[],int size){
+			EdgeNode *p;
+			int i;
+			int j;
+			if(size!=n){
+				cout<<"error edge size.edge size must equal to vec size:"<<"edge size="<<size<<" vec size="<<n<<endl;
+				return;
+			}
+
+			for(i=0;i<size;i++){
+				for(j=0;j<size;j++){
+					if(e[i][j]!=0 && e[i][j]!=INFI){
+						p=new EdgeNode;
+						p->no=j;
+						p->weight=e[i][j];
+						p->next=vec[i]->first;
+						vec[i]->first=p;
+						e++;
+					}
+				}
+			}
 		}
-		void clear_visor(){
+		void visit(int root){
+			if(root<0||root>n-1)
+				return;
+			vec[root]->vis=1;
+			cout<<vec[root]->data<<",";
+		}
+		void clear_visitor(){
 			int i;
 			for(i=0;i<n;i++)
 				vec[i]->vis=0;
 		}
-		EdgeNode * firstAdj(AdjNode<T> *root){
-			if(root->first==NULL)
+		EdgeNode * firstAdj(int root){
+			if(vec[root]->first==NULL)
 				return NULL;
-			return root->first;
+			return vec[root]->first;
 		}
 		EdgeNode * nextAdj(EdgeNode *p){
 			if(p==NULL)
@@ -193,27 +272,56 @@ class AdjGraph{
 			else
 				return p->next;
 		}
-		void _dfs(AdjNode<T> *root){
+		int _dfs(int root){
 			EdgeNode *p;
-			if(root==NULL)
-				return;
 			visit(root);
-			p=firstAdj(root);
-			if(p!=NULL){
+			for(p=firstAdj(root);p;p=nextAdj(p)){
 				if(vec[p->no]->vis==0)
-					_dfs(vec[p->no]);
+					_dfs(p->no);
 			}
-			p=nextAdj(p);
-			while(p){
-				_dfs(vec[p->no]);
-				p=nextAdj(p);
-			}
+			return 1;
 		}
 		void dfs(){
-			_dfs(vec[0]);
+			int count;
+			int ret;
+			count=0;
+			for(int i=0;i<n;i++){
+				if(vec[i]->vis==0){
+					ret=_dfs(i);
+					count=count+ret;
+				}
+			}
+			cout<<"max connect child graph:"<<count;
+		}
+		int  _bfs(VecNode<T> *root){
+			if(root==NULL)
+				return 0;
+			queue<VecNode<T>*> queue;
+			VecNode<T> *p;
+			EdgeNode *e;
+			queue.push(root);
+			while(queue.empty()!=true){
+				p=queue.front();
+				queue.pop();
+				visit(p->no);
+				e=p->first;
+				while(e){
+					queue.push(vec[e->no]);
+					e=e->next;
+				}
+			}
+			return 1;
 		}
 		void bfs(){
-
+			int count=0;
+			int ret;
+			for(int i=0;i<n;i++){
+				if(vec[i]->vis==0){
+					ret=_bfs(vec[i]);
+					count=count+ret;
+				}
+			}
+			cout<<"max connect child graph:"<<count;
 		}
 };
 
