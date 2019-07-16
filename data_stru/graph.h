@@ -109,7 +109,7 @@ class EdgeNode{
 		EdgeNode *next;
 };
 template <class T>
-class AdjNode{
+class VecNode{
 	public:
 		T data;
 		int no;
@@ -119,7 +119,7 @@ class AdjNode{
 template <class T>
 class AdjGraph{
 	public:
-		vector<AdjNode<T> *> vec;
+		vector<VecNode<T> *> vec;
 		int n,e;
 		int nn;
 		AdjGraph(){
@@ -144,8 +144,8 @@ class AdjGraph{
 			e=0;
 		}
 		void insert_element(T da){
-			AdjNode<T> *p;
-			p=new AdjNode<T>;
+			VecNode<T> *p;
+			p=new VecNode<T>;
 			p->data=da;
 			p->first=NULL;
 			p->vis=0;
@@ -158,59 +158,62 @@ class AdjGraph{
 				return ;
 			if(w>n-1||w<0)
 				return ;
-			EdgeNode *p,*q;
+			EdgeNode *p;
 			p=new EdgeNode;
 			p->no=w;
 			p->weight=weight;
-			p->next=NULL;
-			q=vec[v]->first;
-			if(q==NULL){
-				vec[v]->first=p;
-				return ;
-			}
-			while(q->next!=NULL){
-				q=q->next;
-			}
-			q->next=p;
+			p->next=vec[v]->first;
+			vec[v]->first=p;
 		}
-		void visit(AdjNode<T> *root){
-			root->vis=1;
-			cout<<root->data<<",";
+		void visit(int root){
+			if(root<0||root>n-1)
+				return;
+			vec[root]->vis=1;
+			cout<<vec[root]->data<<",";
 		}
 		void clear_visor(){
 			int i;
 			for(i=0;i<n;i++)
 				vec[i]->vis=0;
 		}
-		EdgeNode * firstAdj(AdjNode<T> *root){
-			if(root->first==NULL)
+		EdgeNode * firstAdj(int root){
+			if(root<0||root>n-1)
 				return NULL;
-			return root->first;
+			return vec[root]->first;
 		}
 		EdgeNode * nextAdj(EdgeNode *p){
-			if(p==NULL)
-				return NULL;
-			else
+			if(p)
 				return p->next;
+			else
+				return NULL;
 		}
-		void _dfs(AdjNode<T> *root){
+		void _dfs(int root){
 			EdgeNode *p;
-			if(root==NULL)
-				return;
 			visit(root);
-			p=firstAdj(root);
-			if(p!=NULL){
+			for(p=firstAdj(root);p;p=nextAdj(p)){
 				if(vec[p->no]->vis==0)
-					_dfs(vec[p->no]);
+					_dfs(p->no);
 			}
-			p=nextAdj(p);
-			while(p){
-				_dfs(vec[p->no]);
+			/*
+				equal:
+				p=firstAdj(root);
+				if(p){
+					if(vec[p->no]->vis==0)
+						_dfs(p->no)
+				}
 				p=nextAdj(p);
-			}
+				while(p){
+					if(vec[p->no]->vis==0)
+						_dfs(p->no);
+				}
+			 */
+
 		}
 		void dfs(){
-			_dfs(vec[0]);
+			for(int i=0;i<n;i++){
+				if(vec[i]->vis==0)
+					_dfs(i);
+			}
 		}
 		void bfs(){
 

@@ -33,18 +33,26 @@ void test_graph(){
 	for(i=0;i<(int)sizeof(edges)/(int)sizeof(edge);i++){
 		mg.insert_edge(edges[i].v,edges[i].w,edges[i].weight);
 	}
-	cout<<mg<<endl;
+	cout<<mg;
+	cout<<"dfs:";
 	mg.dfs();
+	cout<<endl;
+	cout<<"bfs:";
 	mg.bfs();
+	cout<<endl;
 	AdjGraph<int> adj;
 	for(i=0;i<(int)sizeof(elements)/(int)sizeof(int);i++)
 		adj.insert_element(elements[i]);
 	for(i=0;i<(int)sizeof(edges)/(int)sizeof(edge);i++){
 		adj.insert_edge(edges[i].v,edges[i].w,edges[i].weight);
 	}
-	cout<<adj<<endl;
+	cout<<adj;
+	cout<<"dfs:";
 	adj.dfs();
+	cout<<endl;
+	cout<<"bfs:";
 	adj.bfs();
+	cout<<endl;
 }
 
 // vim:tw=72 
