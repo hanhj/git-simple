@@ -75,6 +75,7 @@ void test_graph(){
 	AdjGraph<int> adj;
 	for(i=0;i<size;i++)
 		adj.insert_element(elements[i]);
+//	adj.create_edge(ptr_edge_table,size);
 	for(i=0;i<(int)sizeof(edges)/(int)sizeof(edge);i++){
 		adj.insert_edge(edges[i].v,edges[i].w,edges[i].weight);
 	}

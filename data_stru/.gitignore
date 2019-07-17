@@ -6,7 +6,12 @@
 *.pdf
 *.toc
 *.aux
+*.dvi
 logfile
 tags
 test
+t
+test_stu.cbp
+test_stu.depend
+test_stu.layout
 
