@@ -2,4 +2,6 @@ html
 latex
 tags
 *.out
+logfile
+Session.vim
 
