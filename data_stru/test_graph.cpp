@@ -50,13 +50,12 @@ edge edges[]={
 void test_graph(){
 	int i;
 	int size;
-	int **ptr_edge_table;
+	int *ptr_edge_table[11];
 	cout<<"test graph...."<<endl;
 	size=sizeof(elements)/sizeof(int);
 	MGraph<int> mg(size);
 	for(i=0;i<size;i++)
 		mg.insert_element(elements[i]);
-	ptr_edge_table=new int *[size];
 	for(i=0;i<size;i++){
 		ptr_edge_table[i]=edge_table[i];
 	}
@@ -72,13 +71,14 @@ void test_graph(){
 	cout<<"bfs:";
 	mg.bfs();
 	cout<<endl;
+
 	AdjGraph<int> adj;
 	for(i=0;i<size;i++)
 		adj.insert_element(elements[i]);
-//	adj.create_edge(ptr_edge_table,size);
-	for(i=0;i<(int)sizeof(edges)/(int)sizeof(edge);i++){
-		adj.insert_edge(edges[i].v,edges[i].w,edges[i].weight);
-	}
+	adj.create_edge(ptr_edge_table,size);
+//	for(i=0;i<(int)sizeof(edges)/(int)sizeof(edge);i++){
+//		adj.insert_edge(edges[i].v,edges[i].w,edges[i].weight);
+//	}
 	cout<<adj;
 	cout<<"dfs:";
 	adj.dfs();
@@ -87,7 +87,6 @@ void test_graph(){
 	adj.clear_visitor();
 	adj.bfs();
 	cout<<endl;
-	delete ptr_edge_table;
 }
 
 // vim:tw=72 

@@ -19,18 +19,18 @@ class MGraph{
 		int *visitor;
 		T *vec;
 		int cur_n;
-		int n,e;//points and edges
+		int total_vec,total_edge;//points and edges
 		MGraph(){
-			n=0;
-			e=0;
+			total_vec=0;
+			total_edge=0;
 			cur_n=0;
 			vec=NULL;
 			edge=NULL;
 		}
 		MGraph(int size){
-			n=size;
+			total_vec=size;
 			cur_n=0;
-			e=0;
+			total_edge=0;
 			vec=new T[size];
 			visitor=new int[size];
 			edge=new int *[size];
@@ -50,53 +50,54 @@ class MGraph{
 				delete []vec;
 			vec=NULL;
 			if(edge){
-				for(int i=0;i<n;i++){
+				for(int i=0;i<total_vec;i++){
 					if(edge[i])
 						delete []edge[i];
 				}
 				delete []edge;
 			}
-			n=0;
-			e=0;
+			total_vec=0;
+			total_edge=0;
 			if(visitor)
 				delete []visitor;
 		}
 		void visit(int k){
-			if(k>n-1||k<0)
+			if(k>total_vec-1||k<0)
 				return;
 			visitor[k]=1;
 			cout<<vec[k]<<",";
 		}
 		void clear_visitor(){
 			int i;
-			for(i=0;i<n;i++)
+			for(i=0;i<total_vec;i++)
 				visitor[i]=0;
 		}
 		void insert_element(T da){
-			if(cur_n>=n)
+			if(cur_n>=total_vec)
 				return ;
 			vec[cur_n++]=da;
 		}
 		void insert_edge(int v,int w,int weight){
-			if(v>n-1||v<0)
+			if(v>total_vec-1||v<0)
 				return ;
-			if(w>n-1||w<0)
+			if(w>total_vec-1||w<0)
 				return ;
 			edge[v][w]=weight;
-			e++;
+			total_edge++;
 		}
 		void create_edge(int *e[],int size){
-			n=size;
-			for(int i=0;i<n;i++){
-				for(int j=0;j<n;j++)
+			for(int i=0;i<total_vec;i++){
+				for(int j=0;j<total_vec;j++){
 					edge[i][j]=e[i][j];
+					total_edge++;
+				}
 			}
 		}
 		void _dfs(int root){
 			int i;
 			int weight;
 			visit(root);
-			for(i=0;i<n;i++){
+			for(i=0;i<total_vec;i++){
 				weight=edge[root][i];
 				if(weight!=INFI && weight!=0){
 					if(visitor[i]==0)
@@ -106,7 +107,7 @@ class MGraph{
 		}
 		void dfs(){
 			int count=0;
-			for(int i=0;i<n;i++){
+			for(int i=0;i<total_vec;i++){
 				if(visitor[i]==0){
 					_dfs(i);
 					count++;
@@ -124,7 +125,7 @@ class MGraph{
 				p=queue.front();
 				queue.pop();
 				visit(p);
-				for(i=0;i<n;i++){
+				for(i=0;i<total_vec;i++){
 					weight=edge[p][i];
 					if(weight!=INFI && weight !=0){
 						if(visitor[i]==0)
@@ -135,7 +136,7 @@ class MGraph{
 		}
 		void bfs(){
 			int count=0;
-			for(int i=0;i<n;i++){
+			for(int i=0;i<total_vec;i++){
 				if(visitor[i]==0){
 					_bfs(i);
 					count++;
@@ -148,9 +149,9 @@ template <class T>
 ostream & operator <<(ostream &os,MGraph<T>&g ){
 	int i;
 	int j;
-	for(i=0;i<g.n;i++){
+	for(i=0;i<g.total_vec;i++){
 		os<<g.vec[i]<<":";
-		for(j=0;j<g.n;j++){
+		for(j=0;j<g.total_vec;j++){
 			if(g.edge[i][j]!=INFI)
 				os<<g.vec[j]<<"("<<g.edge[i][j]<<")"<<",";
 			else
@@ -178,15 +179,15 @@ template <class T>
 class AdjGraph{
 	public:
 		vector<VecNode<T> *> vec;
-		int n,e;
+		int total_vec,total_edge;
 		AdjGraph(){
-			n=0;
-			e=0;
+			total_vec=0;
+			total_edge=0;
 		}
 		~AdjGraph(){
 			int i;
 			EdgeNode *p,*q;
-			for(i=0;i<n;i++){
+			for(i=0;i<total_vec;i++){
 				p=vec[i]->first;
 				while(p){
 					q=p;
@@ -196,8 +197,8 @@ class AdjGraph{
 				delete vec[i];
 			}
 			vec.clear();
-			n=0;
-			e=0;
+			total_vec=0;
+			total_edge=0;
 		}
 		void insert_element(T da){
 			VecNode<T> *p;
@@ -205,14 +206,14 @@ class AdjGraph{
 			p->data=da;
 			p->first=NULL;
 			p->vis=0;
-			p->no=n;
+			p->no=total_vec;
 			vec.push_back(p);
-			n++;
+			total_vec++;
 		}
 		void insert_edge(int v,int w,int weight){
-			if(v>n-1||v<0)
+			if(v>total_vec-1||v<0)
 				return ;
-			if(w>n-1||w<0)
+			if(w>total_vec-1||w<0)
 				return ;
 			EdgeNode *p;
 			p=new EdgeNode;
@@ -220,14 +221,15 @@ class AdjGraph{
 			p->weight=weight;
 			p->next=vec[v]->first;
 			vec[v]->first=p;
-			e++;
+			total_edge++;
 		}
 		void create_edge(int *e[],int size){
 			EdgeNode *p;
 			int i;
 			int j;
-			if(size!=n){
-				cout<<"error edge size.edge size must equal to vec size:"<<"edge size="<<size<<" vec size="<<n<<endl;
+			if(size!=total_vec){
+				cout<<"error edge size.edge size must equal to vec \
+			size:"<<"edge size="<<size<<" vec size="<<total_vec<<endl;
 				return;
 			}
 			for(i=0;i<size;i++){
@@ -238,20 +240,20 @@ class AdjGraph{
 						p->weight=e[i][j];
 						p->next=vec[i]->first;
 						vec[i]->first=p;
-						e++;
+						total_edge++;
 					}
 				}
 			}
 		}
 		void visit(int root){
-			if(root<0||root>n-1)
+			if(root<0||root>total_vec-1)
 				return;
 			vec[root]->vis=1;
 			cout<<vec[root]->data<<",";
 		}
 		void clear_visitor(){
 			int i;
-			for(i=0;i<n;i++)
+			for(i=0;i<total_vec;i++)
 				vec[i]->vis=0;
 		}
 		EdgeNode * firstAdj(int root){
@@ -276,7 +278,7 @@ class AdjGraph{
 		void dfs(){
 			int count;
 			count=0;
-			for(int i=0;i<n;i++){
+			for(int i=0;i<total_vec;i++){
 				if(vec[i]->vis==0){
 					_dfs(i);
 					count++;
@@ -304,7 +306,7 @@ class AdjGraph{
 		}
 		void bfs(){
 			int count=0;
-			for(int i=0;i<n;i++){
+			for(int i=0;i<total_vec;i++){
 				if(vec[i]->vis==0){
 					_bfs(vec[i]);
 					count++;
@@ -318,7 +320,7 @@ template <class T>
 ostream & operator <<(ostream &os,AdjGraph<T>&g ){
 	int i;
 	EdgeNode *p;
-	for(i=0;i<g.n;i++){
+	for(i=0;i<g.total_vec;i++){
 		os<<g.vec[i]->data<<":";
 		p=g.vec[i]->first;
 		while(p){

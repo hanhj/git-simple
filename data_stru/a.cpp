@@ -5,6 +5,7 @@
  * Created Time: 2019-07-16 18:00:50 week:2
 */
 #include<iostream>
+#include <stdlib.h>
 #include <stdio.h>
 using namespace std;
 void foo1(int *d,int size){
