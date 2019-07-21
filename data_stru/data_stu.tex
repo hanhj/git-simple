@@ -54,6 +54,87 @@
 \subsection{查找}
 \subsection{排序}
 \section{递归与分治}
+	\subsection{递归}
+		递归就是自己调用自己。
+
+		递归需要两个要素：
+		\begin{itemize}
+			\item 递归需要有出口
+			\item 具有递归表达式
+		\end{itemize}
+
+		递归思想：
+
+		复杂问题可以分解成规模较小的\textbf{同类问题},当问题规模小到一定程度时，此规模较小的问题可以直接解决。再逆向可以解决上一层问题，直到最终问题解决。
+
+		\includegraphics[scale=0.4]{pic/recurse-01.png}
+
+		递归问题可以用递归表达式来实现，也可用非递归方式实现。
+
+		非递归方式可以直接从问题本身分析解决，也可以用栈的方式来实现。
+
+		递归的例子比如：n的阶乘问题，非波那契数组问题。
+
+		\begin{verbatim}
+    int foo(n){
+      if(n<=1)
+        return n;
+      else
+        return n*foo(n-1);
+    }
+
+    int foo(n){
+      if(n<=2)
+        return 1;
+      return foo(n-1)+foo(n-2);
+    }
+		\end{verbatim}
+	\subsection{分治}
+		分治与递归紧密联系。
+
+		分治的思想与递归的思想差不多，但是有几个条件：
+		\begin{itemize}
+			\item 可以将原问题分解成小规模的同类子问题,小问题可解。
+			\item 可以通过合并小问题的解形成大问题的解。如果不具备此性质，可以考虑用贪心算法或动态规划。
+			\item 子问题不交叉。交叉将带来效率的低下，因为带来重复计算的问题。如果子问题有交叉，可以考虑用动态规划。
+		\end{itemize}
+		分治递归的例子，比如求n个数的全排列。
+
+		比如给定1,2,3个数，求其全排列：	123,132,213,231,321,312
+
+		解题思路：
+
+		先列出第一个数，其可以从第1到第n个数中任意1个。当选定第一个数后，第2个数只能从剩下的第2到n个数选1个，相当于问题规模缩小，但是性质是一样的，这样直到选到第n个数，可以输出。
+
+		第一个数如何从第1到第n个数选取，采用的方式是交换，即选第2个数时，是将第1与第2个数交换，从而在第1个数的位置是第2个数，这样达到选取第2个数的目的，其他类同。
+
+		算法描述：
+		\begin{verbatim}
+      void foo(int a[],int k,int n){
+        if(k==n){
+          cout<<a;//达到条件，退出。定义递归出口。
+          return ;
+        }
+        for(int i=0;i<n;i++){
+          swap(a[i],a[k]);//选取第i个数
+          foo(a,k+1,n);
+          swap(a[k],a[i]);//要将交换的数复原，以进行下一次交换。
+        }
+      }
+		\end{verbatim}
+
+		思考题：
+
+		1）实现任意长度整数的乘法。
+
+		2）在平面中n个点，求其最近距离的两点。要求T(n)=O(nlogn)
+
+		3) 实现$x^n$,要求T(n)=O(logn)
+
+		4) 2n个人买票，票价50,n个人有50元，n个人有100元，问如何排队使得售票处始终有钱找。
+
+
+
 \section{二叉树}
 	\subsection{树的定义}
 		线性表中的每个中间节点，都只有一个前驱和一个后继。而对于树而言，每个中间节点都只有一个前驱，但有多个后继。特别的如果有两个后继，称为二叉树。
@@ -409,16 +490,76 @@
 		\subsubsection{邻接表}
 		\includegraphics[scale=0.4]{./pic/graph-03.png}
 		\begin{verbatim}
-		struct adjnode{
-		  int adj;
-		  adjnode*next;
-		};
-		struct vexnode{
-		   DataType data;
-		   adjnode *first;
-		}; 
+      struct adjnode{
+        int adj;
+        adjnode*next;
+      };
+      struct vexnode{
+         DataType data;
+         adjnode *first;
+      }; 
+      class AdjGraph{
+        public:
+          struct struct vexnode[MaxPoint];
+          int n,e;
+      };
 		\end{verbatim}
 		 
+	\subsection{图的遍历}
+	图的遍历就是对图中所有节点仅访问一次，包括深度遍历（dfs depth first search）和广度遍历（bfs breath first search）。
+	\subsubsection{深度遍历}
+		相当于二叉树中的先根遍历。
+
+    \begin{verbatim}
+      void dfs(Graph g,int node){
+        visit(g.vec[node]);
+        for(p=g.vec[node].firstArc(node);p;p=g.vec[node].nextArc(p)){
+          if(g.vec[node].visit==0){
+            g.vec[node].vist=1;
+            dfs(g,p);
+          }
+        }
+      }
+	\end{verbatim}
+
+	\subsubsection{广度遍历}
+		广度遍历类似与二叉树的层次遍历。也需要用到队列。
+
+	算法描述：
+  \begin{verbatim}
+    void bfs(Graph g,int node){
+      queue.push(node);
+      while(queue.isEmpty()!=1){
+        p=queue.pop();
+        visit(g.vec[p]);
+        q=g.vec[p].firstArc;
+        while(q!=-1){
+          if(g.vec[q].visit==0){
+            queue.push(q);
+            g.vec[q].visit=1;
+          }
+		  q=g.vec[p].nextArc;
+        }
+      }
+    }
+	\end{verbatim}
+	\subsection{贪心算法}
+	贪心算法的整体思想是：局部最优-》整体最优。
+
+	与递归问题相同的是都会将原问题分解成最小问题，但是递归问题往往可以从小问题比较直接的得到大问题的解，而贪心算法则要分析如何从小问题得到大问题的解。比较经典的贪心算法例子是：最小生成树问题，最短路径问题。
+
+	\subsubsection{最小生成树问题}
+	最小生成树问题是求以最小代价生成图的树。
+	
+	最小生成树算法有两种：普里姆算法，和克鲁斯算法。
+
+	这两种算法都用到一个称为MST的图的性质：设G=(V,{E}),U是V的一个子集，若G中含有一条（u，v）的边，此边的权最小，且$u\in{U},v\in{V-U}$,则G的最小生成树中，必然包括（u，v）。
+
+	可以用反证法来证明：假设G的最小生成树中不包括（u，v），有另外一条（u',v')连接U和V-U，由于是生成树，所以u和u'，v和v'，连接，当我把（u，v）连接，此时将构成回路，将（u'，v'）删除，树仍然是生成树，显然新加入的边比原边更短，所以与原假设矛盾。故证明之。
+
+	\includegraphics[scale=0.4]{./pic/graph-04.png}	
+
+
 \section{动态规划}
 %\end{CJK}
 \end{document}
