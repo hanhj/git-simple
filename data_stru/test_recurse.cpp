@@ -119,16 +119,28 @@ void test_recurse(){
 	cout<<"recurse fact(6)="<<fact(6)<<endl;
 	cout<<"norecurse fact(6)="<<norc_fact(6)<<endl;
 	int i;
-	cout<<"recurse fabonacci(21)=";
-	for(i=0;i<21;i++){
+	int N;
+	N=42;
+	cout<<"recurse fabonacci:"<<N<<endl;
+	gettimeofday(&t1,NULL);
+	for(i=0;i<N;i++){
 		cout<<fabonacci(i)<<",";
 	}
 	cout<<endl;
-	cout<<"norecurse fabonacci(21)=";
-	for(i=0;i<21;i++){
+	gettimeofday(&t2,NULL);
+	diff=t2.tv_sec*1000+(float)t2.tv_usec/1000-(t1.tv_sec*1000+(float)t1.tv_usec/1000);
+	cout<<"run time(ms):"<<diff<<endl;
+	
+	cout<<"norecurse fabonacci:"<<N<<endl;
+	gettimeofday(&t1,NULL);
+	for(i=0;i<N;i++){
 		cout<<norc_fabonacci(i)<<",";
 	}
 	cout<<endl;
+	gettimeofday(&t2,NULL);
+	diff=t2.tv_sec*1000+(float)t2.tv_usec/1000-(t1.tv_sec*1000+(float)t1.tv_usec/1000);
+	cout<<"run time(ms):"<<diff<<endl;
+	
 	string str="helleh";
 	cout<<str<<" is palindrome:"<<isPalindrome(str,0,str.length()-1)<<endl;
 	cout<<str<<" is palindrome:"<<norc_isPalindrome(str)<<endl;
