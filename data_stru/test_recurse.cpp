@@ -120,7 +120,7 @@ void test_recurse(){
 	cout<<"norecurse fact(6)="<<norc_fact(6)<<endl;
 	int i;
 	int N;
-	N=42;
+	N=12;
 	cout<<"recurse fabonacci:"<<N<<endl;
 	gettimeofday(&t1,NULL);
 	for(i=0;i<N;i++){
