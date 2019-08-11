@@ -770,7 +770,7 @@ class app_layer{
 	public:
 		vsq vsq_lo;
 		send_cause cause_lo;
-		int offset;
+		int offset;//position of asdu in frame.
 		int addr_size;
 		int cause_size;
 		int msg_id_size;
