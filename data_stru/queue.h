@@ -76,7 +76,7 @@ class CircleQueue:public Queue<T>{
 		int tail;
 	public:
 		CircleQueue(){
-			front=tail=-1;
+			front=tail=0;
 			this->size=0;
 			cout<<"use CircleQueue"<<endl;
 		}
@@ -170,9 +170,9 @@ int CircleQueue<T>::add(T da){
 		cout<<"full"<<endl;
 		return -1;
 	}
-	tail=(tail+1)%MaxQueue;
 	data[tail]=da;
 	this->size++;
+	tail=(tail+1)%MaxQueue;
 	return 0;
 }
 template <class T>
@@ -181,8 +181,8 @@ int CircleQueue<T>::dequeue(T &da){
 		cout<<"is empty"<<endl;
 		return -1;
 	}
-	front=(front+1)%MaxQueue;
 	da=data[front];
+	front=(front+1)%MaxQueue;
 	this->size--;
 	return 0;
 }
@@ -192,20 +192,24 @@ int CircleQueue<T>::get_size(){
 }
 template <class T>
 int CircleQueue<T>::isEmpty(){
-	return front==tail?1:0;
+	return front==tail;
 }
 template <class T>
 int CircleQueue<T>::isFull(){
+	/*
 	if(front==-1){
 		return tail==MaxQueue-1?1:0;
 	}else{
 		return (tail+1)%MaxQueue==front?1:0;
 	}
+	*/
+	return (tail+1)%MaxQueue==front;
 }
 template <class T>
 void CircleQueue<T>::print(){
 	int i;
-	i=(front+1)%MaxQueue;
+	//i=(front+1)%MaxQueue;
+	i=(front)%MaxQueue;
 	for(;i!=tail;){
 		cout<<data[i]<<" ";
 		i=(i+1)%MaxQueue;
