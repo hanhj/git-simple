@@ -1,5 +1,5 @@
 <Screen
-	CID = "324229062"
+	CID = "120604175"
 	AppID = "2"
 	AppVer = "4.1.109.0"
 	DocID = ""
@@ -12,10 +12,10 @@
 	<Elements
 		CID = "1">
 		<Element
-			CID = "324238312"
+			CID = "120599555"
 			Type = "FrameWindow"
-			X = "144"
-			Y = "67"
+			X = "148"
+			Y = "114"
 			Width = "400"
 			Height = "300"
 			Flags = "0"
@@ -23,7 +23,7 @@
 			Typeface = ""
 			FontAttributes = "1"
 			TextSize = "Normal"
-			Title = "测压"
+			Title = "查询"
 			TitleBarHeight = "18"
 			IconMargin = "0"
 			BorderSize = "1"
@@ -36,27 +36,6 @@
 			Mirror = "0"
 			Buttons = "11"
 			Icon = "DefaultApp"/>
-		<Element
-			CID = "867270023"
-			Type = "ImagePlaceholder"
-			X = "146"
-			Y = "177"
-			Width = "396"
-			Height = "177"
-			Flags = "0"
-			FillColour = "255,255,255,0,6"
-			LineColour = "172,168,153,0,17"
-			TextColour = "0,0,0,0,9"
-			Typeface = ""
-			FontAttributes = "2"
-			TextSize = "Large"
-			BorderSize = "0"
-			MarginLeft = "0"
-			MarginRight = "0"
-			MarginTop = "0"
-			MarginBottom = "0"
-			Text = "image"
-			Fill = "None"/>
 	</Elements>
 	<Connections
 		CID = "2"/>
@@ -67,7 +46,7 @@
 	<Notes
 		CID = "5">
 		<Note
-			CID = "324233726"
+			CID = "120618621"
 			Name = "Description"
 			NextCID = "2">
 			<Text

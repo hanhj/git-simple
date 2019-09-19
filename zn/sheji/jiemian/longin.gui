@@ -169,17 +169,17 @@
 			VertAlign = "Top"
 			MaintainSize = "0"/>
 		<Element
-			CID = "1133798672"
+			CID = "349653887"
 			Type = "Component"
-			X = "644"
-			Y = "351"
+			X = "645"
+			Y = "364"
 			Width = "400"
 			Height = "300"
 			Flags = "3"
 			BackgroundColour = "255,255,255,0,6"
 			RootPath = "$Container"
-			Filename = "longin_operator.gui"
-			Background = "Solid"
+			Filename = "set.gui"
+			Background = "Transparent"
 			HorzAlign = "Left"
 			VertAlign = "Top"
 			MaintainSize = "0"/>
@@ -198,14 +198,14 @@
 			ConLineWidth = "2"
 			ConLineColour = "0,0,0,0,0"/>
 		<Connection
-			CID = "1133794523"
+			CID = "349642179"
 			Layer = "DesignElements"
 			Trigger = "LeftClick"
 			Type = "Navigation"
 			SubType = "Modal"
 			SourceSubItemID = ""
 			SourceRefID = "1005872813"
-			TargetRefID = "1133798672"
+			TargetRefID = "349653887"
 			ConLineWidth = "2"
 			ConLineColour = "0,0,0,0,0"/>
 	</Connections>

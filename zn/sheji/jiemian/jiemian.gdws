@@ -1,7 +1,7 @@
 <Workspace
 	CID = "1"
 	NextCID = "2"
-	IconCategory = "Toolbars">
+	IconCategory = "Windows Library">
 	<OpenFiles
 		CID = "1"
 		LastActive = "3">
@@ -18,6 +18,39 @@
 			FileID = "3AD3C8A6-0A8B-45C0-AECFC54FE417AD12"
 			RootPath = "$Container"
 			RelativePathname = "longin.gui"
+			ViewSettings = ""/>
+		<File
+			RootPath = "$Container"
+			RelativePathname = "check.gui"
+			ViewSettings = ""/>
+		<File
+			RootPath = "$Container"
+			RelativePathname = "fiber_set.gui"
+			ViewSettings = ""/>
+		<File
+			RootPath = "$Container"
+			RelativePathname = "jiaozheng.gui"
+			ViewSettings = ""/>
+		<File
+			RootPath = "$Container"
+			RelativePathname = "longin_doctor.gui"
+			ViewSettings = ""/>
+		<File
+			RootPath = "$Container"
+			RelativePathname = "show.gui"
+			ViewSettings = ""/>
+		<File
+			RootPath = "$Container"
+			RelativePathname = "longin_operator.gui"
+			ViewSettings = ""/>
+		<File
+			FileID = "859866C3-4C62-4BD5-A4680FB512EC492D"
+			RootPath = "$Container"
+			RelativePathname = "search.gui"
+			ViewSettings = ""/>
+		<File
+			RootPath = "$Container"
+			RelativePathname = "set.gui"
 			ViewSettings = ""/>
 	</OpenFiles>
 </Workspace>
