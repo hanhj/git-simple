@@ -1,6 +1,7 @@
 <Project
 	CID = "1"
-	NextCID = "3">
+	NextCID = "4"
+	IconCategory = "Toolbars">
 	<Links
 		CID = "1">
 		<Link
@@ -35,4 +36,56 @@
 		<DataSets
 			CID = "1"/>
 	</Options>
+	<OpenFiles
+		CID = "3"
+		LastActive = "6">
+		<File
+			RootPath = "$Container"
+			RelativePathname = "check.gui"
+			ViewSettings = ""/>
+		<File
+			RootPath = "$Container"
+			RelativePathname = "fiber_set.gui"
+			ViewSettings = ""/>
+		<File
+			RootPath = "$Container"
+			RelativePathname = "longin.gui"
+			ViewSettings = ""/>
+		<File
+			RootPath = "$Container"
+			RelativePathname = "FrameWin.gui"
+			ViewSettings = ""/>
+		<File
+			RootPath = "$Container"
+			RelativePathname = "jiaozheng.gui"
+			ViewSettings = ""/>
+		<File
+			RootPath = "$Container"
+			RelativePathname = "longin_doctor.gui"
+			ViewSettings = ""/>
+		<File
+			RootPath = "$Container"
+			RelativePathname = "longin_operator.gui"
+			ViewSettings = ""/>
+		<File
+			RootPath = "$Container"
+			RelativePathname = "search.gui"
+			ViewSettings = ""/>
+		<File
+			RootPath = "$Container"
+			RelativePathname = "set.gui"
+			ViewSettings = ""/>
+		<File
+			RootPath = "$Container"
+			RelativePathname = "show.gui"
+			ViewSettings = ""/>
+		<File
+			RootPath = "$Container"
+			RelativePathname = "prepare.gui"
+			ViewSettings = ""/>
+		<File
+			RootPath = "$Container"
+			RelativePathname = "test.gui"
+			ViewSettings = ""/>
+	</OpenFiles>
 </Project>

@@ -10,7 +10,8 @@
 	RepresentativeRefID = "0"
 	UseDefRepresentative = "1">
 	<Elements
-		CID = "1">
+		CID = "1"
+		NextCID = "867270024">
 		<Element
 			CID = "324238312"
 			Type = "FrameWindow"
@@ -20,20 +21,13 @@
 			Height = "300"
 			Flags = "0"
 			WindowColour = "255,255,255,0,6"
-			Typeface = ""
-			FontAttributes = "1"
-			TextSize = "Normal"
-			Title = "æµ‹åŽ‹"
+			Title = "²âÑ¹"
 			TitleBarHeight = "18"
-			IconMargin = "0"
 			BorderSize = "1"
 			IsBorderless = "1"
 			IsActive = "1"
-			IsDocWindow = "0"
 			HasSunkenWindow = "1"
-			CentreText = "0"
-			UseMutedColours = "0"
-			Mirror = "0"
+			FontAttributes = "1"
 			Buttons = "11"
 			Icon = "DefaultApp"/>
 		<Element
@@ -65,15 +59,12 @@
 	<SelectionGroups
 		CID = "4"/>
 	<Notes
-		CID = "5">
+		CID = "5"
+		NextCID = "324233727">
 		<Note
 			CID = "324233726"
-			Name = "Description"
-			NextCID = "2">
-			<Text
-				CID = "1">
-				
-			</Text>
+			Name = "Description">
+			
 		</Note>
 	</Notes>
 </Screen>

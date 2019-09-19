@@ -10,7 +10,8 @@
 	RepresentativeRefID = "0"
 	UseDefRepresentative = "1">
 	<Elements
-		CID = "1">
+		CID = "1"
+		NextCID = "1327724091">
 		<Element
 			CID = "1327724090"
 			Type = "FrameWindow"
@@ -20,20 +21,13 @@
 			Height = "300"
 			Flags = "0"
 			WindowColour = "255,255,255,0,32"
-			Typeface = ""
-			FontAttributes = "1"
-			TextSize = "Normal"
-			Title = "å…‰çº¤é™è„‰æµ‹åŽ‹ä»ª/è®¾ç½®/æ˜¾ç¤ºå‚æ•°"
+			Title = "¹âÏË¾²Âö²âÊÔÒÇ"
 			TitleBarHeight = "18"
-			IconMargin = "0"
 			BorderSize = "1"
 			IsBorderless = "1"
 			IsActive = "1"
-			IsDocWindow = "0"
 			HasSunkenWindow = "1"
-			CentreText = "0"
-			UseMutedColours = "0"
-			Mirror = "0"
+			FontAttributes = "1"
 			Buttons = "11"
 			Icon = "DefaultApp"/>
 		<Element
@@ -44,38 +38,26 @@
 			Width = "391"
 			Height = "222"
 			Flags = "0"
-			HeaderBackgroundColour = "236,233,216,0,16"
-			HeaderBorderColour = "172,168,153,0,17"
-			HeaderTextColour = "0,0,0,0,19"
-			BackgroundColour = "172,168,153,0,13"
-			BorderColour = "164,185,127,0,12"
-			GridLineColour = "241,239,226,0,23"
+			BackgroundColour = "90,78,177,0,13"
+			GridLineColour = "174,168,217,0,23"
 			SortedBlendColour = "64,64,64,0,0"
 			DefOddBackgroundColour = "255,255,255,0,6"
 			DefEvenBackgroundColour = "255,255,255,0,6"
 			DefTextColour = "0,0,0,0,9"
-			Typeface = ""
-			FontAttributes = "0"
-			TextSize = "Normal"
 			NextColumnID = "8"
 			IsFlat = "0"
-			IsHeaderBold = "0"
 			IsTransparent = "0"
 			HasBorder = "1"
 			HasHorzScrollBar = "1"
 			HasVertScrollBar = "1"
-			Mirror = "0"
 			HasHorzLines = "1"
 			HasVertLines = "1"
 			HasExtHorzLines = "0"
 			HasExtVertLines = "0"
-			ExtendColumnHeaders = "1"
 			ExtendColumns = "1"
 			ExtendRows = "1"
 			VariableHeightRows = "1"
 			FullRowSelection = "1"
-			HeaderWordWrap = "0"
-			WordWrap = "0"
 			HeaderSpace = "0"
 			HeaderHeight = "22"
 			RowHeight = "18"
@@ -92,7 +74,7 @@
 					EvenBackgroundColour = "255,255,255,0,6"
 					TextColour = "0,0,0,0,9"
 					ColumnID = "1"
-					Heading = "æµ‹é‡å•ä½"
+					Heading = "µ¥Î»"
 					Width = "80"
 					HeaderMargin = "0"
 					CellMargin = "0"
@@ -106,7 +88,7 @@
 					EvenBackgroundColour = "255,255,255,0,6"
 					TextColour = "0,0,0,0,9"
 					ColumnID = "2"
-					Heading = "é‡‡æ ·å‘¨æœŸï¼ˆmsï¼‰"
+					Heading = "²ÉÑùÊ±¼ä£¨ms£©"
 					Width = "100"
 					HeaderMargin = "0"
 					CellMargin = "0"
@@ -120,7 +102,7 @@
 					EvenBackgroundColour = "255,255,255,0,6"
 					TextColour = "0,0,0,0,9"
 					ColumnID = "3"
-					Heading = "æ‹Ÿåˆæ—¶é•¿ï¼ˆmsï¼‰"
+					Heading = "ÄâºÏÊ±¼ä£¨ms£©"
 					Width = "100"
 					HeaderMargin = "0"
 					CellMargin = "0"
@@ -134,7 +116,7 @@
 					EvenBackgroundColour = "255,255,255,0,6"
 					TextColour = "0,0,0,0,9"
 					ColumnID = "4"
-					Heading = "æ˜¾ç¤ºèƒŒæ™¯"
+					Heading = "ÏÔÊ¾±³¾°"
 					Width = "80"
 					HeaderMargin = "0"
 					CellMargin = "0"
@@ -148,7 +130,7 @@
 					EvenBackgroundColour = "255,255,255,0,6"
 					TextColour = "0,0,0,0,9"
 					ColumnID = "5"
-					Heading = "è¯­è¨€"
+					Heading = "ÓïÑÔ"
 					Width = "80"
 					HeaderMargin = "0"
 					CellMargin = "0"
@@ -260,10 +242,9 @@
 			Height = "23"
 			Flags = "0"
 			TextColour = "0,0,0,0,19"
-			Typeface = ""
-			FontAttributes = "0"
-			TextSize = "Normal"
 			Text = "OK"
+			TextSize = "Õý³£"
+			FontAttributes = "0"
 			Depth = "2"
 			IsDefault = "1"
 			IsDisabled = "0"
@@ -281,10 +262,9 @@
 			Height = "23"
 			Flags = "0"
 			TextColour = "0,0,0,0,19"
-			Typeface = ""
-			FontAttributes = "0"
-			TextSize = "Normal"
 			Text = "Cancel"
+			TextSize = "Õý³£"
+			FontAttributes = "0"
 			Depth = "2"
 			IsDefault = "0"
 			IsDisabled = "0"
@@ -302,10 +282,9 @@
 			Height = "23"
 			Flags = "0"
 			TextColour = "0,0,0,0,19"
-			Typeface = ""
-			FontAttributes = "0"
-			TextSize = "Normal"
 			Text = "&amp;Apply"
+			TextSize = "Õý³£"
+			FontAttributes = "0"
 			Depth = "2"
 			IsDefault = "0"
 			IsDisabled = "0"
@@ -322,15 +301,12 @@
 	<SelectionGroups
 		CID = "4"/>
 	<Notes
-		CID = "5">
+		CID = "5"
+		NextCID = "1327725685">
 		<Note
 			CID = "1327725684"
-			Name = "Description"
-			NextCID = "2">
-			<Text
-				CID = "1">
-				
-			</Text>
+			Name = "Description">
+			
 		</Note>
 	</Notes>
 </Screen>

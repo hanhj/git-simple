@@ -10,45 +10,38 @@
 	RepresentativeRefID = "0"
 	UseDefRepresentative = "1">
 	<Elements
-		CID = "1">
+		CID = "1"
+		NextCID = "2067223902">
 		<Element
 			CID = "1201108091"
 			Type = "FrameWindow"
-			X = "154"
+			X = "200"
 			Y = "109"
 			Width = "400"
 			Height = "300"
 			Flags = "0"
 			WindowColour = "255,255,255,0,6"
-			Typeface = ""
-			FontAttributes = "1"
-			TextSize = "Normal"
-			Title = "å…‰çº¤é™è„‰æµ‹åŽ‹ä»ª"
+			Title = "¹âÏË¾²Âö²âÊÔÒÇ"
 			TitleBarHeight = "18"
-			IconMargin = "0"
 			BorderSize = "1"
 			IsBorderless = "1"
 			IsActive = "1"
-			IsDocWindow = "0"
 			HasSunkenWindow = "1"
-			CentreText = "0"
-			UseMutedColours = "0"
-			Mirror = "0"
+			FontAttributes = "1"
 			Buttons = "11"
 			Icon = "DefaultApp"/>
 		<Element
 			CID = "2067213599"
 			Type = "TextButton"
-			X = "195"
+			X = "241"
 			Y = "240"
 			Width = "75"
 			Height = "23"
 			Flags = "0"
 			TextColour = "0,0,0,0,19"
-			Typeface = ""
+			Text = "µ¼¹ÜÉèÖÃ"
+			TextSize = "Õý³£"
 			FontAttributes = "0"
-			TextSize = "Normal"
-			Text = "å¯¼ç®¡å‚æ•°"
 			Depth = "2"
 			IsDefault = "0"
 			IsDisabled = "0"
@@ -60,16 +53,15 @@
 		<Element
 			CID = "2067206066"
 			Type = "TextButton"
-			X = "274"
+			X = "320"
 			Y = "240"
 			Width = "75"
 			Height = "23"
 			Flags = "0"
 			TextColour = "0,0,0,0,19"
-			Typeface = ""
+			Text = "½ÃÕýÏµÊý"
+			TextSize = "Õý³£"
 			FontAttributes = "0"
-			TextSize = "Normal"
-			Text = "çŸ«æ­£ç³»æ•°"
 			Depth = "2"
 			IsDefault = "0"
 			IsDisabled = "0"
@@ -81,16 +73,15 @@
 		<Element
 			CID = "2067223896"
 			Type = "TextButton"
-			X = "353"
+			X = "399"
 			Y = "240"
 			Width = "75"
 			Height = "23"
 			Flags = "0"
 			TextColour = "0,0,0,0,19"
-			Typeface = ""
+			Text = "ÏÔÊ¾ÉèÖÃ"
+			TextSize = "Õý³£"
 			FontAttributes = "0"
-			TextSize = "Normal"
-			Text = "æ˜¾ç¤ºå‚æ•°"
 			Depth = "2"
 			IsDefault = "0"
 			IsDisabled = "0"
@@ -102,16 +93,15 @@
 		<Element
 			CID = "2067217463"
 			Type = "TextButton"
-			X = "432"
+			X = "478"
 			Y = "240"
 			Width = "75"
 			Height = "23"
 			Flags = "0"
 			TextColour = "0,0,0,0,19"
-			Typeface = ""
+			Text = "Í¨Ñ¶ÉèÖÃ"
+			TextSize = "Õý³£"
 			FontAttributes = "0"
-			TextSize = "Normal"
-			Text = "é€šè®¯å‚æ•°"
 			Depth = "2"
 			IsDefault = "0"
 			IsDisabled = "0"
@@ -121,10 +111,50 @@
 			MarginBottom = "0"
 			AutoNavType = ""/>
 		<Element
-			CID = "58531923"
+			CID = "2067223897"
+			Type = "TextButton"
+			X = "242"
+			Y = "274"
+			Width = "75"
+			Height = "23"
+			Flags = "0"
+			TextColour = "0,0,0,0,19"
+			Text = "ÓÃ»§ÉèÖÃ"
+			TextSize = "Õý³£"
+			FontAttributes = "0"
+			Depth = "2"
+			IsDefault = "0"
+			IsDisabled = "0"
+			MarginLeft = "0"
+			MarginRight = "0"
+			MarginTop = "0"
+			MarginBottom = "0"
+			AutoNavType = ""/>
+		<Element
+			CID = "2067223898"
+			Type = "TextButton"
+			X = "323"
+			Y = "274"
+			Width = "75"
+			Height = "23"
+			Flags = "0"
+			TextColour = "0,0,0,0,19"
+			Text = "·µ»Ø"
+			TextSize = "Õý³£"
+			FontAttributes = "0"
+			Depth = "2"
+			IsDefault = "0"
+			IsDisabled = "0"
+			MarginLeft = "0"
+			MarginRight = "0"
+			MarginTop = "0"
+			MarginBottom = "0"
+			AutoNavType = ""/>
+		<Element
+			CID = "2067223899"
 			Type = "Component"
-			X = "-325"
-			Y = "118"
+			X = "-278"
+			Y = "112"
 			Width = "400"
 			Height = "300"
 			Flags = "3"
@@ -136,10 +166,10 @@
 			VertAlign = "Top"
 			MaintainSize = "0"/>
 		<Element
-			CID = "58534213"
+			CID = "2067223900"
 			Type = "Component"
-			X = "139"
-			Y = "505"
+			X = "-283"
+			Y = "433"
 			Width = "400"
 			Height = "300"
 			Flags = "3"
@@ -151,10 +181,10 @@
 			VertAlign = "Top"
 			MaintainSize = "0"/>
 		<Element
-			CID = "58536015"
+			CID = "2067223901"
 			Type = "Component"
-			X = "579"
-			Y = "506"
+			X = "197"
+			Y = "443"
 			Width = "400"
 			Height = "300"
 			Flags = "3"
@@ -167,38 +197,39 @@
 			MaintainSize = "0"/>
 	</Elements>
 	<Connections
-		CID = "2">
+		CID = "2"
+		NextCID = "4">
 		<Connection
-			CID = "58536060"
+			CID = "1"
 			Layer = "DesignElements"
 			Trigger = "LeftClick"
 			Type = "Navigation"
 			SubType = "Modal"
 			SourceSubItemID = ""
 			SourceRefID = "2067213599"
-			TargetRefID = "58531923"
+			TargetRefID = "2067223899"
 			ConLineWidth = "2"
 			ConLineColour = "0,0,0,0,0"/>
 		<Connection
-			CID = "58539848"
+			CID = "2"
 			Layer = "DesignElements"
 			Trigger = "LeftClick"
 			Type = "Navigation"
 			SubType = "Modal"
 			SourceSubItemID = ""
 			SourceRefID = "2067206066"
-			TargetRefID = "58534213"
+			TargetRefID = "2067223900"
 			ConLineWidth = "2"
 			ConLineColour = "0,0,0,0,0"/>
 		<Connection
-			CID = "58537822"
+			CID = "3"
 			Layer = "DesignElements"
 			Trigger = "LeftClick"
 			Type = "Navigation"
 			SubType = "Modal"
 			SourceSubItemID = ""
 			SourceRefID = "2067223896"
-			TargetRefID = "58536015"
+			TargetRefID = "2067223901"
 			ConLineWidth = "2"
 			ConLineColour = "0,0,0,0,0"/>
 	</Connections>
@@ -207,15 +238,12 @@
 	<SelectionGroups
 		CID = "4"/>
 	<Notes
-		CID = "5">
+		CID = "5"
+		NextCID = "1201104498">
 		<Note
 			CID = "1201104497"
-			Name = "Description"
-			NextCID = "2">
-			<Text
-				CID = "1">
-				
-			</Text>
+			Name = "Description">
+			
 		</Note>
 	</Notes>
 </Screen>
