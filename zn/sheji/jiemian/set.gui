@@ -1,0 +1,182 @@
+<Screen
+	CID = "1201110942"
+	AppID = "2"
+	AppVer = "4.3.136.0"
+	DocID = ""
+	HasCanvas = "0"
+	Width = "640"
+	Height = "480"
+	NextCID = "6"
+	RepresentativeRefID = "0"
+	UseDefRepresentative = "1">
+	<Elements
+		CID = "1">
+		<Element
+			CID = "1201108091"
+			Type = "FrameWindow"
+			X = "154"
+			Y = "109"
+			Width = "400"
+			Height = "300"
+			Flags = "0"
+			WindowColour = "255,255,255,0,32"
+			Typeface = ""
+			FontAttributes = "1"
+			TextSize = "Normal"
+			Title = "光纤静脉测压仪"
+			TitleBarHeight = "18"
+			IconMargin = "0"
+			BorderSize = "1"
+			IsBorderless = "1"
+			IsActive = "1"
+			IsDocWindow = "0"
+			HasSunkenWindow = "1"
+			CentreText = "0"
+			UseMutedColours = "0"
+			Mirror = "0"
+			Buttons = "11"
+			Icon = "DefaultApp"/>
+		<Element
+			CID = "1201095755"
+			Type = "Icon"
+			X = "238"
+			Y = "228"
+			Width = "48"
+			Height = "48"
+			Flags = "3"
+			RootPath = "$Application"
+			Filename = "Icons\Miscellaneous\RibbonAppIconBlank.ico"
+			IconIndex = "0"
+			IsDisabled = "0"/>
+		<Element
+			CID = "1201078548"
+			Type = "Icon"
+			X = "378"
+			Y = "228"
+			Width = "48"
+			Height = "48"
+			Flags = "3"
+			RootPath = "$Application"
+			Filename = "Icons\Miscellaneous\RibbonAppIconBlank.ico"
+			IconIndex = "0"
+			IsDisabled = "0"/>
+		<Element
+			CID = "1201102777"
+			Type = "StaticText"
+			X = "201"
+			Y = "285"
+			Width = "100"
+			Height = "21"
+			Flags = "0"
+			FillColour = "236,233,216,0,16"
+			TextColour = "0,0,0,0,19"
+			Typeface = ""
+			FontAttributes = "0"
+			TextSize = "Normal"
+			Text = "导管参数"
+			IsDisabled = "0"
+			IsHyperlink = "0"
+			Fill = "None"
+			HorzAlign = "Centre"
+			VertAlign = "Centre"/>
+		<Element
+			CID = "1201108922"
+			Type = "StaticText"
+			X = "341"
+			Y = "285"
+			Width = "100"
+			Height = "21"
+			Flags = "0"
+			FillColour = "236,233,216,0,16"
+			TextColour = "0,0,0,0,19"
+			Typeface = ""
+			FontAttributes = "0"
+			TextSize = "Normal"
+			Text = "界面参数"
+			IsDisabled = "0"
+			IsHyperlink = "0"
+			Fill = "None"
+			HorzAlign = "Centre"
+			VertAlign = "Centre"/>
+		<Element
+			CID = "1201109785"
+			Type = "Icon"
+			X = "448"
+			Y = "228"
+			Width = "48"
+			Height = "48"
+			Flags = "3"
+			RootPath = "$Application"
+			Filename = "Icons\Miscellaneous\RibbonAppIconBlank.ico"
+			IconIndex = "0"
+			IsDisabled = "0"/>
+		<Element
+			CID = "1201084748"
+			Type = "StaticText"
+			X = "411"
+			Y = "285"
+			Width = "100"
+			Height = "21"
+			Flags = "0"
+			FillColour = "236,233,216,0,16"
+			TextColour = "0,0,0,0,19"
+			Typeface = ""
+			FontAttributes = "0"
+			TextSize = "Normal"
+			Text = "通讯参数"
+			IsDisabled = "0"
+			IsHyperlink = "0"
+			Fill = "None"
+			HorzAlign = "Centre"
+			VertAlign = "Centre"/>
+		<Element
+			CID = "2071805972"
+			Type = "Icon"
+			X = "308"
+			Y = "228"
+			Width = "48"
+			Height = "48"
+			Flags = "3"
+			RootPath = "$Application"
+			Filename = "Icons\Miscellaneous\RibbonAppIconBlank.ico"
+			IconIndex = "0"
+			IsDisabled = "0"/>
+		<Element
+			CID = "2071800321"
+			Type = "StaticText"
+			X = "271"
+			Y = "285"
+			Width = "100"
+			Height = "21"
+			Flags = "0"
+			FillColour = "236,233,216,0,16"
+			TextColour = "0,0,0,0,19"
+			Typeface = ""
+			FontAttributes = "0"
+			TextSize = "Normal"
+			Text = "矫正系数"
+			IsDisabled = "0"
+			IsHyperlink = "0"
+			Fill = "None"
+			HorzAlign = "Centre"
+			VertAlign = "Centre"/>
+	</Elements>
+	<Connections
+		CID = "2"/>
+	<Groups
+		CID = "3"/>
+	<SelectionGroups
+		CID = "4"/>
+	<Notes
+		CID = "5">
+		<Note
+			CID = "1201104497"
+			Name = "Description"
+			NextCID = "2">
+			<Text
+				CID = "1">
+				
+			</Text>
+		</Note>
+	</Notes>
+</Screen>

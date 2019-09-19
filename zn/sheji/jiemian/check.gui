@@ -1,0 +1,58 @@
+<Screen
+	CID = "324229062"
+	AppID = "2"
+	AppVer = "4.1.109.0"
+	DocID = ""
+	HasCanvas = "1"
+	Width = "640"
+	Height = "480"
+	NextCID = "6"
+	RepresentativeRefID = "0"
+	UseDefRepresentative = "1">
+	<Elements
+		CID = "1">
+		<Element
+			CID = "324238312"
+			Type = "FrameWindow"
+			X = "144"
+			Y = "67"
+			Width = "400"
+			Height = "300"
+			Flags = "0"
+			WindowColour = "172,168,153,0,13"
+			Typeface = ""
+			FontAttributes = "1"
+			TextSize = "Normal"
+			Title = "Maximised Application"
+			TitleBarHeight = "18"
+			IconMargin = "0"
+			BorderSize = "1"
+			IsBorderless = "1"
+			IsActive = "1"
+			IsDocWindow = "0"
+			HasSunkenWindow = "1"
+			CentreText = "0"
+			UseMutedColours = "0"
+			Mirror = "0"
+			Buttons = "11"
+			Icon = "DefaultApp"/>
+	</Elements>
+	<Connections
+		CID = "2"/>
+	<Groups
+		CID = "3"/>
+	<SelectionGroups
+		CID = "4"/>
+	<Notes
+		CID = "5">
+		<Note
+			CID = "324233726"
+			Name = "Description"
+			NextCID = "2">
+			<Text
+				CID = "1">
+				
+			</Text>
+		</Note>
+	</Notes>
+</Screen>

@@ -1,0 +1,23 @@
+<Workspace
+	CID = "1"
+	NextCID = "2"
+	IconCategory = "Toolbars">
+	<OpenFiles
+		CID = "1"
+		LastActive = "3">
+		<File
+			FileID = "9D32A6C6-E28A-45D0-8E9C5E1378F7C4F5"
+			RootPath = "$Container"
+			RelativePathname = "FrameWin.gui"
+			ViewSettings = ""/>
+		<File
+			RootPath = "$Absolute"
+			RelativePathname = "F:\share_doc\zn\sheji\jiemian.gui"
+			ViewSettings = ""/>
+		<File
+			FileID = "3AD3C8A6-0A8B-45C0-AECFC54FE417AD12"
+			RootPath = "$Container"
+			RelativePathname = "longin.gui"
+			ViewSettings = ""/>
+	</OpenFiles>
+</Workspace>

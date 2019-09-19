@@ -1,0 +1,17 @@
+<Catalogue
+	CID = "1"
+	NextCID = "2">
+	<Files
+		CID = "1">
+		<FileInfo
+			ID = "3AD3C8A6-0A8B-45C0-AECFC54FE417AD12"
+			RelativePath = "longin.gui"
+			OriginalRoot = "$Project"
+			OriginalPath = "longin.gui"/>
+		<FileInfo
+			ID = "9D32A6C6-E28A-45D0-8E9C5E1378F7C4F5"
+			RelativePath = "FrameWin.gui"
+			OriginalRoot = "$Project"
+			OriginalPath = "FrameWin.gui"/>
+	</Files>
+</Catalogue>

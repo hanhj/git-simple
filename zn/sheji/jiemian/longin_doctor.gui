@@ -1,0 +1,120 @@
+<Screen
+	CID = "212103776"
+	AppID = "2"
+	AppVer = "4.3.136.0"
+	DocID = ""
+	HasCanvas = "0"
+	Width = "640"
+	Height = "480"
+	NextCID = "6"
+	RepresentativeRefID = "0"
+	UseDefRepresentative = "1">
+	<Elements
+		CID = "1">
+		<Element
+			CID = "212082420"
+			Type = "FrameWindow"
+			X = "217"
+			Y = "56"
+			Width = "400"
+			Height = "300"
+			Flags = "0"
+			WindowColour = "198,210,162,0,28"
+			Typeface = ""
+			FontAttributes = "1"
+			TextSize = "Normal"
+			Title = "光纤静脉测压仪"
+			TitleBarHeight = "18"
+			IconMargin = "0"
+			BorderSize = "1"
+			IsBorderless = "1"
+			IsActive = "1"
+			IsDocWindow = "0"
+			HasSunkenWindow = "1"
+			CentreText = "0"
+			UseMutedColours = "0"
+			Mirror = "0"
+			Buttons = "11"
+			Icon = "DefaultApp"/>
+		<Element
+			CID = "212075310"
+			Type = "Icon"
+			X = "362"
+			Y = "198"
+			Width = "48"
+			Height = "48"
+			Flags = "3"
+			RootPath = "$Application"
+			Filename = "Icons\Miscellaneous\RibbonAppIconBlank.ico"
+			IconIndex = "0"
+			IsDisabled = "0"/>
+		<Element
+			CID = "212104657"
+			Type = "Icon"
+			X = "447"
+			Y = "198"
+			Width = "48"
+			Height = "48"
+			Flags = "3"
+			RootPath = "$Application"
+			Filename = "Icons\Miscellaneous\RibbonAppIconBlank.ico"
+			IconIndex = "0"
+			IsDisabled = "0"/>
+		<Element
+			CID = "212101226"
+			Type = "StaticText"
+			X = "332"
+			Y = "255"
+			Width = "100"
+			Height = "21"
+			Flags = "0"
+			FillColour = "236,233,216,0,16"
+			TextColour = "0,0,0,0,19"
+			Typeface = ""
+			FontAttributes = "0"
+			TextSize = "Normal"
+			Text = "检查"
+			IsDisabled = "0"
+			IsHyperlink = "0"
+			Fill = "None"
+			HorzAlign = "Centre"
+			VertAlign = "Centre"/>
+		<Element
+			CID = "212105161"
+			Type = "StaticText"
+			X = "426"
+			Y = "255"
+			Width = "100"
+			Height = "21"
+			Flags = "0"
+			FillColour = "236,233,216,0,16"
+			TextColour = "0,0,0,0,19"
+			Typeface = ""
+			FontAttributes = "0"
+			TextSize = "Normal"
+			Text = "查询&#13;&#10;"
+			IsDisabled = "0"
+			IsHyperlink = "0"
+			Fill = "None"
+			HorzAlign = "Centre"
+			VertAlign = "Centre"/>
+	</Elements>
+	<Connections
+		CID = "2"/>
+	<Groups
+		CID = "3"/>
+	<SelectionGroups
+		CID = "4"/>
+	<Notes
+		CID = "5">
+		<Note
+			CID = "212074524"
+			Name = "Description"
+			NextCID = "2">
+			<Text
+				CID = "1">
+				
+			</Text>
+		</Note>
+	</Notes>
+</Screen>
