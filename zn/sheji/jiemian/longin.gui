@@ -14,8 +14,8 @@
 		<Element
 			CID = "1005858413"
 			Type = "FrameWindow"
-			X = "157"
-			Y = "115"
+			X = "172"
+			Y = "107"
 			Width = "400"
 			Height = "300"
 			Flags = "0"
@@ -39,8 +39,8 @@
 		<Element
 			CID = "1005848440"
 			Type = "StaticText"
-			X = "258"
-			Y = "229"
+			X = "273"
+			Y = "221"
 			Width = "74"
 			Height = "14"
 			Flags = "0"
@@ -57,8 +57,8 @@
 		<Element
 			CID = "1005855605"
 			Type = "StaticText"
-			X = "260"
-			Y = "256"
+			X = "275"
+			Y = "248"
 			Width = "70"
 			Height = "18"
 			Flags = "0"
@@ -75,8 +75,8 @@
 		<Element
 			CID = "1005860883"
 			Type = "EditBox"
-			X = "347"
-			Y = "252"
+			X = "362"
+			Y = "244"
 			Width = "120"
 			Height = "21"
 			Flags = "2"
@@ -105,12 +105,11 @@
 		<Element
 			CID = "1005872813"
 			Type = "TextButton"
-			X = "353"
-			Y = "298"
+			X = "368"
+			Y = "290"
 			Width = "75"
 			Height = "23"
 			Flags = "0"
-			EnabledCondition = "login_user&eq;&eq;lisi"
 			TextColour = "0,0,0,0,19"
 			Typeface = ""
 			FontAttributes = "0"
@@ -127,8 +126,8 @@
 		<Element
 			CID = "1005871856"
 			Type = "ComboBox"
-			X = "347"
-			Y = "221"
+			X = "362"
+			Y = "213"
 			Width = "120"
 			Height = "21"
 			Flags = "2"
@@ -169,10 +168,10 @@
 			VertAlign = "Top"
 			MaintainSize = "0"/>
 		<Element
-			CID = "349653887"
+			CID = "731795852"
 			Type = "Component"
-			X = "645"
-			Y = "364"
+			X = "646"
+			Y = "356"
 			Width = "400"
 			Height = "300"
 			Flags = "3"
@@ -189,7 +188,7 @@
 		<Connection
 			CID = "1133798810"
 			Layer = "DesignElements"
-			Trigger = "LeftClick"
+			Trigger = "RightClick"
 			Type = "Navigation"
 			SubType = "Modal"
 			SourceSubItemID = ""
@@ -198,14 +197,14 @@
 			ConLineWidth = "2"
 			ConLineColour = "0,0,0,0,0"/>
 		<Connection
-			CID = "349642179"
+			CID = "731776364"
 			Layer = "DesignElements"
 			Trigger = "LeftClick"
 			Type = "Navigation"
 			SubType = "Modal"
 			SourceSubItemID = ""
 			SourceRefID = "1005872813"
-			TargetRefID = "349653887"
+			TargetRefID = "731795852"
 			ConLineWidth = "2"
 			ConLineColour = "0,0,0,0,0"/>
 	</Connections>

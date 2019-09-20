@@ -1,7 +1,7 @@
 <Screen
 	CID = "1327717486"
 	AppID = "2"
-	AppVer = "4.3.136.0"
+	AppVer = "4.1.109.0"
 	DocID = ""
 	HasCanvas = "0"
 	Width = "640"
@@ -40,9 +40,9 @@
 			CID = "1327714449"
 			Type = "Table"
 			X = "195"
-			Y = "218"
+			Y = "192"
 			Width = "391"
-			Height = "222"
+			Height = "248"
 			Flags = "0"
 			HeaderBackgroundColour = "236,233,216,0,16"
 			HeaderBorderColour = "172,168,153,0,17"
@@ -255,7 +255,7 @@
 			CID = "1327716749"
 			Type = "TextButton"
 			X = "507"
-			Y = "178"
+			Y = "169"
 			Width = "39"
 			Height = "23"
 			Flags = "0"
@@ -276,7 +276,7 @@
 			CID = "1327696129"
 			Type = "TextButton"
 			X = "546"
-			Y = "178"
+			Y = "169"
 			Width = "39"
 			Height = "23"
 			Flags = "0"
@@ -297,7 +297,7 @@
 			CID = "1327703063"
 			Type = "TextButton"
 			X = "468"
-			Y = "178"
+			Y = "169"
 			Width = "39"
 			Height = "23"
 			Flags = "0"
@@ -314,9 +314,37 @@
 			MarginTop = "0"
 			MarginBottom = "0"
 			AutoNavType = ""/>
+		<Element
+			CID = "946293854"
+			Type = "Component"
+			X = "665"
+			Y = "87"
+			Width = "456"
+			Height = "353"
+			Flags = "3"
+			BackgroundColour = "255,255,255,0,6"
+			FileID = "8647EFA7-FD46-4908-9B200028E9E33A93"
+			RootPath = "$Container"
+			Filename = "bkgnd.gui"
+			Background = "Transparent"
+			HorzAlign = "Left"
+			VertAlign = "Top"
+			MaintainSize = "0"/>
 	</Elements>
 	<Connections
-		CID = "2"/>
+		CID = "2">
+		<Connection
+			CID = "946284638"
+			Layer = "DesignElements"
+			Trigger = "LeftClick"
+			Type = "Navigation"
+			SubType = "Modal"
+			SourceSubItemID = ""
+			SourceRefID = "1327703063"
+			TargetRefID = "946293854"
+			ConLineWidth = "2"
+			ConLineColour = "0,0,0,0,0"/>
+	</Connections>
 	<Groups
 		CID = "3"/>
 	<SelectionGroups
