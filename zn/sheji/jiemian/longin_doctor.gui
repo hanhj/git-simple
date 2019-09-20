@@ -10,8 +10,7 @@
 	RepresentativeRefID = "0"
 	UseDefRepresentative = "1">
 	<Elements
-		CID = "1"
-		NextCID = "2059278771">
+		CID = "1">
 		<Element
 			CID = "212082420"
 			Type = "FrameWindow"
@@ -21,27 +20,35 @@
 			Height = "300"
 			Flags = "0"
 			WindowColour = "255,255,255,0,6"
-			Title = "¹âÏË¾²Âö²âÑ¹ÒÇ"
+			Typeface = ""
+			FontAttributes = "1"
+			TextSize = "Normal"
+			Title = "å…‰çº¤é™è„‰æµ‹åŽ‹ä»ª"
 			TitleBarHeight = "18"
+			IconMargin = "0"
 			BorderSize = "1"
 			IsBorderless = "1"
 			IsActive = "1"
+			IsDocWindow = "0"
 			HasSunkenWindow = "1"
-			FontAttributes = "1"
+			CentreText = "0"
+			UseMutedColours = "0"
+			Mirror = "0"
 			Buttons = "11"
 			Icon = "DefaultApp"/>
 		<Element
 			CID = "2059276721"
 			Type = "TextButton"
-			X = "266"
-			Y = "197"
+			X = "389"
+			Y = "166"
 			Width = "75"
 			Height = "23"
 			Flags = "0"
 			TextColour = "0,0,0,0,19"
-			Text = "Ô¤±¸"
-			TextSize = "Õý³£"
+			Typeface = ""
 			FontAttributes = "0"
+			TextSize = "Normal"
+			Text = "æ£€æŸ¥"
 			Depth = "2"
 			IsDefault = "0"
 			IsDisabled = "0"
@@ -53,15 +60,16 @@
 		<Element
 			CID = "2059278767"
 			Type = "TextButton"
-			X = "453"
-			Y = "197"
+			X = "492"
+			Y = "165"
 			Width = "75"
 			Height = "23"
 			Flags = "0"
 			TextColour = "0,0,0,0,19"
-			Text = "²éÑ¯"
-			TextSize = "Õý³£"
+			Typeface = ""
 			FontAttributes = "0"
+			TextSize = "Normal"
+			Text = "æŸ¥è¯¢"
 			Depth = "2"
 			IsDefault = "0"
 			IsDisabled = "0"
@@ -71,79 +79,150 @@
 			MarginBottom = "0"
 			AutoNavType = ""/>
 		<Element
-			CID = "2059278768"
-			Type = "TextButton"
-			X = "357"
-			Y = "196"
-			Width = "75"
-			Height = "23"
-			Flags = "0"
-			TextColour = "0,0,0,0,19"
-			Text = "¼ì²é"
-			TextSize = "Õý³£"
-			FontAttributes = "0"
-			Depth = "2"
-			IsDefault = "0"
-			IsDisabled = "0"
-			MarginLeft = "0"
-			MarginRight = "0"
-			MarginTop = "0"
-			MarginBottom = "0"
-			AutoNavType = ""/>
-		<Element
-			CID = "2059278769"
+			CID = "867243044"
 			Type = "Component"
-			X = "750"
-			Y = "-35"
-			Width = "640"
-			Height = "480"
+			X = "723"
+			Y = "406"
+			Width = "400"
+			Height = "300"
 			Flags = "3"
 			BackgroundColour = "255,255,255,0,6"
 			RootPath = "$Container"
-			Filename = "prepare.gui"
-			Background = "Solid"
-			HorzAlign = "Left"
-			VertAlign = "Top"
-			MaintainSize = "0"/>
-		<Element
-			CID = "2059278770"
-			Type = "Component"
-			X = "754"
-			Y = "479"
-			Width = "643"
-			Height = "472"
-			Flags = "3"
-			BackgroundColour = "255,255,255,0,6"
-			RootPath = "$Container"
-			Filename = "test.gui"
+			Filename = "check.gui"
 			Background = "Transparent"
 			HorzAlign = "Left"
 			VertAlign = "Top"
 			MaintainSize = "0"/>
+		<Element
+			CID = "867240415"
+			Type = "Component"
+			X = "820"
+			Y = "52"
+			Width = "400"
+			Height = "300"
+			Flags = "3"
+			BackgroundColour = "255,255,255,0,6"
+			FileID = "859866C3-4C62-4BD5-A4680FB512EC492D"
+			RootPath = "$Container"
+			Filename = "search.gui"
+			Background = "Transparent"
+			HorzAlign = "Left"
+			VertAlign = "Top"
+			MaintainSize = "0"/>
+		<Element
+			CID = "1491561563"
+			Type = "TextButton"
+			X = "296"
+			Y = "166"
+			Width = "75"
+			Height = "23"
+			Flags = "0"
+			TextColour = "0,0,0,0,19"
+			Typeface = ""
+			FontAttributes = "0"
+			TextSize = "Normal"
+			Text = "é¢„å¤‡"
+			Depth = "2"
+			IsDefault = "0"
+			IsDisabled = "0"
+			MarginLeft = "0"
+			MarginRight = "0"
+			MarginTop = "0"
+			MarginBottom = "0"
+			AutoNavType = ""/>
+		<Element
+			CID = "1491552973"
+			Type = "Component"
+			X = "219"
+			Y = "409"
+			Width = "400"
+			Height = "300"
+			Flags = "3"
+			BackgroundColour = "255,255,255,0,6"
+			FileID = "CAF55668-EBF9-4CCB-8495086B5C91DDC7"
+			RootPath = "$Container"
+			Filename = "prepare.gui"
+			Background = "Transparent"
+			HorzAlign = "Left"
+			VertAlign = "Top"
+			MaintainSize = "0"/>
+		<Element
+			CID = "728721775"
+			Type = "TextButton"
+			X = "299"
+			Y = "211"
+			Width = "75"
+			Height = "23"
+			Flags = "0"
+			TextColour = "0,0,0,0,19"
+			Typeface = ""
+			FontAttributes = "0"
+			TextSize = "Normal"
+			Text = "è¿”å›ž"
+			Depth = "2"
+			IsDefault = "0"
+			IsDisabled = "0"
+			MarginLeft = "0"
+			MarginRight = "0"
+			MarginTop = "0"
+			MarginBottom = "0"
+			AutoNavType = "Cancel"/>
 	</Elements>
 	<Connections
-		CID = "2"
-		NextCID = "3">
+		CID = "2">
 		<Connection
-			CID = "1"
+			CID = "867266663"
 			Layer = "DesignElements"
 			Trigger = "LeftClick"
 			Type = "Navigation"
 			SubType = "Modal"
 			SourceSubItemID = ""
 			SourceRefID = "2059276721"
-			TargetRefID = "2059278769"
+			TargetRefID = "867243044"
 			ConLineWidth = "2"
 			ConLineColour = "0,0,0,0,0"/>
 		<Connection
-			CID = "2"
+			CID = "867256404"
 			Layer = "DesignElements"
 			Trigger = "LeftClick"
 			Type = "Navigation"
 			SubType = "Modal"
 			SourceSubItemID = ""
-			SourceRefID = "2059278768"
-			TargetRefID = "2059278770"
+			SourceRefID = "2059278767"
+			TargetRefID = "867240415"
+			ConLineWidth = "2"
+			ConLineColour = "0,0,0,0,0"/>
+		<Connection
+			CID = "1491560935"
+			Layer = "DesignElements"
+			Trigger = "LeftClick"
+			Type = "Navigation"
+			SubType = "Modal"
+			SourceSubItemID = ""
+			SourceRefID = "1491561563"
+			TargetRefID = "1491552973"
+			ConLineWidth = "2"
+			ConLineColour = "0,0,0,0,0"/>
+		<Connection
+			CID = "1491557370"
+			Layer = "DesignElements"
+			Trigger = "LeftClick"
+			Type = "Navigation"
+			SubType = "Modal"
+			SourceSubItemID = "933458617;"
+			SourceRefID = "867243044"
+			TargetRefID = "212082420"
+			ConLineWidth = "2"
+			ConLineColour = "0,0,0,0,0"/>
+		<Connection
+			CID = "1491557262"
+			Layer = "DesignElements"
+			Trigger = "LeftClick"
+			Type = "Navigation"
+			SubType = "Modal"
+			SourceSubItemID = "933437014;"
+			SourceRefID = "1491552973"
+			TargetRefID = "212082420"
 			ConLineWidth = "2"
 			ConLineColour = "0,0,0,0,0"/>
 	</Connections>
@@ -152,12 +231,15 @@
 	<SelectionGroups
 		CID = "4"/>
 	<Notes
-		CID = "5"
-		NextCID = "212074525">
+		CID = "5">
 		<Note
 			CID = "212074524"
-			Name = "Description">
-			
+			Name = "Description"
+			NextCID = "2">
+			<Text
+				CID = "1">
+				
+			</Text>
 		</Note>
 	</Notes>
 </Screen>
