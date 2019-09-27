@@ -57,7 +57,7 @@
 			Typeface = ""
 			FontAttributes = "0"
 			TextSize = "Normal"
-			NextColumnID = "7"
+			NextColumnID = "8"
 			IsFlat = "0"
 			IsHeaderBold = "0"
 			IsTransparent = "0"
@@ -157,6 +157,20 @@
 					HasCustomTextColour = "0"
 					HeadingAlignment = "Left"
 					CellAlignment = "Left"/>
+				<ColumnItem
+					OddBackgroundColour = "255,255,255,0,6"
+					EvenBackgroundColour = "255,255,255,0,6"
+					TextColour = "0,0,0,0,9"
+					ColumnID = "7"
+					Heading = "使用次数"
+					Width = "60"
+					HeaderMargin = "0"
+					CellMargin = "0"
+					HasCustomOddBgColour = "0"
+					HasCustomEvenBgColour = "0"
+					HasCustomTextColour = "0"
+					HeadingAlignment = "Left"
+					CellAlignment = "Left"/>
 			</Columns>
 			<Data>
 				<Row
@@ -176,21 +190,6 @@
 					<Cell>
 						
 					</Cell>
-				</Row>
-				<Row
-					IsSelected = "0">
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
 					<Cell>
 						
 					</Cell>
@@ -212,6 +211,30 @@
 					<Cell>
 						
 					</Cell>
+					<Cell>
+						
+					</Cell>
+				</Row>
+				<Row
+					IsSelected = "0">
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
 				</Row>
 				<Row
 					IsSelected = "0">
@@ -230,9 +253,15 @@
 					<Cell>
 						
 					</Cell>
+					<Cell>
+						
+					</Cell>
 				</Row>
 				<Row
 					IsSelected = "0">
+					<Cell>
+						
+					</Cell>
 					<Cell>
 						
 					</Cell>
@@ -347,7 +376,7 @@
 			Typeface = ""
 			FontAttributes = "0"
 			TextSize = "Normal"
-			Text = "+"
+			Text = "添加"
 			Depth = "2"
 			IsDefault = "0"
 			IsDisabled = "0"
@@ -368,7 +397,7 @@
 			Typeface = ""
 			FontAttributes = "0"
 			TextSize = "Normal"
-			Text = "-"
+			Text = "删除"
 			Depth = "2"
 			IsDefault = "0"
 			IsDisabled = "0"

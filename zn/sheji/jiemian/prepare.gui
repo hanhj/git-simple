@@ -132,7 +132,7 @@
 			Typeface = ""
 			FontAttributes = "0"
 			TextSize = "Normal"
-			Text = "+"
+			Text = "添加"
 			Depth = "2"
 			IsDefault = "0"
 			IsDisabled = "0"
@@ -153,7 +153,7 @@
 			Typeface = ""
 			FontAttributes = "0"
 			TextSize = "Normal"
-			Text = "-"
+			Text = "删除"
 			Depth = "2"
 			IsDefault = "0"
 			IsDisabled = "0"
@@ -246,7 +246,7 @@
 			Typeface = ""
 			FontAttributes = "0"
 			TextSize = "Normal"
-			NextColumnID = "13"
+			NextColumnID = "14"
 			IsFlat = "0"
 			IsHeaderBold = "0"
 			IsTransparent = "0"
@@ -270,7 +270,7 @@
 			RowHeight = "18"
 			FirstVisibleRow = "0"
 			FixedColumns = "0"
-			SortedColumn = "0"
+			SortedColumn = "9"
 			SortedBlendFactor = "0.000000"
 			ColumnSort = "Ascending"
 			HeaderStyle = "Standard"
@@ -281,8 +281,36 @@
 					EvenBackgroundColour = "255,255,255,0,6"
 					TextColour = "0,0,0,0,9"
 					ColumnID = "1"
+					Heading = "序号"
+					Width = "43"
+					HeaderMargin = "0"
+					CellMargin = "0"
+					HasCustomOddBgColour = "0"
+					HasCustomEvenBgColour = "0"
+					HasCustomTextColour = "0"
+					HeadingAlignment = "Left"
+					CellAlignment = "Left"/>
+				<ColumnItem
+					OddBackgroundColour = "255,255,255,0,6"
+					EvenBackgroundColour = "255,255,255,0,6"
+					TextColour = "0,0,0,0,9"
+					ColumnID = "13"
 					Heading = "患者id"
 					Width = "80"
+					HeaderMargin = "0"
+					CellMargin = "0"
+					HasCustomOddBgColour = "0"
+					HasCustomEvenBgColour = "0"
+					HasCustomTextColour = "0"
+					HeadingAlignment = "Left"
+					CellAlignment = "Left"/>
+				<ColumnItem
+					OddBackgroundColour = "255,255,255,0,6"
+					EvenBackgroundColour = "255,255,255,0,6"
+					TextColour = "0,0,0,0,9"
+					ColumnID = "9"
+					Heading = "导管编号"
+					Width = "60"
 					HeaderMargin = "0"
 					CellMargin = "0"
 					HasCustomOddBgColour = "0"
@@ -366,7 +394,7 @@
 					TextColour = "0,0,0,0,9"
 					ColumnID = "6"
 					Heading = "送检科室"
-					Width = "60"
+					Width = "74"
 					HeaderMargin = "0"
 					CellMargin = "0"
 					HasCustomOddBgColour = "0"
@@ -380,7 +408,7 @@
 					TextColour = "0,0,0,0,9"
 					ColumnID = "7"
 					Heading = "送检医生"
-					Width = "60"
+					Width = "80"
 					HeaderMargin = "0"
 					CellMargin = "0"
 					HasCustomOddBgColour = "0"
@@ -402,25 +430,50 @@
 					HasCustomTextColour = "0"
 					HeadingAlignment = "Left"
 					CellAlignment = "Left"/>
-				<ColumnItem
-					OddBackgroundColour = "255,255,255,0,6"
-					EvenBackgroundColour = "255,255,255,0,6"
-					TextColour = "0,0,0,0,9"
-					ColumnID = "9"
-					Heading = "导管编号"
-					Width = "60"
-					HeaderMargin = "0"
-					CellMargin = "0"
-					HasCustomOddBgColour = "0"
-					HasCustomEvenBgColour = "0"
-					HasCustomTextColour = "0"
-					HeadingAlignment = "Left"
-					CellAlignment = "Left"/>
 			</Columns>
 			<Data>
 				<Row
 					IsSelected = "0">
 					<Cell>
+						1
+					</Cell>
+					<Cell>
+						32211
+					</Cell>
+					<Cell>
+						112
+					</Cell>
+					<Cell>
+						张三
+					</Cell>
+					<Cell>
+						45
+					</Cell>
+					<Cell>
+						男
+					</Cell>
+					<Cell>
+						21112
+					</Cell>
+					<Cell>
+						112
+					</Cell>
+					<Cell>
+						消化内科
+					</Cell>
+					<Cell>
+						李四
+					</Cell>
+					<Cell>
+						门静脉
+					</Cell>
+				</Row>
+				<Row
+					IsSelected = "0">
+					<Cell>
+						
+					</Cell>
+					<Cell>
 						
 					</Cell>
 					<Cell>
@@ -483,36 +536,6 @@
 					<Cell>
 						
 					</Cell>
-				</Row>
-				<Row
-					IsSelected = "0">
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
 					<Cell>
 						
 					</Cell>
@@ -549,9 +572,15 @@
 					<Cell>
 						
 					</Cell>
+					<Cell>
+						
+					</Cell>
 				</Row>
 				<Row
 					IsSelected = "0">
+					<Cell>
+						
+					</Cell>
 					<Cell>
 						
 					</Cell>

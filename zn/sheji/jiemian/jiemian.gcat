@@ -9,6 +9,11 @@
 			OriginalRoot = "$Project"
 			OriginalPath = "communication.gui"/>
 		<FileInfo
+			ID = "1976FDFA-5196-4A54-8C36112A4EF765F2"
+			RelativePath = "del_user.gui"
+			OriginalRoot = "$Project"
+			OriginalPath = "del_user.gui"/>
+		<FileInfo
 			ID = "26732E64-051F-4C10-8EF1B5C486BE6797"
 			RelativePath = "import.gui"
 			OriginalRoot = "$Project"
@@ -23,6 +28,11 @@
 			RelativePath = "annote.gui"
 			OriginalRoot = "$Project"
 			OriginalPath = "annote.gui"/>
+		<FileInfo
+			ID = "6398E15F-EEAB-487B-9F482BF547A0187B"
+			RelativePath = "save_rec.gui"
+			OriginalRoot = "$Project"
+			OriginalPath = "save_rec.gui"/>
 		<FileInfo
 			ID = "6F1718B7-EE96-4EB0-9EF34C11B9805FA8"
 			RelativePath = "user.gui"
@@ -57,7 +67,8 @@
 			ID = "9D32A6C6-E28A-45D0-8E9C5E1378F7C4F5"
 			RelativePath = "FrameWin.gui"
 			OriginalRoot = "$Project"
-			OriginalPath = "FrameWin.gui"/>
+			OriginalPath = "FrameWin.gui"
+			IsDeleted = "1"/>
 		<FileInfo
 			ID = "CAF55668-EBF9-4CCB-8495086B5C91DDC7"
 			RelativePath = "prepare.gui"

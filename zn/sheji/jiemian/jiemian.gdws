@@ -4,7 +4,7 @@
 	IconCategory = "Documents">
 	<OpenFiles
 		CID = "1"
-		LastActive = "19">
+		LastActive = "8">
 		<File
 			FileID = "9D32A6C6-E28A-45D0-8E9C5E1378F7C4F5"
 			RootPath = "$Container"
@@ -92,6 +92,20 @@
 		<File
 			RootPath = "$Container"
 			RelativePathname = "check.gui"
+			ViewSettings = ""/>
+		<File
+			FileID = "6398E15F-EEAB-487B-9F482BF547A0187B"
+			RootPath = "$Container"
+			RelativePathname = "save_rec.gui"
+			ViewSettings = ""/>
+		<File
+			RootPath = "$Container"
+			RelativePathname = "test.gui"
+			ViewSettings = ""/>
+		<File
+			FileID = "1976FDFA-5196-4A54-8C36112A4EF765F2"
+			RootPath = "$Container"
+			RelativePathname = "del_user.gui"
 			ViewSettings = ""/>
 	</OpenFiles>
 </Workspace>

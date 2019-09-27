@@ -132,7 +132,7 @@
 			Typeface = ""
 			FontAttributes = "0"
 			TextSize = "Normal"
-			Text = "+"
+			Text = "添加"
 			Depth = "2"
 			IsDefault = "0"
 			IsDisabled = "0"
@@ -153,7 +153,7 @@
 			Typeface = ""
 			FontAttributes = "0"
 			TextSize = "Normal"
-			Text = "-"
+			Text = "删除"
 			Depth = "2"
 			IsDefault = "0"
 			IsDisabled = "0"
@@ -430,6 +430,22 @@
 			HorzAlign = "Left"
 			VertAlign = "Top"
 			MaintainSize = "0"/>
+		<Element
+			CID = "1640641538"
+			Type = "Component"
+			X = "871"
+			Y = "447"
+			Width = "400"
+			Height = "300"
+			Flags = "3"
+			BackgroundColour = "255,255,255,0,6"
+			FileID = "1976FDFA-5196-4A54-8C36112A4EF765F2"
+			RootPath = "$Container"
+			Filename = "del_user.gui"
+			Background = "Transparent"
+			HorzAlign = "Left"
+			VertAlign = "Top"
+			MaintainSize = "0"/>
 	</Elements>
 	<Connections
 		CID = "2">
@@ -464,6 +480,17 @@
 			SourceSubItemID = ""
 			SourceRefID = "731785432"
 			TargetRefID = "731791268"
+			ConLineWidth = "2"
+			ConLineColour = "0,0,0,0,0"/>
+		<Connection
+			CID = "1640648010"
+			Layer = "DesignElements"
+			Trigger = "LeftClick"
+			Type = "Navigation"
+			SubType = "Modal"
+			SourceSubItemID = ""
+			SourceRefID = "731790427"
+			TargetRefID = "1640641538"
 			ConLineWidth = "2"
 			ConLineColour = "0,0,0,0,0"/>
 	</Connections>
