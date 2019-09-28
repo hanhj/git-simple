@@ -72,23 +72,6 @@
 			HorzAlign = "Left"
 			VertAlign = "Top"
 			MaintainSize = "0"/>
-		<Element
-			CID = "1655973499"
-			Type = "Bitmap"
-			X = "-146"
-			Y = "-170"
-			Width = "768"
-			Height = "334"
-			Flags = "0"
-			RootPath = "$Container"
-			Filename = "pic.png"
-			Placement = "Stretch"
-			HorzAlign = "Left"
-			VertAlign = "Top"
-			ClipLeft = "0"
-			ClipRight = "0"
-			ClipTop = "0"
-			ClipBottom = "0"/>
 	</Elements>
 	<Connections
 		CID = "2">

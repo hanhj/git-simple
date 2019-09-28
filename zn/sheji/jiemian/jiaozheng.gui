@@ -91,20 +91,6 @@
 					OddBackgroundColour = "255,255,255,0,6"
 					EvenBackgroundColour = "255,255,255,0,6"
 					TextColour = "0,0,0,0,9"
-					ColumnID = "1"
-					Heading = "导管编号"
-					Width = "80"
-					HeaderMargin = "0"
-					CellMargin = "0"
-					HasCustomOddBgColour = "0"
-					HasCustomEvenBgColour = "0"
-					HasCustomTextColour = "0"
-					HeadingAlignment = "Left"
-					CellAlignment = "Left"/>
-				<ColumnItem
-					OddBackgroundColour = "255,255,255,0,6"
-					EvenBackgroundColour = "255,255,255,0,6"
-					TextColour = "0,0,0,0,9"
 					ColumnID = "2"
 					Heading = "VT"
 					Width = "60"
@@ -190,36 +176,9 @@
 					<Cell>
 						
 					</Cell>
-					<Cell>
-						
-					</Cell>
 				</Row>
 				<Row
 					IsSelected = "0">
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-				</Row>
-				<Row
-					IsSelected = "0">
-					<Cell>
-						
-					</Cell>
 					<Cell>
 						
 					</Cell>
@@ -253,15 +212,27 @@
 					<Cell>
 						
 					</Cell>
-					<Cell>
-						
-					</Cell>
 				</Row>
 				<Row
 					IsSelected = "0">
 					<Cell>
 						
 					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+				</Row>
+				<Row
+					IsSelected = "0">
 					<Cell>
 						
 					</Cell>
@@ -325,7 +296,7 @@
 		<Element
 			CID = "651890805"
 			Type = "TextButton"
-			X = "199"
+			X = "275"
 			Y = "146"
 			Width = "39"
 			Height = "23"
@@ -346,7 +317,7 @@
 		<Element
 			CID = "651905139"
 			Type = "TextButton"
-			X = "236"
+			X = "312"
 			Y = "146"
 			Width = "39"
 			Height = "23"
@@ -388,7 +359,7 @@
 		<Element
 			CID = "651901407"
 			Type = "TextButton"
-			X = "313"
+			X = "389"
 			Y = "146"
 			Width = "39"
 			Height = "23"
@@ -409,7 +380,7 @@
 		<Element
 			CID = "651892063"
 			Type = "TextButton"
-			X = "275"
+			X = "351"
 			Y = "146"
 			Width = "39"
 			Height = "23"
@@ -427,9 +398,106 @@
 			MarginTop = "0"
 			MarginBottom = "0"
 			AutoNavType = ""/>
+		<Element
+			CID = "1049571124"
+			Type = "TextButton"
+			X = "200"
+			Y = "146"
+			Width = "39"
+			Height = "23"
+			Flags = "0"
+			TextColour = "0,0,0,0,19"
+			Typeface = ""
+			FontAttributes = "0"
+			TextSize = "Normal"
+			Text = "下载"
+			Depth = "2"
+			IsDefault = "0"
+			IsDisabled = "0"
+			MarginLeft = "0"
+			MarginRight = "0"
+			MarginTop = "0"
+			MarginBottom = "0"
+			AutoNavType = ""/>
+		<Element
+			CID = "1049563770"
+			Type = "TextButton"
+			X = "239"
+			Y = "146"
+			Width = "39"
+			Height = "23"
+			Flags = "0"
+			TextColour = "0,0,0,0,19"
+			Typeface = ""
+			FontAttributes = "0"
+			TextSize = "Normal"
+			Text = "导入"
+			Depth = "2"
+			IsDefault = "0"
+			IsDisabled = "0"
+			MarginLeft = "0"
+			MarginRight = "0"
+			MarginTop = "0"
+			MarginBottom = "0"
+			AutoNavType = ""/>
+		<Element
+			CID = "1049559957"
+			Type = "Component"
+			X = "717"
+			Y = "-63"
+			Width = "400"
+			Height = "300"
+			Flags = "3"
+			BackgroundColour = "255,255,255,0,6"
+			FileID = "8DD99B0B-7C4F-44E2-8370EE09F1120A4C"
+			RootPath = "$Container"
+			Filename = "download.gui"
+			Background = "Transparent"
+			HorzAlign = "Left"
+			VertAlign = "Top"
+			MaintainSize = "0"/>
+		<Element
+			CID = "1049581742"
+			Type = "Component"
+			X = "723"
+			Y = "266"
+			Width = "400"
+			Height = "300"
+			Flags = "3"
+			BackgroundColour = "255,255,255,0,6"
+			FileID = "26732E64-051F-4C10-8EF1B5C486BE6797"
+			RootPath = "$Container"
+			Filename = "import.gui"
+			Background = "Transparent"
+			HorzAlign = "Left"
+			VertAlign = "Top"
+			MaintainSize = "0"/>
 	</Elements>
 	<Connections
-		CID = "2"/>
+		CID = "2">
+		<Connection
+			CID = "1049572499"
+			Layer = "DesignElements"
+			Trigger = "LeftClick"
+			Type = "Navigation"
+			SubType = "Modal"
+			SourceSubItemID = ""
+			SourceRefID = "1049571124"
+			TargetRefID = "1049559957"
+			ConLineWidth = "2"
+			ConLineColour = "0,0,0,0,0"/>
+		<Connection
+			CID = "1049580034"
+			Layer = "DesignElements"
+			Trigger = "LeftClick"
+			Type = "Navigation"
+			SubType = "Modal"
+			SourceSubItemID = ""
+			SourceRefID = "1049563770"
+			TargetRefID = "1049581742"
+			ConLineWidth = "2"
+			ConLineColour = "0,0,0,0,0"/>
+	</Connections>
 	<Groups
 		CID = "3"/>
 	<SelectionGroups

@@ -4,12 +4,7 @@
 	IconCategory = "Documents">
 	<OpenFiles
 		CID = "1"
-		LastActive = "8">
-		<File
-			FileID = "9D32A6C6-E28A-45D0-8E9C5E1378F7C4F5"
-			RootPath = "$Container"
-			RelativePathname = "FrameWin.gui"
-			ViewSettings = ""/>
+		LastActive = "9">
 		<File
 			RootPath = "$Container"
 			RelativePathname = "fiber_set.gui"
@@ -34,11 +29,6 @@
 		<File
 			RootPath = "$Container"
 			RelativePathname = "longin_operator.gui"
-			ViewSettings = ""/>
-		<File
-			FileID = "6F1718B7-EE96-4EB0-9EF34C11B9805FA8"
-			RootPath = "$Container"
-			RelativePathname = "user.gui"
 			ViewSettings = ""/>
 		<File
 			FileID = "78527B2D-F1F3-4E59-94D4A5AF3023D267"
@@ -71,11 +61,6 @@
 			RelativePathname = "search.gui"
 			ViewSettings = ""/>
 		<File
-			FileID = "3AD3C8A6-0A8B-45C0-AECFC54FE417AD12"
-			RootPath = "$Container"
-			RelativePathname = "longin.gui"
-			ViewSettings = ""/>
-		<File
 			FileID = "8647EFA7-FD46-4908-9B200028E9E33A93"
 			RootPath = "$Container"
 			RelativePathname = "bkgnd.gui"
@@ -106,6 +91,16 @@
 			FileID = "1976FDFA-5196-4A54-8C36112A4EF765F2"
 			RootPath = "$Container"
 			RelativePathname = "del_user.gui"
+			ViewSettings = ""/>
+		<File
+			FileID = "6F1718B7-EE96-4EB0-9EF34C11B9805FA8"
+			RootPath = "$Container"
+			RelativePathname = "user.gui"
+			ViewSettings = ""/>
+		<File
+			FileID = "3AD3C8A6-0A8B-45C0-AECFC54FE417AD12"
+			RootPath = "$Container"
+			RelativePathname = "longin.gui"
 			ViewSettings = ""/>
 	</OpenFiles>
 </Workspace>

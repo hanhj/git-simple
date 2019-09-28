@@ -98,7 +98,7 @@
 					IsSelected = "0">
 					<TreeItem
 						ItemID = "7"
-						Text = "通道1"
+						Text = "通道3"
 						IsBold = "0"
 						IsChecked = "0"
 						IsExpanded = "0"
@@ -113,14 +113,14 @@
 					IsSelected = "0">
 					<TreeItem
 						ItemID = "8"
-						Text = "通道1"
+						Text = "通道4"
 						IsBold = "0"
 						IsChecked = "0"
 						IsExpanded = "0"
 						IsSelected = "0"/>
 					<TreeItem
 						ItemID = "9"
-						Text = "通道2"
+						Text = "通道5"
 						IsBold = "0"
 						IsChecked = "0"
 						IsExpanded = "0"

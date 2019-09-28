@@ -132,34 +132,6 @@
 			HorzAlign = "Left"
 			VertAlign = "Centre"/>
 		<Element
-			CID = "732830432"
-			Type = "ComboBox"
-			X = "384"
-			Y = "166"
-			Width = "120"
-			Height = "21"
-			Flags = "2"
-			Typeface = ""
-			FontAttributes = "0"
-			TextSize = "Normal"
-			Text = "导管参数"
-			IsDisabled = "0"
-			IsEditable = "0"
-			IsFlat = "0"
-			Mirror = "0"
-			CustomStyle = "0"
-			HorzAlign = "Left"
-			OverrideTextColour = "0"
-			OverrideDisabledTextColour = "0"
-			OverrideFillColour = "0"
-			OverrideDisabledFillColour = "0"
-			OverrideBorderColour = "0"
-			TextColour = "0,0,0,0,9"
-			DisabledTextColour = "161,161,146,0,18"
-			FillColour = "240,240,255,0,0"
-			DisabledFillColour = "236,233,216,0,16"
-			BorderColour = "192,192,255,0,0"/>
-		<Element
 			CID = "732843222"
 			Type = "HorizontalProgressBar"
 			X = "276"
@@ -232,6 +204,77 @@
 			MarginTop = "0"
 			MarginBottom = "0"
 			AutoNavType = ""/>
+		<Element
+			CID = "1049583182"
+			Type = "ListBox"
+			X = "456"
+			Y = "-6"
+			Width = "120"
+			Height = "66"
+			Flags = "2"
+			Typeface = ""
+			FontAttributes = "0"
+			TextSize = "Normal"
+			NextItemID = "5"
+			IsDisabled = "0"
+			HasHorzScrollBar = "0"
+			HasVertScrollBar = "0"
+			Mirror = "0"
+			WordWrap = "0"
+			IsFlat = "1"
+			AutoHeight = "1"
+			HorzOffset = "0"
+			HorzMargin = "0"
+			FirstVisibleItem = "1"
+			ItemHeight = "16"
+			MaxVisibleItems = "20"
+			HorzAlign = "Left"
+			VertAlign = "Centre">
+			<ListBoxItem
+				ItemID = "1"
+				Value = "导管信息"
+				IsSelected = "0"/>
+			<ListBoxItem
+				ItemID = "2"
+				Value = "当日检查单"
+				IsSelected = "0"/>
+			<ListBoxItem
+				ItemID = "3"
+				Value = "矫正参数"
+				IsSelected = "0"/>
+			<ListBoxItem
+				ItemID = "4"
+				Value = "用户信息"
+				IsSelected = "0"/>
+		</Element>
+		<Element
+			CID = "1049584593"
+			Type = "ComboBox"
+			X = "406"
+			Y = "165"
+			Width = "120"
+			Height = "21"
+			Flags = "2"
+			Typeface = ""
+			FontAttributes = "0"
+			TextSize = "Normal"
+			Text = ""
+			IsDisabled = "0"
+			IsEditable = "0"
+			IsFlat = "0"
+			Mirror = "0"
+			CustomStyle = "0"
+			HorzAlign = "Left"
+			OverrideTextColour = "0"
+			OverrideDisabledTextColour = "0"
+			OverrideFillColour = "0"
+			OverrideDisabledFillColour = "0"
+			OverrideBorderColour = "0"
+			TextColour = "0,0,0,0,9"
+			DisabledTextColour = "161,161,146,0,18"
+			FillColour = "240,240,255,0,0"
+			DisabledFillColour = "236,233,216,0,16"
+			BorderColour = "192,192,255,0,0"/>
 	</Elements>
 	<Connections
 		CID = "2">
@@ -244,6 +287,17 @@
 			SourceSubItemID = ""
 			SourceRefID = "732849200"
 			TargetRefID = "732853189"
+			ConLineWidth = "2"
+			ConLineColour = "0,0,0,0,0"/>
+		<Connection
+			CID = "1049561985"
+			Layer = "DesignElements"
+			Trigger = "LeftClick"
+			Type = "Navigation"
+			SubType = "ModalSelector"
+			SourceSubItemID = ""
+			SourceRefID = "1049584593"
+			TargetRefID = "1049583182"
 			ConLineWidth = "2"
 			ConLineColour = "0,0,0,0,0"/>
 	</Connections>
