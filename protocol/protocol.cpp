@@ -1,5 +1,5 @@
 /*************************************************************************
-	> File Name: pseudo.cpp
+	> File Name: protocol.cpp
 	> Author: hanhj
 	> Mail: hanhj@zx-jy.com 
 	> Created Time: 2019年02月19日 星期二 22时09分40秒
@@ -369,6 +369,22 @@ int link_layer_101::build_yx_data(frame *out){
 	int ret;
 	set_loc_ctl();
 	ret=app->build_yx_data(out,this);
+	if(ret<0){
+		errno=ret;
+		goto err;
+	}
+	ret=build_link_layer(out,ret);		
+	if(ret<0){
+		errno=ret;
+		goto err;
+	}
+err:
+	return ret;
+}
+int link_layer_101::build_dyx_data(frame *out){
+	int ret;
+	set_loc_ctl();
+	ret=app->build_dyx_data(out,this);
 	if(ret<0){
 		errno=ret;
 		goto err;
@@ -758,8 +774,10 @@ int link_layer_101::on_ack(frame *in,frame *out){
 		}else if(summon_step == 1){
 			build_yx_data(out);
 		}else if(summon_step == 2){
-			build_yc_data(out);
+			build_dyx_data(out);
 		}else if(summon_step == 3){
+			build_yc_data(out);
+		}else if(summon_step == 4){
 			build_summon_term(out);
 			process &=~PROCESS_SUMMON;
 		}
@@ -775,8 +793,10 @@ int link_layer_101::on_req_class_1(frame *in,frame *out){
 		}else if(summon_step == 1){
 			build_yx_data(out);
 		}else if(summon_step == 2){
-			build_yc_data(out);
+			build_dyx_data(out);
 		}else if(summon_step == 3){
+			build_yc_data(out);
+		}else if(summon_step == 4){
 			build_summon_term(out);
 			process &=~PROCESS_SUMMON;
 		}
@@ -1605,9 +1625,9 @@ err:
 ***********************************************************************
 */
 int app_layer::build_yx_data(frame *out,link_layer *link){//cause 20
-	int i;
+	int i,j;
 	i=0;
-	int ret;
+	int ret= 0;
 	int send_num;
 	SORT_YX_TAB *pyx;
 	
@@ -1618,13 +1638,14 @@ int app_layer::build_yx_data(frame *out,link_layer *link){//cause 20
 	if(send_num > MAX_SEND_YX_PER_FRAME)
 		send_num = MAX_SEND_YX_PER_FRAME;
 	else{
-		link->summon_step=2;//next for yc
+		link->summon_step++;//next for yc
+		link->sended_yx_num = 0;
 	}
 	pyx=get_yx_data(link->sended_yx_num);
 	link->sended_yx_num+=send_num;
 
 	vsq_lo.bit.n=send_num;
-	vsq_lo.bit.sq=0;
+	vsq_lo.bit.sq=1;
 	cause_lo.bit.cause=CAUSE_Introgen;
 
 	i=0;
@@ -1638,11 +1659,72 @@ int app_layer::build_yx_data(frame *out,link_layer *link){//cause 20
 	if(addr_size==2){
 		out->data[offset+i++]=addr>>8&0x00ff;
 	}
-	out->data[offset+i++]=0x0;
-	out->data[offset+i++]=0x0;
+	out->data[offset+i++]=pyx->pdata->addr;
+	out->data[offset+i++]=pyx->pdata->addr>>8;
 	if(msg_id_size==3)
 		out->data[offset+i++]=0;
-	out->data[offset+i++]=20;
+	for(j=0;j<send_num;j++){
+		out->data[offset+i]=pyx[j].pdata->statu;
+		i++;
+	}
+	ret=i;
+err:
+	return ret;
+}
+/**
+***********************************************************************
+*  @brief	build asdu of yx data command 
+*  @param[in] link point to link_layer  
+*  @param[out]  out point to out frame 
+*  @return upon successful return number of asdu size\n
+*	if fail a negative value returned.
+*  @note	
+*  @see		
+***********************************************************************
+*/
+int app_layer::build_dyx_data(frame *out,link_layer *link){//cause 20
+	int i,j;
+	i=0;
+	int ret= 0;
+	int send_num;
+	SORT_YX_TAB *pyx;
+	
+	ret=get_link_info(link);
+	if(ret<0)
+		goto err;
+	send_num = SelectDYxNum - link->sended_yx_num;
+	if(send_num > MAX_SEND_YX_PER_FRAME)
+		send_num = MAX_SEND_YX_PER_FRAME;
+	else{
+		link->summon_step++;//next for yc
+		link->sended_yx_num = 0;
+	}
+	pyx=get_yx_data(link->sended_yx_num);
+	link->sended_yx_num+=send_num;
+
+	vsq_lo.bit.n=send_num;
+	vsq_lo.bit.sq=1;
+	cause_lo.bit.cause=CAUSE_Introgen;
+
+	i=0;
+	out->data[offset+i++]=COMMAND_DP;
+	out->data[offset+i++]=vsq_lo.data;
+	out->data[offset+i++]=cause_lo.data;
+	if(cause_size==2){
+		out->data[offset+i++]=(cause_lo.data>>8&0x00ff);
+	}
+	out->data[offset+i++]=addr&0x00ff;
+	if(addr_size==2){
+		out->data[offset+i++]=addr>>8&0x00ff;
+	}
+	out->data[offset+i++]=pyx->pdata->addr;
+	out->data[offset+i++]=pyx->pdata->addr>>8;
+	if(msg_id_size==3)
+		out->data[offset+i++]=0;
+	for(j=0;j<send_num;j++){
+		out->data[offset+i]=pyx[j].pdata->statu;
+		i++;
+	}
 	ret=i;
 err:
 	return ret;
@@ -1658,14 +1740,60 @@ err:
 *  @see		
 ***********************************************************************
 */int app_layer::build_yc_data(frame *out,link_layer *link){//cause 20
-	int i;
+	int i,j;
 	i=0;
-	int ret;
+	int ret= 0;
+	int send_num;
+	YC_TAB *pyc;
 	
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
-	ret=i;
+	send_num = SelectYcNum - link->sended_yc_num;
+	if(send_num > MAX_SEND_YC_PER_FRAME)
+		send_num = MAX_SEND_YC_PER_FRAME;
+	else{
+		link->summon_step++;//next 
+		link->sended_yc_num = 0;
+	}
+	pyc=get_yc_data(link->sended_yc_num);
+	link->sended_yc_num+=send_num;
+
+	vsq_lo.bit.n=send_num;
+	vsq_lo.bit.sq=1;
+	cause_lo.bit.cause=CAUSE_Introgen;
+
+	out->data[offset+i++]=yc_data_type;
+	out->data[offset+i++]=vsq_lo.data;
+	out->data[offset+i++]=cause_lo.data;
+	if(cause_size==2){
+		out->data[offset+i++]=(cause_lo.data>>8&0x00ff);
+	}
+	out->data[offset+i++]=addr&0x00ff;
+	if(addr_size==2){
+		out->data[offset+i++]=addr>>8&0x00ff;
+	}
+	out->data[offset+i++]=pyc->ycdata->datasign;
+	out->data[offset+i++]=pyc->ycdata->datasign>>8;
+	if(msg_id_size==3)
+		out->data[offset+i++]=0;
+	if(yc_data_type == 9 || yc_data_type ==11){
+		for(j=0;j<send_num;j++){
+			out->data[offset+i+3*j]=pyc[j].ycdata->deadpass->intdata;
+			out->data[offset+i+3*j+1]=pyc[j].ycdata->deadpass->intdata;
+			out->data[offset+i+3*j+2]=0;//qds
+		}
+		ret=i+3*j;
+	}else if(yc_data_type == 13){
+		for(j=0;j<send_num;j++){
+			out->data[offset+i+5*j]=pyc[j].ycdata->deadpass->floatdata.bitdata.d1;
+			out->data[offset+i+5*j+1]=pyc[j].ycdata->deadpass->floatdata.bitdata.d2;
+			out->data[offset+i+5*j+2]=pyc[j].ycdata->deadpass->floatdata.bitdata.d3;
+			out->data[offset+i+5*j+3]=pyc[j].ycdata->deadpass->floatdata.bitdata.d4;
+			out->data[offset+i+5*j+4]=0;//qds
+		}
+		ret=i+5*j;
+	}
 err:
 	return ret;
 }

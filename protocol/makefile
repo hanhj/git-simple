@@ -1,6 +1,6 @@
 target=test
 all:$(target)
-objs=pseudo.o
+objs=test.o protocol.o data.o Configurable.o com.o system.o utilty.o
 %.o:%.cpp
 	g++ -g -c -Wall $< -o $@
 $(target):$(objs)
