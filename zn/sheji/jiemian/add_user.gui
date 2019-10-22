@@ -241,8 +241,8 @@
 		<Element
 			CID = "19271136"
 			Type = "ListBox"
-			X = "434"
-			Y = "-37"
+			X = "367"
+			Y = "10"
 			Width = "120"
 			Height = "50"
 			Flags = "2"

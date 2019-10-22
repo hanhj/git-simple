@@ -123,7 +123,7 @@
 		<Element
 			CID = "933432723"
 			Type = "TextButton"
-			X = "295"
+			X = "334"
 			Y = "120"
 			Width = "39"
 			Height = "23"
@@ -144,7 +144,7 @@
 		<Element
 			CID = "933443112"
 			Type = "TextButton"
-			X = "331"
+			X = "373"
 			Y = "120"
 			Width = "39"
 			Height = "23"
@@ -186,7 +186,7 @@
 		<Element
 			CID = "933456615"
 			Type = "TextButton"
-			X = "409"
+			X = "451"
 			Y = "120"
 			Width = "39"
 			Height = "23"
@@ -207,7 +207,7 @@
 		<Element
 			CID = "933440012"
 			Type = "TextButton"
-			X = "370"
+			X = "412"
 			Y = "120"
 			Width = "39"
 			Height = "23"
@@ -270,7 +270,7 @@
 			RowHeight = "18"
 			FirstVisibleRow = "0"
 			FixedColumns = "0"
-			SortedColumn = "9"
+			SortedColumn = "7"
 			SortedBlendFactor = "0.000000"
 			ColumnSort = "Ascending"
 			HeaderStyle = "Standard"
@@ -283,20 +283,6 @@
 					ColumnID = "1"
 					Heading = "序号"
 					Width = "43"
-					HeaderMargin = "0"
-					CellMargin = "0"
-					HasCustomOddBgColour = "0"
-					HasCustomEvenBgColour = "0"
-					HasCustomTextColour = "0"
-					HeadingAlignment = "Left"
-					CellAlignment = "Left"/>
-				<ColumnItem
-					OddBackgroundColour = "255,255,255,0,6"
-					EvenBackgroundColour = "255,255,255,0,6"
-					TextColour = "0,0,0,0,9"
-					ColumnID = "13"
-					Heading = "患者id"
-					Width = "80"
 					HeaderMargin = "0"
 					CellMargin = "0"
 					HasCustomOddBgColour = "0"
@@ -352,20 +338,6 @@
 					TextColour = "0,0,0,0,9"
 					ColumnID = "3"
 					Heading = "性别"
-					Width = "60"
-					HeaderMargin = "0"
-					CellMargin = "0"
-					HasCustomOddBgColour = "0"
-					HasCustomEvenBgColour = "0"
-					HasCustomTextColour = "0"
-					HeadingAlignment = "Left"
-					CellAlignment = "Left"/>
-				<ColumnItem
-					OddBackgroundColour = "255,255,255,0,6"
-					EvenBackgroundColour = "255,255,255,0,6"
-					TextColour = "0,0,0,0,9"
-					ColumnID = "4"
-					Heading = "门诊号"
 					Width = "60"
 					HeaderMargin = "0"
 					CellMargin = "0"
@@ -438,9 +410,6 @@
 						1
 					</Cell>
 					<Cell>
-						32211
-					</Cell>
-					<Cell>
 						112
 					</Cell>
 					<Cell>
@@ -451,9 +420,6 @@
 					</Cell>
 					<Cell>
 						男
-					</Cell>
-					<Cell>
-						21112
 					</Cell>
 					<Cell>
 						112
@@ -497,6 +463,30 @@
 					<Cell>
 						
 					</Cell>
+				</Row>
+				<Row
+					IsSelected = "0">
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
 					<Cell>
 						
 					</Cell>
@@ -533,57 +523,9 @@
 					<Cell>
 						
 					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
 				</Row>
 				<Row
 					IsSelected = "0">
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-				</Row>
-				<Row
-					IsSelected = "0">
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
 					<Cell>
 						
 					</Cell>
@@ -615,26 +557,10 @@
 			</Data>
 		</Element>
 		<Element
-			CID = "730738840"
-			Type = "Component"
-			X = "362"
-			Y = "436"
-			Width = "400"
-			Height = "300"
-			Flags = "3"
-			BackgroundColour = "255,255,255,0,6"
-			FileID = "26732E64-051F-4C10-8EF1B5C486BE6797"
-			RootPath = "$Container"
-			Filename = "import.gui"
-			Background = "Transparent"
-			HorzAlign = "Left"
-			VertAlign = "Top"
-			MaintainSize = "0"/>
-		<Element
 			CID = "730735701"
 			Type = "Component"
-			X = "-58"
-			Y = "433"
+			X = "-206"
+			Y = "94"
 			Width = "400"
 			Height = "300"
 			Flags = "3"
@@ -642,6 +568,59 @@
 			FileID = "8DD99B0B-7C4F-44E2-8370EE09F1120A4C"
 			RootPath = "$Container"
 			Filename = "download.gui"
+			Background = "Transparent"
+			HorzAlign = "Left"
+			VertAlign = "Top"
+			MaintainSize = "0"/>
+		<Element
+			CID = "2006057495"
+			Type = "TextButton"
+			X = "295"
+			Y = "120"
+			Width = "39"
+			Height = "23"
+			Flags = "0"
+			TextColour = "0,0,0,0,19"
+			Typeface = ""
+			FontAttributes = "0"
+			TextSize = "Normal"
+			Text = "导出"
+			Depth = "2"
+			IsDefault = "0"
+			IsDisabled = "0"
+			MarginLeft = "0"
+			MarginRight = "0"
+			MarginTop = "0"
+			MarginBottom = "0"
+			AutoNavType = ""/>
+		<Element
+			CID = "2006068792"
+			Type = "Component"
+			X = "-211"
+			Y = "429"
+			Width = "400"
+			Height = "300"
+			Flags = "3"
+			BackgroundColour = "255,255,255,0,6"
+			FileID = "BA57E3ED-C741-42CD-BABF299F45C8FBCF"
+			RootPath = "$Container"
+			Filename = "import.gui"
+			Background = "Transparent"
+			HorzAlign = "Left"
+			VertAlign = "Top"
+			MaintainSize = "0"/>
+		<Element
+			CID = "2006062491"
+			Type = "Component"
+			X = "218"
+			Y = "430"
+			Width = "400"
+			Height = "300"
+			Flags = "3"
+			BackgroundColour = "255,255,255,0,6"
+			FileID = "26732E64-051F-4C10-8EF1B5C486BE6797"
+			RootPath = "$Container"
+			Filename = "export.gui"
 			Background = "Transparent"
 			HorzAlign = "Left"
 			VertAlign = "Top"
@@ -661,14 +640,25 @@
 			ConLineWidth = "2"
 			ConLineColour = "0,0,0,0,0"/>
 		<Connection
-			CID = "730744649"
+			CID = "2006076306"
 			Layer = "DesignElements"
 			Trigger = "LeftClick"
 			Type = "Navigation"
 			SubType = "Modal"
 			SourceSubItemID = ""
 			SourceRefID = "933439493"
-			TargetRefID = "730738840"
+			TargetRefID = "2006068792"
+			ConLineWidth = "2"
+			ConLineColour = "0,0,0,0,0"/>
+		<Connection
+			CID = "2006062844"
+			Layer = "DesignElements"
+			Trigger = "LeftClick"
+			Type = "Navigation"
+			SubType = "Modal"
+			SourceSubItemID = ""
+			SourceRefID = "2006057495"
+			TargetRefID = "2006062491"
 			ConLineWidth = "2"
 			ConLineColour = "0,0,0,0,0"/>
 	</Connections>

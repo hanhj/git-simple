@@ -109,7 +109,7 @@
 			Typeface = ""
 			FontAttributes = "0"
 			TextSize = "Normal"
-			Text = "当前用户无管理用户权限，删除被拒绝。"
+			Text = "当前用户无法删除自身，删除被拒绝。"
 			IsDisabled = "0"
 			Fill = "None"
 			HorzAlign = "Left"

@@ -236,7 +236,7 @@
 				IsSelected = "0"/>
 			<ListBoxItem
 				ItemID = "2"
-				Value = "当日检查单"
+				Value = "检查单"
 				IsSelected = "0"/>
 			<ListBoxItem
 				ItemID = "3"

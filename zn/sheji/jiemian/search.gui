@@ -168,10 +168,10 @@
 			WeekendStartsOn = "5"
 			WeekendLength = "2"
 			FirstYear = "2019"
-			FirstMonth = "9"
+			FirstMonth = "10"
 			SelectedYear = "2019"
-			SelectedMonth = "9"
-			SelectedDay = "20"
+			SelectedMonth = "10"
+			SelectedDay = "22"
 			SelectedCount = "1"
 			IsDisabled = "0"
 			HorzAlign = "Centre"
@@ -187,7 +187,7 @@
 			Typeface = ""
 			FontAttributes = "0"
 			TextSize = "Normal"
-			Text = "zn010120190123"
+			Text = "20190123101"
 			IsDisabled = "0"
 			IsReadOnly = "0"
 			HorzAlign = "Left"
@@ -219,7 +219,7 @@
 			Typeface = ""
 			FontAttributes = "0"
 			TextSize = "Normal"
-			Text = "报告单号"
+			Text = "检查单号"
 			IsDisabled = "0"
 			Fill = "None"
 			HorzAlign = "Left"
@@ -343,20 +343,6 @@
 					OddBackgroundColour = "255,255,255,0,6"
 					EvenBackgroundColour = "255,255,255,0,6"
 					TextColour = "0,0,0,0,9"
-					ColumnID = "1"
-					Heading = "患者id"
-					Width = "80"
-					HeaderMargin = "0"
-					CellMargin = "0"
-					HasCustomOddBgColour = "0"
-					HasCustomEvenBgColour = "0"
-					HasCustomTextColour = "0"
-					HeadingAlignment = "Left"
-					CellAlignment = "Left"/>
-				<ColumnItem
-					OddBackgroundColour = "255,255,255,0,6"
-					EvenBackgroundColour = "255,255,255,0,6"
-					TextColour = "0,0,0,0,9"
 					ColumnID = "12"
 					Heading = "姓名"
 					Width = "80"
@@ -387,20 +373,6 @@
 					TextColour = "0,0,0,0,9"
 					ColumnID = "3"
 					Heading = "性别"
-					Width = "60"
-					HeaderMargin = "0"
-					CellMargin = "0"
-					HasCustomOddBgColour = "0"
-					HasCustomEvenBgColour = "0"
-					HasCustomTextColour = "0"
-					HeadingAlignment = "Left"
-					CellAlignment = "Left"/>
-				<ColumnItem
-					OddBackgroundColour = "255,255,255,0,6"
-					EvenBackgroundColour = "255,255,255,0,6"
-					TextColour = "0,0,0,0,9"
-					ColumnID = "4"
-					Heading = "门诊号"
 					Width = "60"
 					HeaderMargin = "0"
 					CellMargin = "0"
@@ -465,20 +437,6 @@
 					HasCustomTextColour = "0"
 					HeadingAlignment = "Left"
 					CellAlignment = "Left"/>
-				<ColumnItem
-					OddBackgroundColour = "255,255,255,0,6"
-					EvenBackgroundColour = "255,255,255,0,6"
-					TextColour = "0,0,0,0,9"
-					ColumnID = "9"
-					Heading = "导管编号"
-					Width = "60"
-					HeaderMargin = "0"
-					CellMargin = "0"
-					HasCustomOddBgColour = "0"
-					HasCustomEvenBgColour = "0"
-					HasCustomTextColour = "0"
-					HeadingAlignment = "Left"
-					CellAlignment = "Left"/>
 			</Columns>
 			<Data>
 				<Row
@@ -504,60 +462,9 @@
 					<Cell>
 						
 					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
 				</Row>
 				<Row
 					IsSelected = "0">
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-				</Row>
-				<Row
-					IsSelected = "0">
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
 					<Cell>
 						
 					</Cell>
@@ -603,15 +510,6 @@
 					<Cell>
 						
 					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
 				</Row>
 				<Row
 					IsSelected = "0">
@@ -624,6 +522,21 @@
 					<Cell>
 						
 					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+				</Row>
+				<Row
+					IsSelected = "0">
 					<Cell>
 						
 					</Cell>
@@ -733,27 +646,6 @@
 			MarginBottom = "0"
 			AutoNavType = ""/>
 		<Element
-			CID = "2058314054"
-			Type = "TextButton"
-			X = "423"
-			Y = "730"
-			Width = "75"
-			Height = "23"
-			Flags = "0"
-			TextColour = "0,0,0,0,19"
-			Typeface = ""
-			FontAttributes = "0"
-			TextSize = "Normal"
-			Text = "报告"
-			Depth = "2"
-			IsDefault = "0"
-			IsDisabled = "0"
-			MarginLeft = "0"
-			MarginRight = "0"
-			MarginTop = "0"
-			MarginBottom = "0"
-			AutoNavType = ""/>
-		<Element
 			CID = "2058310657"
 			Type = "Bitmap"
 			X = "126"
@@ -761,6 +653,7 @@
 			Width = "476"
 			Height = "654"
 			Flags = "0"
+			FileID = "A9069F3C-3E7A-4A2D-9A3F4C1C37F7F78D"
 			RootPath = "$Container"
 			Filename = "report.png"
 			Placement = "Stretch"
@@ -856,11 +749,12 @@
 		<Element
 			CID = "635469406"
 			Type = "Bitmap"
-			X = "202"
+			X = "222"
 			Y = "606"
-			Width = "396"
+			Width = "358"
 			Height = "123"
 			Flags = "0"
+			FileID = "000587C8-CB2A-4290-9DE51BC0EE7F2B12"
 			RootPath = "$Container"
 			Filename = "pic.png"
 			Placement = "Stretch"
@@ -870,6 +764,28 @@
 			ClipRight = "0"
 			ClipTop = "0"
 			ClipBottom = "0"/>
+		<Element
+			CID = "2008094659"
+			Type = "Icon"
+			X = "202"
+			Y = "658"
+			Width = "16"
+			Height = "16"
+			Flags = "3"
+			RootPath = "$Application"
+			Filename = "Icons\Toolbars\Navigate2Back.ico"
+			IconIndex = "0"/>
+		<Element
+			CID = "2008099722"
+			Type = "Icon"
+			X = "584"
+			Y = "657"
+			Width = "16"
+			Height = "16"
+			Flags = "3"
+			RootPath = "$Application"
+			Filename = "Icons\Toolbars\Navigate2Forward.ico"
+			IconIndex = "0"/>
 	</Elements>
 	<Connections
 		CID = "2">
@@ -882,17 +798,6 @@
 			SourceSubItemID = ""
 			SourceRefID = "2057263532"
 			TargetRefID = "2058312270"
-			ConLineWidth = "2"
-			ConLineColour = "0,0,0,0,0"/>
-		<Connection
-			CID = "2058290704"
-			Layer = "DesignElements"
-			Trigger = "LeftClick"
-			Type = "Navigation"
-			SubType = "Modal"
-			SourceSubItemID = ""
-			SourceRefID = "2058314054"
-			TargetRefID = "2058310657"
 			ConLineWidth = "2"
 			ConLineColour = "0,0,0,0,0"/>
 		<Connection

@@ -86,6 +86,7 @@
 			Width = "394"
 			Height = "225"
 			Flags = "0"
+			FileID = "000587C8-CB2A-4290-9DE51BC0EE7F2B12"
 			RootPath = "$Container"
 			Filename = "pic.png"
 			Placement = "Stretch"
@@ -95,6 +96,24 @@
 			ClipRight = "0"
 			ClipTop = "0"
 			ClipBottom = "0"/>
+		<Element
+			CID = "2010134047"
+			Type = "StaticText"
+			X = "130"
+			Y = "331"
+			Width = "49"
+			Height = "19"
+			Flags = "0"
+			FillColour = "236,233,216,0,16"
+			TextColour = "0,0,0,0,19"
+			Typeface = ""
+			FontAttributes = "0"
+			TextSize = "Normal"
+			Text = "第1幅"
+			IsDisabled = "0"
+			Fill = "None"
+			HorzAlign = "Left"
+			VertAlign = "Top"/>
 	</Elements>
 	<Connections
 		CID = "2"/>
