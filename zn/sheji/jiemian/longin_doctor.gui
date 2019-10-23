@@ -48,7 +48,7 @@
 			Typeface = ""
 			FontAttributes = "0"
 			TextSize = "Normal"
-			Text = "检查"
+			Text = "测压"
 			Depth = "2"
 			IsDefault = "0"
 			IsDisabled = "0"

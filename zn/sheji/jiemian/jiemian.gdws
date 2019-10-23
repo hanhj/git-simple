@@ -4,7 +4,7 @@
 	IconCategory = "jiemian">
 	<OpenFiles
 		CID = "1"
-		LastActive = "12">
+		LastActive = "22">
 		<File
 			FileID = "9D32A6C6-E28A-45D0-8E9C5E1378F7C4F5"
 			RootPath = "$Container"
@@ -46,11 +46,6 @@
 			RelativePathname = "download.gui"
 			ViewSettings = ""/>
 		<File
-			FileID = "26732E64-051F-4C10-8EF1B5C486BE6797"
-			RootPath = "$Container"
-			RelativePathname = "export.gui"
-			ViewSettings = ""/>
-		<File
 			FileID = "79C62603-9238-43BC-B69003CE47C49285"
 			RootPath = "$Container"
 			RelativePathname = "report.gui"
@@ -59,11 +54,6 @@
 			FileID = "4FE7BE25-BFA5-4B50-AF5C07668DE22089"
 			RootPath = "$Container"
 			RelativePathname = "annote.gui"
-			ViewSettings = ""/>
-		<File
-			FileID = "859866C3-4C62-4BD5-A4680FB512EC492D"
-			RootPath = "$Container"
-			RelativePathname = "search.gui"
 			ViewSettings = ""/>
 		<File
 			FileID = "8647EFA7-FD46-4908-9B200028E9E33A93"
@@ -118,6 +108,26 @@
 			FileID = "1976FDFA-5196-4A54-8C36112A4EF765F2"
 			RootPath = "$Container"
 			RelativePathname = "del_user.gui"
+			ViewSettings = ""/>
+		<File
+			FileID = "859866C3-4C62-4BD5-A4680FB512EC492D"
+			RootPath = "$Container"
+			RelativePathname = "search.gui"
+			ViewSettings = ""/>
+		<File
+			FileID = "26732E64-051F-4C10-8EF1B5C486BE6797"
+			RootPath = "$Container"
+			RelativePathname = "export.gui"
+			ViewSettings = ""/>
+		<File
+			FileID = "97993295-E1C1-413D-9F03F9640B9FA881"
+			RootPath = "$Container"
+			RelativePathname = "upload.gui"
+			ViewSettings = ""/>
+		<File
+			FileID = "927B972E-D5F5-4731-8DE914BC8F66D07A"
+			RootPath = "$Container"
+			RelativePathname = "export2.gui"
 			ViewSettings = ""/>
 	</OpenFiles>
 </Workspace>

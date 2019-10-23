@@ -210,12 +210,12 @@
 			X = "456"
 			Y = "-6"
 			Width = "120"
-			Height = "66"
+			Height = "82"
 			Flags = "2"
 			Typeface = ""
 			FontAttributes = "0"
 			TextSize = "Normal"
-			NextItemID = "5"
+			NextItemID = "6"
 			IsDisabled = "0"
 			HasHorzScrollBar = "0"
 			HasVertScrollBar = "0"
@@ -245,6 +245,10 @@
 			<ListBoxItem
 				ItemID = "4"
 				Value = "用户信息"
+				IsSelected = "0"/>
+			<ListBoxItem
+				ItemID = "5"
+				Value = "检查报告"
 				IsSelected = "0"/>
 		</Element>
 		<Element
