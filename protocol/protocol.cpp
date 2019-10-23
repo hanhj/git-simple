@@ -6,7 +6,7 @@
  ************************************************************************/
 #include "all_h.h"
 #include "protocol.h"
-#include "Configurable.h"
+#include "configurable.h"
 
 using namespace std;
 
@@ -1692,7 +1692,7 @@ int app_layer::build_dyx_data(frame *out,link_layer *link){//cause 20
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
-	send_num = SelectDYxNum - link->sended_yx_num;
+	send_num = SelectDpYxNum - link->sended_yx_num;
 	if(send_num > MAX_SEND_YX_PER_FRAME)
 		send_num = MAX_SEND_YX_PER_FRAME;
 	else{

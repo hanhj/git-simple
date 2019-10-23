@@ -7,7 +7,7 @@
 #include<iostream>
 #include "datatype.h"
 #include "data.h"
-#include "Configurable.h"
+#include "configurable.h"
 #include "protocol.h"
 using namespace std;
 int g_balance=0;
@@ -56,6 +56,7 @@ int main(int arg,char **argv){
 	for(i=0;i<3;i++){
 			com[i].connect();
 	}
+	init_yx();
 	while(1){
 		cout<<endl<<"run loop:"<<loops<<endl;
 		loops++;
