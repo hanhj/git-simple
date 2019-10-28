@@ -10,7 +10,7 @@ using namespace std;
 #include "data.h"
 #include "com.h"
 #include "utilty.h"
-#include "Configurable.h"
+#include "configurable.h"
 #include "system.h"
 #define MAX_SEND_YX_PER_FRAME 28 
 #define MAX_SEND_YC_PER_FRAME 16 

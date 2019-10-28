@@ -10,6 +10,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#include "datatype.h"
 #define LOCK 1
 #define UNLOCK 0
 

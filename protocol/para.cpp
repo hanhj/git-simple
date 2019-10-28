@@ -6,7 +6,6 @@
 */
 #include<iostream>
 using namespace std;
-#include "datatype.h"
 #include "data.h"
 
 PRO_PARA ProPara;//规约参数

@@ -1,11 +1,10 @@
 /*
- * File Name: test.cpp
+ * File Name: main.cpp
  * Author: hanhj
  * Mail: hanhj@zx-jy.com 
  * Created Time: 2019-10-18 11:42:22 week:5
 */
 #include<iostream>
-#include "datatype.h"
 #include "data.h"
 #include "configurable.h"
 #include "protocol.h"
@@ -56,6 +55,7 @@ int main(int arg,char **argv){
 	for(i=0;i<3;i++){
 			com[i].connect();
 	}
+	default_init_yx_addr();
 	init_yx();
 	while(1){
 		cout<<endl<<"run loop:"<<loops<<endl;
