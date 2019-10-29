@@ -7,7 +7,6 @@
 #ifndef __protocol_h
 #define __protocol_h
 using namespace std;
-#include "datatype.h"
 #include "data.h"
 #include "com.h"
 #include "utilty.h"

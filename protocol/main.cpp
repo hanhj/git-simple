@@ -5,7 +5,6 @@
  * Created Time: 2019-10-18 11:42:22 week:5
 */
 #include<iostream>
-#include "datatype.h"
 #include "data.h"
 #include "configurable.h"
 #include "protocol.h"
