@@ -7,10 +7,10 @@
 
 #ifndef DATA_H_
 #define DATA_H_
+#include "datatype.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include "datatype.h"
 #define LOCK 1
 #define UNLOCK 0
 

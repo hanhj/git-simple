@@ -5,6 +5,7 @@
  * Created Time: 2019-10-18 11:17:49 week:5
 */
 #include<iostream>
+#include "datatype.h"
 #include "data.h"
 using namespace std;
 allyx TerYx;

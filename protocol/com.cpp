@@ -6,10 +6,9 @@
 */
 #include<iostream>
 using namespace std;
-#include "all_h.h"
+#include "com.h"
 #include "system.h"
 #include "utilty.h"
-#include "com.h"
 extern char g_filename[];
 /****************************
  * physical layer

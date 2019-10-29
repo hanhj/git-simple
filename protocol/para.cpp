@@ -9,5 +9,6 @@ using namespace std;
 #include "data.h"
 
 PRO_PARA ProPara;//规约参数
+DEAD_BAND_PARA DeadBandParaValue;
 
 // vim:tw=72 

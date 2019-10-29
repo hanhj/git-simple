@@ -5,6 +5,7 @@
  * Created Time: 2019-10-18 11:42:22 week:5
 */
 #include<iostream>
+#include "datatype.h"
 #include "data.h"
 #include "configurable.h"
 #include "protocol.h"
@@ -56,7 +57,9 @@ int main(int arg,char **argv){
 			com[i].connect();
 	}
 	default_init_yx_addr();
+	default_init_yc_addr();
 	init_yx();
+	init_yc();
 	while(1){
 		cout<<endl<<"run loop:"<<loops<<endl;
 		loops++;
