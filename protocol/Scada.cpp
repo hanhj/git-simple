@@ -93,97 +93,12 @@ int16 Scada::Init(){
 	memset(&scada_cfg.looptime,0,sizeof(scada_cfg.looptime));
 	memset(&PtCtReg,0,sizeof(PtCtReg));
 
-	 for(int i = 0 ; i<MAX_LINE_NUM ; i++){
-			FreqReg[i].smpT = 0.625;
-			FreqReg[i].smpFreq = 50;
-			FreqReg[i].smpadjcnt = 0;
-			FreqReg[i].Freq = 50;
-	 }
-//	memset(&scada_cfg.SoeBuffer,0,sizeof(scada_cfg.SoeBuffer));
-//	memset(&scada_cfg.DefaultBuffer,0,sizeof(scada_cfg.DefaultBuffer));
-//	memset(&DeadYc,0,sizeof(DeadYc));
-//	memset(&YxConfigure,0xff,sizeof(YxConfigure));
-/*	scada_cfg.d_5202.Data = 100;//温度
-	scada_cfg.d_5203.Data = 99; //湿度
-	scada_cfg.d_5093.Data = 1000;//遥控脉冲时间
-	scada_cfg.d_508D.Data = 5;
-	scada_cfg.d_508E.Data = 220;
-	scada_cfg.d_5094.Data = 5;//秒为单位
-	scada_cfg.d_5092.Data = 1000;
-	scada_cfg.ycavrnum = 0;
-	scada_cfg.d_508B.Data = Pt_3;//三表法
-	scada_cfg.d_508B.Data = Pt_3;//三表法
-	scada_cfg.StartClbrt = 0;
-	scada_cfg.ClbrtTime.SetFlag = 0;
-	scada_cfg.Clbrtnum = 0;
-	//人工值
-	scada_cfg.d_5213.Data = 0;//人工值；
-	scada_cfg.d_5214.Data.Ua.BaseValue = 100;
-	scada_cfg.d_5214.Data.Ua.HarmoDgree = 0;
-	scada_cfg.d_5214.Data.Ua.HarmContent = 0;
-	scada_cfg.d_5214.Data.Ub.BaseValue = 100;
-	scada_cfg.d_5214.Data.Ub.HarmoDgree = 0;
-	scada_cfg.d_5214.Data.Ub.HarmContent = 0;
-	scada_cfg.d_5214.Data.Uc.BaseValue = 100;
-	scada_cfg.d_5214.Data.Uc.HarmoDgree = 0;
-	scada_cfg.d_5214.Data.Uc.HarmContent = 0;
-	scada_cfg.d_5214.Data.Ia.BaseValue = 5;
-	scada_cfg.d_5214.Data.Ia.HarmoDgree = 0;
-	scada_cfg.d_5214.Data.Ia.HarmContent = 0;
-	scada_cfg.d_5214.Data.Ib.BaseValue = 5;
-	scada_cfg.d_5214.Data.Ib.HarmoDgree = 0;
-	scada_cfg.d_5214.Data.Ib.HarmContent = 0;
-	scada_cfg.d_5214.Data.Ic.BaseValue = 5;
-	scada_cfg.d_5214.Data.Ic.HarmoDgree = 0;
-	scada_cfg.d_5214.Data.Ic.HarmContent = 0;
-	scada_cfg.d_5214.Data.IaAngle = 60;
-	scada_cfg.d_5214.Data.IbAngle = 60;
-	scada_cfg.d_5214.Data.IcAngle = 60;
-
-	scada_cfg.d_508F.Data.DeadTime=500;//遥测死区时间设置 ms
-	scada_cfg.d_508F.Data.DeadAngle = 0.5;//死区值
-	scada_cfg.d_508F.Data.DeadFreq = 0.005;
-	scada_cfg.d_508F.Data.DeadHarmoicCount = 0;
-	scada_cfg.d_508F.Data.DeadHarmoicValue = 0;
-	scada_cfg.d_508F.Data.DeadHumidity = 0;
-	scada_cfg.d_508F.Data.DeadI = 0.002;
-	scada_cfg.d_508F.Data.DeadP = 1.0;
-	scada_cfg.d_508F.Data.DeadTemp = 0;
-	scada_cfg.d_508F.Data.DeadU = 0.1;
-
-	scada_cfg.DiffVol = 10;
-	scada_cfg.DiffPhase = 10;
-	scada_cfg.HzCkType = 0;
-	scada_cfg.DiffVolP[0] = &scada_cfg.YcData.Ua1_4001;
-	scada_cfg.DiffVolP[1] = &scada_cfg.YcData.Ub1_4002;
-	scada_cfg.DiffVolName[0] = 0;
-	scada_cfg.DiffVolName[1] = 1;
-
-	for ( i = 0  ; i < MAX_LINE_NUM; i++ ){
+	for(int i = 0 ; i<MAX_LINE_NUM ; i++){
 		FreqReg[i].smpT = 0.625;
 		FreqReg[i].smpFreq = 50;
 		FreqReg[i].smpadjcnt = 0;
 		FreqReg[i].Freq = 50;
 	}
-	scada_cfg.d_5090.Data = 20;//
-	UserParaMask.all = 0x000003FF;
-	YxNatureLocalInit();//所有遥信属性本地初始化;
-	YxPortLocalInit();  //所有遥信端口初始化;*/
-	//YxPortUpdata();
-//	YueXianYxInit();
-
-	//AllYxNatureInit();
-	//AllYxDataInit();
-	//YcCompassInt();
-	//YcPortConfigure();
-	//YcRatioRead();
-	//YkCompassInt();
-	//YkPortConfigure();
-	/////谐波计算数据表初始化
-	//HmncDataPInit();
-	//DeadInit();
-
-
 	return 1;
 }
 

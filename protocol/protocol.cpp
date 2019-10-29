@@ -1780,7 +1780,7 @@ err:
 	if(yc_data_type == 9 || yc_data_type ==11){
 		for(j=0;j<send_num;j++){
 			out->data[offset+i+3*j]=pyc[j].ycdata->deadpass->intdata;
-			out->data[offset+i+3*j+1]=pyc[j].ycdata->deadpass->intdata;
+			out->data[offset+i+3*j+1]=pyc[j].ycdata->deadpass->intdata>>8;
 			out->data[offset+i+3*j+2]=0;//qds
 		}
 		ret=i+3*j;

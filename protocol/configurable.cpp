@@ -209,7 +209,8 @@ uint16 init_yc_table ( void )
 			SelectYcNum ++;
 		}
 	}
-  return  SelectYcNum ;
+	Yc[0].deadpass->intdata=100;
+	return  SelectYcNum ;
 }
 
 /***************************************************************************************
