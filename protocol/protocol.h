@@ -213,7 +213,8 @@ class event{
 		int read_flag;
 };
 #include <list>
-typedef list<event> event_list;
+typedef CircleQueue<event> EventList;
+extern EventList event_list ;
 class dir{//directory
 	public:
 		char file_name[30];
@@ -289,7 +290,7 @@ class app_layer{
 		YC_TAB * (*get_yc_data)(int);
 		int build_yc_data(frame *out,link_layer *link);//cause 20
 
-		int (*get_event_list)(event_list*from,int pos,buffer *data);
+		int (*get_event_list)(EventList *from,int pos,buffer *data);
 		int build_event_data(frame *out,link_layer *link);//cause 3
 
 		int build_clock_con(frame *out,link_layer *link);//cause 7

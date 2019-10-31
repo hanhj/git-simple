@@ -262,7 +262,7 @@ int CircleQueue<T>::empty(){
 }
 template <typename T>
 int CircleQueue<T>::full(){
-	return (_tail+1)%MaxQueue==_front;
+	return (_tail+1) % MaxQueue==_front;
 }
 template <typename T>
 void CircleQueue<T>::clear(){

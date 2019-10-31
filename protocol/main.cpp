@@ -11,6 +11,7 @@
 using namespace std;
 int g_balance=0;
 char g_filename[20];
+EventList event_list;
 /****************************
  *	main 
 ****************************/
@@ -59,6 +60,7 @@ int main(int arg,char **argv){
 	default_init_yc_addr();
 	init_yx();
 	init_yc();
+	event_list.init(100);
 	while(1){
 		cout<<endl<<"run loop:"<<loops<<endl;
 		loops++;
