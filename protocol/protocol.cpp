@@ -4,9 +4,8 @@
 	> Mail: hanhj@zx-jy.com 
 	> Created Time: 2019年02月19日 星期二 22时09分40秒
  ************************************************************************/
-#include "all_h.h"
 #include "protocol.h"
-#include "Configurable.h"
+#include "configurable.h"
 
 using namespace std;
 
@@ -1634,16 +1633,15 @@ int app_layer::build_yx_data(frame *out,link_layer *link){//cause 20
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
-	send_num = SelectYxNum - link->sended_yx_num;
-	if(send_num > MAX_SEND_YX_PER_FRAME)
-		send_num = MAX_SEND_YX_PER_FRAME;
-	else{
-		link->summon_step++;//next for yc
-		link->sended_yx_num = 0;
-	}
 	pyx=get_yx_data(link->sended_yx_num);
-	link->sended_yx_num+=send_num;
+	send_num = SelectYxNum - link->sended_yx_num;
+	if(send_num > MAX_SEND_YX_PER_FRAME){
+		send_num = MAX_SEND_YX_PER_FRAME;
+	}else{
+		link->summon_step++;//next for yc
+	}
 
+	link->sended_yx_num+=send_num;
 	vsq_lo.bit.n=send_num;
 	vsq_lo.bit.sq=1;
 	cause_lo.bit.cause=CAUSE_Introgen;
@@ -1692,15 +1690,16 @@ int app_layer::build_dyx_data(frame *out,link_layer *link){//cause 20
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
-	send_num = SelectDYxNum - link->sended_yx_num;
-	if(send_num > MAX_SEND_YX_PER_FRAME)
+	send_num = SelectDpYxNum - link->sended_yx_num;
+	pyx=get_yx_data(link->sended_yx_num);
+	if(send_num > MAX_SEND_YX_PER_FRAME){
 		send_num = MAX_SEND_YX_PER_FRAME;
+		link->sended_yx_num+=send_num;
+	}
 	else{
 		link->summon_step++;//next for yc
 		link->sended_yx_num = 0;
 	}
-	pyx=get_yx_data(link->sended_yx_num);
-	link->sended_yx_num+=send_num;
 
 	vsq_lo.bit.n=send_num;
 	vsq_lo.bit.sq=1;
@@ -1750,14 +1749,15 @@ err:
 	if(ret<0)
 		goto err;
 	send_num = SelectYcNum - link->sended_yc_num;
-	if(send_num > MAX_SEND_YC_PER_FRAME)
+	pyc=get_yc_data(link->sended_yc_num);
+	if(send_num > MAX_SEND_YC_PER_FRAME){
 		send_num = MAX_SEND_YC_PER_FRAME;
+		link->sended_yc_num+=send_num;
+	}
 	else{
 		link->summon_step++;//next 
 		link->sended_yc_num = 0;
 	}
-	pyc=get_yc_data(link->sended_yc_num);
-	link->sended_yc_num+=send_num;
 
 	vsq_lo.bit.n=send_num;
 	vsq_lo.bit.sq=1;
@@ -1780,7 +1780,7 @@ err:
 	if(yc_data_type == 9 || yc_data_type ==11){
 		for(j=0;j<send_num;j++){
 			out->data[offset+i+3*j]=pyc[j].ycdata->deadpass->intdata;
-			out->data[offset+i+3*j+1]=pyc[j].ycdata->deadpass->intdata;
+			out->data[offset+i+3*j+1]=pyc[j].ycdata->deadpass->intdata>>8;
 			out->data[offset+i+3*j+2]=0;//qds
 		}
 		ret=i+3*j;

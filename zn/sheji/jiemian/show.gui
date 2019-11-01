@@ -330,21 +330,27 @@
 			HorzAlign = "Left"
 			VertAlign = "Top"
 			MaintainSize = "0"/>
+		<Element
+			CID = "810619803"
+			Type = "Bitmap"
+			X = "519"
+			Y = "217"
+			Width = "146"
+			Height = "15"
+			Flags = "0"
+			FileID = "78BF1444-CD84-4109-A0663A5DC260E2AD"
+			RootPath = "$Container"
+			Filename = "left.PNG"
+			Placement = "Stretch"
+			HorzAlign = "Left"
+			VertAlign = "Top"
+			ClipLeft = "0"
+			ClipRight = "0"
+			ClipTop = "0"
+			ClipBottom = "0"/>
 	</Elements>
 	<Connections
-		CID = "2">
-		<Connection
-			CID = "946284638"
-			Layer = "DesignElements"
-			Trigger = "LeftClick"
-			Type = "Navigation"
-			SubType = "Modal"
-			SourceSubItemID = ""
-			SourceRefID = "1327703063"
-			TargetRefID = "946293854"
-			ConLineWidth = "2"
-			ConLineColour = "0,0,0,0,0"/>
-	</Connections>
+		CID = "2"/>
 	<Groups
 		CID = "3"/>
 	<SelectionGroups

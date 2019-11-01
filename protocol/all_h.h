@@ -10,6 +10,7 @@
 #include<unistd.h>
 #include<string.h>
 #include<time.h>
+#include<stddef.h>
 #include<stdio.h>
 #include<stdlib.h>
 #include<stdarg.h>
@@ -18,6 +19,5 @@
 #include<sys/time.h>
 #include<sys/types.h>
 #include<unistd.h>
-#include "datatype.h"
 #endif //__all_h_h
 // vim:tw=72 

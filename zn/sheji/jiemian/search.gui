@@ -67,8 +67,8 @@
 		<Element
 			CID = "2057255719"
 			Type = "Component"
-			X = "662"
-			Y = "465"
+			X = "618"
+			Y = "450"
 			Width = "440"
 			Height = "320"
 			Flags = "3"
@@ -82,7 +82,7 @@
 		<Element
 			CID = "2057246770"
 			Type = "Component"
-			X = "664"
+			X = "619"
 			Y = "791"
 			Width = "440"
 			Height = "320"
@@ -94,88 +94,6 @@
 			HorzAlign = "Left"
 			VertAlign = "Top"
 			MaintainSize = "0"/>
-		<Element
-			CID = "2058312270"
-			Type = "Calendar"
-			X = "241"
-			Y = "269"
-			Width = "205"
-			Height = "158"
-			Flags = "3"
-			MainFillColour = "255,255,255,0,6"
-			MainLineColour = "0,0,0,0,9"
-			MainTextColour = "0,0,0,0,9"
-			TitleFillColour = "139,161,105,0,3"
-			TitleLineColour = "172,168,153,0,11"
-			TitleTextColour = "255,255,255,0,10"
-			DayNamesFillColour = "255,255,255,0,6"
-			DayNamesLineColour = "255,255,255,0,6"
-			DayNamesTextColour = "139,161,105,0,3"
-			WeekendNamesFillColour = "255,255,255,0,6"
-			WeekendNamesLineColour = "255,255,255,0,6"
-			WeekendNamesTextColour = "139,161,105,0,3"
-			WeekFillColour = "255,255,255,0,6"
-			WeekLineColour = "255,255,255,0,6"
-			WeekTextColour = "139,161,105,0,3"
-			DayFillColour = "255,255,255,0,6"
-			DayLineColour = "172,168,153,0,11"
-			DayTextColour = "0,0,0,0,9"
-			WeekendFillColour = "255,255,255,0,6"
-			WeekendLineColour = "172,168,153,0,11"
-			WeekendTextColour = "0,0,0,0,9"
-			TrailingFillColour = "255,255,255,0,6"
-			TrailingLineColour = "164,185,127,0,12"
-			TrailingTextColour = "161,161,146,0,18"
-			SelFillColour = "147,160,112,0,14"
-			SelLineColour = "147,160,112,0,14"
-			SelTextColour = "255,255,255,0,15"
-			TrailingSelFillColour = "147,160,112,0,14"
-			TrailingSelLineColour = "147,160,112,0,14"
-			TrailingSelTextColour = "255,255,255,0,15"
-			TodayFillColour = "255,255,255,0,6"
-			TodayLineColour = "255,0,0,0,0"
-			TodayTextColour = "0,0,0,0,9"
-			Typeface = ""
-			FontAttributes = "0"
-			TextSize = "Normal"
-			MarginLeft = "0"
-			MarginRight = "0"
-			MarginTop = "0"
-			MarginBottom = "0"
-			BorderSize = "1"
-			TitleBorderSize = "0"
-			TitleHeight = "30"
-			CellBorderSize = "0"
-			CellWidth = "25"
-			CellHeight = "15"
-			HorzCellSpacing = "0"
-			VertCellSpacing = "0"
-			HorzMonthSpacing = "6"
-			VertMonthSpacing = "6"
-			Rows = "1"
-			Cols = "1"
-			DayOfWeekChars = "3"
-			HighlightToday = "1"
-			ShowToday = "1"
-			ShowWeekNumbers = "1"
-			ShowWeeksLine = "1"
-			ShowDaysLine = "1"
-			ShowTrailingDays = "1"
-			ShowBetweenDays = "0"
-			SetInitialMonth = "0"
-			SetSelectedDate = "0"
-			WeekStartsOn = "0"
-			WeekendStartsOn = "5"
-			WeekendLength = "2"
-			FirstYear = "2019"
-			FirstMonth = "10"
-			SelectedYear = "2019"
-			SelectedMonth = "10"
-			SelectedDay = "22"
-			SelectedCount = "1"
-			IsDisabled = "0"
-			HorzAlign = "Centre"
-			VertAlign = "Centre"/>
 		<Element
 			CID = "2058301234"
 			Type = "EditBox"
@@ -309,7 +227,7 @@
 			Typeface = ""
 			FontAttributes = "0"
 			TextSize = "Normal"
-			NextColumnID = "13"
+			NextColumnID = "18"
 			IsFlat = "0"
 			IsHeaderBold = "0"
 			IsTransparent = "0"
@@ -344,6 +262,20 @@
 					EvenBackgroundColour = "255,255,255,0,6"
 					TextColour = "0,0,0,0,9"
 					ColumnID = "12"
+					Heading = "检查单号"
+					Width = "80"
+					HeaderMargin = "0"
+					CellMargin = "0"
+					HasCustomOddBgColour = "0"
+					HasCustomEvenBgColour = "0"
+					HasCustomTextColour = "0"
+					HeadingAlignment = "Left"
+					CellAlignment = "Left"/>
+				<ColumnItem
+					OddBackgroundColour = "255,255,255,0,6"
+					EvenBackgroundColour = "255,255,255,0,6"
+					TextColour = "0,0,0,0,9"
+					ColumnID = "13"
 					Heading = "姓名"
 					Width = "80"
 					HeaderMargin = "0"
@@ -437,6 +369,62 @@
 					HasCustomTextColour = "0"
 					HeadingAlignment = "Left"
 					CellAlignment = "Left"/>
+				<ColumnItem
+					OddBackgroundColour = "255,255,255,0,6"
+					EvenBackgroundColour = "255,255,255,0,6"
+					TextColour = "0,0,0,0,9"
+					ColumnID = "15"
+					Heading = "检查人"
+					Width = "60"
+					HeaderMargin = "0"
+					CellMargin = "0"
+					HasCustomOddBgColour = "0"
+					HasCustomEvenBgColour = "0"
+					HasCustomTextColour = "0"
+					HeadingAlignment = "Left"
+					CellAlignment = "Left"/>
+				<ColumnItem
+					OddBackgroundColour = "255,255,255,0,6"
+					EvenBackgroundColour = "255,255,255,0,6"
+					TextColour = "0,0,0,0,9"
+					ColumnID = "14"
+					Heading = "审核人"
+					Width = "60"
+					HeaderMargin = "0"
+					CellMargin = "0"
+					HasCustomOddBgColour = "0"
+					HasCustomEvenBgColour = "0"
+					HasCustomTextColour = "0"
+					HeadingAlignment = "Left"
+					CellAlignment = "Left"/>
+				<ColumnItem
+					OddBackgroundColour = "255,255,255,0,6"
+					EvenBackgroundColour = "255,255,255,0,6"
+					TextColour = "0,0,0,0,9"
+					ColumnID = "16"
+					Heading = "检查日期"
+					Width = "60"
+					HeaderMargin = "0"
+					CellMargin = "0"
+					HasCustomOddBgColour = "0"
+					HasCustomEvenBgColour = "0"
+					HasCustomTextColour = "0"
+					HeadingAlignment = "Left"
+					CellAlignment = "Left"/>
+				<ColumnItem
+					OddBackgroundColour = "255,255,255,0,6"
+					EvenBackgroundColour = "255,255,255,0,6"
+					TextColour = "0,0,0,0,9"
+					ColumnID = "17"
+					Heading = "报告日期"
+					Width = "60"
+					HeaderMargin = "0"
+					CellMargin = "0"
+					HasCustomOddBgColour = "0"
+					HasCustomEvenBgColour = "0"
+					HasCustomTextColour = "0"
+					HeadingAlignment = "Left"
+					CellAlignment = "Left"/>
 			</Columns>
 			<Data>
 				<Row
@@ -462,39 +450,6 @@
 					<Cell>
 						
 					</Cell>
-				</Row>
-				<Row
-					IsSelected = "0">
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
-				</Row>
-				<Row
-					IsSelected = "0">
-					<Cell>
-						
-					</Cell>
-					<Cell>
-						
-					</Cell>
 					<Cell>
 						
 					</Cell>
@@ -534,9 +489,117 @@
 					<Cell>
 						
 					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
 				</Row>
 				<Row
 					IsSelected = "0">
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+				</Row>
+				<Row
+					IsSelected = "0">
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+				</Row>
+				<Row
+					IsSelected = "0">
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
+					<Cell>
+						
+					</Cell>
 					<Cell>
 						
 					</Cell>
@@ -627,9 +690,9 @@
 		<Element
 			CID = "2058292336"
 			Type = "TextButton"
-			X = "523"
+			X = "484"
 			Y = "505"
-			Width = "75"
+			Width = "34"
 			Height = "23"
 			Flags = "0"
 			TextColour = "0,0,0,0,19"
@@ -668,7 +731,7 @@
 			Type = "TextButton"
 			X = "448"
 			Y = "505"
-			Width = "75"
+			Width = "36"
 			Height = "23"
 			Flags = "0"
 			TextColour = "0,0,0,0,19"
@@ -733,8 +796,8 @@
 		<Element
 			CID = "2109288884"
 			Type = "Component"
-			X = "658"
-			Y = "144"
+			X = "201"
+			Y = "135"
 			Width = "400"
 			Height = "300"
 			Flags = "3"
@@ -786,20 +849,67 @@
 			RootPath = "$Application"
 			Filename = "Icons\Toolbars\Navigate2Forward.ico"
 			IconIndex = "0"/>
+		<Element
+			CID = "1166424290"
+			Type = "TextButton"
+			X = "518"
+			Y = "505"
+			Width = "34"
+			Height = "23"
+			Flags = "0"
+			TextColour = "0,0,0,0,19"
+			Typeface = ""
+			FontAttributes = "0"
+			TextSize = "Normal"
+			Text = "导出"
+			Depth = "2"
+			IsDefault = "0"
+			IsDisabled = "0"
+			MarginLeft = "0"
+			MarginRight = "0"
+			MarginTop = "0"
+			MarginBottom = "0"
+			AutoNavType = ""/>
+		<Element
+			CID = "1166412370"
+			Type = "TextButton"
+			X = "549"
+			Y = "505"
+			Width = "34"
+			Height = "23"
+			Flags = "0"
+			TextColour = "0,0,0,0,19"
+			Typeface = ""
+			FontAttributes = "0"
+			TextSize = "Normal"
+			Text = "上传"
+			Depth = "2"
+			IsDefault = "0"
+			IsDisabled = "0"
+			MarginLeft = "0"
+			MarginRight = "0"
+			MarginTop = "0"
+			MarginBottom = "0"
+			AutoNavType = ""/>
+		<Element
+			CID = "1166436331"
+			Type = "Component"
+			X = "615"
+			Y = "137"
+			Width = "400"
+			Height = "300"
+			Flags = "3"
+			BackgroundColour = "255,255,255,0,6"
+			FileID = "97993295-E1C1-413D-9F03F9640B9FA881"
+			RootPath = "$Container"
+			Filename = "upload.gui"
+			Background = "Transparent"
+			HorzAlign = "Left"
+			VertAlign = "Top"
+			MaintainSize = "0"/>
 	</Elements>
 	<Connections
 		CID = "2">
-		<Connection
-			CID = "2058299252"
-			Layer = "DesignElements"
-			Trigger = "LeftClick"
-			Type = "Navigation"
-			SubType = "ModalSelector"
-			SourceSubItemID = ""
-			SourceRefID = "2057263532"
-			TargetRefID = "2058312270"
-			ConLineWidth = "2"
-			ConLineColour = "0,0,0,0,0"/>
 		<Connection
 			CID = "2058298717"
 			Layer = "DesignElements"
@@ -845,14 +955,14 @@
 			ConLineWidth = "2"
 			ConLineColour = "0,0,0,0,0"/>
 		<Connection
-			CID = "2109276457"
+			CID = "1166420115"
 			Layer = "DesignElements"
 			Trigger = "LeftClick"
 			Type = "Navigation"
-			SubType = "ModalSelector"
+			SubType = "Modal"
 			SourceSubItemID = ""
-			SourceRefID = "2109279456"
-			TargetRefID = "2058312270"
+			SourceRefID = "1166412370"
+			TargetRefID = "1166436331"
 			ConLineWidth = "2"
 			ConLineColour = "0,0,0,0,0"/>
 	</Connections>

@@ -1,17 +1,17 @@
 /*
- * File Name: test.cpp
+ * File Name: main.cpp
  * Author: hanhj
  * Mail: hanhj@zx-jy.com 
  * Created Time: 2019-10-18 11:42:22 week:5
 */
 #include<iostream>
-#include "datatype.h"
 #include "data.h"
-#include "Configurable.h"
+#include "configurable.h"
 #include "protocol.h"
 using namespace std;
 int g_balance=0;
 char g_filename[20];
+EventList event_list;
 /****************************
  *	main 
 ****************************/
@@ -56,6 +56,11 @@ int main(int arg,char **argv){
 	for(i=0;i<3;i++){
 			com[i].connect();
 	}
+	default_init_yx_addr();
+	default_init_yc_addr();
+	init_yx();
+	init_yc();
+	event_list.init(100);
 	while(1){
 		cout<<endl<<"run loop:"<<loops<<endl;
 		loops++;

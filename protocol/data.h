@@ -7,6 +7,7 @@
 
 #ifndef DATA_H_
 #define DATA_H_
+#include "datatype.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -528,14 +529,6 @@ typedef struct _terminal_msg{//终端信息
 	int    soe_flag;
 }TerminalMsg;
 extern  TerminalMsg term_msg;
-//为了防止升级后参数发生变更，添加此数据项
-//升级开始禁止保护，升级结束后，需要重新设置保护定值方能允许保护。
-typedef struct _upgrade_data{
-	unsigned	int upgrade_flag;
-	unsigned upgrate_time_cnt;
-	unsigned upgrade_disable_protect;//写到flash中的标志
-}UpgradeData;
-extern UpgradeData upgrade_data;
 #define SETBIT(dest,mask)     (dest |= mask)//目标位置位
 #define CLRBIT(dest,mask)     (dest &= ~mask)//目标位清零
 #define TGLBIT(dest,mask)     (dest ^= mask)//目标位取反

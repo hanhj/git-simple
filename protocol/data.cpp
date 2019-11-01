@@ -5,9 +5,10 @@
  * Created Time: 2019-10-18 11:17:49 week:5
 */
 #include<iostream>
-#include "datatype.h"
 #include "data.h"
 using namespace std;
+allyx TerYx;
+YX_TAB YxTable[TOTALYXNUM];
 SORT_YX_TAB SortYxTable[TOTALYXNUM];
 YC_TAB YcTable[MAX_YC_NUM];
 
