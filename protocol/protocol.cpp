@@ -428,26 +428,10 @@ int link_layer_101::build_event_data(frame *out){
 err:
 	return ret;
 }
-int link_layer_101::build_clock_con(frame *out){	
+int link_layer_101::build_clock(frame *in,frame *out){	
 	int ret;
 	set_loc_ctl();
-	ret=app->build_clock_con(out,this);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-	ret=build_link_layer(out,ret);				
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-err:
-	return ret;
-}
-int link_layer_101::build_clock_resp(frame *out){	
-	int ret;
-	set_loc_ctl();
-	ret=app->build_clock_resp(out,this);
+	ret=app->build_clock(in,out,this);
 	if(ret<0){
 		errno=ret;
 		goto err;
@@ -812,8 +796,6 @@ int link_layer_101::on_req(frame *in,frame *out){
 	ret=0;
 	int ti;
 	ti=in->data[offset_ti];
-	int cause;
-	cause=in->data[offset_cause];
 	int act=0;//for file command
 	switch(ti){
 		case COMMAND_SUMMON://total sum
@@ -823,11 +805,9 @@ int link_layer_101::on_req(frame *in,frame *out){
 			}
 			break;
 		case COMMAND_CLOCK://clock 
-			if(cause==6){
-				process|=PROCESS_CLOCKSYN;
-			}else if(cause==5){
-				process|=PROCESS_CLOCKRD;
-			}
+			process|=PROCESS_CLOCK;
+			if(balance == BALANCE)
+				build_clock(in,out);
 			break;
 		case COMMAND_RM_CTL:
 		case COMMAND_RM_CTL_D:
@@ -1436,8 +1416,8 @@ err:
 ****************************/
 SORT_YX_TAB * get_yx_data(int);
 YC_TAB * get_yc_data(int );
-int get_event_list(event_list*from,int pos,buffer *data);
-int get_clock(buffer*data);
+int get_event_list(EventList*from,int pos,buffer *data);
+int get_clock(CP56Time2a &);
 int do_yk(int id,int sel);
 int get_yc_cg_data(cg_yc_list *list,int pos,buffer*data);
 int get_dir_list(dir_list *list,buffer*data);
@@ -1831,38 +1811,46 @@ err:
 *  @see		
 ***********************************************************************
 */
-int app_layer::build_clock_con(frame *out,link_layer *link){//cause 7
+int app_layer::build_clock(frame *in,frame *out,link_layer *link){//cause 7
 	int i;
 	i=0;
-	int ret;
+	int ret= 0;
 	
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
-	ret=i;
-err:
-	return ret;
-}
-/**
-***********************************************************************
-*  @brief	build asdu of clock synchronism response command 
-*  @param[in] link point to link_layer  
-*  @param[out]  out point to out frame 
-*  @return upon successful return number of asdu size\n
-*	if fail a negative value returned.
-*  @note	
-*  @see		
-***********************************************************************
-*/
-int app_layer::build_clock_resp(frame *out,link_layer *link){//cause 5
-	int i;
-	i=0;
-	int ret;
-	
-	ret=get_link_info(link);
-	if(ret<0)
-		goto err;
-	ret=i;
+	vsq_lo.bit.n=1;
+	vsq_lo.bit.sq=1;
+	if(in->data[link->offset_cause]==CAUSE_Act){
+		cause_lo.bit.cause=CAUSE_Actcon;
+	}else if(in->data[link->offset_cause] == CAUSE_Req){
+		cause_lo.bit.cause=CAUSE_Req;
+	}
+
+	out->data[offset+i++]=COMMAND_CLOCK;
+	out->data[offset+i++]=vsq_lo.data;
+	out->data[offset+i++]=cause_lo.data;
+	if(cause_size==2){
+		out->data[offset+i++]=(cause_lo.data>>8&0x00ff);
+	}
+	out->data[offset+i++]=addr&0x00ff;
+	if(addr_size==2){
+		out->data[offset+i++]=addr>>8&0x00ff;
+	}
+	out->data[offset+i++]=0;
+	out->data[offset+i++]=0;
+	if(msg_id_size==3)
+		out->data[offset+i++]=0;
+	CP56Time2a time;
+	get_clock(time);
+	out->data[offset+i++]=time.year;
+	out->data[offset+i++]=time.month;
+	out->data[offset+i++]=time.day;
+	out->data[offset+i++]=time.hour;
+	out->data[offset+i++]=time.minute;
+	out->data[offset+i++]=time.millisecond>>8;
+	out->data[offset+i++]=time.millisecond & 0x00ff;
+	ret = i;
 err:
 	return ret;
 }
@@ -2408,11 +2396,11 @@ YC_TAB * get_yc_data(int pos){
 	pfunc(DEBUG_NORMAL,"\n");
 	return p;
 }
-int get_event_list(event_list*from,int pos,buffer *data){
+int get_event_list(EventList*from,int pos,buffer *data){
 	pfunc(DEBUG_NORMAL,"\n");
 	return 0;
 }
-int get_clock(buffer*data){
+int get_clock(CP56Time2a &time){
 	pfunc(DEBUG_NORMAL,"\n");
 	return 0;
 }

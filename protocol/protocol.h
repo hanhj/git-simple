@@ -112,8 +112,8 @@ typedef union _send_cause{
 //正在执行的过程
 #define PROCESS_LINK		1<<0
 #define PROCESS_SUMMON		1<<1
-#define PROCESS_CLOCKSYN	1<<2
-#define PROCESS_CLOCKRD		1<<3
+#define PROCESS_CLOCK	1<<2
+//#define PROCESS_CLOCKRD		1<<3
 #define PROCESS_RM_CTL		1<<4
 #define PROCESS_TEST_LINK	1<<5
 #define PROCESS_HART		1<<6
@@ -255,7 +255,7 @@ class app_layer{
 			get_yx_data=NULL;
 			get_yc_data=NULL;
 			get_event_list=NULL;
-			get_clock=NULL;
+			get_clock = NULL;
 			do_yk=NULL;
 			get_yc_cg_data=NULL;
 			get_dir_list=NULL;
@@ -293,9 +293,8 @@ class app_layer{
 		int (*get_event_list)(EventList *from,int pos,buffer *data);
 		int build_event_data(frame *out,link_layer *link);//cause 3
 
-		int build_clock_con(frame *out,link_layer *link);//cause 7
-		int (*get_clock)(buffer*data);
-		int build_clock_resp(frame *out,link_layer *link);//cause 5
+		int build_clock(frame *in,frame *out,link_layer *link);//cause	5,7
+		int (*get_clock)(CP56Time2a &);
 		
 		int on_yk(frame *in,link_layer *link);//deal yk command in
 		int (*do_yk)(int id,int sel);
@@ -552,8 +551,7 @@ class link_layer_101:public link_layer{
 		int build_dyx_data(frame *out);
 		int build_yc_data(frame *out);
 		int build_event_data(frame *out);
-		int build_clock_con(frame *out);
-		int build_clock_resp(frame *out);
+		int build_clock(frame *in,frame *out);
 		int build_yk_con(frame *out,int sel);
 		int build_yk_deact_con(frame *out);
 		int build_link_test_con(frame *out);
