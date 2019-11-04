@@ -195,7 +195,11 @@
 			Typeface = ""
 			FontAttributes = "0"
 			TextSize = "Normal"
+<<<<<<< HEAD
+			Text = "导入"
+=======
 			Text = "导出"
+>>>>>>> 19084ef3e85f0464f316f69acefe5330b48792b4
 			Depth = "2"
 			IsDefault = "0"
 			IsDisabled = "0"
@@ -215,7 +219,11 @@
 			Typeface = ""
 			FontAttributes = "0"
 			TextSize = "Normal"
+<<<<<<< HEAD
+			NextItemID = "5"
+=======
 			NextItemID = "6"
+>>>>>>> 19084ef3e85f0464f316f69acefe5330b48792b4
 			IsDisabled = "0"
 			HasHorzScrollBar = "0"
 			HasVertScrollBar = "0"
