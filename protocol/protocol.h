@@ -98,7 +98,25 @@ typedef union _send_cause{
 	send_cause_bit bit;
 	unsigned short  data;
 }send_cause;
-
+typedef union _sco_bit{
+	unsigned char scs:1;
+	unsigned char res:1;
+	unsigned char qu:6;
+	unsigned char sel:1;
+}sco_bit;
+typedef union _dco_bit{
+	unsigned char dcs:2;
+	unsigned char qu:6;
+	unsigned char sel:1;
+}dco_bit;
+typedef union _sco{
+	sco_bit bit;
+	unsigned char data;
+}sco;
+typedef union _dco{
+	dco_bit bit;
+	unsigned char data;
+}dco;
 //gb101中的传输规则：
 //线路上低位在前，高位在后；低字节在前，高字节在后。
 //define link state
@@ -293,13 +311,12 @@ class app_layer{
 		int (*get_event_list)(EventList *from,int pos,buffer *data);
 		int build_event_data(frame *out,link_layer *link);//cause 3
 
-		int build_clock(frame *in,frame *out,link_layer *link);//cause	5,7
+		int build_clock(frame *out,link_layer *link);//cause	5,7
 		int (*get_clock)(CP56Time2a &);
 		
 		int on_yk(frame *in,link_layer *link);//deal yk command in
-		int (*do_yk)(int id,int sel);
-		int build_yk_con(frame *out,link_layer *link,int sel);//cause=7,sel=0 or 1
-		int build_yk_deact_con(frame *out,link_layer *link);//cause=9,sel=0
+		int (*do_yk)(int id,int type,int cmd);
+		int build_yk(frame *in,frame *out,link_layer *link);//cause=7,sel=0 or 1
 		
 		int build_link_test_con(frame *out,link_layer *link);//cause 7
 		
@@ -386,7 +403,8 @@ class link_layer{
 		int sended_yx_num;
 		int sended_yc_num;
 		int summon_step;
-
+		int clock_syn;
+		int clock_rd;
 	public:
 		link_layer(){
 			port=0;
@@ -430,16 +448,22 @@ class link_layer{
 		//the inheritance class must realize these virtual function.
 		virtual int build_link_layer(frame *out,int)=0;//by asdu build link frame 
 		virtual int build_link_fini(frame *out)=0;
+
+		virtual int process_summon(frame *out)=0;
 		virtual int build_summon_con(frame *out)=0;
 		virtual int build_summon_term(frame *out)=0;
 		virtual int build_yx_data(frame *out)=0;
 		virtual int build_dyx_data(frame *out)=0;
 		virtual int build_yc_data(frame *out)=0;
+
 		virtual int build_event_data(frame *out)=0;
-		virtual int build_clock_con(frame *out)=0;
-		virtual int build_clock_resp(frame *out)=0;
-		virtual int build_yk_con(frame *out,int sel)=0;
-		virtual int build_yk_deact_con(frame *out)=0;
+		
+		virtual int process_clock(frame *in,frame *out)=0;
+		virtual int build_clock(frame *out)=0;
+		
+		virtual int process_yk(frame *in,frame *out)=0;
+		virtual int build_yk(frame *in,frame *out)=0;
+
 		virtual int build_link_test_con(frame *out)=0;
 		virtual int build_yc_cg_data(frame *out)=0;
 		virtual int build_reset_con(frame *out)=0;
@@ -545,15 +569,22 @@ class link_layer_101:public link_layer{
 //the next functions  is implement of parent virtual function. inheritance 继承
 		int build_link_layer(frame *out,int asdu_len);//by asdu build link frame.
 		int build_link_fini(frame *out);//set fc=3(balance) or fc=8(unbalance),var frame
+		
+		int process_summon(frame *out);//set fc=3(balance) or fc=8(unbalance),var frame
 		int build_summon_con(frame *out);//set fc=3(balance) or fc=8(unbalance),var frame
 		int build_summon_term(frame *out);
 		int build_yx_data(frame *out);
 		int build_dyx_data(frame *out);
 		int build_yc_data(frame *out);
+
 		int build_event_data(frame *out);
-		int build_clock(frame *in,frame *out);
-		int build_yk_con(frame *out,int sel);
-		int build_yk_deact_con(frame *out);
+
+		int process_clock(frame *in,frame *out);
+		int build_clock(frame *out);
+
+		int process_yk(frame *in,frame *out);
+		int build_yk(frame *in,frame *out);
+
 		int build_link_test_con(frame *out);
 		int build_yc_cg_data(frame *out);
 		int build_reset_con(frame *out);
@@ -567,6 +598,8 @@ class link_layer_101:public link_layer{
 		int build_rd_dz_con(frame *out);
 		int build_dz_con(frame *out,int sel);
 		int build_dz_dact_con(frame *out);
+
+
 		int build_summon_acc_con(frame *out);
 		int build_summon_acc_term(frame *out);
 		int build_summon_acc_resp(frame *out);

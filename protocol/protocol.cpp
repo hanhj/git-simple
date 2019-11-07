@@ -428,10 +428,10 @@ int link_layer_101::build_event_data(frame *out){
 err:
 	return ret;
 }
-int link_layer_101::build_clock(frame *in,frame *out){	
+int link_layer_101::build_clock(frame *out){	
 	int ret;
 	set_loc_ctl();
-	ret=app->build_clock(in,out,this);
+	ret=app->build_clock(out,this);
 	if(ret<0){
 		errno=ret;
 		goto err;
@@ -444,26 +444,10 @@ int link_layer_101::build_clock(frame *in,frame *out){
 err:
 	return ret;
 }
-int link_layer_101::build_yk_con(frame *out,int sel){	
+int link_layer_101::build_yk(frame *in,frame *out){	
 	int ret;
 	set_loc_ctl();
-	ret=app->build_yk_con(out,this,sel);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-	ret=build_link_layer(out,ret);				
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-err:
-	return ret;
-}
-int link_layer_101::build_yk_deact_con(frame *out){	
-	int ret;
-	set_loc_ctl();
-	ret=app->build_yk_deact_con(out,this);
+	ret=app->build_yk(in,out,this);
 	if(ret<0){
 		errno=ret;
 		goto err;
@@ -752,48 +736,62 @@ err:
 int link_layer_101::on_ack(frame *in,frame *out){
 	cout<<"on_ack"<<endl;
 	if(process & PROCESS_SUMMON){
-		if(summon_step==0){
-			build_summon_con(out);
-		}else if(summon_step == 1){
-			build_yx_data(out);
-		}else if(summon_step == 2){
-			build_dyx_data(out);
-		}else if(summon_step == 3){
-			build_yc_data(out);
-		}else if(summon_step == 4){
-			build_summon_term(out);
-			process &=~PROCESS_SUMMON;
-		}
+		process_summon(out);
 	}
+
 	return 0 ;
 }
 //for unbalance
 int link_layer_101::on_req_class_1(frame *in,frame *out){
+	int ret ;
 	cout<<"on_req_class_1"<<endl;
 	if(process & PROCESS_SUMMON){
-		if(summon_step==0){
-			build_summon_con(out);
-		}else if(summon_step == 1){
-			build_yx_data(out);
-		}else if(summon_step == 2){
-			build_dyx_data(out);
-		}else if(summon_step == 3){
-			build_yc_data(out);
-		}else if(summon_step == 4){
-			build_summon_term(out);
-			process &=~PROCESS_SUMMON;
-		}
+		ret = process_summon(out);
 	}
-	return 0 ;
+	return ret ;
 }
 //for unbalance
 int link_layer_101::on_req_class_2(frame *in,frame *out){
+	int ret;
 	cout<<"on_req_class_2"<<endl;
-	return 0;
+	if(process & PROCESS_CLOCK){
+		ret=process_clock(in,out);
+	}
+	return ret;
+}
+int link_layer_101::process_summon(frame *out){
+	int ret;
+	if(summon_step==0){
+		ret=build_summon_con(out);
+	}else if(summon_step == 1){
+		ret=build_yx_data(out);
+	}else if(summon_step == 2){
+		ret=build_dyx_data(out);
+	}else if(summon_step == 3){
+		ret=build_yc_data(out);
+	}else if(summon_step == 4){
+		ret=build_summon_term(out);
+		process &=~PROCESS_SUMMON;
+	}
+	return ret;
+}
+int link_layer_101::process_clock(frame *in,frame *out){
+	int ret;
+	ret =0;
+	if(in->data[offset_cause]==CAUSE_Act){
+		clock_syn = 1;
+	}else if(in->data[offset_cause] == CAUSE_Req){
+		clock_rd = 1;
+	}
+	return ret;
+}
+int link_layer_101::process_yk(frame *in,frame *out){
+	int ret =0;
+	return ret;
 }
 int link_layer_101::on_req(frame *in,frame *out){
 	int ret;
-	ret=0;
+	ret= 0;
 	int ti;
 	ti=in->data[offset_ti];
 	int act=0;//for file command
@@ -801,17 +799,20 @@ int link_layer_101::on_req(frame *in,frame *out){
 		case COMMAND_SUMMON://total sum
 			process|=PROCESS_SUMMON;
 			if(balance == BALANCE){
-				build_summon_con(out);
+				ret=process_summon(out);
 			}
 			break;
 		case COMMAND_CLOCK://clock 
 			process|=PROCESS_CLOCK;
-			if(balance == BALANCE)
-				build_clock(in,out);
+			process_clock(in,out);
+			if(balance ==BALANCE)
+				ret=build_clock(out);
 			break;
 		case COMMAND_RM_CTL:
 		case COMMAND_RM_CTL_D:
 			process|=PROCESS_RM_CTL;
+			if(balance == BALANCE)
+				ret=process_yk(in,out);
 			break;
 		case COMMAND_TEST_LINK:
 			process|=PROCESS_TEST_LINK;
@@ -845,9 +846,6 @@ int link_layer_101::on_req(frame *in,frame *out){
 			break;
 		case COMMAND_UPDATE:
 			process|=PROCESS_UPDATE;
-			break;
-		default:
-			ret=-1;
 			break;
 	}
 	return ret;
@@ -1162,7 +1160,7 @@ int link_layer_101::on_fc3(frame *f){
 			if(ctl.pm.fcb!=ctl_rm.pm.fcb){
 				ctl_rm.data=ctl.data;//save control
 				ret=on_req(f,&s_var_frame);
-				if(ret==0){
+				if(ret>=0){
 					ret=build_ack(&s_fix_frame,has_data);
 					if(ret<0){
 						goto err;
@@ -1206,7 +1204,7 @@ int link_layer_101::on_fc3(frame *f){
 			if(ctl.pm.fcb!=ctl_rm.pm.fcb){
 				ctl_rm.data=ctl.data;//save control
 				ret=on_req(f,&s_var_frame);
-				if(ret==0){
+				if(ret>=0){
 					ret=build_ack(&s_fix_frame);
 					if(ret<0){
 						goto err;
@@ -1418,7 +1416,7 @@ SORT_YX_TAB * get_yx_data(int);
 YC_TAB * get_yc_data(int );
 int get_event_list(EventList*from,int pos,buffer *data);
 int get_clock(CP56Time2a &);
-int do_yk(int id,int sel);
+int do_yk(int id,int type,int cmd);
 int get_yc_cg_data(cg_yc_list *list,int pos,buffer*data);
 int get_dir_list(dir_list *list,buffer*data);
 int get_file_segment(char *filename,int pos,file_segment *file);
@@ -1811,7 +1809,7 @@ err:
 *  @see		
 ***********************************************************************
 */
-int app_layer::build_clock(frame *in,frame *out,link_layer *link){//cause 7
+int app_layer::build_clock(frame *out,link_layer *link){//cause 7
 	int i;
 	i=0;
 	int ret= 0;
@@ -1820,11 +1818,13 @@ int app_layer::build_clock(frame *in,frame *out,link_layer *link){//cause 7
 	if(ret<0)
 		goto err;
 	vsq_lo.bit.n=1;
-	vsq_lo.bit.sq=1;
-	if(in->data[link->offset_cause]==CAUSE_Act){
+	vsq_lo.bit.sq=0;
+	if(link->clock_syn){
 		cause_lo.bit.cause=CAUSE_Actcon;
-	}else if(in->data[link->offset_cause] == CAUSE_Req){
+		link->clock_syn = 0;
+	}else if(link->clock_rd){
 		cause_lo.bit.cause=CAUSE_Req;
+		link->clock_rd = 0;
 	}
 
 	out->data[offset+i++]=COMMAND_CLOCK;
@@ -1856,29 +1856,6 @@ err:
 }
 /**
 ***********************************************************************
-*  @brief	build asdu of link_fini command 
-*  @param[in] link point to link_layer  
-*  @param[out]  out point to out frame 
-*  @return upon successful return number of asdu size\n
-*	if fail a negative value returned.
-*  @note	
-*  @see		
-***********************************************************************
-*/
-int app_layer::on_yk(frame *in,link_layer *link){//deal yk command in
-	int i;
-	i=0;
-	int ret;
-	
-	ret=get_link_info(link);
-	if(ret<0)
-		goto err;
-	ret=i;
-err:
-	return ret;
-}
-/**
-***********************************************************************
 *  @brief	build asdu of yk confirm command 
 *  @param[in] link point to link_layer  
 *  @param[out]  out point to out frame 
@@ -1888,38 +1865,80 @@ err:
 *  @see		
 ***********************************************************************
 */
-int app_layer::build_yk_con(frame *out,link_layer *link,int sel){//cause=7,sel=0 or 1
+int app_layer::build_yk(frame *in,frame *out,link_layer *link){//cause=7,sel=0 or 1
 	int i;
 	i=0;
-	int ret;
+	int ret= 0;
+	int ctrl_id;
+	int cmd_id;
+	int cmd;//0:open;1:close
+	sco sco;
+	dco dco;
+	int cancel;
+	cmd=0;
+	cancel = 0;
+
+	//sco 0:open;1:close;
+	//dco 1:open;2:close
 	
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
-	ret=i;
-err:
-	return ret;
-}
-/**
-***********************************************************************
-*  @brief	build asdu of link_fini command 
-*  @param[in] link point to link_layer  
-*  @param[out]  out point to out frame 
-*  @return upon successful return number of asdu size\n
-*	if fail a negative value returned.
-*  @note	
-*  @see		
-***********************************************************************
-*/
-int app_layer::build_yk_deact_con(frame *out,link_layer *link){//cause=9,sel=0
-	int i;
-	i=0;
-	int ret;
-	
-	ret=get_link_info(link);
-	if(ret<0)
+	vsq_lo.bit.n=1;
+	vsq_lo.bit.sq=0;
+	cmd_id=in->data[link->offset_ti];
+	ctrl_id=in->data[link->offset_data];
+	ctrl_id=(ctrl_id<<8)+in->data[link->offset_data+1];
+
+	if(in->data[link->offset_cause]==CAUSE_Act){
+		cause_lo.bit.cause=CAUSE_Actcon;
+	}else if(in->data[link->offset_cause] == CAUSE_Deact){
+		cause_lo.bit.cause=CAUSE_Deactcon;
+		cancel = 1;
+	}
+
+	if(cmd_id == COMMAND_RM_CTL){
+		sco.data=in->data[link->offset_data+2];
+		cmd=sco.bit.scs;
+		if(sco.bit.sel == 0){
+			ret=do_yk(ctrl_id,0,cmd);
+		}else if(sco.bit.sel == 1){
+			ret = do_yk(ctrl_id,1,cmd);
+		}
+		if(ret <0)
+			goto err;
+	}else if(cmd_id == COMMAND_RM_CTL_D){
+		dco.data = in->data[link->offset_data + 2];
+		cmd=dco.bit.dcs==1?0:1;
+		if(dco.bit.sel == 0){
+			ret=do_yk(ctrl_id,0,cmd);
+		}else if(dco.bit.sel == 1){
+			ret = do_yk(ctrl_id,1,cmd);
+		}
+		if(ret <0)
+			goto err;
+	}else
 		goto err;
-	ret=i;
+
+	if(cancel==1){
+		do_yk(ctrl_id,2,cmd);
+	}
+	out->data[offset+i++]=cmd_id;
+	out->data[offset+i++]=vsq_lo.data;
+	out->data[offset+i++]=cause_lo.data;
+	if(cause_size==2){
+		out->data[offset+i++]=(cause_lo.data>>8&0x00ff);
+	}
+	out->data[offset+i++]=addr&0x00ff;
+	if(addr_size==2){
+		out->data[offset+i++]=addr>>8&0x00ff;
+	}
+	out->data[offset+i++]=ctrl_id;
+	out->data[offset+i++]=ctrl_id>>8;
+	if(msg_id_size==3)
+		out->data[offset+i++]=0;
+	out->data[offset+i++]=cmd_id == COMMAND_RM_CTL?sco.data:dco.data;
+	ret = i;
 err:
 	return ret;
 }
@@ -2404,8 +2423,16 @@ int get_clock(CP56Time2a &time){
 	pfunc(DEBUG_NORMAL,"\n");
 	return 0;
 }
-int do_yk(int id,int sel){
-	pfunc(DEBUG_NORMAL,"\n");
+//type:0 do;1:select;2:cancel
+int do_yk(int id,int type,int cmd){
+	pfunc(DEBUG_NORMAL,"type:%d\n",type);
+	if(type == 0){
+		pfunc(DEBUG_NORMAL,"do execute:%d\n",cmd);
+	}else if(type == 1){
+		pfunc(DEBUG_NORMAL,"do select:%d\n",cmd);
+	}else if(type == 2){
+		pfunc(DEBUG_NORMAL,"do cancel:%d\n",cmd);
+	}
 	return 0;
 }
 int get_yc_cg_data(cg_yc_list *list,int pos,buffer*data){
@@ -2453,7 +2480,7 @@ int get_yx_data(buffer*data);
 int get_yc_data(buffer*data);
 int get_event_list(event_list*from,int pos,buffer *data);
 int get_clock(buffer*data);
-int do_yk(int id,int sel);
+int do_yk(int id,int type,int cmd);
 int get_yc_cg_data(cg_yc_list *list,int pos,buffer*data);
 int get_dir_list(dir_list *list,buffer*data);
 int get_file_segment(char *filename,int pos,file_segment *file);
