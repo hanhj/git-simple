@@ -66,6 +66,13 @@ int link_layer::check_state(){
 	cout<<"check state of link "<<port<<",state:"<<link_state<<endl;
 	return 0;
 }
+void link_layer::reset_yk_data(){
+	yk_data.sel=0;
+	yk_data.act=0;
+	yk_data.start_timeout=0;
+	yk_data.timeout=0;
+	process&=~PROCESS_RM_CTL;
+}
 /****************************
  *  realize link_layer_101
 ****************************/
@@ -296,499 +303,181 @@ void link_layer_101::set_loc_ctl(){
 		ctl_lo.pm.rev_dir=1;
 	}
 }
-int link_layer_101::build_link_fini(frame *out){
-	int ret;
-	ret=0;
-	if(!balance){
-		ctl_lo.sl.fc=8;
-		ctl_lo.sl.dfc=0;
-		ctl_lo.sl.acd_rev=1;
-		ctl_lo.sl.prm=0;
-		ctl_lo.sl.rev_dir=0;
-
-	}else if(balance==BALANCE){
-		ctl_lo.pm.fc=3;
-		ctl_lo.pm.fcv=1;
-		ctl_lo.pm.fcb=0;
-		ctl_lo.pm.prm=1;
-		ctl_lo.pm.rev_dir=1;
-	}
-	ret=app->build_link_fini(out,this);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-	ret=build_link_layer(out,ret);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-err:
-	return ret;
-}
-int link_layer_101::build_summon_con(frame *out){
-	int ret;
-	ret=0;
-	set_loc_ctl();
-	ret=app->build_summon_con(out,this);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-	ret=build_link_layer(out,ret);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-	summon_step = 1;
-err:
-	return ret;
-}
-int link_layer_101::build_summon_term(frame *out){	
-	int ret;
-	set_loc_ctl();
-	if(!balance){
-		ctl_lo.sl.acd_rev=0;//no more data;
-	}
-	ret=app->build_summon_term(out,this);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-	ret=build_link_layer(out,ret);	
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-	summon_step = 0;
-err:
-	return ret;
-}
-int link_layer_101::build_yx_data(frame *out){
-	int ret;
-	set_loc_ctl();
-	ret=app->build_yx_data(out,this);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-	ret=build_link_layer(out,ret);		
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-err:
-	return ret;
-}
-int link_layer_101::build_dyx_data(frame *out){
-	int ret;
-	set_loc_ctl();
-	ret=app->build_dyx_data(out,this);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-	ret=build_link_layer(out,ret);		
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-err:
-	return ret;
-}
-int link_layer_101::build_yc_data(frame *out){	
-	int ret;
-	set_loc_ctl();
-	ret=app->build_yc_data(out,this);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-	ret=build_link_layer(out,ret);			
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-err:
-	return ret;
-}
-int link_layer_101::build_event_data(frame *out){	
-	int ret;
-	set_loc_ctl();
-	ret=app->build_event_data(out,this);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-	ret=build_link_layer(out,ret);				
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-err:
-	return ret;
-}
-int link_layer_101::build_clock(frame *out){	
-	int ret;
-	set_loc_ctl();
-	ret=app->build_clock(out,this);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-	ret=build_link_layer(out,ret);				
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-err:
-	return ret;
-}
-int link_layer_101::build_yk(frame *in,frame *out){	
-	int ret;
-	set_loc_ctl();
-	ret=app->build_yk(in,out,this);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-	ret=build_link_layer(out,ret);				
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-err:
-	return ret;
-}
-int link_layer_101::build_link_test_con(frame *out){	
-	int ret;
-	set_loc_ctl();
-	ret=app->build_link_test_con(out,this);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-	ret=build_link_layer(out,ret);				
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-err:
-	return ret;
-}
-int link_layer_101::build_yc_cg_data(frame *out){
-	int ret;
-	set_loc_ctl();
-	ret=app->build_yc_cg_data(out,this);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-	ret=build_link_layer(out,ret);					
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-err:
-	return ret;
-}
-int link_layer_101::build_reset_con(frame *out){
-	int ret;
-	set_loc_ctl();
-	ret=app->build_reset_con(out,this);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-	ret=build_link_layer(out,ret);					
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-err:
-	return ret;
-}
-int link_layer_101::build_rd_dir_resp(frame *out){
-	int ret;
-	set_loc_ctl();
-	ret=app->build_rd_dir_resp(out,this);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-	ret=build_link_layer(out,ret);					
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-err:
-	return ret;
-}
-int link_layer_101::build_rd_file_con(frame *out){
-	int ret;
-	set_loc_ctl();
-	ret=app->build_rd_file_con(out,this);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-	ret=build_link_layer(out,ret);				
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-err:
-	return ret;
-}
-int link_layer_101::build_rd_file_resp(frame *out,file_segment *file){
-	int ret;
-	set_loc_ctl();
-	ret=app->build_rd_file_resp(out,this,file);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-	ret=build_link_layer(out,ret);								
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-err:
-	return ret;
-}
-int link_layer_101::build_wr_file_con(frame *out){
-	int ret;
-	set_loc_ctl();
-	ret=app->build_wr_file_con(out,this);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-	ret=build_link_layer(out,ret);					
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-err:
-	return ret;
-}
-int link_layer_101::build_wr_file_resp(frame *out){
-	int ret;
-	set_loc_ctl();
-	ret=app->build_wr_file_resp(out,this);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-	ret=build_link_layer(out,ret);					
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-err:
-	return ret;
-}
-int link_layer_101::build_rd_dz_unit_con(frame *out){
-	int ret;
-	set_loc_ctl();
-	ret=app->build_rd_dz_unit_con(out,this);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-	ret=build_link_layer(out,ret);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-err:
-	return ret;
-}
-int link_layer_101::build_wr_dz_unit_con(frame *out){	
-	int ret;
-	set_loc_ctl();
-	ret=app->build_wr_dz_unit_con(out,this);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-	ret=build_link_layer(out,ret);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-err:
-	return ret;
-}
-int link_layer_101::build_rd_dz_con(frame *out){	
-	int ret;
-	set_loc_ctl();
-	ret=app->build_rd_dz_con(out,this);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-	ret=build_link_layer(out,ret);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-err:
-	return ret;
-}
-int link_layer_101::build_dz_con(frame *out,int sel){	
-	int ret;
-	set_loc_ctl();
-	ret=app->build_dz_con(out,this,sel);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-	ret=build_link_layer(out,ret);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-err:
-	return ret;
-}
-int link_layer_101::build_dz_dact_con(frame *out){	
-	int ret;
-	set_loc_ctl();
-	ret=app->build_dz_dact_con(out,this);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-	ret=build_link_layer(out,ret);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-err:
-	return ret;
-}
-int link_layer_101::build_summon_acc_con(frame *out){	
-	int ret;
-	set_loc_ctl();
-	ret=app->build_summon_acc_con(out,this);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-	ret=build_link_layer(out,ret);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-err:
-	return ret;
-}
-int link_layer_101::build_summon_acc_term(frame *out){	
-	int ret;
-	set_loc_ctl();
-	ret=app->build_summon_acc_term(out,this);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-	ret=build_link_layer(out,ret);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-err:
-	return ret;
-}
-int link_layer_101::build_summon_acc_resp(frame *out){	
-	int ret;
-	set_loc_ctl();
-	ret=app->build_summon_acc_resp(out,this);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-	ret=build_link_layer(out,ret);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-err:
-	return ret;
-}
-int link_layer_101::build_update_con(frame *out,int sel){	
-	int ret;
-	set_loc_ctl();
-	ret=app->build_update_con(out,this,sel);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-	ret=build_link_layer(out,ret);
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-err:
-	return ret;
-}
 //for balance
 int link_layer_101::on_ack(frame *in,frame *out){
+	int ret;
+	ret=0;
 	cout<<"on_ack"<<endl;
 	if(process & PROCESS_SUMMON){
-		process_summon(out);
+		ret=process_summon(out);
 	}
-
-	return 0 ;
+	return ret ;
 }
 //for unbalance
 int link_layer_101::on_req_class_1(frame *in,frame *out){
 	int ret ;
 	cout<<"on_req_class_1"<<endl;
+	ret=0;
 	if(process & PROCESS_SUMMON){
 		ret = process_summon(out);
+	}else if(process & PROCESS_RM_CTL){
+		ret=app->build_yk(out,this);
 	}
 	return ret ;
 }
 //for unbalance
 int link_layer_101::on_req_class_2(frame *in,frame *out){
 	int ret;
+	ret=0;
 	cout<<"on_req_class_2"<<endl;
 	if(process & PROCESS_CLOCK){
-		ret=process_clock(in,out);
+		ret=app->build_clock(out,this);
 	}
 	return ret;
 }
 int link_layer_101::process_summon(frame *out){
 	int ret;
-	if(summon_step==0){
-		ret=build_summon_con(out);
-	}else if(summon_step == 1){
-		ret=build_yx_data(out);
-	}else if(summon_step == 2){
-		ret=build_dyx_data(out);
-	}else if(summon_step == 3){
-		ret=build_yc_data(out);
-	}else if(summon_step == 4){
-		ret=build_summon_term(out);
+	if(summon_data.summon_step==0){
+		ret=app->build_summon_con(out,this);
+	}else if(summon_data.summon_step == 1){
+		ret=app->build_yx_data(out,this);
+	}else if(summon_data.summon_step == 2){
+		ret=app->build_dyx_data(out,this);
+	}else if(summon_data.summon_step == 3){
+		ret=app->build_yc_data(out,this);
+	}else if(summon_data.summon_step == 4){
+		ret=app->build_summon_term(out,this);
 		process &=~PROCESS_SUMMON;
 	}
+	return ret;
+}
+int link_layer_101::process_summon_acc(frame *out){
+	int ret =0;
 	return ret;
 }
 int link_layer_101::process_clock(frame *in,frame *out){
 	int ret;
 	ret =0;
 	if(in->data[offset_cause]==CAUSE_Act){
-		clock_syn = 1;
+		clock_data.clock_syn = 1;
 	}else if(in->data[offset_cause] == CAUSE_Req){
-		clock_rd = 1;
+		clock_data.clock_rd = 1;
 	}
 	return ret;
 }
+//10ms
+void link_layer_101::deal_timeout(){
+	if(yk_data.start_timeout==1){
+		yk_data.timeout++;
+		if(yk_data.timeout ==6000){//60s
+			yk_data.start_timeout = 0;
+			yk_data.timeout=0;
+			yk_data.sel=0;
+			yk_data.act=0;
+			yk_data.deactive=0;
+			yk_data.act_over=0;
+		}
+	}
+}
 int link_layer_101::process_yk(frame *in,frame *out){
 	int ret =0;
+	int ctrl;
+	yk_data.cmd_id=in->data[offset_ti];
+	yk_data.ctrl_id=in->data[offset_data];
+	yk_data.ctrl_id=(yk_data.ctrl_id<<8)+in->data[offset_data+1];
+	yk_data.sco.data=in->data[offset_data+2];
+	yk_data.dco.data=yk_data.sco.data;
+	
+	if(yk_data.ctrl_id == COMMAND_RM_CTL){
+		ctrl=yk_data.sco.bit.scs;
+	}else if(yk_data.ctrl_id == COMMAND_RM_CTL_D){
+		ctrl=yk_data.dco.bit.dcs==1?0:1;
+	}
+	if(in->data[offset_cause]==CAUSE_Act){
+		if(yk_data.sco.bit.sel==0){//sel
+			if(yk_data.sel==0){
+				yk_data.sel=1;
+				ret=app->do_yk(yk_data.ctrl_id,1,ctrl);//do check
+				if(ret<0)
+					yk_data.fail=1;
+				else if(yk_data.start_timeout==0)
+					yk_data.start_timeout = 1;
+			}else//re select
+				yk_data.fail=1;
+			}
+		else if(yk_data.sco.bit.sel==1){//act
+			if(yk_data.sel==1){
+				yk_data.act=1;
+				ret=app->do_yk(yk_data.ctrl_id,0,ctrl);//do act 
+				if(ret<0)
+					yk_data.fail=1;
+			}else{
+				yk_data.fail=1;
+			}
+		}
+	}else if(in->data[offset_cause] == CAUSE_Deact){
+		yk_data.deactive=1;
+	}
+	if(yk_data.fail){
+		ret=-1;
+		reset_yk_data();
+
+	}
+	if(yk_data.deactive){
+		reset_yk_data();
+	}
+
 	return ret;
 }
+int link_layer_101::process_evnet(frame *in,frame *out){
+	int ret=0;
+	return ret;
+}
+int link_layer_101::process_test_link(frame *in,frame *out){
+	int ret=0;
+	return ret;
+}
+int link_layer_101::process_yc_change(frame *in,frame *out){
+	int ret=0;
+	return ret;
+}
+int link_layer_101::process_reset_terminal(frame *in,frame *out){
+	int ret=0;
+	return ret;
+}
+int link_layer_101::process_rd_dir(frame *in,frame *out){
+	int ret=0;
+	return ret;
+}
+int link_layer_101::process_rd_file(frame *in,frame *out){
+	int ret=0;
+	return ret;
+}
+int link_layer_101::process_wt_file(frame *in,frame *out){
+	int ret=0;
+	return ret;
+}
+int link_layer_101::process_rd_dz(frame *in,frame *out){
+	int ret=0;
+	return ret;
+}
+int link_layer_101::process_rd_unit(frame *in,frame *out){
+	int ret=0;
+	return ret;
+}
+int link_layer_101::process_wt_dz(frame *in,frame *out){
+	int ret=0;
+	return ret;
+}
+int link_layer_101::process_wt_unit(frame *in,frame *out){
+	int ret=0;
+	return ret;
+}
+int link_layer_101::process_update(frame *in,frame *out){
+	int ret=0;
+	return ret;
+}
+
 int link_layer_101::on_req(frame *in,frame *out){
 	int ret;
 	ret= 0;
@@ -804,15 +493,16 @@ int link_layer_101::on_req(frame *in,frame *out){
 			break;
 		case COMMAND_CLOCK://clock 
 			process|=PROCESS_CLOCK;
-			process_clock(in,out);
+			ret=process_clock(in,out);
 			if(balance ==BALANCE)
-				ret=build_clock(out);
+				ret=app->build_clock(out,this);
 			break;
 		case COMMAND_RM_CTL:
 		case COMMAND_RM_CTL_D:
 			process|=PROCESS_RM_CTL;
-			if(balance == BALANCE)
 				ret=process_yk(in,out);
+			if(balance == BALANCE)
+				ret=app->build_yk(out,this);
 			break;
 		case COMMAND_TEST_LINK:
 			process|=PROCESS_TEST_LINK;
@@ -1103,7 +793,7 @@ int link_layer_101::on_fc0(frame*f){
 			link_step++;//5
 		}else if(link_step==7){
 			link_step++;//8
-			ret=build_link_fini(&s_var_frame);
+			ret=app->build_link_fini(&s_var_frame,this);
 			if(ret<0){
 				goto err;
 			}
@@ -1312,7 +1002,7 @@ int link_layer_101::on_fc10(frame*f){
 	if(balance!=BALANCE){
 		if(link_step==4){
 			link_step++;//5
-			ret=build_link_fini(&s_var_frame);
+			ret=app->build_link_fini(&s_var_frame,this);
 			if(ret<0){
 				goto err;
 			}
@@ -1469,13 +1159,17 @@ err:
 *  @return upon successful return number of asdu size\n
 *	if fail a negative value returned.
 *  @note	
-*  @see		
+*  @see	cio	
 ***********************************************************************
 */
 int app_layer::build_link_fini(frame*out,link_layer*link){
 	int i;
 	int ret;
+	cio cio;
 
+	cio.data=0;
+
+	link->set_loc_ctl();
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
@@ -1499,8 +1193,13 @@ int app_layer::build_link_fini(frame*out,link_layer*link){
 	out->data[offset+i++]=0x0;
 	if(msg_id_size==3)
 		out->data[offset+i++]=0x0;
-	out->data[offset+i++]=0x0;
+	out->data[offset+i++]=cio.data;//coi
 	ret=i;
+	ret=link->build_link_layer(out,ret);
+	if(ret<0){
+		errno=ret;
+		goto err;
+	}
 err:
 	return ret;
 }
@@ -1518,7 +1217,11 @@ err:
 int app_layer::build_summon_con(frame*out,link_layer*link){
 	int i;
 	int ret;
+	qoi qoi;
 
+	qoi.data=20;
+
+	link->set_loc_ctl();
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
@@ -1526,6 +1229,8 @@ int app_layer::build_summon_con(frame*out,link_layer*link){
 	vsq_lo.bit.n=1;
 	vsq_lo.bit.sq=0;
 	cause_lo.bit.cause=CAUSE_Actcon;
+
+	link->summon_data.summon_step++;
 
 	i=0;
 	out->data[offset+i++]=COMMAND_SUMMON;
@@ -1542,8 +1247,13 @@ int app_layer::build_summon_con(frame*out,link_layer*link){
 	out->data[offset+i++]=0x0;
 	if(msg_id_size==3)
 		out->data[offset+i++]=0;
-	out->data[offset+i++]=20;
+	out->data[offset+i++]=qoi.data;
 	ret=i;
+	ret=link->build_link_layer(out,ret);				
+	if(ret<0){
+		errno=ret;
+		goto err;
+	}
 err:
 	return ret;
 }
@@ -1561,7 +1271,11 @@ err:
 int app_layer::build_summon_term(frame *out,link_layer *link){
 	int i;
 	int ret;
+	qoi qoi;
 
+	qoi.data=20;
+
+	link->set_loc_ctl();
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
@@ -1585,8 +1299,13 @@ int app_layer::build_summon_term(frame *out,link_layer *link){
 	out->data[offset+i++]=0x0;
 	if(msg_id_size==3)
 		out->data[offset+i++]=0;
-	out->data[offset+i++]=20;
+	out->data[offset+i++]=qoi.data;
 	ret=i;
+	ret=link->build_link_layer(out,ret);				
+	if(ret<0){
+		errno=ret;
+		goto err;
+	}
 err:
 	return ret;
 }
@@ -1608,18 +1327,19 @@ int app_layer::build_yx_data(frame *out,link_layer *link){//cause 20
 	int send_num;
 	SORT_YX_TAB *pyx;
 	
+	link->set_loc_ctl();
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
-	pyx=get_yx_data(link->sended_yx_num);
-	send_num = SelectYxNum - link->sended_yx_num;
+	pyx=get_yx_data(link->summon_data.sended_yx_num);
+	send_num = SelectYxNum - link->summon_data.sended_yx_num;
 	if(send_num > MAX_SEND_YX_PER_FRAME){
 		send_num = MAX_SEND_YX_PER_FRAME;
 	}else{
-		link->summon_step++;//next for yc
+		link->summon_data.summon_step++;//next for yc
 	}
 
-	link->sended_yx_num+=send_num;
+	link->summon_data.sended_yx_num+=send_num;
 	vsq_lo.bit.n=send_num;
 	vsq_lo.bit.sq=1;
 	cause_lo.bit.cause=CAUSE_Introgen;
@@ -1644,6 +1364,11 @@ int app_layer::build_yx_data(frame *out,link_layer *link){//cause 20
 		i++;
 	}
 	ret=i;
+	ret=link->build_link_layer(out,ret);				
+	if(ret<0){
+		errno=ret;
+		goto err;
+	}
 err:
 	return ret;
 }
@@ -1665,18 +1390,19 @@ int app_layer::build_dyx_data(frame *out,link_layer *link){//cause 20
 	int send_num;
 	SORT_YX_TAB *pyx;
 	
+	link->set_loc_ctl();	
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
-	send_num = SelectDpYxNum - link->sended_yx_num;
-	pyx=get_yx_data(link->sended_yx_num);
+	send_num = SelectDpYxNum - link->summon_data.sended_yx_num;
+	pyx=get_yx_data(link->summon_data.sended_yx_num);
 	if(send_num > MAX_SEND_YX_PER_FRAME){
 		send_num = MAX_SEND_YX_PER_FRAME;
-		link->sended_yx_num+=send_num;
+		link->summon_data.sended_yx_num+=send_num;
 	}
 	else{
-		link->summon_step++;//next for yc
-		link->sended_yx_num = 0;
+		link->summon_data.summon_step++;//next for yc
+		link->summon_data.sended_yx_num = 0;
 	}
 
 	vsq_lo.bit.n=send_num;
@@ -1703,6 +1429,11 @@ int app_layer::build_dyx_data(frame *out,link_layer *link){//cause 20
 		i++;
 	}
 	ret=i;
+	ret=link->build_link_layer(out,ret);				
+	if(ret<0){
+		errno=ret;
+		goto err;
+	}
 err:
 	return ret;
 }
@@ -1723,18 +1454,19 @@ err:
 	int send_num;
 	YC_TAB *pyc;
 	
+	link->set_loc_ctl();
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
-	send_num = SelectYcNum - link->sended_yc_num;
-	pyc=get_yc_data(link->sended_yc_num);
+	send_num = SelectYcNum - link->summon_data.sended_yc_num;
+	pyc=get_yc_data(link->summon_data.sended_yc_num);
 	if(send_num > MAX_SEND_YC_PER_FRAME){
 		send_num = MAX_SEND_YC_PER_FRAME;
-		link->sended_yc_num+=send_num;
+		link->summon_data.sended_yc_num+=send_num;
 	}
 	else{
-		link->summon_step++;//next 
-		link->sended_yc_num = 0;
+		link->summon_data.summon_step++;//next 
+		link->summon_data.sended_yc_num = 0;
 	}
 
 	vsq_lo.bit.n=send_num;
@@ -1772,6 +1504,11 @@ err:
 		}
 		ret=i+5*j;
 	}
+	ret=link->build_link_layer(out,ret);				
+	if(ret<0){
+		errno=ret;
+		goto err;
+	}
 err:
 	return ret;
 }
@@ -1791,10 +1528,16 @@ int app_layer::build_event_data(frame *out,link_layer *link){//cause 3
 	i=0;
 	int ret;
 	
+	link->set_loc_ctl();	
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
 	ret=i;
+	ret=link->build_link_layer(out,ret);				
+	if(ret<0){
+		errno=ret;
+		goto err;
+	}
 err:
 	return ret;
 }
@@ -1814,17 +1557,18 @@ int app_layer::build_clock(frame *out,link_layer *link){//cause 7
 	i=0;
 	int ret= 0;
 	
+	link->set_loc_ctl();	
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
 	vsq_lo.bit.n=1;
 	vsq_lo.bit.sq=0;
-	if(link->clock_syn){
+	if(link->clock_data.clock_syn){
 		cause_lo.bit.cause=CAUSE_Actcon;
-		link->clock_syn = 0;
-	}else if(link->clock_rd){
+		link->clock_data.clock_syn = 0;
+	}else if(link->clock_data.clock_rd){
 		cause_lo.bit.cause=CAUSE_Req;
-		link->clock_rd = 0;
+		link->clock_data.clock_rd = 0;
 	}
 
 	out->data[offset+i++]=COMMAND_CLOCK;
@@ -1851,6 +1595,11 @@ int app_layer::build_clock(frame *out,link_layer *link){//cause 7
 	out->data[offset+i++]=time.millisecond>>8;
 	out->data[offset+i++]=time.millisecond & 0x00ff;
 	ret = i;
+	ret=link->build_link_layer(out,ret);				
+	if(ret<0){
+		errno=ret;
+		goto err;
+	}
 err:
 	return ret;
 }
@@ -1865,65 +1614,28 @@ err:
 *  @see		
 ***********************************************************************
 */
-int app_layer::build_yk(frame *in,frame *out,link_layer *link){//cause=7,sel=0 or 1
+int app_layer::build_yk(frame *out,link_layer *link){//cause=7,sel=0 or 1
 	int i;
 	i=0;
 	int ret= 0;
-	int ctrl_id;
-	int cmd_id;
-	int cmd;//0:open;1:close
-	sco sco;
-	dco dco;
-	int cancel;
-	cmd=0;
-	cancel = 0;
-
-	//sco 0:open;1:close;
-	//dco 1:open;2:close
-	
+	link->set_loc_ctl();	
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
 	vsq_lo.bit.n=1;
 	vsq_lo.bit.sq=0;
-	cmd_id=in->data[link->offset_ti];
-	ctrl_id=in->data[link->offset_data];
-	ctrl_id=(ctrl_id<<8)+in->data[link->offset_data+1];
-
-	if(in->data[link->offset_cause]==CAUSE_Act){
-		cause_lo.bit.cause=CAUSE_Actcon;
-	}else if(in->data[link->offset_cause] == CAUSE_Deact){
-		cause_lo.bit.cause=CAUSE_Deactcon;
-		cancel = 1;
+	if(link->yk_data.sel==1){
+		cause_lo.data=CAUSE_Actcon;
+	}else if(link->yk_data.deactive==1){
+		cause_lo.data=CAUSE_Deactcon;
+	}else if(link->yk_data.act==1){
+		cause_lo.data=CAUSE_Actcon;
+		link->yk_data.act_over=1;
+	}else if(link->yk_data.act_over==1){
+		cause_lo.data=CAUSE_Actterm;
+		link->reset_yk_data();
 	}
-
-	if(cmd_id == COMMAND_RM_CTL){
-		sco.data=in->data[link->offset_data+2];
-		cmd=sco.bit.scs;
-		if(sco.bit.sel == 0){
-			ret=do_yk(ctrl_id,0,cmd);
-		}else if(sco.bit.sel == 1){
-			ret = do_yk(ctrl_id,1,cmd);
-		}
-		if(ret <0)
-			goto err;
-	}else if(cmd_id == COMMAND_RM_CTL_D){
-		dco.data = in->data[link->offset_data + 2];
-		cmd=dco.bit.dcs==1?0:1;
-		if(dco.bit.sel == 0){
-			ret=do_yk(ctrl_id,0,cmd);
-		}else if(dco.bit.sel == 1){
-			ret = do_yk(ctrl_id,1,cmd);
-		}
-		if(ret <0)
-			goto err;
-	}else
-		goto err;
-
-	if(cancel==1){
-		do_yk(ctrl_id,2,cmd);
-	}
-	out->data[offset+i++]=cmd_id;
+	out->data[offset+i++]=link->yk_data.cmd_id;
 	out->data[offset+i++]=vsq_lo.data;
 	out->data[offset+i++]=cause_lo.data;
 	if(cause_size==2){
@@ -1933,12 +1645,17 @@ int app_layer::build_yk(frame *in,frame *out,link_layer *link){//cause=7,sel=0 o
 	if(addr_size==2){
 		out->data[offset+i++]=addr>>8&0x00ff;
 	}
-	out->data[offset+i++]=ctrl_id;
-	out->data[offset+i++]=ctrl_id>>8;
+	out->data[offset+i++]=link->yk_data.ctrl_id;
+	out->data[offset+i++]=link->yk_data.ctrl_id>>8;
 	if(msg_id_size==3)
 		out->data[offset+i++]=0;
-	out->data[offset+i++]=cmd_id == COMMAND_RM_CTL?sco.data:dco.data;
+	out->data[offset+i++]=link->yk_data.cmd_id == COMMAND_RM_CTL?link->yk_data.sco.data:link->yk_data.dco.data;
 	ret = i;
+	ret=link->build_link_layer(out,ret);				
+	if(ret<0){
+		errno=ret;
+		goto err;
+	}
 err:
 	return ret;
 }
@@ -1957,11 +1674,17 @@ int app_layer::build_link_test_con(frame *out,link_layer *link){//cause 7
 	int i;
 	i=0;
 	int ret;
-	
+
+	link->set_loc_ctl();	
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
 	ret=i;
+	ret=link->build_link_layer(out,ret);				
+	if(ret<0){
+		errno=ret;
+		goto err;
+	}
 err:
 	return ret;
 }
@@ -1980,10 +1703,16 @@ err:
 	i=0;
 	int ret;
 	
+	link->set_loc_ctl();	
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
 	ret=i;
+	ret=link->build_link_layer(out,ret);				
+	if(ret<0){
+		errno=ret;
+		goto err;
+	}
 err:
 	return ret;
 }
@@ -2002,33 +1731,16 @@ err:
 	i=0;
 	int ret;
 	
+	link->set_loc_ctl();	
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
 	ret=i;
-err:
-	return ret;
-}
-/**
-***********************************************************************
-*  @brief	build asdu of link_fini command 
-*  @param[in] link point to link_layer  
-*  @param[out]  out point to out frame 
-*  @return upon successful return number of asdu size\n
-*	if fail a negative value returned.
-*  @note	
-*  @see		
-***********************************************************************
-*/
-int app_layer::on_file(frame *in,link_layer *link){
-	int i;
-	i=0;
-	int ret;
-	
-	ret=get_link_info(link);
-	if(ret<0)
+	ret=link->build_link_layer(out,ret);				
+	if(ret<0){
+		errno=ret;
 		goto err;
-	ret=i;
+	}
 err:
 	return ret;
 }
@@ -2048,10 +1760,16 @@ int app_layer::build_rd_dir_resp(frame *out,link_layer *link){//cause 5
 	i=0;
 	int ret;
 	
+	link->set_loc_ctl();	
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
 	ret=i;
+	ret=link->build_link_layer(out,ret);				
+	if(ret<0){
+		errno=ret;
+		goto err;
+	}
 err:
 	return ret;
 }
@@ -2071,9 +1789,15 @@ int app_layer::build_rd_file_con(frame *out,link_layer *link){//cause 7
 	i=0;
 	int ret;
 	
+	link->set_loc_ctl();	
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
+	ret=link->build_link_layer(out,ret);				
+	if(ret<0){
+		errno=ret;
+		goto err;
+	}
 	ret=i;
 err:
 	return ret;
@@ -2094,10 +1818,16 @@ int app_layer::build_rd_file_resp(frame *out,link_layer *link,file_segment *file
 	i=0;
 	int ret;
 	
+	link->set_loc_ctl();	
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
 	ret=i;
+	ret=link->build_link_layer(out,ret);				
+	if(ret<0){
+		errno=ret;
+		goto err;
+	}
 err:
 	return ret;
 }
@@ -2117,10 +1847,16 @@ int app_layer::build_wr_file_con(frame *out,link_layer *link){//cause 7
 	i=0;
 	int ret;
 	
+	link->set_loc_ctl();	
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
 	ret=i;
+	ret=link->build_link_layer(out,ret);				
+	if(ret<0){
+		errno=ret;
+		goto err;
+	}
 err:
 	return ret;
 }
@@ -2140,10 +1876,16 @@ int app_layer::build_wr_file_resp(frame *out,link_layer *link){//cause 5
 	i=0;
 	int ret;
 	
+	link->set_loc_ctl();	
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
 	ret=i;
+	ret=link->build_link_layer(out,ret);				
+	if(ret<0){
+		errno=ret;
+		goto err;
+	}
 err:
 	return ret;
 }
@@ -2163,10 +1905,16 @@ int app_layer::build_rd_dz_unit_con(frame *out,link_layer *link){//cause 7
 	i=0;
 	int ret;
 	
+	link->set_loc_ctl();	
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
 	ret=i;
+	ret=link->build_link_layer(out,ret);				
+	if(ret<0){
+		errno=ret;
+		goto err;
+	}
 err:
 	return ret;
 }
@@ -2186,10 +1934,16 @@ int app_layer::build_wr_dz_unit_con(frame *out,link_layer *link){//cause 7
 	i=0;
 	int ret;
 	
+	link->set_loc_ctl();	
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
 	ret=i;
+	ret=link->build_link_layer(out,ret);				
+	if(ret<0){
+		errno=ret;
+		goto err;
+	}
 err:
 	return ret;
 }
@@ -2209,33 +1963,16 @@ int app_layer::build_rd_dz_con(frame *out,link_layer *link){//cause 7
 	i=0;
 	int ret;
 	
+	link->set_loc_ctl();	
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
 	ret=i;
-err:
-	return ret;
-}
-/**
-***********************************************************************
-*  @brief	build asdu of link_fini command 
-*  @param[in] link point to link_layer  
-*  @param[out]  out point to out frame 
-*  @return upon successful return number of asdu size\n
-*	if fail a negative value returned.
-*  @note	
-*  @see		
-***********************************************************************
-*/
-int app_layer::on_set_dz(frame *in,link_layer *link){
-	int i;
-	i=0;
-	int ret;
-	
-	ret=get_link_info(link);
-	if(ret<0)
+	ret=link->build_link_layer(out,ret);				
+	if(ret<0){
+		errno=ret;
 		goto err;
-	ret=i;
+	}
 err:
 	return ret;
 }
@@ -2255,10 +1992,16 @@ int app_layer::build_dz_con(frame *out,link_layer *link,int sel){//cause 7,sel =
 	i=0;
 	int ret;
 	
+	link->set_loc_ctl();	
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
 	ret=i;
+	ret=link->build_link_layer(out,ret);				
+	if(ret<0){
+		errno=ret;
+		goto err;
+	}
 err:
 	return ret;
 }
@@ -2278,10 +2021,16 @@ int app_layer::build_dz_dact_con(frame *out,link_layer *link){//cause 9,sel=0,cr
 	i=0;
 	int ret;
 	
+	link->set_loc_ctl();	
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
 	ret=i;
+	ret=link->build_link_layer(out,ret);				
+	if(ret<0){
+		errno=ret;
+		goto err;
+	}
 err:
 	return ret;
 }
@@ -2301,10 +2050,16 @@ int app_layer::build_summon_acc_con(frame *out,link_layer *link){//cause 7
 	i=0;
 	int ret;
 	
+	link->set_loc_ctl();	
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
 	ret=i;
+	ret=link->build_link_layer(out,ret);				
+	if(ret<0){
+		errno=ret;
+		goto err;
+	}
 err:
 	return ret;
 }
@@ -2324,10 +2079,16 @@ int app_layer::build_summon_acc_term(frame *out,link_layer *link){//cause 10
 	i=0;
 	int ret;
 	
+	link->set_loc_ctl();	
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
 	ret=i;
+	ret=link->build_link_layer(out,ret);				
+	if(ret<0){
+		errno=ret;
+		goto err;
+	}
 err:
 	return ret;
 }
@@ -2347,33 +2108,16 @@ int app_layer::build_summon_acc_resp(frame *out,link_layer *link){//cause 37
 	i=0;
 	int ret;
 	
+	link->set_loc_ctl();	
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
 	ret=i;
-err:
-	return ret;
-}
-/**
-***********************************************************************
-*  @brief	build asdu of link_fini command 
-*  @param[in] link point to link_layer  
-*  @param[out]  out point to out frame 
-*  @return upon successful return number of asdu size\n
-*	if fail a negative value returned.
-*  @note	
-*  @see		
-***********************************************************************
-*/
-int app_layer::on_update(frame *in,link_layer *link){
-	int i;
-	i=0;
-	int ret;
-	
-	ret=get_link_info(link);
-	if(ret<0)
+	ret=link->build_link_layer(out,ret);				
+	if(ret<0){
+		errno=ret;
 		goto err;
-	ret=i;
+	}
 err:
 	return ret;
 }
@@ -2393,10 +2137,16 @@ int app_layer::build_update_con(frame *out,link_layer *link,int sel){//cause 7 s
 	i=0;
 	int ret;
 	
+	link->set_loc_ctl();	
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
 	ret=i;
+	ret=link->build_link_layer(out,ret);				
+	if(ret<0){
+		errno=ret;
+		goto err;
+	}
 err:
 	return ret;
 }
@@ -2423,15 +2173,13 @@ int get_clock(CP56Time2a &time){
 	pfunc(DEBUG_NORMAL,"\n");
 	return 0;
 }
-//type:0 do;1:select;2:cancel
+//type:0 execute;1:check;
 int do_yk(int id,int type,int cmd){
 	pfunc(DEBUG_NORMAL,"type:%d\n",type);
 	if(type == 0){
 		pfunc(DEBUG_NORMAL,"do execute:%d\n",cmd);
 	}else if(type == 1){
 		pfunc(DEBUG_NORMAL,"do select:%d\n",cmd);
-	}else if(type == 2){
-		pfunc(DEBUG_NORMAL,"do cancel:%d\n",cmd);
 	}
 	return 0;
 }

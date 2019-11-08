@@ -384,12 +384,9 @@ void InitYxTable( void )
 
 void  InitSortYxTable ( void )
 {
-
 	uint16 postemp;
     uint16 datasign;
-	//uint16 n=0;
 	uint16 m=0;
-   // uint16 i;
     uint16 k = 0;
 	uint16 j = 0;
     for ( datasign = 0x0001;datasign < TOTALYXNUM + 1;datasign++ ) {
@@ -415,13 +412,8 @@ void  InitSortYxTable ( void )
             }
         }
     }
-    if ( k == 0 ) {
-     //   return -1;
-    } else {
-    	SelectYxNum = ( k );
-    	SelectDpYxNum = ( j );
-
-    }
+    SelectYxNum = ( k );
+    SelectDpYxNum = ( j+k );
 }
 
 

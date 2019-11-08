@@ -98,25 +98,36 @@ typedef union _send_cause{
 	send_cause_bit bit;
 	unsigned short  data;
 }send_cause;
-typedef union _sco_bit{
-	unsigned char scs:1;
+typedef struct _sco_bit{//单命令
+	unsigned char scs:1;//0开，1合
 	unsigned char res:1;
 	unsigned char qu:6;
 	unsigned char sel:1;
 }sco_bit;
-typedef union _dco_bit{
-	unsigned char dcs:2;
+typedef struct _dco_bit{//双命令
+	unsigned char dcs:2;//1开，2合
 	unsigned char qu:6;
 	unsigned char sel:1;
 }dco_bit;
 typedef union _sco{
 	sco_bit bit;
 	unsigned char data;
-}sco;
+}Sco;
 typedef union _dco{
 	dco_bit bit;
 	unsigned char data;
-}dco;
+}Dco;
+typedef struct _cio_bit{//初始化限定词
+	unsigned char b1:7;//1本地电源合上，1本地复位，2远程复位
+	unsigned char b2:1;//0未改变参数，1改变参数。
+}cio_bit;
+typedef union _cio{
+	cio_bit bit;
+	unsigned char data;
+}cio;
+typedef struct _qoi{//召唤限定词
+	unsigned char data;//20总召唤，21第一组，。。。36第三十六组
+}qoi;
 //gb101中的传输规则：
 //线路上低位在前，高位在后；低字节在前，高字节在后。
 //define link state
@@ -231,6 +242,7 @@ class event{
 		int read_flag;
 };
 #include <list>
+#include <list>
 typedef CircleQueue<event> EventList;
 extern EventList event_list ;
 class dir{//directory
@@ -255,7 +267,30 @@ class buffer{
  * app_layer
 ****************************/
 class link_layer;
-//app_layer is only deal asdu part
+//process data
+typedef struct _summon_data{
+	int sended_yx_num;
+	int sended_yc_num;
+	int summon_step;
+}SummonData;
+typedef struct _clock_data{
+	int clock_syn;
+	int clock_rd;
+}ClockData;
+typedef struct _yk_data{
+	int sel;
+	int act;
+	int act_over;
+	int deactive;
+	int cmd_id;
+	int ctrl_id;
+	int start_timeout;
+	int timeout;
+	int fail;
+	Sco sco;
+	Dco dco;
+}YkData;
+//app_layer is y deal asdu part
 class app_layer{
 	public:
 		vsq vsq_lo;
@@ -314,9 +349,8 @@ class app_layer{
 		int build_clock(frame *out,link_layer *link);//cause	5,7
 		int (*get_clock)(CP56Time2a &);
 		
-		int on_yk(frame *in,link_layer *link);//deal yk command in
 		int (*do_yk)(int id,int type,int cmd);
-		int build_yk(frame *in,frame *out,link_layer *link);//cause=7,sel=0 or 1
+		int build_yk(frame *out,link_layer *link);//cause=7,sel=0 or 1
 		
 		int build_link_test_con(frame *out,link_layer *link);//cause 7
 		
@@ -325,7 +359,6 @@ class app_layer{
 		
 		int build_reset_con(frame *out,link_layer *link);//reset terminal cause 7
 		
-		int on_file(frame *in,link_layer *link);
 		int (*get_dir_list)(dir_list *list,buffer*data);
 		int build_rd_dir_resp(frame *out,link_layer *link);//cause 5
 		int build_rd_file_con(frame *out,link_layer *link);//cause 7
@@ -342,7 +375,6 @@ class app_layer{
 
 		int (*get_dz_data)(int id,buffer*data);
 		int build_rd_dz_con(frame *out,link_layer *link);//cause 7
-		int on_set_dz(frame *in,link_layer *link);
 		int (*set_dz)(int id,int sel,buffer*data);
 		int build_dz_con(frame *out,link_layer *link,int sel);//cause 7,sel =0 or 1 ,cr=0
 		int build_dz_dact_con(frame *out,link_layer *link);//cause 9,sel=0,cr=1
@@ -352,7 +384,6 @@ class app_layer{
 		int build_summon_acc_resp(frame *out,link_layer *link);//cause 37
 		int (*get_summon_acc_data)(buffer*data);
 
-		int on_update(frame *in,link_layer *link);
 		int (*save_update_file)(char *filename,file_segment *file);
 		int build_update_con(frame *out,link_layer *link,int sel);//cause 7 sel=1 start,0 stop
 };
@@ -400,11 +431,11 @@ class link_layer{
 		int rep_times;
 		timer rcv_var_timer;//接收数据超时计时器
 
-		int sended_yx_num;
-		int sended_yc_num;
-		int summon_step;
-		int clock_syn;
-		int clock_rd;
+		long process;//which process is in.
+		SummonData summon_data;
+		ClockData clock_data;
+		YkData yk_data;
+
 	public:
 		link_layer(){
 			port=0;
@@ -431,15 +462,18 @@ class link_layer{
 			rep_timer.stop();
 			rcv_var_timer.stop();
 
-			sended_yx_num =0;
-			summon_step = 0;
+			summon_data.sended_yx_num =0;
+			summon_data.summon_step = 0;
+			process=0;
 		}
 		int set_link_com(com_port*,int port);
 		int set_app(app_layer*);
+		virtual void deal_timeout()=0;
 		virtual int get_frame()=0;//get a valid frame from port.
 		virtual int active_send()=0;
 		virtual int deal_frame(frame *)=0;
 		virtual void set_loc_ctl()=0;
+		void reset_yk_data();
 		int check_state();//cycle check link state
 		int send_frame(frame *);
 	public:
@@ -447,40 +481,24 @@ class link_layer{
 		//different link layer has different link frame(eg 101 and 104).but they have same app_layer frame(asdu).
 		//the inheritance class must realize these virtual function.
 		virtual int build_link_layer(frame *out,int)=0;//by asdu build link frame 
-		virtual int build_link_fini(frame *out)=0;
 
 		virtual int process_summon(frame *out)=0;
-		virtual int build_summon_con(frame *out)=0;
-		virtual int build_summon_term(frame *out)=0;
-		virtual int build_yx_data(frame *out)=0;
-		virtual int build_dyx_data(frame *out)=0;
-		virtual int build_yc_data(frame *out)=0;
-
-		virtual int build_event_data(frame *out)=0;
-		
+		virtual int process_summon_acc(frame *out)=0;
 		virtual int process_clock(frame *in,frame *out)=0;
-		virtual int build_clock(frame *out)=0;
-		
 		virtual int process_yk(frame *in,frame *out)=0;
-		virtual int build_yk(frame *in,frame *out)=0;
+		virtual int process_evnet(frame *in,frame *out)=0;
+		virtual int process_test_link(frame *in,frame *out)=0;
+		virtual int process_yc_change(frame *in,frame *out)=0;
+		virtual int process_reset_terminal(frame *in,frame *out)=0;
+		virtual int process_rd_dir(frame *in,frame *out)=0;
+		virtual int process_rd_file(frame *in,frame *out)=0;
+		virtual int process_wt_file(frame *in,frame *out)=0;
+		virtual int process_rd_dz(frame *in,frame *out)=0;
+		virtual int process_rd_unit(frame *in,frame *out)=0;
+		virtual int process_wt_dz(frame *in,frame *out)=0;
+		virtual int process_wt_unit(frame *in,frame *out)=0;
+		virtual int process_update(frame *in,frame *out)=0;
 
-		virtual int build_link_test_con(frame *out)=0;
-		virtual int build_yc_cg_data(frame *out)=0;
-		virtual int build_reset_con(frame *out)=0;
-		virtual int build_rd_dir_resp(frame *out)=0;
-		virtual int build_rd_file_con(frame *out)=0;
-		virtual int build_rd_file_resp(frame *out,file_segment *file)=0;
-		virtual int build_wr_file_con(frame *out)=0;
-		virtual int build_wr_file_resp(frame *out)=0;
-		virtual int build_rd_dz_unit_con(frame *out)=0;
-		virtual int build_wr_dz_unit_con(frame *out)=0;
-		virtual int build_rd_dz_con(frame *out)=0;
-		virtual int build_dz_con(frame *out,int sel)=0;
-		virtual int build_dz_dact_con(frame *out)=0;
-		virtual int build_summon_acc_con(frame *out)=0;
-		virtual int build_summon_acc_term(frame *out)=0;
-		virtual int build_summon_acc_resp(frame *out)=0;
-		virtual int build_update_con(frame *out,int sel)=0;
 
 		void on_notify(message *msg);
 		void notify(message *msg);
@@ -548,7 +566,7 @@ class link_layer_101:public link_layer{
 		int on_fc10(frame *);
 		int on_fc11(frame *);
 	public:
-		long process;//which process is in.
+		void deal_timeout();
 		int get_frame();
 		int active_send();//for balance
 		int deal_frame(frame *in);
@@ -571,39 +589,21 @@ class link_layer_101:public link_layer{
 		int build_link_fini(frame *out);//set fc=3(balance) or fc=8(unbalance),var frame
 		
 		int process_summon(frame *out);//set fc=3(balance) or fc=8(unbalance),var frame
-		int build_summon_con(frame *out);//set fc=3(balance) or fc=8(unbalance),var frame
-		int build_summon_term(frame *out);
-		int build_yx_data(frame *out);
-		int build_dyx_data(frame *out);
-		int build_yc_data(frame *out);
-
-		int build_event_data(frame *out);
-
+		int process_summon_acc(frame *out);
 		int process_clock(frame *in,frame *out);
-		int build_clock(frame *out);
-
 		int process_yk(frame *in,frame *out);
-		int build_yk(frame *in,frame *out);
-
-		int build_link_test_con(frame *out);
-		int build_yc_cg_data(frame *out);
-		int build_reset_con(frame *out);
-		int build_rd_dir_resp(frame *out);
-		int build_rd_file_con(frame *out);
-		int build_rd_file_resp(frame *out,file_segment *file);
-		int build_wr_file_con(frame *out);
-		int build_wr_file_resp(frame *out);
-		int build_rd_dz_unit_con(frame *out);
-		int build_wr_dz_unit_con(frame *out);
-		int build_rd_dz_con(frame *out);
-		int build_dz_con(frame *out,int sel);
-		int build_dz_dact_con(frame *out);
-
-
-		int build_summon_acc_con(frame *out);
-		int build_summon_acc_term(frame *out);
-		int build_summon_acc_resp(frame *out);
-		int build_update_con(frame *out,int sel);
+		int process_evnet(frame *in,frame *out);
+		int process_test_link(frame *in,frame *out);
+		int process_yc_change(frame *in,frame *out);
+		int process_reset_terminal(frame *in,frame *out);
+		int process_rd_dir(frame *in,frame *out);
+		int process_rd_file(frame *in,frame *out);
+		int process_wt_file(frame *in,frame *out);
+		int process_rd_dz(frame *in,frame *out);
+		int process_rd_unit(frame *in,frame *out);
+		int process_wt_dz(frame *in,frame *out);
+		int process_wt_unit(frame *in,frame *out);
+		int process_update(frame *in,frame *out);
 };
 #define REP_TIMES 3
 #define REP_TIME  1

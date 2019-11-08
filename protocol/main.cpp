@@ -64,17 +64,21 @@ int main(int arg,char **argv){
 	while(1){
 		cout<<endl<<"run loop:"<<loops<<endl;
 		loops++;
-		sleep_ms(1);
+		sleep_ms(10);
 		for(i=0;i<3;i++){
 			com[i].read(100);
 		}
 		for(i=0;i<3;i++){
+			link[i].deal_timeout();
 			link[i].check_state();
 			link[i].get_frame();
 			link[i].active_send();
 		}
 
 	}
+	CircleQueue<event> ll;
+	CircleQueue<event>::iterator it;
+
 	return 0;
 }
 // vim:tw=72 

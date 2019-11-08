@@ -183,6 +183,13 @@ int tmpComplex<T>::operator==(tmpComplex<T> &da){
 	}
 	return 0;
 }
+template <typename T>
+class _iterator{
+	public:
+		_iterator &operator++(int){
+			
+		}
+};
 /*Queue is FIFO struct.First in First out*/
 //#define MaxQueue 100
 template <typename T>
@@ -194,7 +201,10 @@ class CircleQueue{
 		int _tail;
 		int _size;
 	public:
+		typedef T*	iterator;
 		int MaxQueue;
+		T *begin();
+		T *end();
 		CircleQueue(){
 			_front=_tail=0;
 			this->_size=0;
