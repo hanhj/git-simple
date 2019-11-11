@@ -1,15 +1,19 @@
-target=test
+target=test t2
 all:$(target)
-objs=main.o Scada.o para.o protocol.o data.o configurable.o com.o system.o utilty.o
+objs1=main.o Scada.o para.o protocol.o data.o configurable.o com.o system.o utilty.o
+objs2=t2.o
+objs=$(objs1) $(objs2)
 depend_file=$(objs:%.o=%.d)
--include $(depend_file)
+#-include $(depend_file)
 %.o:%.cpp
-	g++ -g -c -Wall  -fpermissive $< -o $@
+	g++ -g -c -Wall -std=c++0x  -fpermissive $< -o $@
 %.d:%.cpp
 	g++ -M $< -o $@
 
-$(target):$(objs)
-	g++ $(objs) -o $@
+test:$(objs1)
+	g++ $(objs1) -o $@
+t2:$(objs2)
+	g++ $(objs2) -o $@
 help:
 	doxygen
 clean:
