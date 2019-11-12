@@ -141,8 +141,8 @@ typedef struct _qoi{//召唤限定词
 //正在执行的过程
 #define PROCESS_LINK		1<<0
 #define PROCESS_SUMMON		1<<1
-#define PROCESS_CLOCK	1<<2
-//#define PROCESS_CLOCKRD		1<<3
+#define PROCESS_CLOCK		1<<2
+#define PROCESS_EVENT		1<<3
 #define PROCESS_RM_CTL		1<<4
 #define PROCESS_TEST_LINK	1<<5
 #define PROCESS_HART		1<<6
@@ -234,17 +234,7 @@ typedef struct _qoi{//召唤限定词
 /*
 #define PRESERVATION   48~63
 */
-class event{
-	public:
-		int id;
-		CP56Time2a time;
-		int state;
-		int read_flag;
-};
 #include <list>
-#include <list>
-typedef CircleQueue<event> EventList;
-extern EventList event_list ;
 class dir{//directory
 	public:
 		char file_name[30];
@@ -290,6 +280,9 @@ typedef struct _yk_data{
 	Sco sco;
 	Dco dco;
 }YkData;
+typedef struct _event_data{
+	int need_ack;
+}EventData;
 //app_layer is y deal asdu part
 class app_layer{
 	public:
@@ -343,8 +336,8 @@ class app_layer{
 		YC_TAB * (*get_yc_data)(int);
 		int build_yc_data(frame *out,link_layer *link);//cause 20
 
-		int (*get_event_list)(EventList *from,int pos,buffer *data);
-		int build_event_data(frame *out,link_layer *link);//cause 3
+		int (*get_event_list)(int type,event *&e,int change);
+		int build_event_data(frame *out,link_layer *link,event *e);//cause 3
 
 		int build_clock(frame *out,link_layer *link);//cause	5,7
 		int (*get_clock)(CP56Time2a &);
@@ -435,6 +428,7 @@ class link_layer{
 		SummonData summon_data;
 		ClockData clock_data;
 		YkData yk_data;
+		EventData event_data;
 
 	public:
 		link_layer(){
@@ -486,7 +480,7 @@ class link_layer{
 		virtual int process_summon_acc(frame *out)=0;
 		virtual int process_clock(frame *in,frame *out)=0;
 		virtual int process_yk(frame *in,frame *out)=0;
-		virtual int process_evnet(frame *in,frame *out)=0;
+		virtual int process_event(frame *in,frame *out)=0;
 		virtual int process_test_link(frame *in,frame *out)=0;
 		virtual int process_yc_change(frame *in,frame *out)=0;
 		virtual int process_reset_terminal(frame *in,frame *out)=0;
@@ -592,7 +586,7 @@ class link_layer_101:public link_layer{
 		int process_summon_acc(frame *out);
 		int process_clock(frame *in,frame *out);
 		int process_yk(frame *in,frame *out);
-		int process_evnet(frame *in,frame *out);
+		int process_event(frame *in,frame *out);
 		int process_test_link(frame *in,frame *out);
 		int process_yc_change(frame *in,frame *out);
 		int process_reset_terminal(frame *in,frame *out);

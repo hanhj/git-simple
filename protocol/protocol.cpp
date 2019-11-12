@@ -318,10 +318,13 @@ int link_layer_101::on_req_class_1(frame *in,frame *out){
 	int ret ;
 	cout<<"on_req_class_1"<<endl;
 	ret=0;
-	if(process & PROCESS_SUMMON){
-		ret = process_summon(out);
-	}else if(process & PROCESS_RM_CTL){
-		ret=app->build_yk(out,this);
+	ret=process_event(in,out);
+	if(ret<=0){
+		if(process & PROCESS_SUMMON){
+			ret = process_summon(out);
+		}else if(process & PROCESS_RM_CTL){
+			ret=app->build_yk(out,this);
+		}
 	}
 	return ret ;
 }
@@ -330,8 +333,11 @@ int link_layer_101::on_req_class_2(frame *in,frame *out){
 	int ret;
 	ret=0;
 	cout<<"on_req_class_2"<<endl;
-	if(process & PROCESS_CLOCK){
-		ret=app->build_clock(out,this);
+	ret=process_event(in,out);
+	if(ret<=0){
+		if(process & PROCESS_CLOCK){
+			ret=app->build_clock(out,this);
+		}
 	}
 	return ret;
 }
@@ -377,6 +383,21 @@ void link_layer_101::deal_timeout(){
 			yk_data.deactive=0;
 			yk_data.act_over=0;
 		}
+	}
+	int ret=0;
+	event *e;
+	e=NULL;
+	if(app->get_event_list(port,e,0)==1){
+		process|=PROCESS_EVENT;
+		if(event_data.need_ack==0){
+			ret=app->build_event_data(&s_var_frame,this,e);
+		}
+
+	}else{
+		process &=~PROCESS_EVENT;
+	}
+	if(ret){
+		send_frame(&s_var_frame);
 	}
 }
 int link_layer_101::process_yk(frame *in,frame *out){
@@ -429,8 +450,13 @@ int link_layer_101::process_yk(frame *in,frame *out){
 
 	return ret;
 }
-int link_layer_101::process_evnet(frame *in,frame *out){
+int link_layer_101::process_event(frame *in,frame *out){
 	int ret=0;
+	event *e;
+	e=NULL;
+	if(app->get_event_list(port,e,1)==1){
+		ret=app->build_event_data(out,this,e);
+	}
 	return ret;
 }
 int link_layer_101::process_test_link(frame *in,frame *out){
@@ -1104,7 +1130,7 @@ err:
 ****************************/
 SORT_YX_TAB * get_yx_data(int);
 YC_TAB * get_yc_data(int );
-int get_event_list(EventList*from,int pos,buffer *data);
+int get_event_list(int type,event *&e,int change);
 int get_clock(CP56Time2a &);
 int do_yk(int id,int type,int cmd);
 int get_yc_cg_data(cg_yc_list *list,int pos,buffer*data);
@@ -1523,7 +1549,7 @@ err:
 *  @see		
 ***********************************************************************
 */
-int app_layer::build_event_data(frame *out,link_layer *link){//cause 3
+int app_layer::build_event_data(frame *out,link_layer *link,event* e){//cause 3
 	int i;
 	i=0;
 	int ret;
@@ -2165,9 +2191,23 @@ YC_TAB * get_yc_data(int pos){
 	pfunc(DEBUG_NORMAL,"\n");
 	return p;
 }
-int get_event_list(EventList*from,int pos,buffer *data){
+int get_event_list(int type,event *&e,int change){
+	int ret;
+	ret=0;
 	pfunc(DEBUG_NORMAL,"\n");
-	return 0;
+	EventList::iterator end,it;
+	end=event_list.end();
+	it=event_list.begin();
+	while(it!=end){
+		if(it->readflag[type]==0){
+			if(change)
+				it->readflag[type]=1;
+			e=&it;
+			ret=1;
+			break;
+		}
+	}
+	return ret;
 }
 int get_clock(CP56Time2a &time){
 	pfunc(DEBUG_NORMAL,"\n");
@@ -2226,7 +2266,7 @@ int save_update_file(char *filename,file_segment *file){
 /*
 int get_yx_data(buffer*data);
 int get_yc_data(buffer*data);
-int get_event_list(event_list*from,int pos,buffer *data);
+int get_event_list(int type,evnet *&e,int change);
 int get_clock(buffer*data);
 int do_yk(int id,int type,int cmd);
 int get_yc_cg_data(cg_yc_list *list,int pos,buffer*data);

@@ -11,7 +11,6 @@
 using namespace std;
 int g_balance=0;
 char g_filename[20];
-EventList event_list;
 /****************************
  *	main 
 ****************************/
@@ -48,7 +47,7 @@ int main(int arg,char **argv){
 	com[2].set_com_para((void *)&wire_set_1,3);
 	com[2].init();
 	for(i=0;i<3;i++){
-		link[i].set_link_com(&com[i],i+1);
+		link[i].set_link_com(&com[i],i);
 		link[i].set_app(&app);
 		link[i].set_balance(g_balance);
 	}

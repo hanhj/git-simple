@@ -184,10 +184,61 @@ int tmpComplex<T>::operator==(tmpComplex<T> &da){
 	return 0;
 }
 template <typename T>
-class _iterator{
+class _cir_iterator{
 	public:
-		_iterator &operator++(int){
-			
+		typedef _cir_iterator<T> self;
+		T *data;
+		int pos;	
+		int max;
+		_cir_iterator(){
+			pos=0;
+		}
+		_cir_iterator(int da){
+			max=da;
+		}
+		_cir_iterator(T *da,int p){
+			data=da;
+			pos=p;
+		}
+		self & operator =(self da){
+			data=da.data;
+			pos=da.pos;
+			return *this;
+		}
+		self operator ++(int){
+			int tmp;
+			tmp=pos;
+			pos=(pos+1)%max;
+			return (self)tmp;
+		}
+		self operator --(int){
+			int tmp;
+			tmp=pos;
+			pos=(pos-1)%max;
+			return (self)tmp;
+		}
+		self & operator ++(){
+			pos=(pos+1)%max;
+			return (self)pos;
+		}
+		self & operator --(){
+			pos=(pos-1)%max;
+			return (self)pos;
+		}
+		T & operator *(){
+			return data[pos];
+		}
+		T * operator &(){
+			return &data[pos];
+		}
+		T * operator ->(){
+			return &data[pos];
+		}
+		bool operator !=(const self &da ){
+			return pos!=da.pos;
+		}
+		bool operator ==(const self &da){
+			return pos==da.pos;
 		}
 };
 /*Queue is FIFO struct.First in First out*/
@@ -201,10 +252,14 @@ class CircleQueue{
 		int _tail;
 		int _size;
 	public:
-		typedef T*	iterator;
+		typedef _cir_iterator<T> iterator;
 		int MaxQueue;
-		T *begin();
-		T *end();
+		iterator begin(){
+			return iterator(data,_front);
+		}
+		iterator end(){
+			return iterator(data,_tail);
+		}
 		CircleQueue(){
 			_front=_tail=0;
 			this->_size=0;

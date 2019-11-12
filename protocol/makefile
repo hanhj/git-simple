@@ -1,8 +1,9 @@
-target=test it 
+target =test it 
 all:$(target)
-objs1=main.o Scada.o para.o protocol.o data.o configurable.o com.o system.o utilty.o
-objs2=it.o
-objs=$(objs1) $(objs2)
+objs1 =main.o Scada.o para.o protocol.o data.o configurable.o com.o system.o utilty.o
+objs2 =it.o
+objs  =$(objs1) 
+objs  += $(objs2)
 depend_file=$(objs:%.o=%.d)
 #-include $(depend_file)
 %.o:%.cpp

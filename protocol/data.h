@@ -393,6 +393,15 @@ typedef struct action_soe_buffer {
 	 ACTION_DATA SoeData[MAX_ACT_SOE_NUM];
 } ACTION_SOE_BUFF;
 extern ACTION_SOE_BUFF ActionSoeBuf;
+
+typedef struct _event{
+	int id;
+	CP56Time2a time;
+	int state;
+	int readflag[4];
+}event;
+typedef CircleQueue<event> EventList;
+extern EventList event_list ;
 #define SCIA 0
 #define SCIB 1
 #define SCIC 2
