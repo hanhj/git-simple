@@ -1,7 +1,7 @@
-target=test t2
+target=test it 
 all:$(target)
 objs1=main.o Scada.o para.o protocol.o data.o configurable.o com.o system.o utilty.o
-objs2=t2.o
+objs2=it.o
 objs=$(objs1) $(objs2)
 depend_file=$(objs:%.o=%.d)
 #-include $(depend_file)
@@ -12,7 +12,7 @@ depend_file=$(objs:%.o=%.d)
 
 test:$(objs1)
 	g++ $(objs1) -o $@
-t2:$(objs2)
+it:$(objs2)
 	g++ $(objs2) -o $@
 help:
 	doxygen
