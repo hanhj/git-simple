@@ -405,9 +405,11 @@ void link_layer_101::deal_timeout(){
 			yk_data.act_over=0;
 		}
 	}
+	
 	int ret=0;
 	event *e;
 	e=NULL;
+
 	if(app->get_event_list(port,e,0)==1){
 		process|=PROCESS_EVENT;
 		has_data=1;
@@ -419,7 +421,7 @@ void link_layer_101::deal_timeout(){
 			}
 		}
 	}else{
-		process &=~PROCESS_EVENT;
+		process &=(~PROCESS_EVENT);
 		event_data.need_ack[port] = 0;
 		has_data=0;
 	}
@@ -432,10 +434,16 @@ void link_layer_101::deal_timeout(){
 				event_data.need_yc_ack[port]=1;
 			}
 		}
+	}else{
+		process &=~PROCESS_YC_CHANGE;
+		event_data.need_yc_ack[port] = 0;
+		has_data=0;
+
 	}
 end:if(ret){
 		send_frame(&s_var_frame);
 	}
+	
 	if(app->need_reset)
 		app->do_reset();
 }

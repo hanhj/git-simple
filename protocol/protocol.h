@@ -163,23 +163,23 @@ typedef struct _qoi{//召唤限定词
 #define MSG_ID_SIZE			2
 #define BALANCE				1
 //正在执行的过程
-#define PROCESS_LINK		1<<0
-#define PROCESS_SUMMON		1<<1
-#define PROCESS_CLOCK		1<<2
-#define PROCESS_EVENT		1<<3
-#define PROCESS_RM_CTL		1<<4
-#define PROCESS_TEST_LINK	1<<5
-#define PROCESS_YC_CHANGE	1<<6
-#define PROCESS_RESET		1<<7
-#define PROCESS_RD_DIR		1<<8
-#define PROCESS_RD_FILE		1<<9
-#define PROCESS_WR_FILE		1<<10
-#define PROCESS_RD_DZ		1<<11
-#define PROCESS_WR_DZ		1<<12
-#define PROCESS_RD_DZ_UNIT	1<<13
-#define PROCESS_WR_DZ_UNIT	1<<14
-#define PROCESS_SUMMON_ACC	1<<15//累计量
-#define PROCESS_UPDATE		1<<16
+#define PROCESS_LINK		0x01
+#define PROCESS_SUMMON		0x02	
+#define PROCESS_CLOCK		0x04
+#define PROCESS_EVENT		0x08
+#define PROCESS_RM_CTL		0x10
+#define PROCESS_TEST_LINK	0x20
+#define PROCESS_YC_CHANGE	0x40
+#define PROCESS_RESET		0x80
+#define PROCESS_RD_DIR		0x100
+#define PROCESS_RD_FILE		0x200
+#define PROCESS_WR_FILE		0x400
+#define PROCESS_RD_DZ		0x800
+#define PROCESS_WR_DZ		0x1000
+#define PROCESS_RD_DZ_UNIT	0x2000
+#define PROCESS_WR_DZ_UNIT	0x4000
+#define PROCESS_SUMMON_ACC	0x8000//累计量
+#define PROCESS_UPDATE		0x10000
 //功能码
 #define COMMAND_SP			1
 #define COMMAND_DP			2
@@ -454,7 +454,7 @@ class link_layer{
 		int rep_times;
 		timer rcv_var_timer;//接收数据超时计时器
 
-		long process;//which process is in.
+		unsigned long process;//which process is in.
 		SummonData summon_data;
 		ClockData clock_data;
 		YkData yk_data;

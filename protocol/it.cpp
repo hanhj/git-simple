@@ -365,6 +365,14 @@ void get_data(int * &d){
 	it=cq.begin();
 	d=&it;
 }
+#define PROCESS_LINK		1<<0
+#define PROCESS_SUMMON		1<<1
+#define PROCESS_CLOCK		1<<2
+#define PROCESS_EVENT		1<<3
+#define PROCESS_RM_CTL		1<<4
+#define PROCESS_TEST_LINK	1<<5
+#define PROCESS_YC_CHANGE	0x40	
+#define PROCESS_RESET		1<<7
 int main(){
 	vector<std::string> bb {"1","2"};
 	myswap(begin(bb),begin(bb)+1);
@@ -422,7 +430,11 @@ int main(){
 	d=NULL;
 	get_data(d);
 	cout<<d<<endl;
-
+	unsigned long e,f;
+	e=PROCESS_YC_CHANGE;
+	f=~e;
+	printf("%x %x ",PROCESS_YC_CHANGE,~PROCESS_YC_CHANGE);
+	printf("%lx %lx ",e,f);
 	return 0;
 }
 
