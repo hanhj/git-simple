@@ -6,7 +6,7 @@
  ************************************************************************/
 #include "protocol.h"
 #include "configurable.h"
-
+#include "para.h"
 using namespace std;
 
 /****************************
@@ -306,10 +306,14 @@ void link_layer_101::set_loc_ctl(){
 //for balance
 int link_layer_101::on_ack(frame *in,frame *out){
 	int ret;
-	ret=0;
+	ret=-1;
 	cout<<"on_ack"<<endl;
-	if(process & PROCESS_SUMMON){
+	if(process & PROCESS_EVENT){
+		ret = process_event(out);
+	}else if(process & PROCESS_SUMMON){
 		ret=process_summon(out);
+	}else if(process & PROCESS_YC_CHANGE){
+		ret=process_yc_change(out);
 	}
 	return ret ;
 }
@@ -317,32 +321,40 @@ int link_layer_101::on_ack(frame *in,frame *out){
 int link_layer_101::on_req_class_1(frame *in,frame *out){
 	int ret ;
 	cout<<"on_req_class_1"<<endl;
-	ret=0;
-	ret=process_event(in,out);
-	if(ret<=0){
-		if(process & PROCESS_SUMMON){
-			ret = process_summon(out);
-		}else if(process & PROCESS_RM_CTL){
-			ret=app->build_yk(out,this);
-		}
+	ret=-1;
+	if(process & PROCESS_EVENT){
+		ret=process_event(out);
+	}else if(process & PROCESS_SUMMON){
+		ret = process_summon(out);
+	}else if(process & PROCESS_RM_CTL){
+		ret=process_yk(out);
+	}else if(process & PROCESS_RESET){
+		ret=process_reset_terminal(out);
 	}
 	return ret ;
 }
 //for unbalance
 int link_layer_101::on_req_class_2(frame *in,frame *out){
 	int ret;
-	ret=0;
+	ret=-1;
 	cout<<"on_req_class_2"<<endl;
-	ret=process_event(in,out);
-	if(ret<=0){
-		if(process & PROCESS_CLOCK){
-			ret=app->build_clock(out,this);
-		}
+	if( process & PROCESS_EVENT){
+		ret=process_event(out);
+	}else if(process & PROCESS_CLOCK){
+		ret=process_clock(out);
+	}else if(process & PROCESS_TEST_LINK){
+		ret=process_test_link(out);
+	}else if(process & PROCESS_YC_CHANGE){
+		ret=process_yc_change(out);
 	}
 	return ret;
 }
+int link_layer_101::on_summon(frame *in,frame *out){
+	return 0;
+}
 int link_layer_101::process_summon(frame *out){
 	int ret;
+	ret=-1;
 	if(summon_data.summon_step==0){
 		ret=app->build_summon_con(out,this);
 	}else if(summon_data.summon_step == 1){
@@ -357,11 +369,20 @@ int link_layer_101::process_summon(frame *out){
 	}
 	return ret;
 }
+int link_layer_101::on_summon_acc(frame *in,frame *out){
+	return 0;
+}
 int link_layer_101::process_summon_acc(frame *out){
 	int ret =0;
 	return ret;
 }
-int link_layer_101::process_clock(frame *in,frame *out){
+int link_layer_101::process_clock(frame *out){
+	int ret;
+	ret=-1;
+	ret=app->build_clock(out,this);
+	return ret;
+}
+int link_layer_101::on_clock(frame *in,frame *out){
 	int ret;
 	ret =0;
 	if(in->data[offset_cause]==CAUSE_Act){
@@ -389,18 +410,41 @@ void link_layer_101::deal_timeout(){
 	e=NULL;
 	if(app->get_event_list(port,e,0)==1){
 		process|=PROCESS_EVENT;
-		if(event_data.need_ack==0){
-			ret=app->build_event_data(&s_var_frame,this,e);
+		has_data=1;
+		if(balance == BALANCE){
+			if(event_data.need_ack[port]==0){
+				ret=app->build_event_data(&s_var_frame,this,e);
+				event_data.need_ack[port]=1;
+				goto end;
+			}
 		}
-
 	}else{
 		process &=~PROCESS_EVENT;
+		event_data.need_ack[port] = 0;
+		has_data=0;
 	}
-	if(ret){
+	event_yc *e_yc;
+	if(app->get_yc_cg_data(port,e_yc)){
+		process|=PROCESS_YC_CHANGE;
+		if(balance == BALANCE){
+			if(event_data.need_yc_ack[port]==0){
+				ret=app->build_yc_cg_data(&s_var_frame,this,e_yc);
+				event_data.need_yc_ack[port]=1;
+			}
+		}
+	}
+end:if(ret){
 		send_frame(&s_var_frame);
 	}
+	if(app->need_reset)
+		app->do_reset();
 }
-int link_layer_101::process_yk(frame *in,frame *out){
+int link_layer_101::process_yk(frame *out){
+	int ret;
+	ret=app->build_yk(out,this);
+	return ret;
+}
+int link_layer_101::on_yk(frame *in,frame *out){
 	int ret =0;
 	int ctrl;
 	yk_data.cmd_id=in->data[offset_ti];
@@ -450,8 +494,8 @@ int link_layer_101::process_yk(frame *in,frame *out){
 
 	return ret;
 }
-int link_layer_101::process_event(frame *in,frame *out){
-	int ret=0;
+int link_layer_101::process_event(frame *out){
+	int ret=-1;
 	event *e;
 	e=NULL;
 	if(app->get_event_list(port,e,1)==1){
@@ -459,16 +503,31 @@ int link_layer_101::process_event(frame *in,frame *out){
 	}
 	return ret;
 }
-int link_layer_101::process_test_link(frame *in,frame *out){
-	int ret=0;
+int link_layer_101::on_test_link(frame *in,frame *out){
+	return 0;
+}
+int link_layer_101::process_test_link(frame *out){
+	int ret=-1;
+	ret=app->build_link_test_con(out,this);
+	process &=~PROCESS_TEST_LINK;
 	return ret;
 }
-int link_layer_101::process_yc_change(frame *in,frame *out){
-	int ret=0;
+int link_layer_101::process_yc_change(frame *out){
+	int ret=-1;
+	event_yc *e;
+	if(app->get_yc_cg_data(port,e)==1)
+		ret=app->build_yc_cg_data(out,this,e);
 	return ret;
 }
-int link_layer_101::process_reset_terminal(frame *in,frame *out){
+int link_layer_101::on_reset_terminal(frame *in,frame *out){
+	has_data =1;
+	return 0;
+}
+int link_layer_101::process_reset_terminal(frame *out){
 	int ret=0;
+	ret=app->build_reset_con(out,this);
+	has_data=0;
+	app->need_reset=1;
 	return ret;
 }
 int link_layer_101::process_rd_dir(frame *in,frame *out){
@@ -506,35 +565,42 @@ int link_layer_101::process_update(frame *in,frame *out){
 
 int link_layer_101::on_req(frame *in,frame *out){
 	int ret;
-	ret= 0;
+	ret= -1;
 	int ti;
 	ti=in->data[offset_ti];
 	int act=0;//for file command
 	switch(ti){
 		case COMMAND_SUMMON://total sum
 			process|=PROCESS_SUMMON;
+			ret=on_summon(in,out);
 			if(balance == BALANCE){
 				ret=process_summon(out);
 			}
 			break;
 		case COMMAND_CLOCK://clock 
 			process|=PROCESS_CLOCK;
-			ret=process_clock(in,out);
+			ret=on_clock(in,out);
 			if(balance ==BALANCE)
-				ret=app->build_clock(out,this);
+				ret=process_clock(out);
 			break;
 		case COMMAND_RM_CTL:
 		case COMMAND_RM_CTL_D:
 			process|=PROCESS_RM_CTL;
-				ret=process_yk(in,out);
+			ret=on_yk(in,out);
 			if(balance == BALANCE)
-				ret=app->build_yk(out,this);
+				ret=process_yk(out);
 			break;
 		case COMMAND_TEST_LINK:
 			process|=PROCESS_TEST_LINK;
+			ret=on_test_link(in,out);
+			if(balance == BALANCE)
+				ret=process_test_link(out);
 			break;
 		case COMMAND_RESET:
 			process|=PROCESS_RESET;
+			ret=on_reset_terminal(in,out);
+			if(balance==BALANCE)
+				ret=process_reset_terminal(out);
 			break;
 		case COMMAND_FILE:
 			if(act==1){
@@ -862,7 +928,15 @@ int link_layer_101::on_fc2(frame*f){
 	int ret;
 	ret=0;
 	cout<<"on_fc2"<<endl;
-//err:
+	ret=build_ack(&s_fix_frame,has_data);
+	if(ret<0){
+		goto err;
+	}
+	ret=send_frame(&s_fix_frame);
+	if(ret<0){
+		goto err;
+	}//ack
+err:
 	return ret;
 }
 int link_layer_101::on_fc3(frame *f){
@@ -1045,12 +1119,21 @@ int link_layer_101::on_fc10(frame*f){
 				if(ctl.pm.fcb!=ctl_rm.pm.fcb){
 					ctl_rm.data=ctl.data;//save control
 					ret=on_req_class_1(f,&s_var_frame);
-					if(ret==0){
+					if(ret>=0){
 						ret=send_frame(&s_var_frame);
 						if(ret<0){
 							goto err;
 						}
 						save_frame(&s_var_frame);//save frame
+					}else{
+						ret=build_nak(&s_fix_frame);
+						if(ret<0){
+							goto err;
+						}
+						ret=send_frame(&s_fix_frame);
+						if(ret<0){
+							goto err;
+						}
 					}
 				}else{
 					ret=send_frame(&last_send_frame);
@@ -1084,12 +1167,21 @@ int link_layer_101::on_fc11(frame *f){
 			if(ctl.pm.fcb!=ctl_rm.pm.fcb){
 				ctl_rm.data=ctl.data;//save control
 				ret=on_req_class_2(f,&s_var_frame);
-				if(ret==0){
+				if(ret>=0){
 					ret=send_frame(&s_var_frame);
 					if(ret<0){
 						goto err;
 					}
 					save_frame(&s_var_frame);//save frame
+				}else{
+					ret=build_nak(&s_fix_frame);
+					if(ret<0){
+						goto err;
+					}
+					ret=send_frame(&s_fix_frame);
+					if(ret<0){
+						goto err;
+					}
 				}
 			}else{
 				ret=send_frame(&last_send_frame);
@@ -1133,7 +1225,8 @@ YC_TAB * get_yc_data(int );
 int get_event_list(int type,event *&e,int change);
 int get_clock(CP56Time2a &);
 int do_yk(int id,int type,int cmd);
-int get_yc_cg_data(cg_yc_list *list,int pos,buffer*data);
+void do_reset();
+int get_yc_cg_data(int port ,event_yc *&e);
 int get_dir_list(dir_list *list,buffer*data);
 int get_file_segment(char *filename,int pos,file_segment *file);
 int save_file_segment(char *filename,int pos,file_segment *file);
@@ -1553,11 +1646,48 @@ int app_layer::build_event_data(frame *out,link_layer *link,event* e){//cause 3
 	int i;
 	i=0;
 	int ret;
+	siq siq;
+	diq diq;
 	
 	link->set_loc_ctl();	
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
+	vsq_lo.bit.n=1;
+	vsq_lo.bit.sq=0;
+	cause_lo.bit.cause=CAUSE_Spont;
+
+	if(e->soe.type==S_YX){
+		out->data[offset+i++]=COMMAND_SP_TIME;
+		siq.bit.spi=e->soe.status;
+	}else if(e->soe.type == D_YX){
+		out->data[offset+i++]=COMMAND_DP_TIME;
+		diq.bit.dpi=e->soe.status==0?1:2;
+	}
+	out->data[offset+i++]=vsq_lo.data;
+	out->data[offset+i++]=cause_lo.data;
+	if(cause_size==2){
+		out->data[offset+i++]=(cause_lo.data>>8&0x00ff);
+	}
+	out->data[offset+i++]=addr&0x00ff;
+	if(addr_size==2){
+		out->data[offset+i++]=addr>>8&0x00ff;
+	}
+	out->data[offset+i++]=e->soe.datasign;
+	out->data[offset+i++]=e->soe.datasign>>8;
+	if(msg_id_size==3)
+		out->data[offset+i++]=0;
+	if(e->soe.type==S_YX)
+		out->data[offset + i++]=siq.data;
+	else if(e->soe.type == D_YX)
+		out->data[offset + i++] = diq.data;
+	out->data[offset+i++]=e->soe.time.year;
+	out->data[offset+i++]=e->soe.time.month;
+	out->data[offset+i++]=e->soe.time.day;
+	out->data[offset+i++]=e->soe.time.hour;
+	out->data[offset+i++]=e->soe.time.minute;
+	out->data[offset+i++]=e->soe.time.millisecond>>8;
+	out->data[offset+i++]=e->soe.time.millisecond & 0x00ff;
 	ret=i;
 	ret=link->build_link_layer(out,ret);				
 	if(ret<0){
@@ -1701,10 +1831,26 @@ int app_layer::build_link_test_con(frame *out,link_layer *link){//cause 7
 	i=0;
 	int ret;
 
-	link->set_loc_ctl();	
-	ret=get_link_info(link);
-	if(ret<0)
-		goto err;
+	vsq_lo.bit.n=1;
+	vsq_lo.bit.sq=0;
+	cause_lo.bit.cause=CAUSE_Actcon;
+
+	out->data[offset+i++]=COMMAND_TEST_LINK;
+	out->data[offset+i++]=vsq_lo.data;
+	out->data[offset+i++]=cause_lo.data;
+	if(cause_size==2){
+		out->data[offset+i++]=(cause_lo.data>>8&0x00ff);
+	}
+	out->data[offset+i++]=addr&0x00ff;
+	if(addr_size==2){
+		out->data[offset+i++]=addr>>8&0x00ff;
+	}
+	out->data[offset+i++]=0;
+	out->data[offset+i++]=0;
+	if(msg_id_size==3)
+		out->data[offset+i++]=0;
+	out->data[offset + i++]=0xaa;
+	out->data[offset + i++]=0x55;
 	ret=i;
 	ret=link->build_link_layer(out,ret);				
 	if(ret<0){
@@ -1724,7 +1870,7 @@ err:
 *  @note	
 *  @see		
 ***********************************************************************
-*/int app_layer::build_yc_cg_data(frame *out,link_layer *link){//cause 3
+*/int app_layer::build_yc_cg_data(frame *out,link_layer *link,event_yc*e){//cause 3
 	int i;
 	i=0;
 	int ret;
@@ -1733,6 +1879,35 @@ err:
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
+	vsq_lo.bit.n=1;
+	vsq_lo.bit.sq=0;
+	cause_lo.bit.cause=CAUSE_Spont;
+
+	out->data[offset+i++]=yc_data_type;
+	out->data[offset+i++]=vsq_lo.data;
+	out->data[offset+i++]=cause_lo.data;
+	if(cause_size==2){
+		out->data[offset+i++]=(cause_lo.data>>8&0x00ff);
+	}
+	out->data[offset+i++]=addr&0x00ff;
+	if(addr_size==2){
+		out->data[offset+i++]=addr>>8&0x00ff;
+	}
+	out->data[offset+i++]=e->data->datasign;
+	out->data[offset+i++]=e->data->datasign>>8;
+	if(msg_id_size==3)
+		out->data[offset+i++]=0;
+	if(yc_data_type==9||yc_data_type == 11){
+		out->data[offset + i++]=e->data->deadpass->intdata;
+		out->data[offset + i++]=e->data->deadpass->intdata>>8;
+		out->data[offset + i++]=0;
+	}else if(yc_data_type == 13){
+			out->data[offset + i++ ]=e->data->deadpass->floatdata.bitdata.d1;
+			out->data[offset + i++ ]=e->data->deadpass->floatdata.bitdata.d2;
+			out->data[offset + i++ ]=e->data->deadpass->floatdata.bitdata.d3;
+			out->data[offset + i++ ]=e->data->deadpass->floatdata.bitdata.d4;
+			out->data[offset + i++ ]=0;//qds
+	}
 	ret=i;
 	ret=link->build_link_layer(out,ret);				
 	if(ret<0){
@@ -2206,6 +2381,7 @@ int get_event_list(int type,event *&e,int change){
 			ret=1;
 			break;
 		}
+		it++;
 	}
 	return ret;
 }
@@ -2223,9 +2399,26 @@ int do_yk(int id,int type,int cmd){
 	}
 	return 0;
 }
-int get_yc_cg_data(cg_yc_list *list,int pos,buffer*data){
+void do_reset(){
+
+}
+int get_yc_cg_data(int port,event_yc *&e){
+	int ret;
+	ret=0;
+	EventYcList::iterator it,end;
+	it=event_yc_list.begin();
+	end=event_yc_list.end();
+	while(it!=end){
+		if(it->readflag[port]==0){
+			it->readflag[port]=1;
+			e=&it;
+			ret=1;
+			break;
+		}
+		it++;
+	}
 	pfunc(DEBUG_NORMAL,"\n");
-	return 0;
+	return ret;
 }
 int get_dir_list(dir_list *list,buffer*data){
 	pfunc(DEBUG_NORMAL,"\n");
@@ -2266,10 +2459,11 @@ int save_update_file(char *filename,file_segment *file){
 /*
 int get_yx_data(buffer*data);
 int get_yc_data(buffer*data);
-int get_event_list(int type,evnet *&e,int change);
+int get_event_list(int port,event *&e,int change);
 int get_clock(buffer*data);
 int do_yk(int id,int type,int cmd);
-int get_yc_cg_data(cg_yc_list *list,int pos,buffer*data);
+int do_reset();
+int get_yc_cg_data(int port,event *&e);
 int get_dir_list(dir_list *list,buffer*data);
 int get_file_segment(char *filename,int pos,file_segment *file);
 int save_file_segment(char *filename,int pos,file_segment *file);
@@ -2286,6 +2480,7 @@ void set_app_interface(app_layer *app){
 	app->get_event_list=get_event_list;
 	app->get_clock=get_clock;
 	app->do_yk=do_yk;
+	app->do_reset=do_reset;
 	app->get_yc_cg_data=get_yc_cg_data;
 	app->get_dir_list=get_dir_list;
 	app->get_file_segment=get_file_segment;

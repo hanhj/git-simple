@@ -12,4 +12,5 @@ YX_TAB YxTable[TOTALYXNUM];
 SORT_YX_TAB SortYxTable[TOTALYXNUM];
 YC_TAB YcTable[MAX_YC_NUM];
 EventList event_list;
+EventYcList event_yc_list;
 // vim:tw=72 

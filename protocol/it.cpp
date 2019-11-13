@@ -286,6 +286,7 @@ class CircleQueue{
 		void init(int size);
 		int push(T&);
 		int pop();
+		int push_pop(T&);
 		T & front();
 		int size();
 		int empty();
@@ -329,6 +330,13 @@ int CircleQueue<T>::pop(){
 	_front=(_front+1)%MaxQueue;
 	this->_size--;
 	return 0;
+}
+template <typename T>
+int CircleQueue<T>::push_pop(T &da){
+	if(full()){
+		pop();
+	}
+	return push(da);
 }
 template <typename T>
 T & CircleQueue<T>::front(){
@@ -396,18 +404,18 @@ int main(){
 		cq.push(a);
 		cq.pop();
 	}
-	for(;i<48;i++){
+	for(;i<148;i++){
 		a=i;
-		cq.push(a);
+		cq.push_pop(a);
 	}
 	int *c;
 	int *d;
 	CircleQueue<int>::iterator cit(cq.MaxQueue);
 	cit=cq.begin();
 	while(cit!=cq.end()){
-		cout<<*cit<<",";
+		cout<<*cit<<"(";
 		c=&cit;
-		cout<<c<<",";
+		cout<<c<<"),";
 		cit++;
 	}
 	cout<<endl;

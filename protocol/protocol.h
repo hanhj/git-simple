@@ -98,6 +98,30 @@ typedef union _send_cause{
 	send_cause_bit bit;
 	unsigned short  data;
 }send_cause;
+typedef struct _siq_bit{
+	unsigned char spi:1;//0开，1合
+	unsigned char res:3;//保留
+	unsigned char bl:1;//0未被闭锁
+	unsigned char sb:1;//0未被取代
+	unsigned char nt:1;//0当前值
+	unsigned char iv:1;//0有效
+}siq_bit;
+typedef struct _diq_bit{
+	unsigned char dpi:2;//1开，2合
+	unsigned char res:2;//保留
+	unsigned char bl:1;
+	unsigned char sb:1;
+	unsigned char nt:1;
+	unsigned char iv:1;
+}diq_bit;
+typedef union _siq{
+	siq_bit bit;
+	unsigned char data;
+}siq;
+typedef union _diq{
+	diq_bit bit;
+	unsigned char data;
+}diq;
 typedef struct _sco_bit{//单命令
 	unsigned char scs:1;//0开，1合
 	unsigned char res:1;
@@ -145,7 +169,7 @@ typedef struct _qoi{//召唤限定词
 #define PROCESS_EVENT		1<<3
 #define PROCESS_RM_CTL		1<<4
 #define PROCESS_TEST_LINK	1<<5
-#define PROCESS_HART		1<<6
+#define PROCESS_YC_CHANGE	1<<6
 #define PROCESS_RESET		1<<7
 #define PROCESS_RD_DIR		1<<8
 #define PROCESS_RD_FILE		1<<9
@@ -281,7 +305,8 @@ typedef struct _yk_data{
 	Dco dco;
 }YkData;
 typedef struct _event_data{
-	int need_ack;
+	int need_ack[4];
+	int need_yc_ack[4];
 }EventData;
 //app_layer is y deal asdu part
 class app_layer{
@@ -294,6 +319,7 @@ class app_layer{
 		int msg_id_size;
 		int addr;
 		int yc_data_type;
+		int need_reset;
 	public:
 		app_layer(){
 			vsq_lo.data=0;
@@ -303,6 +329,7 @@ class app_layer{
 			get_event_list=NULL;
 			get_clock = NULL;
 			do_yk=NULL;
+			do_reset=NULL;
 			get_yc_cg_data=NULL;
 			get_dir_list=NULL;
 			get_file_segment=NULL;
@@ -314,6 +341,7 @@ class app_layer{
 			get_summon_acc_data=NULL;
 			save_update_file=NULL;
 			yc_data_type=9;
+			need_reset=0;
 		}
 		int get_link_info(link_layer*);
 		void set_yc_data_type(int da){
@@ -347,10 +375,12 @@ class app_layer{
 		
 		int build_link_test_con(frame *out,link_layer *link);//cause 7
 		
-		int (*get_yc_cg_data)(cg_yc_list *list,int pos,buffer*data);
-		int build_yc_cg_data(frame *out,link_layer *link);//cause 3
+		int (*get_yc_cg_data)(int port ,event_yc *&);
+		int build_yc_cg_data(frame *out,link_layer *link,event_yc *e);//cause 3
 		
+		void (*do_reset)();
 		int build_reset_con(frame *out,link_layer *link);//reset terminal cause 7
+
 		
 		int (*get_dir_list)(dir_list *list,buffer*data);
 		int build_rd_dir_resp(frame *out,link_layer *link);//cause 5
@@ -476,14 +506,20 @@ class link_layer{
 		//the inheritance class must realize these virtual function.
 		virtual int build_link_layer(frame *out,int)=0;//by asdu build link frame 
 
-		virtual int process_summon(frame *out)=0;
+		virtual int on_summon(frame *in,frame *out)=0;
+		virtual int process_summon(frame *out)=0;//set fc=3(balance) or fc=8(unbalance),var frame
+		virtual int on_summon_acc(frame *in,frame *out)=0;
 		virtual int process_summon_acc(frame *out)=0;
-		virtual int process_clock(frame *in,frame *out)=0;
-		virtual int process_yk(frame *in,frame *out)=0;
-		virtual int process_event(frame *in,frame *out)=0;
-		virtual int process_test_link(frame *in,frame *out)=0;
-		virtual int process_yc_change(frame *in,frame *out)=0;
-		virtual int process_reset_terminal(frame *in,frame *out)=0;
+		virtual int on_clock(frame *in,frame *out)=0;
+		virtual int process_clock(frame *out)=0;
+		virtual int on_yk(frame *in,frame *out)=0;
+		virtual int process_yk(frame *out)=0;
+		virtual int process_event(frame *out)=0;
+		virtual int on_test_link(frame *in,frame *out)=0;
+		virtual int process_test_link(frame *out)=0;
+		virtual int process_yc_change(frame *out)=0;
+		virtual int on_reset_terminal(frame *in,frame *out)=0;
+		virtual int process_reset_terminal(frame *out)=0;
 		virtual int process_rd_dir(frame *in,frame *out)=0;
 		virtual int process_rd_file(frame *in,frame *out)=0;
 		virtual int process_wt_file(frame *in,frame *out)=0;
@@ -582,14 +618,21 @@ class link_layer_101:public link_layer{
 		int build_link_layer(frame *out,int asdu_len);//by asdu build link frame.
 		int build_link_fini(frame *out);//set fc=3(balance) or fc=8(unbalance),var frame
 		
+		int on_summon(frame *in,frame *out);
 		int process_summon(frame *out);//set fc=3(balance) or fc=8(unbalance),var frame
+		int on_summon_acc(frame *in,frame *out);
 		int process_summon_acc(frame *out);
-		int process_clock(frame *in,frame *out);
-		int process_yk(frame *in,frame *out);
-		int process_event(frame *in,frame *out);
-		int process_test_link(frame *in,frame *out);
-		int process_yc_change(frame *in,frame *out);
-		int process_reset_terminal(frame *in,frame *out);
+		int on_clock(frame *in,frame *out);
+		int process_clock(frame *out);
+		int on_yk(frame *in,frame *out);
+		int process_yk(frame *out);
+		int process_event(frame *out);
+		int on_test_link(frame *in,frame *out);
+		int process_test_link(frame *out);
+		int process_yc_change(frame *out);
+		int on_reset_terminal(frame *in,frame *out);
+		int process_reset_terminal(frame *out);
+
 		int process_rd_dir(frame *in,frame *out);
 		int process_rd_file(frame *in,frame *out);
 		int process_wt_file(frame *in,frame *out);
