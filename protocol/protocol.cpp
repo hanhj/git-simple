@@ -410,7 +410,7 @@ void link_layer_101::deal_timeout(){
 	event *e;
 	e=NULL;
 
-	if(app->get_event_list(port,e,0)==1){
+	if(app->get_event_data(port,e,0)==1){
 		process|=PROCESS_EVENT;
 		has_data=1;
 		if(balance == BALANCE){
@@ -506,7 +506,7 @@ int link_layer_101::process_event(frame *out){
 	int ret=-1;
 	event *e;
 	e=NULL;
-	if(app->get_event_list(port,e,1)==1){
+	if(app->get_event_data(port,e,1)==1){
 		ret=app->build_event_data(out,this,e);
 	}
 	return ret;
@@ -1230,7 +1230,7 @@ err:
 ****************************/
 SORT_YX_TAB * get_yx_data(int);
 YC_TAB * get_yc_data(int );
-int get_event_list(int type,event *&e,int change);
+int get_event_data(int type,event *&e,int change);
 int get_clock(CP56Time2a &);
 int do_yk(int id,int type,int cmd);
 void do_reset();
@@ -2374,7 +2374,7 @@ YC_TAB * get_yc_data(int pos){
 	pfunc(DEBUG_NORMAL,"\n");
 	return p;
 }
-int get_event_list(int type,event *&e,int change){
+int get_event_data(int type,event *&e,int change){
 	int ret;
 	ret=0;
 	pfunc(DEBUG_NORMAL,"\n");
@@ -2467,7 +2467,7 @@ int save_update_file(char *filename,file_segment *file){
 /*
 int get_yx_data(buffer*data);
 int get_yc_data(buffer*data);
-int get_event_list(int port,event *&e,int change);
+int get_event_data(int port,event *&e,int change);
 int get_clock(buffer*data);
 int do_yk(int id,int type,int cmd);
 int do_reset();
@@ -2485,7 +2485,7 @@ int save_update_file(char *filename,file_segment *file);
 void set_app_interface(app_layer *app){
 	app->get_yx_data=get_yx_data;
 	app->get_yc_data=get_yc_data;
-	app->get_event_list=get_event_list;
+	app->get_event_data=get_event_data;
 	app->get_clock=get_clock;
 	app->do_yk=do_yk;
 	app->do_reset=do_reset;

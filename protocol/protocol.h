@@ -326,7 +326,7 @@ class app_layer{
 			cause_lo.data=0;
 			get_yx_data=NULL;
 			get_yc_data=NULL;
-			get_event_list=NULL;
+			get_event_data=NULL;
 			get_clock = NULL;
 			do_yk=NULL;
 			do_reset=NULL;
@@ -364,7 +364,7 @@ class app_layer{
 		YC_TAB * (*get_yc_data)(int);
 		int build_yc_data(frame *out,link_layer *link);//cause 20
 
-		int (*get_event_list)(int type,event *&e,int change);
+		int (*get_event_data)(int type,event *&e,int change);
 		int build_event_data(frame *out,link_layer *link,event *e);//cause 3
 
 		int build_clock(frame *out,link_layer *link);//cause	5,7
