@@ -583,13 +583,13 @@ int link_layer_101::on_file(frame *in,frame *out){
 		file_data.rd_file.id=file_data.rd_file.id<<8;
 		file_data.rd_file.id|=in->data[offset_data+i++];
 		
-		file_data.rd_file.ack_offset=in->data[ack_offset_data+i++];
+		file_data.rd_file.ack_offset=in->data[offset_data+i++];
 		file_data.rd_file.ack_offset=file_data.rd_file.ack_offset<<8;
-		file_data.rd_file.ack_offset|=in->data[ack_offset_data+i++];
+		file_data.rd_file.ack_offset|=in->data[offset_data+i++];
 		file_data.rd_file.ack_offset=file_data.rd_file.ack_offset<<8;
-		file_data.rd_file.ack_offset|=in->data[ack_offset_data+i++];
+		file_data.rd_file.ack_offset|=in->data[offset_data+i++];
 		file_data.rd_file.ack_offset=file_data.rd_file.ack_offset<<8;
-		file_data.rd_file.ack_offset|=in->data[ack_offset_data+i++];
+		file_data.rd_file.ack_offset|=in->data[offset_data+i++];
 		file_data.rd_file.suc=in->data[offset_data+i++];
 	}else if(file_data.act ==7){//write file
 
@@ -600,6 +600,7 @@ int link_layer_101::process_file(frame *out){
 	int ret=-1;
 	if(file_data.act==1){
 		dir_list *dir;
+		dir=NULL;
 		ret=app->get_dir_list(file_data.rd_dir.name,dir);
 		if(ret)
 			ret=app->build_rd_dir_resp(out,this,dir);
@@ -607,7 +608,11 @@ int link_layer_101::process_file(frame *out){
 		if(file_data.rd_file.step==0){
 			ret=app->build_rd_file_con(out,this);
 		}else{
-			ret=app->build_rd_file_resp(out,this);
+			file_segment *file;
+			file=NULL;
+			ret=app->get_file_segment(file_data.rd_file.name,file_data.rd_file.cur_offset,file);
+			if(ret)
+				ret=app->build_rd_file_resp(out,this,file);
 		}
 	}else if(file_data.act==6){
 		ret=0;
@@ -616,23 +621,47 @@ int link_layer_101::process_file(frame *out){
 	}
 	return ret;
 }
-int link_layer_101::process_rd_dz(frame *in,frame *out){
+int link_layer_101::on_rd_dz(frame *in,frame *out){
 	int ret=0;
 	return ret;
 }
-int link_layer_101::process_rd_unit(frame *in,frame *out){
+int link_layer_101::process_rd_dz(frame *out){
 	int ret=0;
 	return ret;
 }
-int link_layer_101::process_wt_dz(frame *in,frame *out){
+
+int link_layer_101::on_rd_unit(frame *in,frame *out){
 	int ret=0;
 	return ret;
 }
-int link_layer_101::process_wt_unit(frame *in,frame *out){
+int link_layer_101::process_rd_unit(frame *out){
 	int ret=0;
 	return ret;
 }
-int link_layer_101::process_update(frame *in,frame *out){
+
+int link_layer_101::on_wt_dz(frame *in,frame *out){
+	int ret=0;
+	return ret;
+}
+int link_layer_101::process_wt_dz(frame *out){
+	int ret=0;
+	return ret;
+}
+
+int link_layer_101::on_wt_unit(frame *in,frame *out){
+	int ret=0;
+	return ret;
+}
+int link_layer_101::process_wt_unit(frame *out){
+	int ret=0;
+	return ret;
+}
+
+int link_layer_101::on_update(frame *in,frame *out){
+	int ret=0;
+	return ret;
+}
+int link_layer_101::process_update(frame *out){
 	int ret=0;
 	return ret;
 }
@@ -1297,9 +1326,9 @@ int get_clock(CP56Time2a &);
 int do_yk(int id,int type,int cmd);
 void do_reset();
 int get_yc_cg_data(int port ,event_yc *&e);
-int get_dir_list(dir_list *list,buffer*data);
-int get_file_segment(char *filename,int pos,file_segment *file);
-int save_file_segment(char *filename,int pos,file_segment *file);
+int get_dir_list(char *,dir_list *&list);
+int get_file_segment(char *filename,int pos,file_segment *&file);
+int save_file_segment(char *filename,int pos,file_segment *&file);
 int get_dz_unit(buffer*data);
 int set_dz_unit(int);
 int get_dz_data(int id,buffer*data);
@@ -2123,7 +2152,7 @@ err:
 int app_layer::build_rd_file_resp(frame *out,link_layer *link,file_segment *file){//cause 5
 	int i;
 	i=0;
-	int reti=-1;
+	int ret=-1;
 	
 	link->set_loc_ctl();	
 	ret=get_link_info(link);
@@ -2528,15 +2557,15 @@ int get_yc_cg_data(int port,event_yc *&e){
 	pfunc(DEBUG_NORMAL,"\n");
 	return ret;
 }
-int get_dir_list(dir_list *list,buffer*data){
+int get_dir_list(char *name,dir_list *&list){
 	pfunc(DEBUG_NORMAL,"\n");
 	return 0;
 }
-int get_file_segment(char *filename,int pos,file_segment *file){
+int get_file_segment(char *filename,int pos,file_segment *&file){
 	pfunc(DEBUG_NORMAL,"\n");
 	return 0;
 }
-int save_file_segment(char *filename,int pos,file_segment *file){
+int save_file_segment(char *filename,int pos,file_segment *&file){
 	pfunc(DEBUG_NORMAL,"\n");
 	return 0;
 }
@@ -2564,24 +2593,6 @@ int save_update_file(char *filename,file_segment *file){
 	pfunc(DEBUG_NORMAL,"\n");
 	return 0;
 }
-/*
-int get_yx_data(buffer*data);
-int get_yc_data(buffer*data);
-int get_event_data(int port,event *&e,int change);
-int get_clock(buffer*data);
-int do_yk(int id,int type,int cmd);
-int do_reset();
-int get_yc_cg_data(int port,event *&e);
-int get_dir_list(dir_list *list,buffer*data);
-int get_file_segment(char *filename,int pos,file_segment *file);
-int save_file_segment(char *filename,int pos,file_segment *file);
-int get_dz_unit(buffer*data);
-int set_dz_unit(int);
-int get_dz_data(int id,buffer*data);
-int set_dz(int id,int sel,buffer*data);
-int get_summon_acc_data(buffer*data);
-int save_update_file(char *filename,file_segment *file);
-*/
 void set_app_interface(app_layer *app){
 	app->get_yx_data=get_yx_data;
 	app->get_yc_data=get_yc_data;

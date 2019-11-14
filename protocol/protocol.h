@@ -263,10 +263,14 @@ typedef struct _dir{//directory
 	int file_size;
 }dir;
 typedef list<dir> dir_list;
-typedef _file_segment{
+typedef struct _file_segment{
 	int pos;
 	char content[300];
 }file_segment;
+typedef struct _buffer{
+	int len;
+	char data[300];
+}buffer;
 /****************************
  * app_layer
 ****************************/
@@ -402,11 +406,11 @@ class app_layer{
 		int (*get_dir_list)(char *dir_name,dir_list *&list);
 		int build_rd_dir_resp(frame *out,link_layer *link,dir_list *);//cause 5
 		int build_rd_file_con(frame *out,link_layer *link);//cause 7
-		int (*get_file_segment)(char *filename,int pos,file_segment *file);
-		int build_rd_file_resp(frame *out,link_layer *link,file_segment *file);//cause 5
+		int (*get_file_segment)(char *filename,int pos,file_segment *&file);
+		int build_rd_file_resp(frame *out,link_layer *link,file_segment	*file);//cause 5
 		int build_wr_file_con(frame *out,link_layer *link);//cause 7
 		int build_wr_file_resp(frame *out,link_layer *link);//cause 5
-		int (*save_file_segment)(char *filename,int pos,file_segment *file);
+		int (*save_file_segment)(char *filename,int pos,file_segment *&file);
 		
 		int (*get_dz_unit)(buffer*data);
 		int build_rd_dz_unit_con(frame *out,link_layer *link);//cause 7
