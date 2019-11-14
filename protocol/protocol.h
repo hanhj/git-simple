@@ -171,9 +171,7 @@ typedef struct _qoi{//召唤限定词
 #define PROCESS_TEST_LINK	0x20
 #define PROCESS_YC_CHANGE	0x40
 #define PROCESS_RESET		0x80
-#define PROCESS_RD_DIR		0x100
-#define PROCESS_RD_FILE		0x200
-#define PROCESS_WR_FILE		0x400
+#define PROCESS_FILE		0x200
 #define PROCESS_RD_DZ		0x800
 #define PROCESS_WR_DZ		0x1000
 #define PROCESS_RD_DZ_UNIT	0x2000
@@ -259,24 +257,16 @@ typedef struct _qoi{//召唤限定词
 #define PRESERVATION   48~63
 */
 #include <list>
-class dir{//directory
-	public:
-		char file_name[30];
-		int file_id;
-		int file_size;
-};
+typedef struct _dir{//directory
+	char file_name[30];
+	int file_id;
+	int file_size;
+}dir;
 typedef list<dir> dir_list;
-typedef list<float>cg_yc_list;
-class file_segment{
-	public:
-		int pos;
-		char content[300];
-};
-class buffer{
-	public:
-		int len;
-		char content[300];
-};
+typedef _file_segment{
+	int pos;
+	char content[300];
+}file_segment;
 /****************************
  * app_layer
 ****************************/
@@ -308,6 +298,33 @@ typedef struct _event_data{
 	int need_ack[4];
 	int need_yc_ack[4];
 }EventData;
+typedef struct _file_data{
+	int act;
+	struct {
+		long id;
+		int len;
+		char name[10];
+		int flag;
+		union{
+			CP56Time2a time;
+			unsigned char data[7];
+		}start_time;
+		union{
+			CP56Time2a time;
+			unsigned char data[7];
+		}end_time;
+	}rd_dir;
+	struct {
+		int len;
+		char name[10];
+		long id;
+		long ack_offset;
+		long cur_offset;
+		char suc;//0无后续，1有后续
+		int step;
+	}rd_file;
+}FileData;
+
 //app_layer is y deal asdu part
 class app_layer{
 	public:
@@ -382,8 +399,8 @@ class app_layer{
 		int build_reset_con(frame *out,link_layer *link);//reset terminal cause 7
 
 		
-		int (*get_dir_list)(dir_list *list,buffer*data);
-		int build_rd_dir_resp(frame *out,link_layer *link);//cause 5
+		int (*get_dir_list)(char *dir_name,dir_list *&list);
+		int build_rd_dir_resp(frame *out,link_layer *link,dir_list *);//cause 5
 		int build_rd_file_con(frame *out,link_layer *link);//cause 7
 		int (*get_file_segment)(char *filename,int pos,file_segment *file);
 		int build_rd_file_resp(frame *out,link_layer *link,file_segment *file);//cause 5
@@ -459,6 +476,7 @@ class link_layer{
 		ClockData clock_data;
 		YkData yk_data;
 		EventData event_data;
+		FileData file_data;
 
 	public:
 		link_layer(){
@@ -494,7 +512,7 @@ class link_layer{
 		int set_app(app_layer*);
 		virtual void deal_timeout()=0;
 		virtual int get_frame()=0;//get a valid frame from port.
-		virtual int active_send()=0;
+		virtual int link_time()=0;
 		virtual int deal_frame(frame *)=0;
 		virtual void set_loc_ctl()=0;
 		void reset_yk_data();
@@ -520,14 +538,18 @@ class link_layer{
 		virtual int process_yc_change(frame *out)=0;
 		virtual int on_reset_terminal(frame *in,frame *out)=0;
 		virtual int process_reset_terminal(frame *out)=0;
-		virtual int process_rd_dir(frame *in,frame *out)=0;
-		virtual int process_rd_file(frame *in,frame *out)=0;
-		virtual int process_wt_file(frame *in,frame *out)=0;
-		virtual int process_rd_dz(frame *in,frame *out)=0;
-		virtual int process_rd_unit(frame *in,frame *out)=0;
-		virtual int process_wt_dz(frame *in,frame *out)=0;
-		virtual int process_wt_unit(frame *in,frame *out)=0;
-		virtual int process_update(frame *in,frame *out)=0;
+		virtual int on_file(frame *in,frame *out)=0;
+		virtual int process_file(frame *out)=0;
+		virtual int on_rd_dz(frame *in,frame *out)=0;
+		virtual int process_rd_dz(frame *out)=0;
+		virtual int on_rd_unit(frame *in,frame *out)=0;
+		virtual int process_rd_unit(frame *out)=0;
+		virtual int on_wt_dz(frame *in,frame *out)=0;
+		virtual int process_wt_dz(frame *out)=0;
+		virtual int on_wt_unit(frame *in,frame *out)=0;
+		virtual int process_wt_unit(frame *out)=0;
+		virtual int on_update(frame *in,frame *out)=0;
+		virtual int process_update(frame *out)=0;
 
 
 		void on_notify(message *msg);
@@ -598,7 +620,7 @@ class link_layer_101:public link_layer{
 	public:
 		void deal_timeout();
 		int get_frame();
-		int active_send();//for balance
+		int link_time();//for balance
 		int deal_frame(frame *in);
 		int save_frame(frame *);
 		//build fix frame
@@ -632,15 +654,18 @@ class link_layer_101:public link_layer{
 		int process_yc_change(frame *out);
 		int on_reset_terminal(frame *in,frame *out);
 		int process_reset_terminal(frame *out);
-
-		int process_rd_dir(frame *in,frame *out);
-		int process_rd_file(frame *in,frame *out);
-		int process_wt_file(frame *in,frame *out);
-		int process_rd_dz(frame *in,frame *out);
-		int process_rd_unit(frame *in,frame *out);
-		int process_wt_dz(frame *in,frame *out);
-		int process_wt_unit(frame *in,frame *out);
-		int process_update(frame *in,frame *out);
+		int on_file(frame *in,frame *out);
+		int process_file(frame *out);
+		int on_rd_dz(frame *in,frame *out);
+		int process_rd_dz(frame *out);
+		int on_rd_unit(frame *in,frame *out);
+		int process_rd_unit(frame *out);
+		int on_wt_dz(frame *in,frame *out);
+		int process_wt_dz(frame *out);
+		int on_wt_unit(frame *in,frame *out);
+		int process_wt_unit(frame *out);
+		int on_update(frame *in,frame *out);
+		int process_update(frame *out);
 };
 #define REP_TIMES 3
 #define REP_TIME  1

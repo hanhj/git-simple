@@ -72,7 +72,6 @@ int main(int arg,char **argv){
 			link[i].deal_timeout();
 			link[i].check_state();
 			link[i].get_frame();
-			link[i].active_send();
 		}
 
 	}
