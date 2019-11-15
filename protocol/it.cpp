@@ -248,8 +248,14 @@ class _cir_iterator{
 		T & operator *(){
 			return data[pos];
 		}
+		T & operator [](int p){
+			return data[p];
+		}
 		T * operator &(){
 			return &data[pos];
+		}
+		T * operator &(int p){
+			return &data[p];
 		}
 		bool operator !=(const self &da ){
 			return pos!=da.pos;
@@ -373,6 +379,13 @@ void get_data(int * &d){
 #define PROCESS_TEST_LINK	1<<5
 #define PROCESS_YC_CHANGE	0x40	
 #define PROCESS_RESET		1<<7
+typedef struct _dir_node{//directory
+	long name_len;
+	char name[30];
+	long file_id;
+	long file_size;
+}dir_node;
+typedef CircleQueue<dir_node> dir_list;
 int main(){
 	vector<std::string> bb {"1","2"};
 	myswap(begin(bb),begin(bb)+1);
@@ -420,6 +433,24 @@ int main(){
 	int *d;
 	CircleQueue<int>::iterator cit(cq.MaxQueue);
 	cit=cq.begin();
+	cout<<*cit<<endl;
+	a=cit[0];
+	cout<<a<<endl;
+	a=cit[1];
+	cout<<a<<endl;
+	a=cit[2];
+	cout<<a<<endl;
+	a=cit[3];
+	cout<<a<<endl;
+	c=&cit[0];
+	cout<<*c<<endl;
+	c=&cit[1];
+	cout<<*c<<endl;
+	c=&cit[2];
+	cout<<*c<<endl;
+	c=&cit[3];
+	cout<<*c<<endl;
+
 	while(cit!=cq.end()){
 		cout<<*cit<<"(";
 		c=&cit;
@@ -435,6 +466,7 @@ int main(){
 	f=~e;
 	printf("%x %x ",PROCESS_YC_CHANGE,~PROCESS_YC_CHANGE);
 	printf("%lx %lx ",e,f);
+	dir_list::iterator dir_it;
 	return 0;
 }
 

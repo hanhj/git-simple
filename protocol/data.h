@@ -319,8 +319,7 @@ typedef struct time_data{
 	 unsigned int day;//day_week:week占字节高3位(1-7星期的天)，day占字节低5位 （1-31月的天）
 	 unsigned int month;//高四位备用 month占低4位（1-12月）
 	 unsigned int year;//最高位备用 year占低7位（0-99年）
-
-} CP56Time2a;
+}CP56Time2a;
 typedef struct time16_data{
 	unsigned int millisecond;
 }CP16Time2a;
@@ -406,6 +405,19 @@ typedef CircleQueue<event> EventList;
 typedef CircleQueue<event_yc> EventYcList;
 extern EventList event_list ;
 extern EventYcList event_yc_list ;
+typedef struct _dir_node{//directory
+	long name_len;
+	char name[30];
+	long file_id;
+	long file_size;
+	CP56Time2a time;
+}dir_node;
+typedef CircleQueue<dir_node> dir_list;
+extern dir_list g_dir_list;
+typedef struct _buffer{
+	int len;
+	char data[300];
+}buffer;
 #define SCIA 0
 #define SCIB 1
 #define SCIC 2

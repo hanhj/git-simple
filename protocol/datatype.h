@@ -228,8 +228,14 @@ class _cir_iterator{
 		T & operator *(){
 			return data[pos];
 		}
+		T & operator [](int n){
+			return data[n];
+		}
 		T * operator &(){
 			return &data[pos];
+		}
+		T * operator &(int n){
+			return &data[n];
 		}
 		T * operator ->(){
 			return &data[pos];

@@ -3,7 +3,7 @@
 	> Author: hanhj
 	> Mail: hanhj@zx-jy.com 
 	> Created Time: 2019年02月19日 星期二 22时09分40秒
- ************************************************************************/
+************************************************************************/
 #include "protocol.h"
 #include "configurable.h"
 #include "para.h"
@@ -599,20 +599,23 @@ int link_layer_101::on_file(frame *in,frame *out){
 int link_layer_101::process_file(frame *out){
 	int ret=-1;
 	if(file_data.act==1){
-		dir_list *dir;
-		dir=NULL;
-		ret=app->get_dir_list(file_data.rd_dir.name,dir);
-		if(ret)
-			ret=app->build_rd_dir_resp(out,this,dir);
+		ret=app->get_dir_data(&file_data.rd_dir);
+		if(ret){
+			ret=app->build_rd_dir_resp(out,this,&file_data.rd_dir);
+			if(file_data.rd_dir.suc==0)
+				file_data.act=0;
+		}
 	}else if(file_data.act==3){
 		if(file_data.rd_file.step==0){
-			ret=app->build_rd_file_con(out,this);
-		}else{
-			file_segment *file;
-			file=NULL;
-			ret=app->get_file_segment(file_data.rd_file.name,file_data.rd_file.cur_offset,file);
+			ret=app->get_file_data(&file_data.rd_file);
 			if(ret)
-				ret=app->build_rd_file_resp(out,this,file);
+				ret=app->build_rd_file_con(out,this,&file_data.rd_file);
+		}else{
+			buffer *seg;
+			seg=NULL;
+			ret=app->get_file_segment(&file_data.rd_file,seg);
+			if(ret)
+				ret=app->build_rd_file_resp(out,this,seg);
 		}
 	}else if(file_data.act==6){
 		ret=0;
@@ -1326,15 +1329,16 @@ int get_clock(CP56Time2a &);
 int do_yk(int id,int type,int cmd);
 void do_reset();
 int get_yc_cg_data(int port ,event_yc *&e);
-int get_dir_list(char *,dir_list *&list);
-int get_file_segment(char *filename,int pos,file_segment *&file);
-int save_file_segment(char *filename,int pos,file_segment *&file);
+int get_dir_data(_rd_dir*);
+int get_file_data(_rd_file*);
+int get_file_segment(_rd_file *file,buffer *&seg);
+int save_file_segment(_rd_file *file,buffer *&seg);
 int get_dz_unit(buffer*data);
 int set_dz_unit(int);
 int get_dz_data(int id,buffer*data);
 int set_dz(int id,int sel,buffer*data);
 int get_summon_acc_data(buffer*data);
-int save_update_file(char *filename,file_segment *file);
+int save_update_file(_rd_file *file,buffer *seg);
 
 
 /****************************
@@ -2071,10 +2075,16 @@ err:
 *  @see		
 ***********************************************************************
 */
-int app_layer::build_rd_dir_resp(frame *out,link_layer *link,dir_list *dir){//cause 5
+int app_layer::build_rd_dir_resp(frame *out,link_layer *link,_rd_dir *dir){//cause 5
 	int i;
-	i=0;
+	int j;
 	int ret;
+	int bak_pos;
+	int n;
+	dir_list::iterator it(dir->res_list.MaxQueue);
+	dir_node *node;
+	i=0;
+	n=0;
 	
 	link->set_loc_ctl();	
 	ret=get_link_info(link);
@@ -2099,7 +2109,44 @@ int app_layer::build_rd_dir_resp(frame *out,link_layer *link,dir_list *dir){//ca
 	out->data[offset+i++]=2;//addition data type: 2:file transfer
 	out->data[offset+i++]=2;//act: 2:rd dir
 	out->data[offset+i++]=0;//result: 0:successful 1 fail
+	out->data[offset+i++]=dir->id;
+	out->data[offset+i++]=dir->id>>8;
+	out->data[offset+i++]=dir->id>>8;
+	out->data[offset+i++]=dir->id>>8;
+	bak_pos=i;
+	out->data[offset+i++]=dir->suc;//suc
+	out->data[offset+i++]=n;//number of files
 
+	it=dir->res_list.begin();
+	while(dir->cur_read<dir->res_list.size()){
+		node=&it[0];	
+		out->data[offset+i++]=node->name_len;
+		for(j=0;j<node->name_len;j++){
+			out->data[offset+i++]=node->name[j];
+		}
+		out->data[offset+i++]=0;//reverse 
+		out->data[offset+i++]=node->file_size;
+		out->data[offset+i++]=node->file_size>>8;
+		out->data[offset+i++]=node->file_size>>8;
+		out->data[offset+i++]=node->file_size>>8;
+		out->data[offset+i++]=node->time.year;
+		out->data[offset+i++]=node->time.month;
+		out->data[offset+i++]=node->time.day;
+		out->data[offset+i++]=node->time.hour;
+		out->data[offset+i++]=node->time.minute;
+		out->data[offset+i++]=node->time.millisecond>>8;
+		out->data[offset+i++]=node->time.millisecond & 0x00ff;
+		dir->cur_read++;
+		n++;
+		if(n>5)break;
+		dir->suc=1;
+	}
+	if(n<=5){
+		dir->suc=0;
+		dir->cur_read=0;
+	}
+	out->data[bak_pos]=dir->suc;//suc
+	out->data[bak_pos+1]=n;//
 	ret=i;
 	ret=link->build_link_layer(out,ret);				
 	if(ret<0){
@@ -2120,21 +2167,52 @@ err:
 *  @see		
 ***********************************************************************
 */
-int app_layer::build_rd_file_con(frame *out,link_layer *link){//cause 7
+int app_layer::build_rd_file_con(frame *out,link_layer *link,_rd_file *file){//cause 7
 	int i;
-	i=0;
+	int j;
 	int ret;
+	i=0;
 	
 	link->set_loc_ctl();	
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
+	vsq_lo.bit.n=1;
+	vsq_lo.bit.sq=0;
+	cause_lo.bit.cause=CAUSE_Req;
+
+	out->data[offset+i++]=COMMAND_FILE;
+	out->data[offset+i++]=vsq_lo.data;
+	out->data[offset+i++]=cause_lo.data;
+	if(cause_size==2){
+		out->data[offset+i++]=(cause_lo.data>>8&0x00ff);
+	}
+	out->data[offset+i++]=addr&0x00ff;
+	if(addr_size==2){
+		out->data[offset+i++]=addr>>8&0x00ff;
+	}
+	out->data[offset+i++]=0;
+	out->data[offset+i++]=0;
+	out->data[offset+i++]=2;//addition data type: 2:file transfer
+	out->data[offset+i++]=4;//act: 4:rd file
+	out->data[offset+i++]=0;//result: 0:successful 1 fail
+	out->data[offset+i++]=file->res_file.name_len;
+	for(j=0;j<file->res_file.name_len;j++)
+		out->data[offset+i++]=file->res_file.name[j];
+	out->data[offset+i++]=file->res_file.file_id;
+	out->data[offset+i++]=file->res_file.file_id>>8;
+	out->data[offset+i++]=file->res_file.file_id>>8;
+	out->data[offset+i++]=file->res_file.file_id>>8;
+	out->data[offset+i++]=file->res_file.file_size;
+	out->data[offset+i++]=file->res_file.file_size>>8;
+	out->data[offset+i++]=file->res_file.file_size>>8;
+	out->data[offset+i++]=file->res_file.file_size>>8;
+	ret=i;
 	ret=link->build_link_layer(out,ret);				
 	if(ret<0){
 		errno=ret;
 		goto err;
 	}
-	ret=i;
 err:
 	return ret;
 }
@@ -2149,7 +2227,7 @@ err:
 *  @see		
 ***********************************************************************
 */
-int app_layer::build_rd_file_resp(frame *out,link_layer *link,file_segment *file){//cause 5
+int app_layer::build_rd_file_resp(frame *out,link_layer *link,buffer *seg){//cause 5
 	int i;
 	i=0;
 	int ret=-1;
@@ -2557,15 +2635,34 @@ int get_yc_cg_data(int port,event_yc *&e){
 	pfunc(DEBUG_NORMAL,"\n");
 	return ret;
 }
-int get_dir_list(char *name,dir_list *&list){
+int get_dir_data(_rd_dir *dir){
+	pfunc(DEBUG_NORMAL,"\n");
+	dir->res_list.clear();
+	return 0;
+}
+int get_file_data(_rd_file *file){
+	pfunc(DEBUG_NORMAL,"\n");
+	int ret;
+	dir_list list;
+
+	ret=0;
+	list.init(10);
+	dir_list::iterator it(list.MaxQueue);
+	it=list.begin();
+	while(it!=list.end()){
+		if(it->file_id==file->id){
+			ret=1;
+			file->res_file=*it;
+			break;
+		}
+	}
+	return ret;
+}
+int get_file_segment(_rd_file*file,buffer *&seg){
 	pfunc(DEBUG_NORMAL,"\n");
 	return 0;
 }
-int get_file_segment(char *filename,int pos,file_segment *&file){
-	pfunc(DEBUG_NORMAL,"\n");
-	return 0;
-}
-int save_file_segment(char *filename,int pos,file_segment *&file){
+int save_file_segment(_rd_file*file,buffer *&seg){
 	pfunc(DEBUG_NORMAL,"\n");
 	return 0;
 }
@@ -2589,7 +2686,7 @@ int get_summon_acc_data(buffer*data){
 	pfunc(DEBUG_NORMAL,"\n");
 	return 0;
 }
-int save_update_file(char *filename,file_segment *file){
+int save_update_file(_rd_file *file,buffer*seg){
 	pfunc(DEBUG_NORMAL,"\n");
 	return 0;
 }
@@ -2601,7 +2698,8 @@ void set_app_interface(app_layer *app){
 	app->do_yk=do_yk;
 	app->do_reset=do_reset;
 	app->get_yc_cg_data=get_yc_cg_data;
-	app->get_dir_list=get_dir_list;
+	app->get_dir_data=get_dir_data;
+	app->get_file_data=get_file_data;
 	app->get_file_segment=get_file_segment;
 	app->save_file_segment=save_file_segment;
 	app->get_dz_unit=get_dz_unit;

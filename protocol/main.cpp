@@ -61,6 +61,7 @@ int main(int arg,char **argv){
 	init_yc();
 	event_list.init(100);
 	event_yc_list.init(100);
+	g_dir_list.init(20);
 	while(1){
 		cout<<endl<<"run loop:"<<loops<<endl;
 		loops++;

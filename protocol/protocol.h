@@ -256,21 +256,6 @@ typedef struct _qoi{//召唤限定词
 /*
 #define PRESERVATION   48~63
 */
-#include <list>
-typedef struct _dir{//directory
-	char file_name[30];
-	int file_id;
-	int file_size;
-}dir;
-typedef list<dir> dir_list;
-typedef struct _file_segment{
-	int pos;
-	char content[300];
-}file_segment;
-typedef struct _buffer{
-	int len;
-	char data[300];
-}buffer;
 /****************************
  * app_layer
 ****************************/
@@ -302,31 +287,38 @@ typedef struct _event_data{
 	int need_ack[4];
 	int need_yc_ack[4];
 }EventData;
+typedef struct __rd_dir{
+	long id;
+	int  len;
+	char name[10];
+	int flag;
+	union{
+		CP56Time2a time;
+		unsigned char data[7];
+	}start_time;
+	union{
+		CP56Time2a time;
+		unsigned char data[7];
+	}end_time;
+	dir_list res_list;
+	int cur_read;
+	int suc;
+}_rd_dir;
+typedef struct __rd_file{
+	int  len;
+	char name[10];
+	long id;
+	long ack_offset;
+	long cur_offset;
+	char suc;//0无后续，1有后续
+	int step;
+	dir_node res_file;
+	buffer res_seg;
+}_rd_file;
 typedef struct _file_data{
 	int act;
-	struct {
-		long id;
-		int len;
-		char name[10];
-		int flag;
-		union{
-			CP56Time2a time;
-			unsigned char data[7];
-		}start_time;
-		union{
-			CP56Time2a time;
-			unsigned char data[7];
-		}end_time;
-	}rd_dir;
-	struct {
-		int len;
-		char name[10];
-		long id;
-		long ack_offset;
-		long cur_offset;
-		char suc;//0无后续，1有后续
-		int step;
-	}rd_file;
+	_rd_dir rd_dir;
+	_rd_file rd_file;
 }FileData;
 
 //app_layer is y deal asdu part
@@ -352,7 +344,7 @@ class app_layer{
 			do_yk=NULL;
 			do_reset=NULL;
 			get_yc_cg_data=NULL;
-			get_dir_list=NULL;
+			get_dir_data=NULL;
 			get_file_segment=NULL;
 			save_file_segment=NULL;
 			get_dz_unit=NULL;
@@ -403,14 +395,15 @@ class app_layer{
 		int build_reset_con(frame *out,link_layer *link);//reset terminal cause 7
 
 		
-		int (*get_dir_list)(char *dir_name,dir_list *&list);
-		int build_rd_dir_resp(frame *out,link_layer *link,dir_list *);//cause 5
-		int build_rd_file_con(frame *out,link_layer *link);//cause 7
-		int (*get_file_segment)(char *filename,int pos,file_segment *&file);
-		int build_rd_file_resp(frame *out,link_layer *link,file_segment	*file);//cause 5
+		int (*get_dir_data)(_rd_dir *);
+		int build_rd_dir_resp(frame *out,link_layer *link,_rd_dir *);//cause 5
+		int (*get_file_data)(_rd_file *);
+		int build_rd_file_con(frame *out,link_layer *link,_rd_file *);//cause 7
+		int (*get_file_segment)(_rd_file *,buffer *&seg);
+		int build_rd_file_resp(frame *out,link_layer *link,buffer *file);//cause 5
 		int build_wr_file_con(frame *out,link_layer *link);//cause 7
 		int build_wr_file_resp(frame *out,link_layer *link);//cause 5
-		int (*save_file_segment)(char *filename,int pos,file_segment *&file);
+		int (*save_file_segment)(_rd_file *,buffer *&seg);
 		
 		int (*get_dz_unit)(buffer*data);
 		int build_rd_dz_unit_con(frame *out,link_layer *link);//cause 7
@@ -428,7 +421,7 @@ class app_layer{
 		int build_summon_acc_resp(frame *out,link_layer *link);//cause 37
 		int (*get_summon_acc_data)(buffer*data);
 
-		int (*save_update_file)(char *filename,file_segment *file);
+		int (*save_update_file)(_rd_file *,buffer *seg);
 		int build_update_con(frame *out,link_layer *link,int sel);//cause 7 sel=1 start,0 stop
 };
 /****************************
