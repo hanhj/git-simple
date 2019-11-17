@@ -477,6 +477,11 @@ class link_layer{
 
 	public:
 		link_layer(){
+			memset(&summon_data,0,sizeof(summon_data));
+			memset(&clock_data,0,sizeof(clock_data));
+			memset(&yk_data,0,sizeof(yk_data));
+			memset(&event_data,0,sizeof(event_data));
+			memset(&file_data,0,sizeof(file_data));
 			port=0;
 			com=NULL;
 			protocol=101;
