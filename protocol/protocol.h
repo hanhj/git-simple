@@ -290,7 +290,7 @@ typedef struct _event_data{
 typedef struct __rd_dir{
 	long id;
 	int  len;
-	char name[10];
+	char name[30];
 	int flag;
 	union{
 		CP56Time2a time;
@@ -305,20 +305,21 @@ typedef struct __rd_dir{
 	int suc;
 }_rd_dir;
 typedef struct __rd_file{
-	int  len;
-	char name[10];
-	long id;
 	long ack_offset;
 	long cur_offset;
 	char suc;//0无后续，1有后续
-	int step;
+	int	step;
+	dir_node req_file;
 	dir_node res_file;
+	int result;
+	char sum;
 	buffer res_seg;
 }_rd_file;
 typedef struct _file_data{
 	int act;
 	_rd_dir rd_dir;
 	_rd_file rd_file;
+	_rd_file wt_file;
 }FileData;
 
 //app_layer is y deal asdu part
@@ -326,7 +327,7 @@ class app_layer{
 	public:
 		vsq vsq_lo;
 		send_cause cause_lo;
-		int offset;//position of asdu in frame.
+		int offset_asdu;//position of asdu in frame.
 		int addr_size;
 		int cause_size;
 		int msg_id_size;
@@ -397,13 +398,16 @@ class app_layer{
 		
 		int (*get_dir_data)(_rd_dir *);
 		int build_rd_dir_resp(frame *out,link_layer *link,_rd_dir *);//cause 5
+		
 		int (*get_file_data)(_rd_file *);
 		int build_rd_file_con(frame *out,link_layer *link,_rd_file *);//cause 7
-		int (*get_file_segment)(_rd_file *,buffer *&seg);
-		int build_rd_file_resp(frame *out,link_layer *link,buffer *file);//cause 5
-		int build_wr_file_con(frame *out,link_layer *link);//cause 7
-		int build_wr_file_resp(frame *out,link_layer *link);//cause 5
-		int (*save_file_segment)(_rd_file *,buffer *&seg);
+		int (*get_file_segment)(_rd_file *);
+		int build_rd_file_resp(frame *out,link_layer *link,_rd_file *file);//cause 5
+
+		int (*save_file_data)(_rd_file *);
+		int build_wt_file_con(frame *out,link_layer *link,_rd_file *file);//cause 7
+		int (*save_file_segment)(_rd_file *);
+		int build_wt_file_resp(frame *out,link_layer *link,_rd_file *file);//cause 5
 		
 		int (*get_dz_unit)(buffer*data);
 		int build_rd_dz_unit_con(frame *out,link_layer *link);//cause 7
