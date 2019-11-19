@@ -311,10 +311,19 @@ typedef struct __rd_file{
 	int	step;
 	dir_node req_file;
 	dir_node res_file;
-	int result;
-	char sum;
-	buffer res_seg;
+	long result;
+	long file_size;
+	unsigned char sum;
+	buffer segment;
 }_rd_file;
+#define FILE_NO_ERROR 0
+#define FILE_UNKNOWN_ERROR 1
+#define FILE_UNSUPPORTNAME_ERROR 2
+#define FILE_LONGNAME_ERROR 3
+#define FILE_CHECK_ERROR 2
+#define FILE_FILE_SIZE_ERROR 3
+#define FILE_FILE_ID_ERROR 4
+
 typedef struct _file_data{
 	int act;
 	_rd_dir rd_dir;
@@ -447,6 +456,7 @@ class link_layer{
 
 		int link_state;
 		int link_step;
+		int has_data;
 
 		//101的可变帧与104的帧用同一缓冲区
 		var_frame last_send_frame;
@@ -467,6 +477,7 @@ class link_layer{
 		int offset_pub_addr;
 		int offset_msg_id;
 		int offset_data;
+		int offset_len;//for 101,offset of length 
 
 		timer rep_timer;
 		int rep_times;
@@ -513,139 +524,27 @@ class link_layer{
 			summon_data.sended_yx_num =0;
 			summon_data.summon_step = 0;
 			process=0;
+			offset_len=1;
+			has_data=0;
 		}
-		int set_link_com(com_port*,int port);
-		int set_app(app_layer*);
-		virtual void deal_timeout()=0;
-		virtual int get_frame()=0;//get a valid frame from port.
-		virtual int link_time()=0;
-		virtual int deal_frame(frame *)=0;
-		virtual void set_loc_ctl()=0;
-		void reset_yk_data();
-		int check_state();//cycle check link state
-		int send_frame(frame *);
 	public:
 		//the next functions will build link layer frame by call same name function in app_layer.
 		//different link layer has different link frame(eg 101 and 104).but they have same app_layer frame(asdu).
 		//the inheritance class must realize these virtual function.
 		virtual int build_link_layer(frame *out,int)=0;//by asdu build link frame 
+		virtual void deal_timeout()=0;
+		virtual int get_frame()=0;//get a valid frame from port.
+		virtual int link_time()=0;
+		virtual int deal_frame(frame *)=0;
+		virtual void set_loc_ctl()=0;
 
-		virtual int on_summon(frame *in,frame *out)=0;
-		virtual int process_summon(frame *out)=0;//set fc=3(balance) or fc=8(unbalance),var frame
-		virtual int on_summon_acc(frame *in,frame *out)=0;
-		virtual int process_summon_acc(frame *out)=0;
-		virtual int on_clock(frame *in,frame *out)=0;
-		virtual int process_clock(frame *out)=0;
-		virtual int on_yk(frame *in,frame *out)=0;
-		virtual int process_yk(frame *out)=0;
-		virtual int process_event(frame *out)=0;
-		virtual int on_test_link(frame *in,frame *out)=0;
-		virtual int process_test_link(frame *out)=0;
-		virtual int process_yc_change(frame *out)=0;
-		virtual int on_reset_terminal(frame *in,frame *out)=0;
-		virtual int process_reset_terminal(frame *out)=0;
-		virtual int on_file(frame *in,frame *out)=0;
-		virtual int process_file(frame *out)=0;
-		virtual int on_rd_dz(frame *in,frame *out)=0;
-		virtual int process_rd_dz(frame *out)=0;
-		virtual int on_rd_unit(frame *in,frame *out)=0;
-		virtual int process_rd_unit(frame *out)=0;
-		virtual int on_wt_dz(frame *in,frame *out)=0;
-		virtual int process_wt_dz(frame *out)=0;
-		virtual int on_wt_unit(frame *in,frame *out)=0;
-		virtual int process_wt_unit(frame *out)=0;
-		virtual int on_update(frame *in,frame *out)=0;
-		virtual int process_update(frame *out)=0;
+		int set_link_com(com_port*,int port);
+		int set_app(app_layer*);
+		void reset_yk_data();
+		int check_state();//cycle check link state
+		int send_frame(frame *);
 
-
-		void on_notify(message *msg);
-		void notify(message *msg);
-};
-/****************************
- * link_layer_101
-****************************/
-class link_layer_101:public link_layer{
-	public:
-		int balance;//1 balance,0 no balance
-		//fix frame is only for 101,so i define it in this.
-		fix_frame r_fix_frame;
-		fix_frame s_fix_frame;
-		int start_rcv_fix_flag;
-		int r_fix_pos;
-		int s_fix_pos;
-
-		ctrl_word ctl_rm;//saved control word from remote.
-		ctrl_word ctl_lo;
-		int offset_len;
-		int offset_control;
-		int offset_addr;
-
-		int has_data;
-		
-		timer rcv_fix_timer;//接收数据超时计时器
-	public:
-		link_layer_101(){
-			balance=0;
-			start_rcv_fix_flag=0;
-			r_fix_pos=0;
-			s_fix_pos=0;
-
-			rcv_fix_timer.stop();
-
-			ctl_rm.data=0;
-			ctl_lo.data=0;
-
-			offset_len=1;
-			offset_control=4;
-			offset_addr=5;
-			offset_asdu=offset_addr+addr_size;
-			offset_ti=offset_asdu;
-			offset_vsq=offset_asdu+1;
-			offset_cause=offset_vsq+1;
-			offset_pub_addr=offset_cause+cause_size;
-			offset_msg_id=offset_pub_addr+addr_size;
-			offset_data=offset_msg_id+msg_id_size;
-			has_data=0;
-		}
-		void set_balance(int da){
-			balance = da;
-		}
-	public:
-		int on_fc0(frame *);
-		int on_fc1(frame *);
-		int on_fc2(frame *);
-		int on_fc3(frame *);
-		int on_fc4(frame *);
-		int on_fc5(frame *);
-		int on_fc6(frame *);
-		int on_fc7(frame *);
-		int on_fc8(frame *);
-		int on_fc9(frame *);
-		int on_fc10(frame *);
-		int on_fc11(frame *);
-	public:
-		void deal_timeout();
-		int get_frame();
-		int link_time();//for balance
-		int deal_frame(frame *in);
-		int save_frame(frame *);
-		//build fix frame
-		int build_ack(frame *out,int has_data=0);//set fc=0,fix frame,has_data indicator if have class 1 data,used for unbalance.
-		int build_nak(frame *out);//set fc=1, fix frame
-		int build_err_rep(frame *out,int err);//?
-		int build_link_ack(frame *out);//set fc=11,fix frame,
-		int build_link_req(frame *out);//set fc=9,fix frame,for balance.
-		int build_reset_link(frame *out);//set fc=0,fix frame,for balance
-		int on_req_class_1(frame *in,frame *out);//set fc=8 or fc=9,response fc10,for unbalance,fix frame or var frame,for unbalance
-		int on_req_class_2(frame *in,frame *out);//set fc=8 or fc=9,response fc11,for unbalance,fix frame or var frame,for unbalance.
-		int on_req(frame *in,frame *out);//set fc=0 or fc=1,response fc3,fix frame or var frame,for balance and unbalance.
-		int on_ack(frame *in,frame *out);//response fc0,used by balance;
-
-		void set_loc_ctl();	//set respose frame's control word.
-//the next functions  is implement of parent virtual function. inheritance 继承
-		int build_link_layer(frame *out,int asdu_len);//by asdu build link frame.
 		int build_link_fini(frame *out);//set fc=3(balance) or fc=8(unbalance),var frame
-		
 		int on_summon(frame *in,frame *out);
 		int process_summon(frame *out);//set fc=3(balance) or fc=8(unbalance),var frame
 		int on_summon_acc(frame *in,frame *out);
@@ -672,6 +571,89 @@ class link_layer_101:public link_layer{
 		int process_wt_unit(frame *out);
 		int on_update(frame *in,frame *out);
 		int process_update(frame *out);
+
+		void on_notify(message *msg);
+		void notify(message *msg);
+};
+/****************************
+ * link_layer_101
+****************************/
+class link_layer_101:public link_layer{
+	public:
+		int balance;//1 balance,0 no balance
+		//fix frame is only for 101,so i define it in this.
+		fix_frame r_fix_frame;
+		fix_frame s_fix_frame;
+		int start_rcv_fix_flag;
+		int r_fix_pos;
+		int s_fix_pos;
+
+		ctrl_word ctl_rm;//saved control word from remote.
+		ctrl_word ctl_lo;
+		int offset_control;
+		int offset_addr;
+
+		
+		timer rcv_fix_timer;//接收数据超时计时器
+	public:
+		link_layer_101(){
+			balance=0;
+			start_rcv_fix_flag=0;
+			r_fix_pos=0;
+			s_fix_pos=0;
+
+			rcv_fix_timer.stop();
+
+			ctl_rm.data=0;
+			ctl_lo.data=0;
+
+			offset_control=4;
+			offset_addr=5;
+			offset_asdu=offset_addr+addr_size;
+			offset_ti=offset_asdu;
+			offset_vsq=offset_asdu+1;
+			offset_cause=offset_vsq+1;
+			offset_pub_addr=offset_cause+cause_size;
+			offset_msg_id=offset_pub_addr+addr_size;
+			offset_data=offset_msg_id+msg_id_size;
+		}
+		void set_balance(int da){
+			balance = da;
+		}
+	public:
+		int on_fc0(frame *);
+		int on_fc1(frame *);
+		int on_fc2(frame *);
+		int on_fc3(frame *);
+		int on_fc4(frame *);
+		int on_fc5(frame *);
+		int on_fc6(frame *);
+		int on_fc7(frame *);
+		int on_fc8(frame *);
+		int on_fc9(frame *);
+		int on_fc10(frame *);
+		int on_fc11(frame *);
+	public:
+		//build fix frame
+		int build_ack(frame *out,int has_data=0);//set fc=0,fix frame,has_data indicator if have class 1 data,used for unbalance.
+		int build_nak(frame *out);//set fc=1, fix frame
+		int build_err_rep(frame *out,int err);//?
+		int build_link_ack(frame *out);//set fc=11,fix frame,
+		int build_link_req(frame *out);//set fc=9,fix frame,for balance.
+		int build_reset_link(frame *out);//set fc=0,fix frame,for balance
+		int on_req_class_1(frame *in,frame *out);//set fc=8 or fc=9,response fc10,for unbalance,fix frame or var frame,for unbalance
+		int on_req_class_2(frame *in,frame *out);//set fc=8 or fc=9,response fc11,for unbalance,fix frame or var frame,for unbalance.
+		int on_req(frame *in,frame *out);//set fc=0 or fc=1,response fc3,fix frame or var frame,for balance and unbalance.
+		int on_ack(frame *in,frame *out);//response fc0,used by balance;
+
+		void set_loc_ctl();	//set respose frame's control word.
+//the next functions  is implement of parent virtual function. inheritance 继承
+		int build_link_layer(frame *out,int asdu_len);//by asdu build link frame.
+		void deal_timeout();
+		int get_frame();
+		int link_time();//for balance
+		int deal_frame(frame *in);
+		int save_frame(frame *);
 };
 #define REP_TIMES 3
 #define REP_TIME  1

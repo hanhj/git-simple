@@ -66,6 +66,49 @@ int link_layer::check_state(){
 	cout<<"check state of link "<<port<<",state:"<<link_state<<endl;
 	return 0;
 }
+int link_layer::on_summon(frame *in,frame *out){
+	return 0;
+}
+int link_layer::process_summon(frame *out){
+	int ret;
+	ret=-1;
+	if(summon_data.summon_step==0){
+		ret=app->build_summon_con(out,this);
+	}else if(summon_data.summon_step == 1){
+		ret=app->build_yx_data(out,this);
+	}else if(summon_data.summon_step == 2){
+		ret=app->build_dyx_data(out,this);
+	}else if(summon_data.summon_step == 3){
+		ret=app->build_yc_data(out,this);
+	}else if(summon_data.summon_step == 4){
+		ret=app->build_summon_term(out,this);
+		process &=~PROCESS_SUMMON;
+	}
+	return ret;
+}
+int link_layer::on_summon_acc(frame *in,frame *out){
+	return 0;
+}
+int link_layer::process_summon_acc(frame *out){
+	int ret =0;
+	return ret;
+}
+int link_layer::process_clock(frame *out){
+	int ret;
+	ret=-1;
+	ret=app->build_clock(out,this);
+	return ret;
+}
+int link_layer::on_clock(frame *in,frame *out){
+	int ret;
+	ret =0;
+	if(in->data[offset_cause]==CAUSE_Act){
+		clock_data.clock_syn = 1;
+	}else if(in->data[offset_cause] == CAUSE_Req){
+		clock_data.clock_rd = 1;
+	}
+	return ret;
+}
 void link_layer::reset_yk_data(){
 	yk_data.sel=0;
 	yk_data.act=0;
@@ -73,6 +116,274 @@ void link_layer::reset_yk_data(){
 	yk_data.timeout=0;
 	process&=~PROCESS_RM_CTL;
 }
+int link_layer::on_yk(frame *in,frame *out){
+	int ret =0;
+	int ctrl;
+	yk_data.cmd_id=in->data[offset_ti];
+	yk_data.ctrl_id=in->data[offset_data];
+	yk_data.ctrl_id=(yk_data.ctrl_id<<8)+in->data[offset_data+1];
+	yk_data.sco.data=in->data[offset_data+2];
+	yk_data.dco.data=yk_data.sco.data;
+	
+	if(yk_data.ctrl_id == COMMAND_RM_CTL){
+		ctrl=yk_data.sco.bit.scs;
+	}else if(yk_data.ctrl_id == COMMAND_RM_CTL_D){
+		ctrl=yk_data.dco.bit.dcs==1?0:1;
+	}
+	if(in->data[offset_cause]==CAUSE_Act){
+		if(yk_data.sco.bit.sel==0){//sel
+			if(yk_data.sel==0){
+				yk_data.sel=1;
+				ret=app->do_yk(yk_data.ctrl_id,1,ctrl);//do check
+				if(ret<0)
+					yk_data.fail=1;
+				else if(yk_data.start_timeout==0)
+					yk_data.start_timeout = 1;
+			}else//re select
+				yk_data.fail=1;
+			}
+		else if(yk_data.sco.bit.sel==1){//act
+			if(yk_data.sel==1){
+				yk_data.act=1;
+				ret=app->do_yk(yk_data.ctrl_id,0,ctrl);//do act 
+				if(ret<0)
+					yk_data.fail=1;
+			}else{
+				yk_data.fail=1;
+			}
+		}
+	}else if(in->data[offset_cause] == CAUSE_Deact){
+		yk_data.deactive=1;
+	}
+	if(yk_data.fail){
+		ret=-1;
+		reset_yk_data();
+
+	}
+	if(yk_data.deactive){
+		reset_yk_data();
+	}
+
+	return ret;
+}
+int link_layer::process_yk(frame *out){
+	int ret;
+	ret=app->build_yk(out,this);
+	return ret;
+}
+int link_layer::process_event(frame *out){
+	int ret=-1;
+	event *e;
+	e=NULL;
+	if(app->get_event_data(port,e,1)==1){
+		ret=app->build_event_data(out,this,e);
+	}
+	return ret;
+}
+int link_layer::on_test_link(frame *in,frame *out){
+	return 0;
+}
+int link_layer::process_test_link(frame *out){
+	int ret=-1;
+	ret=app->build_link_test_con(out,this);
+	process &=~PROCESS_TEST_LINK;
+	return ret;
+}
+int link_layer::process_yc_change(frame *out){
+	int ret=-1;
+	event_yc *e;
+	if(app->get_yc_cg_data(port,e)==1)
+		ret=app->build_yc_cg_data(out,this,e);
+	return ret;
+}
+int link_layer::on_reset_terminal(frame *in,frame *out){
+	has_data =1;
+	return 0;
+}
+int link_layer::process_reset_terminal(frame *out){
+	int ret=0;
+	ret=app->build_reset_con(out,this);
+	has_data=0;
+	return ret;
+}
+int link_layer::on_file(frame *in,frame *out){
+	int ret=0;
+	int i,j;
+	i=3;
+	j=0;
+	file_data.act=in->data[offset_data+i++];
+	if(file_data.act == 1){//rd dir
+		file_data.rd_dir.id=in->data[offset_data+i++];
+		file_data.rd_dir.id=file_data.rd_dir.id<<8;
+		file_data.rd_dir.id|=in->data[offset_data+i++];
+		file_data.rd_dir.id=file_data.rd_dir.id<<8;
+		file_data.rd_dir.id|=in->data[offset_data+i++];
+		file_data.rd_dir.id=file_data.rd_dir.id<<8;
+		file_data.rd_dir.id|=in->data[offset_data+i++];
+		file_data.rd_dir.len=in->data[offset_data+i++];
+		for(j=0;j<file_data.rd_dir.len;j++){
+			file_data.rd_dir.name[j]=in->data[offset_data+i++];
+		}
+		file_data.rd_dir.flag=in->data[offset_data+i++];
+		for(j=0;j<7;j++)
+			file_data.rd_dir.start_time.data[j]=in->data[offset_data+i++];
+		for(j=0;j<7;j++)
+			file_data.rd_dir.end_time.data[j]=in->data[offset_data+i++];
+	}else if(file_data.act == 3){//rd file
+		file_data.rd_file.req_file.name_len=in->data[offset_data+i++];
+		for(j=0;j<file_data.rd_file.req_file.name_len;j++){
+			file_data.rd_file.req_file.name[j]=in->data[offset_data+i++];
+		}
+	}else if(file_data.act == 6){//rd file confirm
+		file_data.rd_file.req_file.file_id=in->data[offset_data+i++];
+		file_data.rd_file.req_file.file_id=file_data.rd_file.req_file.file_id<<8;
+		file_data.rd_file.req_file.file_id|=in->data[offset_data+i++];
+		file_data.rd_file.req_file.file_id=file_data.rd_file.req_file.file_id<<8;
+		file_data.rd_file.req_file.file_id|=in->data[offset_data+i++];
+		file_data.rd_file.req_file.file_id=file_data.rd_file.req_file.file_id<<8;
+		file_data.rd_file.req_file.file_id|=in->data[offset_data+i++];
+		
+		file_data.rd_file.ack_offset=in->data[offset_data+i++];
+		file_data.rd_file.ack_offset=file_data.rd_file.ack_offset<<8;
+		file_data.rd_file.ack_offset|=in->data[offset_data+i++];
+		file_data.rd_file.ack_offset=file_data.rd_file.ack_offset<<8;
+		file_data.rd_file.ack_offset|=in->data[offset_data+i++];
+		file_data.rd_file.ack_offset=file_data.rd_file.ack_offset<<8;
+		file_data.rd_file.ack_offset|=in->data[offset_data+i++];
+		file_data.rd_file.suc=in->data[offset_data+i++];
+	}else if(file_data.act ==7){//write file act
+		file_data.wt_file.req_file.name_len=in->data[offset_data+i++];
+		file_data.wt_file.result=0;
+		for(j=0;j<file_data.wt_file.req_file.name_len&&j<30;j++){
+			file_data.wt_file.req_file.name[j]=in->data[offset_data+i++];
+		}
+		if(file_data.wt_file.req_file.name_len>30)
+			file_data.wt_file.result=FILE_LONGNAME_ERROR;//long name file error
+		file_data.wt_file.req_file.file_id=in->data[offset_data+i++];
+		file_data.wt_file.req_file.file_id=file_data.wt_file.req_file.file_id<<8;
+		file_data.wt_file.req_file.file_id|=in->data[offset_data+i++];
+		file_data.wt_file.req_file.file_id=file_data.wt_file.req_file.file_id<<8;
+		file_data.wt_file.req_file.file_id|=in->data[offset_data+i++];
+		file_data.wt_file.req_file.file_id=file_data.wt_file.req_file.file_id<<8;
+		file_data.wt_file.req_file.file_id|=in->data[offset_data+i++];
+
+		file_data.wt_file.req_file.file_size=in->data[offset_data+i++];
+		file_data.wt_file.req_file.file_size=file_data.wt_file.req_file.file_size<<8;
+		file_data.wt_file.req_file.file_size|=in->data[offset_data+i++];
+		file_data.wt_file.req_file.file_size=file_data.wt_file.req_file.file_size<<8;
+		file_data.wt_file.req_file.file_size|=in->data[offset_data+i++];
+		file_data.wt_file.req_file.file_size=file_data.wt_file.req_file.file_size<<8;
+		file_data.wt_file.req_file.file_size|=in->data[offset_data+i++];
+	}else if(file_data.act==9){
+		int data_len;
+		long tmp_id;
+		data_len=in->data[offset_len] - 1 - addr_size - 1 - 1 - cause_size - addr_size - msg_id_size;
+		tmp_id=in->data[offset_data+i++];
+		tmp_id=tmp_id<<8;
+		tmp_id|=in->data[offset_data+i++];
+		tmp_id=tmp_id<<8;
+		tmp_id|=in->data[offset_data+i++];
+		tmp_id=tmp_id<<8;
+		tmp_id|=in->data[offset_data+i++];
+		file_data.wt_file.cur_offset=in->data[offset_data+i++];
+		file_data.wt_file.cur_offset=file_data.wt_file.cur_offset<<8;
+		file_data.wt_file.cur_offset|=in->data[offset_data+i++];
+		file_data.wt_file.cur_offset=file_data.wt_file.cur_offset<<8;
+		file_data.wt_file.cur_offset|=in->data[offset_data+i++];
+		file_data.wt_file.cur_offset=file_data.wt_file.cur_offset<<8;
+		file_data.wt_file.cur_offset|=in->data[offset_data+i++];
+		file_data.wt_file.suc=in->data[offset_data+i++];
+		file_data.wt_file.segment.len=data_len;
+		for(j=0;j<data_len;j++){
+			file_data.wt_file.segment.data[j]=in->data[offset_data+i++];
+		}
+		if(tmp_id!=file_data.wt_file.req_file.file_id)
+			file_data.wt_file.result=FILE_FILE_ID_ERROR;//file error
+		file_data.wt_file.sum=in->data[offset_data+i++];
+	}
+	return ret;
+}
+int link_layer::process_file(frame *out){
+	int ret=-1;
+	if(file_data.act==1){
+		ret=app->get_dir_data(&file_data.rd_dir);
+		if(ret>=0){
+			ret=app->build_rd_dir_resp(out,this,&file_data.rd_dir);
+			if(file_data.rd_dir.suc==0)
+				file_data.act=0;
+		}
+	}else if(file_data.act==3){
+		if(file_data.rd_file.step==0){
+			ret=app->get_file_data(&file_data.rd_file);
+			if(ret>=0)
+				ret=app->build_rd_file_con(out,this,&file_data.rd_file);
+		}else{
+			ret=app->get_file_segment(&file_data.rd_file);
+			if(ret>=0)
+				ret=app->build_rd_file_resp(out,this,&file_data.rd_file);
+		}
+	}else if(file_data.act==6){
+		ret=0;
+		//change file offset_asdu
+		if(file_data.rd_file.ack_offset == file_data.rd_file.cur_offset)
+			file_data.rd_file.cur_offset=file_data.rd_file.cur_offset+file_data.rd_file.segment.len;
+		file_data.act=3;
+	}else if(file_data.act==7){
+		ret=app->save_file_data(&file_data.wt_file);
+		if(ret>=0)
+			ret=app->build_wt_file_con(out,this,&file_data.wt_file);
+	}else if(file_data.act==9){
+		ret=app->save_file_segment(&file_data.wt_file);
+		if(ret>=0)
+			ret=app->build_wt_file_resp(out,this,&file_data.wt_file);
+	}
+	return ret;
+}
+int link_layer::on_rd_dz(frame *in,frame *out){
+	int ret=0;
+	return ret;
+}
+int link_layer::process_rd_dz(frame *out){
+	int ret=0;
+	return ret;
+}
+
+int link_layer::on_rd_unit(frame *in,frame *out){
+	int ret=0;
+	return ret;
+}
+int link_layer::process_rd_unit(frame *out){
+	int ret=0;
+	return ret;
+}
+
+int link_layer::on_wt_dz(frame *in,frame *out){
+	int ret=0;
+	return ret;
+}
+int link_layer::process_wt_dz(frame *out){
+	int ret=0;
+	return ret;
+}
+
+int link_layer::on_wt_unit(frame *in,frame *out){
+	int ret=0;
+	return ret;
+}
+int link_layer::process_wt_unit(frame *out){
+	int ret=0;
+	return ret;
+}
+
+int link_layer::on_update(frame *in,frame *out){
+	int ret=0;
+	return ret;
+}
+int link_layer::process_update(frame *out){
+	int ret=0;
+	return ret;
+}
+
 /****************************
  *  realize link_layer_101
 ****************************/
@@ -358,49 +669,6 @@ int link_layer_101::on_req_class_2(frame *in,frame *out){
 	}
 	return ret;
 }
-int link_layer_101::on_summon(frame *in,frame *out){
-	return 0;
-}
-int link_layer_101::process_summon(frame *out){
-	int ret;
-	ret=-1;
-	if(summon_data.summon_step==0){
-		ret=app->build_summon_con(out,this);
-	}else if(summon_data.summon_step == 1){
-		ret=app->build_yx_data(out,this);
-	}else if(summon_data.summon_step == 2){
-		ret=app->build_dyx_data(out,this);
-	}else if(summon_data.summon_step == 3){
-		ret=app->build_yc_data(out,this);
-	}else if(summon_data.summon_step == 4){
-		ret=app->build_summon_term(out,this);
-		process &=~PROCESS_SUMMON;
-	}
-	return ret;
-}
-int link_layer_101::on_summon_acc(frame *in,frame *out){
-	return 0;
-}
-int link_layer_101::process_summon_acc(frame *out){
-	int ret =0;
-	return ret;
-}
-int link_layer_101::process_clock(frame *out){
-	int ret;
-	ret=-1;
-	ret=app->build_clock(out,this);
-	return ret;
-}
-int link_layer_101::on_clock(frame *in,frame *out){
-	int ret;
-	ret =0;
-	if(in->data[offset_cause]==CAUSE_Act){
-		clock_data.clock_syn = 1;
-	}else if(in->data[offset_cause] == CAUSE_Req){
-		clock_data.clock_rd = 1;
-	}
-	return ret;
-}
 //10ms
 void link_layer_101::deal_timeout(){
 	int ret=0;
@@ -456,270 +724,6 @@ end:if(ret){
 	if(app->need_reset)
 		app->do_reset();
 }
-int link_layer_101::process_yk(frame *out){
-	int ret;
-	ret=app->build_yk(out,this);
-	return ret;
-}
-int link_layer_101::on_yk(frame *in,frame *out){
-	int ret =0;
-	int ctrl;
-	yk_data.cmd_id=in->data[offset_ti];
-	yk_data.ctrl_id=in->data[offset_data];
-	yk_data.ctrl_id=(yk_data.ctrl_id<<8)+in->data[offset_data+1];
-	yk_data.sco.data=in->data[offset_data+2];
-	yk_data.dco.data=yk_data.sco.data;
-	
-	if(yk_data.ctrl_id == COMMAND_RM_CTL){
-		ctrl=yk_data.sco.bit.scs;
-	}else if(yk_data.ctrl_id == COMMAND_RM_CTL_D){
-		ctrl=yk_data.dco.bit.dcs==1?0:1;
-	}
-	if(in->data[offset_cause]==CAUSE_Act){
-		if(yk_data.sco.bit.sel==0){//sel
-			if(yk_data.sel==0){
-				yk_data.sel=1;
-				ret=app->do_yk(yk_data.ctrl_id,1,ctrl);//do check
-				if(ret<0)
-					yk_data.fail=1;
-				else if(yk_data.start_timeout==0)
-					yk_data.start_timeout = 1;
-			}else//re select
-				yk_data.fail=1;
-			}
-		else if(yk_data.sco.bit.sel==1){//act
-			if(yk_data.sel==1){
-				yk_data.act=1;
-				ret=app->do_yk(yk_data.ctrl_id,0,ctrl);//do act 
-				if(ret<0)
-					yk_data.fail=1;
-			}else{
-				yk_data.fail=1;
-			}
-		}
-	}else if(in->data[offset_cause] == CAUSE_Deact){
-		yk_data.deactive=1;
-	}
-	if(yk_data.fail){
-		ret=-1;
-		reset_yk_data();
-
-	}
-	if(yk_data.deactive){
-		reset_yk_data();
-	}
-
-	return ret;
-}
-int link_layer_101::process_event(frame *out){
-	int ret=-1;
-	event *e;
-	e=NULL;
-	if(app->get_event_data(port,e,1)==1){
-		ret=app->build_event_data(out,this,e);
-	}
-	return ret;
-}
-int link_layer_101::on_test_link(frame *in,frame *out){
-	return 0;
-}
-int link_layer_101::process_test_link(frame *out){
-	int ret=-1;
-	ret=app->build_link_test_con(out,this);
-	process &=~PROCESS_TEST_LINK;
-	return ret;
-}
-int link_layer_101::process_yc_change(frame *out){
-	int ret=-1;
-	event_yc *e;
-	if(app->get_yc_cg_data(port,e)==1)
-		ret=app->build_yc_cg_data(out,this,e);
-	return ret;
-}
-int link_layer_101::on_reset_terminal(frame *in,frame *out){
-	has_data =1;
-	return 0;
-}
-int link_layer_101::process_reset_terminal(frame *out){
-	int ret=0;
-	ret=app->build_reset_con(out,this);
-	has_data=0;
-	return ret;
-}
-int link_layer_101::on_file(frame *in,frame *out){
-	int ret=0;
-	int i,j;
-	i=3;
-	j=0;
-	file_data.act=in->data[offset_data+i++];
-	if(file_data.act == 1){//rd dir
-		file_data.rd_dir.id=in->data[offset_data+i++];
-		file_data.rd_dir.id=file_data.rd_dir.id<<8;
-		file_data.rd_dir.id|=in->data[offset_data+i++];
-		file_data.rd_dir.id=file_data.rd_dir.id<<8;
-		file_data.rd_dir.id|=in->data[offset_data+i++];
-		file_data.rd_dir.id=file_data.rd_dir.id<<8;
-		file_data.rd_dir.id|=in->data[offset_data+i++];
-		file_data.rd_dir.len=in->data[offset_data+i++];
-		for(j=0;j<file_data.rd_dir.len;j++){
-			file_data.rd_dir.name[j]=in->data[offset_data+i++];
-		}
-		file_data.rd_dir.flag=in->data[offset_data+i++];
-		for(j=0;j<7;j++)
-			file_data.rd_dir.start_time.data[j]=in->data[offset_data+i++];
-		for(j=0;j<7;j++)
-			file_data.rd_dir.end_time.data[j]=in->data[offset_data+i++];
-	}else if(file_data.act == 3){//rd file
-		file_data.rd_file.req_file.name_len=in->data[offset_data+i++];
-		for(j=0;j<file_data.rd_file.req_file.name_len;j++){
-			file_data.rd_file.req_file.name[j]=in->data[offset_data+i++];
-		}
-	}else if(file_data.act == 6){//rd file confirm
-		file_data.rd_file.req_file.file_id=in->data[offset_data+i++];
-		file_data.rd_file.req_file.file_id=file_data.rd_file.req_file.file_id<<8;
-		file_data.rd_file.req_file.file_id|=in->data[offset_data+i++];
-		file_data.rd_file.req_file.file_id=file_data.rd_file.req_file.file_id<<8;
-		file_data.rd_file.req_file.file_id|=in->data[offset_data+i++];
-		file_data.rd_file.req_file.file_id=file_data.rd_file.req_file.file_id<<8;
-		file_data.rd_file.req_file.file_id|=in->data[offset_data+i++];
-		
-		file_data.rd_file.ack_offset=in->data[offset_data+i++];
-		file_data.rd_file.ack_offset=file_data.rd_file.ack_offset<<8;
-		file_data.rd_file.ack_offset|=in->data[offset_data+i++];
-		file_data.rd_file.ack_offset=file_data.rd_file.ack_offset<<8;
-		file_data.rd_file.ack_offset|=in->data[offset_data+i++];
-		file_data.rd_file.ack_offset=file_data.rd_file.ack_offset<<8;
-		file_data.rd_file.ack_offset|=in->data[offset_data+i++];
-		file_data.rd_file.suc=in->data[offset_data+i++];
-	}else if(file_data.act ==7){//write file act
-		file_data.wt_file.req_file.name_len=in->data[offset_data+i++];
-		file_data.wt_file.result=0;
-		for(j=0;j<file_data.wt_file.req_file.name_len&&j<30;j++){
-			file_data.wt_file.req_file.name[j]=in->data[offset_data+i++];
-		}
-		if(file_data.wt_file.req_file.name_len>30)
-			file_data.wt_file.result=3;//long name
-		file_data.wt_file.req_file.file_id=in->data[offset_data+i++];
-		file_data.wt_file.req_file.file_id=file_data.wt_file.req_file.file_id<<8;
-		file_data.wt_file.req_file.file_id|=in->data[offset_data+i++];
-		file_data.wt_file.req_file.file_id=file_data.wt_file.req_file.file_id<<8;
-		file_data.wt_file.req_file.file_id|=in->data[offset_data+i++];
-		file_data.wt_file.req_file.file_id=file_data.wt_file.req_file.file_id<<8;
-		file_data.wt_file.req_file.file_id|=in->data[offset_data+i++];
-
-		file_data.wt_file.req_file.file_size=in->data[offset_data+i++];
-		file_data.wt_file.req_file.file_size=file_data.wt_file.req_file.file_size<<8;
-		file_data.wt_file.req_file.file_size|=in->data[offset_data+i++];
-		file_data.wt_file.req_file.file_size=file_data.wt_file.req_file.file_size<<8;
-		file_data.wt_file.req_file.file_size|=in->data[offset_data+i++];
-		file_data.wt_file.req_file.file_size=file_data.wt_file.req_file.file_size<<8;
-		file_data.wt_file.req_file.file_size|=in->data[offset_data+i++];
-	}else if(file_data.act==9){
-		int data_len;
-		data_len=in->data[offset_len] - 1 - addr_size - 1 - 1 - cause_size - addr_size - msg_id_size;
-		file_data.wt_file.req_file.file_id=in->data[offset_data+i++];
-		file_data.wt_file.req_file.file_id=file_data.wt_file.req_file.file_id<<8;
-		file_data.wt_file.req_file.file_id|=in->data[offset_data+i++];
-		file_data.wt_file.req_file.file_id=file_data.wt_file.req_file.file_id<<8;
-		file_data.wt_file.req_file.file_id|=in->data[offset_data+i++];
-		file_data.wt_file.req_file.file_id=file_data.wt_file.req_file.file_id<<8;
-		file_data.wt_file.req_file.file_id|=in->data[offset_data+i++];
-		file_data.wt_file.cur_offset=in->data[offset_data+i++];
-		file_data.wt_file.cur_offset=file_data.wt_file.cur_offset<<8;
-		file_data.wt_file.cur_offset|=in->data[offset_data+i++];
-		file_data.wt_file.cur_offset=file_data.wt_file.cur_offset<<8;
-		file_data.wt_file.cur_offset|=in->data[offset_data+i++];
-		file_data.wt_file.cur_offset=file_data.wt_file.cur_offset<<8;
-		file_data.wt_file.cur_offset|=in->data[offset_data+i++];
-		file_data.wt_file.suc=in->data[offset_data+i++];
-		file_data.wt_file.res_seg.len=data_len;
-		for(j=0;j<data_len;j++){
-			file_data.wt_file.res_seg.data[j]=in->data[offset_data+i++];
-		}
-		file_data.wt_file.sum=in->data[offset_data+i++];
-	}
-	return ret;
-}
-int link_layer_101::process_file(frame *out){
-	int ret=-1;
-	if(file_data.act==1){
-		ret=app->get_dir_data(&file_data.rd_dir);
-		if(ret){
-			ret=app->build_rd_dir_resp(out,this,&file_data.rd_dir);
-			if(file_data.rd_dir.suc==0)
-				file_data.act=0;
-		}
-	}else if(file_data.act==3){
-		if(file_data.rd_file.step==0){
-			ret=app->get_file_data(&file_data.rd_file);
-			if(ret)
-				ret=app->build_rd_file_con(out,this,&file_data.rd_file);
-		}else{
-			ret=app->get_file_segment(&file_data.rd_file);
-			if(ret>=0)
-				ret=app->build_rd_file_resp(out,this,&file_data.rd_file);
-		}
-	}else if(file_data.act==6){
-		ret=0;
-		//change file offset_asdu
-		if(file_data.rd_file.ack_offset == file_data.rd_file.cur_offset)
-			file_data.rd_file.cur_offset=file_data.rd_file.cur_offset+file_data.rd_file.res_seg.len;
-		file_data.act=3;
-	}else if(file_data.act==7){
-		ret=app->save_file_data(&file_data.wt_file);
-		if(ret)
-			ret=app->build_wt_file_con(out,this,&file_data.wt_file);
-	}else if(file_data.act==9){
-		ret=app->save_file_segment(&file_data.wt_file);
-		if(ret>=0)
-			ret=app->build_wt_file_resp(out,this,&file_data.wt_file);
-	}
-	return ret;
-}
-int link_layer_101::on_rd_dz(frame *in,frame *out){
-	int ret=0;
-	return ret;
-}
-int link_layer_101::process_rd_dz(frame *out){
-	int ret=0;
-	return ret;
-}
-
-int link_layer_101::on_rd_unit(frame *in,frame *out){
-	int ret=0;
-	return ret;
-}
-int link_layer_101::process_rd_unit(frame *out){
-	int ret=0;
-	return ret;
-}
-
-int link_layer_101::on_wt_dz(frame *in,frame *out){
-	int ret=0;
-	return ret;
-}
-int link_layer_101::process_wt_dz(frame *out){
-	int ret=0;
-	return ret;
-}
-
-int link_layer_101::on_wt_unit(frame *in,frame *out){
-	int ret=0;
-	return ret;
-}
-int link_layer_101::process_wt_unit(frame *out){
-	int ret=0;
-	return ret;
-}
-
-int link_layer_101::on_update(frame *in,frame *out){
-	int ret=0;
-	return ret;
-}
-int link_layer_101::process_update(frame *out){
-	int ret=0;
-	return ret;
-}
 
 int link_layer_101::on_req(frame *in,frame *out){
 	int ret;
@@ -760,6 +764,7 @@ int link_layer_101::on_req(frame *in,frame *out){
 				ret=process_reset_terminal(out);
 			break;
 		case COMMAND_FILE:
+			process|=PROCESS_FILE;
 			ret=on_file(in,out);
 			if(balance ==BALANCE){
 				ret=process_file(out);
@@ -767,6 +772,10 @@ int link_layer_101::on_req(frame *in,frame *out){
 			break;
 		case COMMAND_RD_DZ_UNIT:
 			process|=PROCESS_RD_DZ_UNIT;
+			ret=on_rd_dz_unit(in,out);
+			if(balance == BALANCE){
+				ret = process_rd_dz_unit(out);
+			}
 			break;
 		case COMMAND_RD_DZ:
 			process|=PROCESS_RD_DZ;
@@ -1648,7 +1657,7 @@ err:
 }
 /**
 ***********************************************************************
-*  @brief	build asdu of yx data command 
+*  @brief	build asdu of double yx data command 
 *  @param[in] link point to link_layer  
 *  @param[out]  out point to out frame 
 *  @return upon successful return number of asdu size\n
@@ -1972,7 +1981,7 @@ err:
 }
 /**
 ***********************************************************************
-*  @brief	build asdu of link_fini command 
+*  @brief	build asdu of link_test confirm command 
 *  @param[in] link point to link_layer  
 *  @param[out]  out point to out frame 
 *  @return upon successful return number of asdu size\n
@@ -2017,7 +2026,7 @@ err:
 }
 /**
 ***********************************************************************
-*  @brief	build asdu of link_fini command 
+*  @brief	build asdu of yc change command 
 *  @param[in] link point to link_layer  
 *  @param[out]  out point to out frame 
 *  @return upon successful return number of asdu size\n
@@ -2074,7 +2083,7 @@ err:
 }
 /**
 ***********************************************************************
-*  @brief	build asdu of link_fini command 
+*  @brief	build asdu of reset terminal confirm command 
 *  @param[in] link point to link_layer  
 *  @param[out]  out point to out frame 
 *  @return upon successful return number of asdu size\n
@@ -2118,7 +2127,7 @@ err:
 }
 /**
 ***********************************************************************
-*  @brief	build asdu of link_fini command 
+*  @brief	build asdu of read dirtionary command 
 *  @param[in] link point to link_layer  
 *  @param[out]  out point to out frame 
 *  @return upon successful return number of asdu size\n
@@ -2210,7 +2219,7 @@ err:
 }
 /**
 ***********************************************************************
-*  @brief	build asdu of link_fini command 
+*  @brief	build asdu of read file active confirm command 
 *  @param[in] link point to link_layer  
 *  @param[out]  out point to out frame 
 *  @return upon successful return number of asdu size\n
@@ -2272,7 +2281,7 @@ err:
 }
 /**
 ***********************************************************************
-*  @brief	build asdu of link_fini command 
+*  @brief	build asdu of read file segment response command 
 *  @param[in] link point to link_layer  
 *  @param[out]  out point to out frame 
 *  @return upon successful return number of asdu size\n
@@ -2321,9 +2330,9 @@ int app_layer::build_rd_file_resp(frame *out,link_layer *link,_rd_file *file){//
 	out->data[offset_asdu+i++]=file->cur_offset>>8;
 	out->data[offset_asdu+i++]=file->suc;
 	sum=0;
-	for(j=0;j<file->res_seg.len;j++){
-		out->data[offset_asdu+i++]=file->res_seg.data[j];
-		sum+=file->res_seg.data[j];
+	for(j=0;j<file->segment.len;j++){
+		out->data[offset_asdu+i++]=file->segment.data[j];
+		sum+=file->segment.data[j];
 	}
 	out->data[offset_asdu+i++]=sum;
 	ret=i;
@@ -2337,7 +2346,7 @@ err:
 }
 /**
 ***********************************************************************
-*  @brief	build asdu of link_fini command 
+*  @brief	build asdu of write file active confirm command 
 *  @param[in] link point to link_layer  
 *  @param[out]  out point to out frame 
 *  @return upon successful return number of asdu size\n
@@ -2393,13 +2402,12 @@ int app_layer::build_wt_file_con(frame *out,link_layer *link,_rd_file *file){//c
 		errno=ret;
 		goto err;
 	}
-	file->step=1;
 err:
 	return ret;
 }
 /**
 ***********************************************************************
-*  @brief	build asdu of link_fini command 
+*  @brief	build asdu of write file segment response command 
 *  @param[in] link point to link_layer  
 *  @param[out]  out point to out frame 
 *  @return upon successful return number of asdu size\n
@@ -2410,13 +2418,41 @@ err:
 */
 int app_layer::build_wt_file_resp(frame *out,link_layer *link,_rd_file *file){//cause 5
 	int i;
-	i=0;
 	int ret;
+	i=0;
+	ret = -1;
 	
 	link->set_loc_ctl();	
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
+	vsq_lo.bit.n=1;
+	vsq_lo.bit.sq=0;
+	cause_lo.bit.cause=CAUSE_Req;
+
+	out->data[offset_asdu+i++]=COMMAND_FILE;
+	out->data[offset_asdu+i++]=vsq_lo.data;
+	out->data[offset_asdu+i++]=cause_lo.data;
+	if(cause_size==2){
+		out->data[offset_asdu+i++]=(cause_lo.data>>8&0x00ff);
+	}
+	out->data[offset_asdu+i++]=addr&0x00ff;
+	if(addr_size==2){
+		out->data[offset_asdu+i++]=addr>>8&0x00ff;
+	}
+	out->data[offset_asdu+i++]=0;
+	out->data[offset_asdu+i++]=0;
+	out->data[offset_asdu+i++]=2;//addition data type: 2:file transfer
+	out->data[offset_asdu+i++]=10;//act: 8:wt file segment response
+	out->data[offset_asdu+i++]=file->res_file.file_id;
+	out->data[offset_asdu+i++]=file->res_file.file_id>>8;
+	out->data[offset_asdu+i++]=file->res_file.file_id>>8;
+	out->data[offset_asdu+i++]=file->res_file.file_id>>8;
+	out->data[offset_asdu+i++]=file->cur_offset;
+	out->data[offset_asdu+i++]=file->cur_offset>>8;
+	out->data[offset_asdu+i++]=file->cur_offset>>8;
+	out->data[offset_asdu+i++]=file->cur_offset>>8;
+	out->data[offset_asdu+i++]=file->result;//result: 0:successful 1 fail
 	ret=i;
 	ret=link->build_link_layer(out,ret);				
 	if(ret<0){
@@ -2764,7 +2800,7 @@ int get_dir_data(_rd_dir *dir){
 int get_file_data(_rd_file *file){
 	pfunc(DEBUG_NORMAL,"\n");
 	int ret;
-	ret=0;
+	ret=-1;
 	dir_list::iterator it(g_dir_list.MaxQueue);
 	it=g_dir_list.begin();
 	while(it!=g_dir_list.end()){
@@ -2783,9 +2819,9 @@ int get_file_segment(_rd_file*file){
 	int ret_len;
 	f=fopen(file->req_file.name,"r");
 	if(!f)
-		return ret;
+	return ret;
 	fseek(f,file->cur_offset,SEEK_SET);
-	ret_len=fread(file->res_seg.data,200,1,f);
+	ret_len=fread(file->segment.data,200,1,f);
 	if(ret_len<200){
 		ret=0;
 		file->suc=0;
@@ -2794,7 +2830,7 @@ int get_file_segment(_rd_file*file){
 		ret=1;
 		file->suc=1;
 	}
-	file->res_seg.len=ret_len;
+	file->segment.len=ret_len;
 	file->step=file->suc;
 	fclose(f);
 	pfunc(DEBUG_NORMAL,"\n");
@@ -2822,7 +2858,7 @@ int save_file_data(_rd_file *file){
 	ret=1;
 	find=0;
 	FILE *f;
-	if(file->result==3)
+	if(file->result==FILE_LONGNAME_ERROR)
 		return ret;
 	dir_list::iterator it(g_dir_list.MaxQueue);
 	it=g_dir_list.begin();
@@ -2836,9 +2872,11 @@ int save_file_data(_rd_file *file){
 	}
 	f=fopen(file->req_file.name,"w");
 	if(f==NULL){
-		file->result=1;
+		file->result=FILE_UNKNOWN_ERROR;//file error
 		return ret;
 	}
+	fclose(f);
+	file->file_size=0;
 	if(find==0){
 		strcpy(node.name,file->req_file.name);
 		node.name_len=strlen(file->req_file.name);
@@ -2848,14 +2886,44 @@ int save_file_data(_rd_file *file){
 		get_clock(time);
 		node.time=time;
 		g_dir_list.push(node);
+		save_file_list();
 	}
-	save_file_list();
 	return ret;
 }
 int save_file_segment(_rd_file*file){
+	int ret=0;
+	int j;
 	pfunc(DEBUG_NORMAL,"\n");
-	file->step=file->suc;
-	return 0;
+	if(file->result!=0)
+		return ret;
+	FILE *f;
+	f=fopen(file->req_file.name,"w");
+	if(f==NULL){
+		file->result=FILE_UNKNOWN_ERROR;
+		return ret;
+	}
+	unsigned char sum;
+	sum=0;
+	for(j=0;j<file->segment.len;j++){
+		sum+=file->segment.data[j];
+	}
+	if(sum!=file->sum){
+		file->result=FILE_CHECK_ERROR;
+		return ret;
+	}
+	file->file_size+=file->segment.len;
+	if(file->suc==0){
+		if(file->file_size!=file->req_file.file_size){
+			file->result=FILE_FILE_SIZE_ERROR;//file error
+			return ret;
+		}else{
+			file->result=0;
+		}
+	}
+	fseek(f,file->cur_offset,SEEK_SET);
+	fwrite(file->segment.data,file->segment.len,1,f);
+	fclose(f);
+	return ret;
 }
 int get_dz_unit(buffer*data){
 	pfunc(DEBUG_NORMAL,"\n");
