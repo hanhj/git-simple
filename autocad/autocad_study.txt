@@ -84,17 +84,17 @@ ray			射线
 xline		构造线	可用来等分角
 rec			矩形	rectang
 
-c			圆形	circle
+c				圆形	circle
 pol			正多边形	polygen
 ml			多线	multi line
 					进入ml后可以用s指定ml的宽度，j指定中心点（中间还是上，下），st指定样式
 					mlstyle	可以指定或创造多线样式
-c			圆形	circle
 arc			圆弧		
 
 bo			边界	boundary
 reg			创建面域 region
 wipeout 区域覆盖。用于遮蔽后面的物体。在选择好遮蔽区域后，用右键将在前面的物体绘图次序前置。
+table		表格
 
 文字样式
 	在工具栏中点击样式，可以出现文字样式的工具
@@ -123,11 +123,12 @@ wipeout 区域覆盖。用于遮蔽后面的物体。在选择好遮蔽区域后
 				1）定义线性参数。在参数属性中，可选择参数为列表形式，然后输入尺寸数字。
 				2）定义动作。选择缩放动作-》选择参数-》选择物体-》放置动作标志。
 
+
 修改		在修改菜单和面板中
 cha			倒角	chamfer
-f			圆角	fillet
+f				圆角	fillet
 co			复制	copy
-o			偏移	offset
+o				偏移	offset
 tr			修剪	trim	先选择修剪的边界，再选择要修剪的对象，就会把要删除的部分删除掉。
 ex			延伸	extend	先选择延伸的边界，在选择要延伸的对象，就会将对象延伸到边界。
 mi			镜像	mirror
