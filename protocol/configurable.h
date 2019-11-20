@@ -6,6 +6,7 @@
 */
 #ifndef __Configurable_h
 #define __Configurable_h
+#include "datatype.h"
 extern unsigned int SelectYxNum ; 
 extern unsigned int SelectDpYxNum ; 
 extern unsigned int SelectYcNum ; 

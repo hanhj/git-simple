@@ -174,8 +174,8 @@ typedef struct _qoi{//召唤限定词
 #define PROCESS_FILE		0x200
 #define PROCESS_RD_DZ		0x800
 #define PROCESS_WR_DZ		0x1000
-#define PROCESS_RD_DZ_UNIT	0x2000
-#define PROCESS_WR_DZ_UNIT	0x4000
+#define PROCESS_RD_UNIT		0x2000
+#define PROCESS_WR_UNIT		0x4000
 #define PROCESS_SUMMON_ACC	0x8000//累计量
 #define PROCESS_UPDATE		0x10000
 //功能码
@@ -196,9 +196,9 @@ typedef struct _qoi{//召唤限定词
 #define COMMAND_RESET		105
 #define COMMAND_FILE		210
 #define COMMAND_RD_DZ		202
-#define COMMAND_RD_DZ_UNIT	201
-#define COMMAND_WR_DZ_UNIT	200
 #define COMMAND_WR_DZ		203
+#define COMMAND_WR_UNIT		200
+#define COMMAND_RD_UNIT		201
 #define COMMAND_UPDATE		211
 
 //宏定义传送原因中的CODE
@@ -325,12 +325,30 @@ typedef struct __rd_file{
 #define FILE_FILE_ID_ERROR 4
 
 typedef struct _file_data{
-	int act;
+	int op;
 	_rd_dir rd_dir;
 	_rd_file rd_file;
 	_rd_file wt_file;
 }FileData;
-
+typedef struct _para_node{
+	int id;
+	int tag;
+	int len;
+	char para[30];
+}para_node;
+typedef struct __para_list{
+	int op;//操作
+	int pi;//parameter identification
+	int unit;//unit
+	int max_unit;
+	int min_unit;
+	int result;
+	int cur_read;
+	int req_num;
+	int req_id[30];
+	int res_num;
+	para_node nodes[30];
+}_para_list;
 //app_layer is y deal asdu part
 class app_layer{
 	public:
@@ -418,15 +436,15 @@ class app_layer{
 		int (*save_file_segment)(_rd_file *);
 		int build_wt_file_resp(frame *out,link_layer *link,_rd_file *file);//cause 5
 		
-		int (*get_dz_unit)(buffer*data);
-		int build_rd_dz_unit_con(frame *out,link_layer *link);//cause 7
+		int (*get_dz_unit)(_para_list *);
+		int build_rd_unit_con(frame *out,link_layer *link,_para_list *);//cause 7
 		int (*set_dz_unit)(int);
-		int build_wr_dz_unit_con(frame *out,link_layer *link);//cause 7
+		int build_wr_unit_con(frame *out,link_layer *link,_para_list *);//cause 7
 
-		int (*get_dz_data)(int id,buffer*data);
-		int build_rd_dz_con(frame *out,link_layer *link);//cause 7
-		int (*set_dz)(int id,int sel,buffer*data);
-		int build_dz_con(frame *out,link_layer *link,int sel);//cause 7,sel =0 or 1 ,cr=0
+		int (*get_dz_data)(para_node * );
+		int build_rd_dz_con(frame *out,link_layer *link,_para_list *);//cause 7
+		int (*set_dz)(para_node *);
+		int build_wr_dz_con(frame *out,link_layer *link,_para_list *);//cause 7,sel =0 or 1 ,cr=0
 		int build_dz_dact_con(frame *out,link_layer *link);//cause 9,sel=0,cr=1
 
 		int build_summon_acc_con(frame *out,link_layer *link);//cause 7
@@ -489,6 +507,7 @@ class link_layer{
 		YkData yk_data;
 		EventData event_data;
 		FileData file_data;
+		_para_list para_data;
 
 	public:
 		link_layer(){
@@ -565,10 +584,10 @@ class link_layer{
 		int process_rd_dz(frame *out);
 		int on_rd_unit(frame *in,frame *out);
 		int process_rd_unit(frame *out);
-		int on_wt_dz(frame *in,frame *out);
-		int process_wt_dz(frame *out);
-		int on_wt_unit(frame *in,frame *out);
-		int process_wt_unit(frame *out);
+		int on_wr_dz(frame *in,frame *out);
+		int process_wr_dz(frame *out);
+		int on_wr_unit(frame *in,frame *out);
+		int process_wr_unit(frame *out);
 		int on_update(frame *in,frame *out);
 		int process_update(frame *out);
 

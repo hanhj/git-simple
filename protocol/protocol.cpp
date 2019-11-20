@@ -211,8 +211,8 @@ int link_layer::on_file(frame *in,frame *out){
 	int i,j;
 	i=3;
 	j=0;
-	file_data.act=in->data[offset_data+i++];
-	if(file_data.act == 1){//rd dir
+	file_data.op=in->data[offset_data+i++];
+	if(file_data.op == 1){//rd dir
 		file_data.rd_dir.id=in->data[offset_data+i++];
 		file_data.rd_dir.id=file_data.rd_dir.id<<8;
 		file_data.rd_dir.id|=in->data[offset_data+i++];
@@ -229,12 +229,12 @@ int link_layer::on_file(frame *in,frame *out){
 			file_data.rd_dir.start_time.data[j]=in->data[offset_data+i++];
 		for(j=0;j<7;j++)
 			file_data.rd_dir.end_time.data[j]=in->data[offset_data+i++];
-	}else if(file_data.act == 3){//rd file
+	}else if(file_data.op == 3){//rd file
 		file_data.rd_file.req_file.name_len=in->data[offset_data+i++];
 		for(j=0;j<file_data.rd_file.req_file.name_len;j++){
 			file_data.rd_file.req_file.name[j]=in->data[offset_data+i++];
 		}
-	}else if(file_data.act == 6){//rd file confirm
+	}else if(file_data.op == 6){//rd file confirm
 		file_data.rd_file.req_file.file_id=in->data[offset_data+i++];
 		file_data.rd_file.req_file.file_id=file_data.rd_file.req_file.file_id<<8;
 		file_data.rd_file.req_file.file_id|=in->data[offset_data+i++];
@@ -251,7 +251,7 @@ int link_layer::on_file(frame *in,frame *out){
 		file_data.rd_file.ack_offset=file_data.rd_file.ack_offset<<8;
 		file_data.rd_file.ack_offset|=in->data[offset_data+i++];
 		file_data.rd_file.suc=in->data[offset_data+i++];
-	}else if(file_data.act ==7){//write file act
+	}else if(file_data.op ==7){//write file act
 		file_data.wt_file.req_file.name_len=in->data[offset_data+i++];
 		file_data.wt_file.result=0;
 		for(j=0;j<file_data.wt_file.req_file.name_len&&j<30;j++){
@@ -274,7 +274,7 @@ int link_layer::on_file(frame *in,frame *out){
 		file_data.wt_file.req_file.file_size|=in->data[offset_data+i++];
 		file_data.wt_file.req_file.file_size=file_data.wt_file.req_file.file_size<<8;
 		file_data.wt_file.req_file.file_size|=in->data[offset_data+i++];
-	}else if(file_data.act==9){
+	}else if(file_data.op == 9){
 		int data_len;
 		long tmp_id;
 		data_len=in->data[offset_len] - 1 - addr_size - 1 - 1 - cause_size - addr_size - msg_id_size;
@@ -305,14 +305,14 @@ int link_layer::on_file(frame *in,frame *out){
 }
 int link_layer::process_file(frame *out){
 	int ret=-1;
-	if(file_data.act==1){
+	if(file_data.op==1){
 		ret=app->get_dir_data(&file_data.rd_dir);
 		if(ret>=0){
 			ret=app->build_rd_dir_resp(out,this,&file_data.rd_dir);
 			if(file_data.rd_dir.suc==0)
-				file_data.act=0;
+				file_data.op=0;
 		}
-	}else if(file_data.act==3){
+	}else if(file_data.op==3){
 		if(file_data.rd_file.step==0){
 			ret=app->get_file_data(&file_data.rd_file);
 			if(ret>=0)
@@ -322,17 +322,17 @@ int link_layer::process_file(frame *out){
 			if(ret>=0)
 				ret=app->build_rd_file_resp(out,this,&file_data.rd_file);
 		}
-	}else if(file_data.act==6){
+	}else if(file_data.op==6){
 		ret=0;
 		//change file offset_asdu
 		if(file_data.rd_file.ack_offset == file_data.rd_file.cur_offset)
 			file_data.rd_file.cur_offset=file_data.rd_file.cur_offset+file_data.rd_file.segment.len;
-		file_data.act=3;
-	}else if(file_data.act==7){
+		file_data.op=3;
+	}else if(file_data.op==7){
 		ret=app->save_file_data(&file_data.wt_file);
 		if(ret>=0)
 			ret=app->build_wt_file_con(out,this,&file_data.wt_file);
-	}else if(file_data.act==9){
+	}else if(file_data.op==9){
 		ret=app->save_file_segment(&file_data.wt_file);
 		if(ret>=0)
 			ret=app->build_wt_file_resp(out,this,&file_data.wt_file);
@@ -341,10 +341,48 @@ int link_layer::process_file(frame *out){
 }
 int link_layer::on_rd_dz(frame *in,frame *out){
 	int ret=0;
+	int i=0;
+	int j;
+	para_data.cur_read=0;
+	para_data.req_num=in->data[offset_vsq]&0x7f;
+	para_data.unit=in->data[offset_data+i++];
+	para_data.unit=para_data.unit<<8;
+	para_data.unit|=in->data[offset_data+i++];
+	if(para_data.req_num==0)
+		para_data.op=2;//read all para 
+	else
+		para_data.op=1;//read mul para 
+	for(j=0;j<para_data.req_num;j++){
+		para_data.req_id[j]=in->data[offset_data+i++];
+		para_data.req_id[j]=para_data.req_id[j]<<8;
+		para_data.req_id[j]|=in->data[offset_data+i++];
+	}
 	return ret;
 }
 int link_layer::process_rd_dz(frame *out){
 	int ret=0;
+	int len;
+	int data_len;
+	len=0;
+	int i,j;
+	j=0;
+	if(para_data.op==1){
+		for(i=para_data.cur_read;i<para_data.req_num;i++){
+			para_data.nodes[j].id=para_data.req_id[i];
+			len=app->get_dz_data(&para_data.nodes[j]);
+			data_len+=len;
+			para_data.cur_read++;
+			j++;
+			if(data_len>200)
+				break;
+		}
+	}
+	if(para_data.cur_read==para_data.req_num)
+		para_data.pi=0;
+	else
+		para_data.pi=1;
+	para_data.res_num=j;
+	ret=app->build_rd_dz_con(out,this,&para_data);
 	return ret;
 }
 
@@ -354,24 +392,37 @@ int link_layer::on_rd_unit(frame *in,frame *out){
 }
 int link_layer::process_rd_unit(frame *out){
 	int ret=0;
+	app->get_dz_unit(&para_data);
+	ret=app->build_rd_unit_con(out,this,&para_data);
 	return ret;
 }
 
-int link_layer::on_wt_dz(frame *in,frame *out){
+int link_layer::on_wr_dz(frame *in,frame *out){
 	int ret=0;
 	return ret;
 }
-int link_layer::process_wt_dz(frame *out){
+int link_layer::process_wr_dz(frame *out){
 	int ret=0;
+	int i;
+	for(i=0;i<para_data.req_num;i++){
+		app->set_dz(&para_data.nodes[i]);
+	}
+	ret=app->build_wr_dz_con(out,this,&para_data);
 	return ret;
 }
 
-int link_layer::on_wt_unit(frame *in,frame *out){
+int link_layer::on_wr_unit(frame *in,frame *out){
 	int ret=0;
+	int i=0;
+	para_data.unit=in->data[offset_data+i++];
+	para_data.unit=para_data.unit<<8;
+	para_data.unit|=in->data[offset_data+i++];
 	return ret;
 }
-int link_layer::process_wt_unit(frame *out){
+int link_layer::process_wr_unit(frame *out){
 	int ret=0;
+	app->set_dz_unit(para_data.unit);
+	ret=app->build_wr_unit_con(out,this,&para_data);
 	return ret;
 }
 
@@ -770,21 +821,32 @@ int link_layer_101::on_req(frame *in,frame *out){
 				ret=process_file(out);
 			}
 			break;
-		case COMMAND_RD_DZ_UNIT:
-			process|=PROCESS_RD_DZ_UNIT;
-			ret=on_rd_dz_unit(in,out);
+		case COMMAND_RD_UNIT:
+			process|=PROCESS_RD_UNIT;
+			ret=on_rd_unit(in,out);
 			if(balance == BALANCE){
-				ret = process_rd_dz_unit(out);
+				ret = process_rd_unit(out);
+			}
+			break;
+		case COMMAND_WR_UNIT:
+			process|=PROCESS_WR_UNIT;
+			ret=on_wr_unit(in,out);
+			if(balance){
+				ret=process_wr_unit(out);
 			}
 			break;
 		case COMMAND_RD_DZ:
 			process|=PROCESS_RD_DZ;
+			ret=on_rd_dz(in,out);
+			if(balance == BALANCE)
+				ret=process_rd_dz(out);
 			break;
 		case COMMAND_WR_DZ:
 			process|=PROCESS_WR_DZ;
-			break;
-		case COMMAND_WR_DZ_UNIT:
-			process|=PROCESS_WR_DZ_UNIT;
+			ret=on_wr_dz(in,out);
+			if(balance == BALANCE){
+				ret=process_wr_dz(out);
+			}
 			break;
 		case COMMAND_SUMMON_ACC:
 			process|=PROCESS_SUMMON_ACC;
@@ -1394,10 +1456,10 @@ int get_dir_data(_rd_dir*);
 int get_file_data(_rd_file*);
 int get_file_segment(_rd_file *file);
 int save_file_segment(_rd_file *file);
-int get_dz_unit(buffer*data);
+int get_dz_unit(_para_list *);
 int set_dz_unit(int);
-int get_dz_data(int id,buffer*data);
-int set_dz(int id,int sel,buffer*data);
+int get_dz_data(para_node *);
+int set_dz(para_node *);
 int get_summon_acc_data(buffer*data);
 int save_update_file(_rd_file *file,buffer *seg);
 
@@ -2241,7 +2303,7 @@ int app_layer::build_rd_file_con(frame *out,link_layer *link,_rd_file *file){//c
 		goto err;
 	vsq_lo.bit.n=1;
 	vsq_lo.bit.sq=0;
-	cause_lo.bit.cause=CAUSE_Req;
+	cause_lo.bit.cause=CAUSE_Actcon;
 
 	out->data[offset_asdu+i++]=COMMAND_FILE;
 	out->data[offset_asdu+i++]=vsq_lo.data;
@@ -2368,7 +2430,7 @@ int app_layer::build_wt_file_con(frame *out,link_layer *link,_rd_file *file){//c
 		goto err;
 	vsq_lo.bit.n=1;
 	vsq_lo.bit.sq=0;
-	cause_lo.bit.cause=CAUSE_Req;
+	cause_lo.bit.cause=CAUSE_Actcon;
 
 	out->data[offset_asdu+i++]=COMMAND_FILE;
 	out->data[offset_asdu+i++]=vsq_lo.data;
@@ -2464,7 +2526,7 @@ err:
 }
 /**
 ***********************************************************************
-*  @brief	build asdu of link_fini command 
+*  @brief	build asdu of rd dz unit command 
 *  @param[in] link point to link_layer  
 *  @param[out]  out point to out frame 
 *  @return upon successful return number of asdu size\n
@@ -2473,15 +2535,43 @@ err:
 *  @see		
 ***********************************************************************
 */
-int app_layer::build_rd_dz_unit_con(frame *out,link_layer *link){//cause 7
+int app_layer::build_rd_unit_con(frame *out,link_layer *link,_para_list *para){//cause 7
 	int i;
-	i=0;
 	int ret;
+	i=0;
+	ret = -1;
 	
 	link->set_loc_ctl();	
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
+	vsq_lo.bit.n=1;
+	vsq_lo.bit.sq=0;
+	cause_lo.bit.cause=CAUSE_Actcon;
+
+	out->data[offset_asdu+i++]=COMMAND_RD_UNIT;
+	out->data[offset_asdu+i++]=vsq_lo.data;
+	out->data[offset_asdu+i++]=cause_lo.data;
+	if(cause_size==2){
+		out->data[offset_asdu+i++]=(cause_lo.data>>8&0x00ff);
+	}
+	out->data[offset_asdu+i++]=addr&0x00ff;
+	if(addr_size==2){
+		out->data[offset_asdu+i++]=addr>>8&0x00ff;
+	}
+	out->data[offset_asdu+i++]=0;
+	out->data[offset_asdu+i++]=0;
+	out->data[offset_asdu+i++]=para->unit;
+	out->data[offset_asdu+i++]=para->unit>>8;
+	out->data[offset_asdu+i++]=para->min_unit;
+	out->data[offset_asdu+i++]=para->min_unit>>8;
+	out->data[offset_asdu+i++]=para->max_unit;
+	out->data[offset_asdu+i++]=para->max_unit>>8;
+	out->data[offset_asdu+i++]=0;
+	out->data[offset_asdu+i++]=0;
+	out->data[offset_asdu+i++]=0;
+	out->data[offset_asdu+i++]=0;
+	out->data[offset_asdu+i++]=0;
 	ret=i;
 	ret=link->build_link_layer(out,ret);				
 	if(ret<0){
@@ -2489,7 +2579,7 @@ int app_layer::build_rd_dz_unit_con(frame *out,link_layer *link){//cause 7
 		goto err;
 	}
 err:
-	return ret;
+	return ret;	
 }
 /**
 ***********************************************************************
@@ -2502,15 +2592,34 @@ err:
 *  @see		
 ***********************************************************************
 */
-int app_layer::build_wr_dz_unit_con(frame *out,link_layer *link){//cause 7
+int app_layer::build_wr_unit_con(frame *out,link_layer *link,_para_list *para){//cause 7
 	int i;
-	i=0;
 	int ret;
+	i=0;
+	ret = -1;
 	
 	link->set_loc_ctl();	
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
+	vsq_lo.bit.n=1;
+	vsq_lo.bit.sq=0;
+	cause_lo.bit.cause=CAUSE_Actcon;
+
+	out->data[offset_asdu+i++]=COMMAND_WR_UNIT;
+	out->data[offset_asdu+i++]=vsq_lo.data;
+	out->data[offset_asdu+i++]=cause_lo.data;
+	if(cause_size==2){
+		out->data[offset_asdu+i++]=(cause_lo.data>>8&0x00ff);
+	}
+	out->data[offset_asdu+i++]=addr&0x00ff;
+	if(addr_size==2){
+		out->data[offset_asdu+i++]=addr>>8&0x00ff;
+	}
+	out->data[offset_asdu+i++]=0;
+	out->data[offset_asdu+i++]=0;
+	out->data[offset_asdu+i++]=para->unit;
+	out->data[offset_asdu+i++]=para->unit>>8;
 	ret=i;
 	ret=link->build_link_layer(out,ret);				
 	if(ret<0){
@@ -2518,7 +2627,67 @@ int app_layer::build_wr_dz_unit_con(frame *out,link_layer *link){//cause 7
 		goto err;
 	}
 err:
-	return ret;
+	return ret;	
+}
+/**
+***********************************************************************
+*  @brief	build asdu of read dz confirm command 
+*  @param[in] link point to link_layer  
+*  @param[out]  out point to out frame 
+*  @return upon successful return number of asdu size\n
+*	if fail a negative value returned.
+*  @note	
+*  @see		
+***********************************************************************
+*/
+int app_layer::build_rd_dz_con(frame *out,link_layer *link,_para_list *para){//cause 7
+	int i;
+	int j;
+	int m;
+	int ret;
+	i=0;
+	ret = -1;
+	
+	link->set_loc_ctl();	
+	ret=get_link_info(link);
+	if(ret<0)
+		goto err;
+	vsq_lo.bit.n=1;
+	vsq_lo.bit.sq=0;
+	cause_lo.bit.cause=CAUSE_Actcon;
+
+	out->data[offset_asdu+i++]=COMMAND_WR_UNIT;
+	out->data[offset_asdu+i++]=vsq_lo.data;
+	out->data[offset_asdu+i++]=cause_lo.data;
+	if(cause_size==2){
+		out->data[offset_asdu+i++]=(cause_lo.data>>8&0x00ff);
+	}
+	out->data[offset_asdu+i++]=addr&0x00ff;
+	if(addr_size==2){
+		out->data[offset_asdu+i++]=addr>>8&0x00ff;
+	}
+	out->data[offset_asdu+i++]=0;
+	out->data[offset_asdu+i++]=0;
+	out->data[offset_asdu+i++]=para->unit;
+	out->data[offset_asdu+i++]=para->unit>>8;
+	out->data[offset_asdu+i++]=para->pi;
+	for(j=0;j<para->res_num;j++){
+		out->data[offset_asdu+i++]=para->nodes[j].id;
+		out->data[offset_asdu+i++]=para->nodes[j].id>>8;
+		out->data[offset_asdu+i++]=para->nodes[j].tag;
+		out->data[offset_asdu+i++]=para->nodes[j].len;
+		for(m=0;m<para->nodes[j].len;m++){
+			out->data[offset_asdu+i++]=para->nodes[j].para[m];
+		}
+	}
+	ret=i;
+	ret=link->build_link_layer(out,ret);				
+	if(ret<0){
+		errno=ret;
+		goto err;
+	}
+err:
+	return ret;	
 }
 /**
 ***********************************************************************
@@ -2531,36 +2700,7 @@ err:
 *  @see		
 ***********************************************************************
 */
-int app_layer::build_rd_dz_con(frame *out,link_layer *link){//cause 7
-	int i;
-	i=0;
-	int ret;
-	
-	link->set_loc_ctl();	
-	ret=get_link_info(link);
-	if(ret<0)
-		goto err;
-	ret=i;
-	ret=link->build_link_layer(out,ret);				
-	if(ret<0){
-		errno=ret;
-		goto err;
-	}
-err:
-	return ret;
-}
-/**
-***********************************************************************
-*  @brief	build asdu of link_fini command 
-*  @param[in] link point to link_layer  
-*  @param[out]  out point to out frame 
-*  @return upon successful return number of asdu size\n
-*	if fail a negative value returned.
-*  @note	
-*  @see		
-***********************************************************************
-*/
-int app_layer::build_dz_con(frame *out,link_layer *link,int sel){//cause 7,sel =0 or 1 ,cr=0
+int app_layer::build_wr_dz_con(frame *out,link_layer *link,_para_list*para){//cause 7,sel =0 or 1 ,cr=0
 	int i;
 	i=0;
 	int ret;
@@ -2836,6 +2976,18 @@ int get_file_segment(_rd_file*file){
 	pfunc(DEBUG_NORMAL,"\n");
 	return ret;
 }
+void load_file_list(){
+	dir_node node;
+	FILE *f;
+	f=fopen("file_list.dat","rb");
+	if(f==NULL)
+		return;
+	g_dir_list.clear();
+	while(!feof(f)){
+		fread(&node,sizeof(node),1,f);
+		g_dir_list.push(node);
+	}
+}
 void save_file_list(){
 	dir_node node;
 	dir_list::iterator it(g_dir_list.MaxQueue);
@@ -2925,19 +3077,24 @@ int save_file_segment(_rd_file*file){
 	fclose(f);
 	return ret;
 }
-int get_dz_unit(buffer*data){
+int get_dz_unit(_para_list *data){
 	pfunc(DEBUG_NORMAL,"\n");
+	data->unit=LimitBounds.cur_unit;
+	data->min_unit=LimitBounds.min_unit;
+	data->max_unit=LimitBounds.max_unit;
 	return 0;
 }
-int set_dz_unit(int){
+int set_dz_unit(int unit){
 	pfunc(DEBUG_NORMAL,"\n");
+	LimitBounds.cur_unit=unit;
 	return 0;
 }
-int get_dz_data(int id,buffer*data){
+int get_dz_data(para_node *para){
+	para->len=10;
 	pfunc(DEBUG_NORMAL,"\n");
-	return 0;
+	return para->len;
 }
-int set_dz(int id,int sel,buffer*data){
+int set_dz(para_node*para){
 	pfunc(DEBUG_NORMAL,"\n");
 	return 0;
 }

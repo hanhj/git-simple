@@ -55,13 +55,7 @@ int main(int arg,char **argv){
 	for(i=0;i<3;i++){
 			com[i].connect();
 	}
-	default_init_yx_addr();
-	default_init_yc_addr();
-	init_yx();
-	init_yc();
-	event_list.init(100);
-	event_yc_list.init(100);
-	g_dir_list.init(20);
+	init_data();
 	while(1){
 		cout<<endl<<"run loop:"<<loops<<endl;
 		loops++;

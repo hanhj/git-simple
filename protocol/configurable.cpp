@@ -37,6 +37,7 @@ short coeftable[MAX_YC_NUM] = {
 		100,//hz
 };
 YC_DATA Yc[MAX_YC_NUM];
+YC_DATA Energy[MAX_ENERGY_NUM];
 /***************************************************************************************
 * 函数名:void default_init_yc_addr(void)
 * 输  入:
@@ -180,6 +181,15 @@ void init_ycdata ( void )
 	Yc[i].datasign = 0xffff;
 	Yc[i].changeflag = 0;	
 	*/
+
+	i=0;
+	Energy[i].src_yc = &scada.scada_cfg.YcData.pos_P.Data;
+	Energy[i].deadpass = NULL;
+	Energy[i].Coef = NULL;
+	Energy[i].range = NULL;
+	Energy[i].dead = &DeadBandParaValue.DeadP;
+	Energy[i].datasign = 0xffff;
+	Energy[i].changeflag = 0;	
 	memset(&scada.scada_cfg.YcData,0,sizeof(scada.scada_cfg.YcData));
 
 

@@ -7,8 +7,9 @@
 #include<iostream>
 using namespace std;
 #include "data.h"
+#include "para.h"
 
 PRO_PARA ProPara;//规约参数
 DEAD_BAND_PARA DeadBandParaValue;
-
+TOTAL_LIMIT_BOUNDS LimitBounds;
 // vim:tw=72 

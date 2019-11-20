@@ -13,10 +13,7 @@ extern "C" {
 #endif
 #define LOCK 1
 #define UNLOCK 0
-
-
 //定义终端最大串口数
-
 #define MAX_SERIAL_NUM 2
 #define MAX_NET_NUM 1
 #define MAX_SOCKET_NUM 1
@@ -43,6 +40,7 @@ extern "C" {
 #define MAX_YK_NUM 2
 //定义终端最大遥测数
 #define MAX_YC_NUM  26
+#define MAX_ENERGY_NUM  4
 #define CONFIG_YC_NUM  13
 
 #define PI 3.1415926
@@ -290,9 +288,6 @@ typedef struct sntpdata{
 		unsigned int StartMinute;
 }sntpdata_t;
 typedef struct terminal_para_tag {//终端参数
-
-//	uint16 ter_addr;
-//	uint16 master_addr;
 	uint16 nulldata[8];//未定义数据
 	SERIAL_PARA ComPara[MAX_SERIAL_NUM];
 	ETH_PARA EthPara[MAX_NET_NUM];
@@ -302,7 +297,6 @@ typedef struct terminal_para_tag {//终端参数
     uint32 yk_he_pulse;//遥控合脉冲时间
     uint32 yk_fen_pulse;//遥控分脉冲时间；
     uint32 ykdelaytime;//遥控延迟断开电源时间。
-  //  unsigned int  ter_pswd[6];
     unsigned int  cascadeport;//CASCADE_PORT；
     BATTERYDATA_T battery_action_time ;
 	sntpdata_t sntppara;
@@ -601,6 +595,8 @@ extern void ComBoxInit(void);
 extern int    CheckTerminalState();
 extern void InitTerminalState();
 extern void show_ratio();
+extern void load_file_list();
+extern void init_data();
 #ifdef __cplusplus
 }
 #endif

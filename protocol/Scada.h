@@ -193,6 +193,12 @@ typedef struct scada_yc{
 
 	DataType4 Up;//正序；
 	DataType4 Un;//反序；
+	
+	DataType4 pos_P	;//正向有功
+	DataType4 neg_P	;//反向有功
+	DataType4 pos_Q	;//正向无功
+	DataType4 neg_Q	;//反向无功
+
 }scada_yc_t;
 
 
