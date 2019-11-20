@@ -1,6 +1,6 @@
 /*
  * data.h
- *	���ݣ�ң�����ݣ��ն˲���������һЩ��ʹ�õĺ���
+ *	内容：遥信数据，终端参数，声明一些被使用的函数
  *  Created on: 2014-10-18
  *      Author: Administrator
  */
@@ -13,18 +13,18 @@ extern "C" {
 #endif
 #define LOCK 1
 #define UNLOCK 0
-//�����ն���󴮿���
+//定义终端最大串口数
 #define MAX_SERIAL_NUM 2
 #define MAX_NET_NUM 1
 #define MAX_SOCKET_NUM 1
 #define MAX_COM_PORT_NUM MAX_SERIAL_NUM + MAX_NET_NUM*MAX_SOCKET_NUM
 
-//�����ն���������
+//定义终端最大回线数
 #ifndef MAX_LINE_NUM
 #define MAX_LINE_NUM 1
 #endif
-#define MAX_SECTION_NUM 2 //������������
-#define SEGMENT_NUM 3 //����ʽ����
+#define MAX_SECTION_NUM 2 //保护参数套数
+#define SEGMENT_NUM 3 //三段式保护
 
 #define ENABLE 1
 #define DISENABLE 0
@@ -32,13 +32,13 @@ extern "C" {
 
 #define _0_HE_1_KAI 0
 #define _1_HE_0_KAI 1
-#define _1_KAI_0_HE 1 //�ն�Ĭ�ϵķֺ����ƽ��ϵ
-#define _0_KAI_1_HE 0 //�ն�Ĭ�ϵķֺ����ƽ��ϵ
+#define _1_KAI_0_HE 1 //终端默认的分合与电平关系
+#define _0_KAI_1_HE 0 //终端默认的分合与电平关系
 
 
 #define MAX_COUPLEYX_NUM 2
 #define MAX_YK_NUM 2
-//�����ն����ң����
+//定义终端最大遥测数
 #define MAX_YC_NUM  26
 #define MAX_ENERGY_NUM  4
 #define CONFIG_YC_NUM  13
@@ -63,73 +63,73 @@ typedef struct yxdata{
 	uint16 addr;
 	uint16 nature;
 	Uint16 statu;
-	Uint16 priority;//���ȼ���
-	Uint16 type;//��˫�㣻
+	Uint16 priority;//优先级别
+	Uint16 type;//单双点；
 }yxdata_t;
-/*BL:Ƿѹ
- *AN:����ʧ��
- *BR:��ػ
- *BR:��ػ
- *OV����Դ����
+/*BL:欠压
+ *AN:交流失电
+ *BR:电池活化
+ *BR:电池活化
+ *OV：电源故障
  */
-/* �ڱ���Ŀ��Hyx����Ϊ
-0 	��λ		
-1 	��λ		
-2 	����λ		
-3 	Զ���͵�λ	
-4 	�ֶ���բ		
-5 	�ֶ���բ		
+/* 在本项目中Hyx定义为
+0 	合位		
+1 	分位		
+2 	储能位		
+3 	远方就地位	
+4 	手动分闸		
+5 	手动合闸		
 6	VL 
 7	POK
 8	VH 
 9	HOK 
-10 ˫��ң��
+10 双点遥信
 
-VL	���Ƿѹ�澯
-POK	����ʧ��澯
-VH	��Դ���ϸ澯
-HOK	�״̬
+VL	电池欠压告警
+POK	交流失电告警
+VH	电源故障告警
+HOK	活化状态
 */
 typedef struct allyx{
 	 yxdata_t pt_yx[MAX_LINE_NUM];
 	 yxdata_t ct_yx[MAX_LINE_NUM];
-	 yxdata_t Hyx[MAXHYXNUM];//ǰ�������û�ң�ţ���11����˫��ң�ţ�7(Ƿѹ),8��ʧ�磩,9����Դ�쳣��,10������ǵ�Դ����ң�š�
-	 yxdata_t CurrentAlarmYx[MAX_LINE_NUM][3];//���ι����ź�
-	 yxdata_t CurrentActionYx[MAX_LINE_NUM][3];//���ι��������ź�
+	 yxdata_t Hyx[MAXHYXNUM];//前六个是用户遥信，第11个是双点遥信，7(欠压),8（失电）,9（电源异常）,10（活化）是电源管理遥信。
+	 yxdata_t CurrentAlarmYx[MAX_LINE_NUM][3];//三段过流信号
+	 yxdata_t CurrentActionYx[MAX_LINE_NUM][3];//三段过流动作信号
 
-	 yxdata_t GrdAlarmYx[MAX_LINE_NUM][3];//������������ź�
-	 yxdata_t GrdActionYx[MAX_LINE_NUM][3];//����������������ź�
+	 yxdata_t GrdAlarmYx[MAX_LINE_NUM][3];//三段零序过流信号
+	 yxdata_t GrdActionYx[MAX_LINE_NUM][3];//三段零序过流动作信号
 
-	 yxdata_t U0Alarm[MAX_LINE_NUM];//�����ѹ�����ź�(��ȡ���ñ������������ź�)
-	 yxdata_t U0Action[MAX_LINE_NUM];//�����ѹ���������ź�(��ȡ���ñ������������ź�)
+	 yxdata_t U0Alarm[MAX_LINE_NUM];//零序电压保护信号(已取消该保护，但保留信号)
+	 yxdata_t U0Action[MAX_LINE_NUM];//零序电压保护动作信号(已取消该保护，但保留信号)
 
-	 yxdata_t HjsActionYx[MAX_LINE_NUM];//����ٶ����ź�
+	 yxdata_t HjsActionYx[MAX_LINE_NUM];//后加速动作信号
 
-	 yxdata_t ChzYx[MAX_LINE_NUM];//�غ�բ�����źš��������ɹ�/ʧ�ܣ�
+	 yxdata_t ChzYx[MAX_LINE_NUM];//重合闸动作信号。启动，成功/失败；
 
-	 yxdata_t JyYx[MAX_LINE_NUM];//���������Ծ�����ź�
-	 yxdata_t JyActionYx[MAX_LINE_NUM];//���������Ծ�����ź�
+	 yxdata_t JyYx[MAX_LINE_NUM];//零序电流阶跃故障信号
+	 yxdata_t JyActionYx[MAX_LINE_NUM];//零序电流阶跃动作信号
 
-	 yxdata_t JynegIYx[MAX_LINE_NUM];//���������Ծ�ź�
+	 yxdata_t JynegIYx[MAX_LINE_NUM];//负序电流阶跃信号
 	 
-	 yxdata_t P0Yx[MAX_LINE_NUM];//�����ʹ����ź�(��ȡ���ñ������������ź�)
-	 yxdata_t P0ActionYx[MAX_LINE_NUM];//�����ʶ����ź�(��ȡ���ñ������������ź�)
+	 yxdata_t P0Yx[MAX_LINE_NUM];//零序功率故障信号(已取消该保护，但保留信号)
+	 yxdata_t P0ActionYx[MAX_LINE_NUM];//零序功率动作信号(已取消该保护，但保留信号)
 
-	 yxdata_t JyP0Yx[MAX_LINE_NUM];//�����ʽ�Ծ�ź�(��ȡ���ñ������������ź�)
-	 yxdata_t JyP0ActionYx[MAX_LINE_NUM];//�����ʽ�Ծ�����ź�(��ȡ���ñ������������ź�)
+	 yxdata_t JyP0Yx[MAX_LINE_NUM];//零序功率阶跃信号(已取消该保护，但保留信号)
+	 yxdata_t JyP0ActionYx[MAX_LINE_NUM];//零序功率阶跃动作信号(已取消该保护，但保留信号)
 
-	 yxdata_t AngleYx[MAX_LINE_NUM];//��λ�����ź�
-	 yxdata_t AngleActionYx[MAX_LINE_NUM];//��λ���������ź�
+	 yxdata_t AngleYx[MAX_LINE_NUM];//相位保护信号
+	 yxdata_t AngleActionYx[MAX_LINE_NUM];//相位保护动作信号
 
-	 yxdata_t RaiseYx[MAX_LINE_NUM];//�������������ź�
-	 yxdata_t RaiseActionYx[MAX_LINE_NUM];//�����������������ź�
+	 yxdata_t RaiseYx[MAX_LINE_NUM];//增量电流保护信号
+	 yxdata_t RaiseActionYx[MAX_LINE_NUM];//增量电流保护动作信号
 
-	 yxdata_t gzfg[MAX_LINE_NUM][2];//���ϸ����źţ�0 ˲ʱ��1����
-	 yxdata_t YueXianYx[MAX_LINE_NUM][10];//Խ���ź�
-	 yxdata_t ActionCkYx[MAX_LINE_NUM];//����У���ź�
-	 yxdata_t TerminalCkYx;//װ�ù����ź�
-	 yxdata_t reverLineYx[MAX_LINE_NUM];//��·�����ź�
-	 yxdata_t reverXuYx[MAX_LINE_NUM];//�����������ź�
+	 yxdata_t gzfg[MAX_LINE_NUM][2];//故障复归信号；0 瞬时，1永久
+	 yxdata_t YueXianYx[MAX_LINE_NUM][10];//越限信号
+	 yxdata_t ActionCkYx[MAX_LINE_NUM];//动作校验信号
+	 yxdata_t TerminalCkYx;//装置故障信号
+	 yxdata_t reverLineYx[MAX_LINE_NUM];//线路反向信号
+	 yxdata_t reverXuYx[MAX_LINE_NUM];//电流逆相序信号
 	 
 }allyx;
 extern allyx TerYx;
@@ -139,12 +139,12 @@ typedef struct yx_table{
 	//char *soe_p;
 	yxdata_t *pdata;
 }YX_TAB;
-extern YX_TAB YxTable[TOTALYXNUM] ;//����POS�̶�˳������б�
+extern YX_TAB YxTable[TOTALYXNUM] ;//按照POS固定顺序的排列表
 
 typedef struct _sort_yx_table{
 	yxdata_t *pdata;
 }SORT_YX_TAB;
-extern SORT_YX_TAB SortYxTable[TOTALYXNUM];// ���յ�ַ˳�����еı�
+extern SORT_YX_TAB SortYxTable[TOTALYXNUM];// 按照地址顺序排列的表
 
 typedef struct limt{
     float Limit;
@@ -152,48 +152,48 @@ typedef struct limt{
     int32 ContinueTime;
 }limt ;
 typedef enum YXENUM{
-	HE1 = 0,///<��·��1��λ
-	FEN1,///<��·��1��λ
-	CN1, ///<��·��1����λ��
-	GLD1,///<��·��1���뵶բλ�ã�����ң��4��
-	YX1_5,///<����ң��5��λ,�������ں�բ��ť
-	YX1_6,//<����ң��6��λ���������ڷ�բ��ť
-	XJGZ1,//����ָʾ��ָʾ��·2����·����
-	JDGZ1,//����ָʾ��ָʾ��·2�ӵع���
-	SP6GZ1,//SF6�����쳣�����ź�
-	SP6BS1,//SF6��ѹ�����ź�
-	HE2 ,///<��·��1��λ
-	FEN2,///<��·��1��λ
-	CN2, ///<��·��1����λ��
-	GLD2,///<��·��1���뵶բλ�ã�����ң��4��
-	YX25,///<����ң��5��λ
-	YX26,//<����ң��6��λ
-	XJGZ2,//����ָʾ��ָʾ��·2����·����
-	JDGZ2, //����ָʾ��ָʾ��·2�ӵع���
-	SP6GZ2,//SF6�����쳣�����ź�
-	SP6BS2,//SF6��ѹ�����ź�
-	YFJD   //Զ���ӵ�λ��
-}YXENUM_E; //����21��
+	HE1 = 0,///<断路器1合位
+	FEN1,///<断路器1分位
+	CN1, ///<断路器1储能位置
+	GLD1,///<断路器1隔离刀闸位置（备用遥信4）
+	YX1_5,///<备用遥信5变位,本次用于合闸按钮
+	YX1_6,//<备用遥信6变位，本次用于分闸按钮
+	XJGZ1,//故障指示器指示线路2相间短路故障
+	JDGZ1,//故障指示器指示线路2接地故障
+	SP6GZ1,//SF6气体异常报警信号
+	SP6BS1,//SF6气压闭锁信号
+	HE2 ,///<断路器1合位
+	FEN2,///<断路器1分位
+	CN2, ///<断路器1储能位置
+	GLD2,///<断路器1隔离刀闸位置（备用遥信4）
+	YX25,///<备用遥信5变位
+	YX26,//<备用遥信6变位
+	XJGZ2,//故障指示器指示线路2相间短路故障
+	JDGZ2, //故障指示器指示线路2接地故障
+	SP6GZ2,//SF6气体异常报警信号
+	SP6BS2,//SF6气压闭锁信号
+	YFJD   //远方接地位置
+}YXENUM_E; //共计21项
 typedef enum YKENUM{
-	BREAKER1 = 0, //��·��1ң��
-	BREAKER1JHH,  //��·��1 ��ϻ�
-	BREAKER2,     //��·��2ң��
-	BREAKER2JHH,  //��·��2��ϻ�
-	BATTARYACTION,//��ػң��
-	BATTARYOFF,   //����˳�ң��
-	MOTOR,	  //�������
+	BREAKER1 = 0, //断路器1遥控
+	BREAKER1JHH,  //断路器1 解合环
+	BREAKER2,     //断路器2遥控
+	BREAKER2JHH,  //断路器2解合环
+	BATTARYACTION,//电池活化遥控
+	BATTARYOFF,   //电池退出遥控
+	MOTOR,	  //电机控制
 }YKENUM_E;
 
-#define HE(n) 	(HE1 + HE2*n)	///<��·��1��λ
-#define FEN(n)	(FEN1 + HE2*n)	///<��·��1��λ
-#define CN(n)	(CN1 + HE2*n)	///<��·��1����λ��
-#define GLD(n)	(GLD1 + HE2*n)	///<��·��1���뵶բλ�ã�����ң��4��
-#define BYX5(n)	(YX15 + HE2*n)	///<����ң��5��λ
-#define BYX6(n)	(YX16 + HE2*n)	//<����ң��6��λ
-#define XJGZ(n)	(XJGZ1 + HE2*n)	//����ָʾ��ָʾ��·2����·����
-#define JDGZ(n)	(JDGZ1 + HE2*n)	//����ָʾ��ָʾ��·2�ӵع���
-#define SP6GZ(n)(SP6GZ1 + HE2*n)	//SF6�����쳣�����ź�
-#define SP6BS(n)(SP6BS1 + HE2*n)	//SF6��ѹ�����ź�
+#define HE(n) 	(HE1 + HE2*n)	///<断路器1合位
+#define FEN(n)	(FEN1 + HE2*n)	///<断路器1分位
+#define CN(n)	(CN1 + HE2*n)	///<断路器1储能位置
+#define GLD(n)	(GLD1 + HE2*n)	///<断路器1隔离刀闸位置（备用遥信4）
+#define BYX5(n)	(YX15 + HE2*n)	///<备用遥信5变位
+#define BYX6(n)	(YX16 + HE2*n)	//<备用遥信6变位
+#define XJGZ(n)	(XJGZ1 + HE2*n)	//故障指示器指示线路2相间短路故障
+#define JDGZ(n)	(JDGZ1 + HE2*n)	//故障指示器指示线路2接地故障
+#define SP6GZ(n)(SP6GZ1 + HE2*n)	//SF6气体异常报警信号
+#define SP6BS(n)(SP6BS1 + HE2*n)	//SF6气压闭锁信号
 
 typedef struct fourchar{
 	long d1:8;
@@ -213,8 +213,8 @@ typedef struct passdata{
 typedef struct yc_data{
 	float *src_yc;
 	passdata *deadpass;
-	short *Coef;//����ϵ����
-	short *range;//����;
+	short *Coef;//工程系数；
+	short *range;//量程;
 	float *dead;
 	uint16 dataid;
 	uint16 datasign;
@@ -264,15 +264,15 @@ typedef struct eth_para_tag {//lenth 37
     uint32 recvbyte;
 } ETH_PARA;
 typedef struct eth_com_tag {
-	uint16 ethnum;//��Ӧ�����ں�
-	uint16 comtype;//ͨ����־��1 ��ͨ����0��ͨ����Ĭ����ͨ����
-	int16 server_client;//1:�Ƿ�������2�ǿͻ��ˣ�Ĭ�Ͽͻ���
-	int16 enable ;//ͨ�����ñ�־��
-	int16 tcpiptype;//1:TCP;2:UDP Ĭ��tcp
-	int16 net_port;//������������ʱ�ļ����˿ڣ�
-	uint8 remote_ip[4];//Զ��IP
-	int16 dport;//Զ�˶˿�
-	int16 protocol;//��Լ
+	uint16 ethnum;//对应的网口好
+	uint16 comtype;//通道标志，1 主通道，0子通道，默认子通道；
+	int16 server_client;//1:是服务器，2是客户端，默认客户端
+	int16 enable ;//通道启用标志；
+	int16 tcpiptype;//1:TCP;2:UDP 默认tcp
+	int16 net_port;//本地做服务器时的监听端口；
+	uint8 remote_ip[4];//远端IP
+	int16 dport;//远端端口
+	int16 protocol;//规约
 } ETH_COM_PARA;
 
 typedef union charipunion{
@@ -287,32 +287,32 @@ typedef struct sntpdata{
 		unsigned int StartHour;
 		unsigned int StartMinute;
 }sntpdata_t;
-typedef struct terminal_para_tag {//�ն˲���
-	uint16 nulldata[8];//δ��������
+typedef struct terminal_para_tag {//终端参数
+	uint16 nulldata[8];//未定义数据
 	SERIAL_PARA ComPara[MAX_SERIAL_NUM];
 	ETH_PARA EthPara[MAX_NET_NUM];
 	ETH_COM_PARA EthSocketPara[MAX_SOCKET_NUM];
-    uint32 yx_filter_time;//ң�ŷ���ʱ�䣻
-    uint32 ykchecktime;//ң�ط�Уʱ�䣻
-    uint32 yk_he_pulse;//ң�غ�����ʱ��
-    uint32 yk_fen_pulse;//ң�ط�����ʱ�䣻
-    uint32 ykdelaytime;//ң���ӳٶϿ���Դʱ�䡣
-    unsigned int  cascadeport;//CASCADE_PORT��
+    uint32 yx_filter_time;//遥信防抖时间；
+    uint32 ykchecktime;//遥控返校时间；
+    uint32 yk_he_pulse;//遥控合脉冲时间
+    uint32 yk_fen_pulse;//遥控分脉冲时间；
+    uint32 ykdelaytime;//遥控延迟断开电源时间。
+    unsigned int  cascadeport;//CASCADE_PORT；
     BATTERYDATA_T battery_action_time ;
 	sntpdata_t sntppara;
-	uint16 show_data;//Һ����ʾһ��ֵ
+	uint16 show_data;//液晶显示一次值
 	uint16 reverse[18];
 	uint16 crc;
 } TER_PARA;
-extern TER_PARA TerPara;//�ն˲���
+extern TER_PARA TerPara;//终端参数
 
 typedef struct time_data{
-	 unsigned int millisecond;//0-999����
-	 unsigned int minute;//IV--�Ƿ���Ч 0��Ч 1��Ч ռ�ֽ����λ ����λ���� ��6λΪ���ݣ�0-59��--��GB_T 18657.4-2002 Զ���豸��ϵͳ ���岿�� �����Լ ����ƪ Ӧ����ϢԪ�صı���Ͷ�������ͼ����д��0-99��
-	 unsigned int hour;//SU--�Ƿ�����ʱ 0��׼ʱ�䣬1����ʱ ռ�ֽ����λ����������λ���ã���5λΪ���ݣ�0-23Сʱ��
-	 unsigned int day;//day_week:weekռ�ֽڸ�3λ(1-7���ڵ���)��dayռ�ֽڵ�5λ ��1-31�µ��죩
-	 unsigned int month;//����λ���� monthռ��4λ��1-12�£�
-	 unsigned int year;//���λ���� yearռ��7λ��0-99�꣩
+	 unsigned int millisecond;//0-999毫秒
+	 unsigned int minute;//IV--是否有效 0有效 1无效 占字节最高位 第七位备用 低6位为数据（0-59分--在GB_T 18657.4-2002 远动设备及系统 第五部分 传输规约 第四篇 应用信息元素的编码和定义中例图有误写成0-99）
+	 unsigned int hour;//SU--是否夏令时 0标准时间，1夏令时 占字节最高位，第六、七位备用，低5位为数据（0-23小时）
+	 unsigned int day;//day_week:week占字节高3位(1-7星期的天)，day占字节低5位 （1-31月的天）
+	 unsigned int month;//高四位备用 month占低4位（1-12月）
+	 unsigned int year;//最高位备用 year占低7位（0-99年）
 }CP56Time2a;
 typedef struct time16_data{
 	unsigned int millisecond;
@@ -330,13 +330,13 @@ typedef struct setmstime{
 #define MAX_ACT_SOE_NUM 10
 #define MAX_SOE_INFLASH		300
 #define MAX_ACTSOE_INFLASH	100
-#define EVENTSOE 1 //˳��SOE
-#define YKSOE    2   //ң��SOE
-#define TERSOE 3  // �ն˹���SOE
+#define EVENTSOE 1 //顺序SOE
+#define YKSOE    2   //遥控SOE
+#define TERSOE 3  // 终端故障SOE
 
 #define PER_SOE_SIZE  (sizeof(SoeData))
 #define PER_ACTION_SIZE  (sizeof(ActionData))
-//������¼�ṹ
+//动作记录结构
 typedef struct _ActionData{
 	uint16 dataid;		// dataid use for local show,from 0
 	uint16 datasign;     //dagasign use for master communication
@@ -351,27 +351,27 @@ typedef struct _SoeData{
 	uint16 dataid;	// dataid use for local show,from 0
 	uint16 datasign; //dagasign use for master communication
 	uint16  status;
-	uint16  type;//��˫�㣻
+	uint16  type;//单双点；
 	CP56Time2a time;
 	int txt_len; //txt len use for master  file transfer by ascii
 }SoeData;
-//soe �ļ�ͷ
+//soe 文件头
 typedef struct _SoeHeader{
-	uint16 cur_index;//ָʾ��ǰsoe������
-	uint16 total_cnt;//ָʾ��ǰ�ļ��������soe����
-	uint16 total_txt_len;//ָʾ��ǰ�ļ������м�¼ת����ascii��ĳ���
+	uint16 cur_index;//指示当前soe索引号
+	uint16 total_cnt;//指示当前文件中所存的soe数量
+	uint16 total_txt_len;//指示当前文件中所有记录转换成ascii码的长度
 	uint16 statu;//no use
-	uint16 valid_flag[MAX_SOE_INFLASH];//ָʾ��ǰ��¼�Ƿ���Ч����Ϊsoe��¼������actsoe��¼�������ԣ�����ȡMAX_SOE_INFLASH
+	uint16 valid_flag[MAX_SOE_INFLASH];//指示当前记录是否有效。因为soe记录数大于actsoe记录数，所以，这里取MAX_SOE_INFLASH
 }SoeHeader;
 typedef struct soe_data {
-	Uint16 ReadFlag1[MAX_COM_PORT_NUM];//һ��
-	Uint16 ReadFlag2[MAX_COM_PORT_NUM];//����
+	Uint16 ReadFlag1[MAX_COM_PORT_NUM];//一级
+	Uint16 ReadFlag2[MAX_COM_PORT_NUM];//二级
 	Uint16 SaveFlag;//EVENTSOE  YKSOE TERCHECK
 	SoeData soe;
 } SOE_DATA;
 
 typedef struct soe_buffer {
-	 unsigned int  produce_cnt;//��������ָ�����ڶ������ݵ����ͣ�Ŀ����Ϊ�˱�֤ʱ��˳�򡣶���һ��������ʱ���ã�����һ�黺����
+	 unsigned int  produce_cnt;//生产消费指针用于二级数据的上送，目的是为了保证时间顺序。对于一级数据暂时不用，遍历一遍缓冲区
 	 unsigned int  consume_cnt;
     SOE_DATA SoeData[MAX_SOE_NUM];
 } SOE_BUFFER;
@@ -418,26 +418,26 @@ typedef struct _buffer{
 #define COM_SEND_BUFFER_SIZE 256
 #define COM_RECV_BUFFER_SIZE 512
 typedef struct combox{
-			unsigned int 	recv_time_out;//���ճ�ʱ
-			unsigned int 	send_time_out;//���ͳ�ʱ
-			unsigned int 	inbyte_cnt;//���ջ����������ݼ���
-			unsigned int 	outbyte_cnt;//���ջ���ȡ�����ݼ���
-			unsigned char short_pack_buffer[10];//�̶�֡����
-			unsigned char long_pack_buffer[COM_RECV_BUFFER_SIZE];//�ɱ�֡����
-			unsigned int 	short_pack_byte_cnt;//�̶�֡�ֽڼ���
-			unsigned int    long_pack_byte_cnt;//�ɱ�֡�ֽڼ���
-			unsigned int 	short_start_flag;//�̶�֡�����ʼ��־
-			unsigned int 	long_start_flag;//�ɱ�֡�����ʼ��־
-			unsigned int 	exp_len;//�ڴ���֡����
-			unsigned int 	wait_com_flag;//�ȴ���־
-			unsigned int 	wait_com_time;//�ȴ�ʱ��
+			unsigned int 	recv_time_out;//接收超时
+			unsigned int 	send_time_out;//发送超时
+			unsigned int 	inbyte_cnt;//接收缓存填入数据计数
+			unsigned int 	outbyte_cnt;//接收缓存取出数据计数
+			unsigned char short_pack_buffer[10];//固定帧缓存
+			unsigned char long_pack_buffer[COM_RECV_BUFFER_SIZE];//可变帧缓存
+			unsigned int 	short_pack_byte_cnt;//固定帧字节计数
+			unsigned int    long_pack_byte_cnt;//可变帧字节计数
+			unsigned int 	short_start_flag;//固定帧检包开始标志
+			unsigned int 	long_start_flag;//可变帧检包开始标志
+			unsigned int 	exp_len;//期待的帧长度
+			unsigned int 	wait_com_flag;//等待标志
+			unsigned int 	wait_com_time;//等待时间
 			unsigned int	link_wait_flag;
-			unsigned int	link_wait_time;//�ȴ���·���ӵ�ʱ��
-			unsigned char	short_addr_buffer[10]; //�����Ϊ����ɽ��վ���ж��ն˵�ַ׼����֡��
+			unsigned int	link_wait_time;//等待链路连接的时间
+			unsigned char	short_addr_buffer[10]; //这个是为马鞍山主站的招读终端地址准备的帧。
 			unsigned int	short_addr_byte_cnt;	//
 			unsigned int	short_addr_flag;
-			unsigned char 	com_send_buffer[COM_SEND_BUFFER_SIZE];//���ͻ���
-			unsigned char 	com_recv_buffer[COM_RECV_BUFFER_SIZE];//���ջ���
+			unsigned char 	com_send_buffer[COM_SEND_BUFFER_SIZE];//发送缓存
+			unsigned char 	com_recv_buffer[COM_RECV_BUFFER_SIZE];//接收缓存
 } COMBOX;
 
 typedef struct YC_ADDR_POS {
@@ -469,10 +469,10 @@ typedef struct tagComPub{
 	uint16	per_grp_yc_cnt;
 }ComPub;
 
-typedef struct protocol_para_tag {  //��Լ����
+typedef struct protocol_para_tag {  //规约参数
 	yxpara	yx_dataaddr ;
 	ycpara	yc_dataaddr;
-	uint16	yk_dataaddr[MAX_YK_NUM];//δ��
+	uint16	yk_dataaddr[MAX_YK_NUM];//未用
 	ComPub	com_pub;
 	uint16	yx_ack_type ;
 	uint16     reverse[20];
@@ -482,21 +482,21 @@ typedef struct protocol_para_tag {  //��Լ����
 extern PRO_PARA ProPara;
 
 typedef struct dead_band_para{
-	int16 DeadTime;//ң������ʱ������
-    float DeadU;   ///<��ѹ��������
-    float DeadI;      ///<������������
-    float DeadP;      ///<������������
-    float DeadFreq;   ///<Ƶ����������
-    float DeadAngle;///<�Ƕ���������//�͹�����������
-    float DeadHarmoicValue;///<г����Чֵ��������
-    float DeadHarmoicCount;///<   г����������������
-    float DeadTemp;   ///<�¶���������
-    float DeadHumidity;///<ʪ����������
+	int16 DeadTime;//遥测死区时间设置
+    float DeadU;   ///<电压死区设置
+    float DeadI;      ///<电流死区设置
+    float DeadP;      ///<功率死区设置
+    float DeadFreq;   ///<频率死区设置
+    float DeadAngle;///<角度死区设置//和功率因数公用
+    float DeadHarmoicValue;///<谐波有效值死区设置
+    float DeadHarmoicCount;///<   谐波含有率死区设置
+    float DeadTemp;   ///<温度死区设置
+    float DeadHumidity;///<湿度死区设置
     uint16 reverse[20];
     uint16 crc;
 } DEAD_BAND_PARA;
 extern DEAD_BAND_PARA DeadBandPara;
-extern DEAD_BAND_PARA DeadBandParaValue;//ת���ɾ���ֵ
+extern DEAD_BAND_PARA DeadBandParaValue;//转换成绝对值
 
 typedef struct unitary_table{
 	int U_bdata;
@@ -507,17 +507,17 @@ typedef struct unitary_table{
 	int ANGLE_bdata;
 	int DC_bdata;
 	int TEMP_bdata;
-}UNITARY_TAB;             //��һ��ϵ����
+}UNITARY_TAB;             //归一化系数表
 
 typedef struct angleratio{
-	float angle;//�Ƕ����
-	float cos_a;//�Ƕ���������ֵ
-	float sin_a;//�Ƕ���������ֵ
+	float angle;//角度误差
+	float cos_a;//角度误差的余弦值
+	float sin_a;//角度误差的正弦值
 }angleratio_t;
 typedef struct ratio{
 	float PortRatio[13];//UA1,UB1,UC1,UAB1,UBC1,UCA1,U01,IA11,IB11,IC11,I011,IA12,IB12,IC12,
-	float PowerLineRatio[4];// Pa ; Pb ; Pc; Pall;  ����ϵ��
-	angleratio_t PowerAngleRatio[2][4];//Qa ; Qb ;  Qc; Qall; �Ƕ�ϵ��
+	float PowerLineRatio[4];// Pa ; Pb ; Pc; Pall;  线性系数
+	angleratio_t PowerAngleRatio[2][4];//Qa ; Qb ;  Qc; Qall; 角度系数
 	uint16 reverse[20];
 	uint16 crc;
 }ratio_t;
@@ -530,9 +530,9 @@ typedef struct BASEPROSTATU{
 	bool Trigger;
 }BASEPROSTATU_T;
 
-//����װ�ù�����Ϣλ
+//定义装置故障信息位
 #define ERROR_FLASH 0
-typedef struct _terminal_msg{//�ն���Ϣ
+typedef struct _terminal_msg{//终端信息
 	char term_type[32];
 	char term_operating[32];
 	char term_manufactor[32];
@@ -543,15 +543,15 @@ typedef struct _terminal_msg{//�ն���Ϣ
 	char term_id[32];
 	char term_mac[6];
 	char term_sw_date[12];
-	uint32 	term_device_state;//װ�ù�����Ϣ
+	uint32 	term_device_state;//装置故障信息
 	yxdata_t *SoeId;
 	int    soe_flag;
 }TerminalMsg;
 extern  TerminalMsg term_msg;
-#define SETBIT(dest,mask)     (dest |= mask)//Ŀ��λ��λ
-#define CLRBIT(dest,mask)     (dest &= ~mask)//Ŀ��λ����
-#define TGLBIT(dest,mask)     (dest ^= mask)//Ŀ��λȡ��
-#define CHKBIT(dest,mask)     (dest & mask)//Ŀ��λ���
+#define SETBIT(dest,mask)     (dest |= mask)//目标位置位
+#define CLRBIT(dest,mask)     (dest &= ~mask)//目标位清零
+#define TGLBIT(dest,mask)     (dest ^= mask)//目标位取反
+#define CHKBIT(dest,mask)     (dest & mask)//目标位检测
 
 #define SET_BIT 0
 #define CLR_BIT 1
@@ -567,11 +567,11 @@ extern int64 t6,max_t6,min_t6;
 extern Uint64 t7,t8;
 extern int64 t9,max_t9,min_t9;
 
-extern float *ptr_pt;//������Һ�������в���ʹ���࣬���Ե���ʾһ��ֵ��Ҫʹ��pt��ctʱ��ֻ����ȫ�ֲ���
+extern float *ptr_pt;//由于在液晶程序中不能使用类，所以当显示一次值需要使用pt，ct时，只能用全局参数
 extern float *ptr_ct;
 extern float *ptr_ct0;
 extern float *ptr_pt0;
-extern uint16 *ptr_d_yx;//˫��ң��
+extern uint16 *ptr_d_yx;//双点遥信
 extern int16 DogFood;
 extern COMBOX ComBox[MAX_COM_PORT_NUM];
 extern SOE_BUFFER SoeBuffer;

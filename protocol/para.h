@@ -1,5 +1,5 @@
 /*
-	ÄÚÈİ£º¶¨Òå±£»¤ÓÃµÄ²ÎÊı
+	å†…å®¹ï¼šå®šä¹‰ä¿æŠ¤ç”¨çš„å‚æ•°
  */
 #ifndef _PARA__H_
 #define _PARA__H_
@@ -21,11 +21,11 @@ typedef union gd_jhhyb{
 
 }gdjhhyb;
 
-//±£»¤¶¨Ê±Æ÷
+//ä¿æŠ¤å®šæ—¶å™¨
 typedef struct protect_timer {
-    unsigned int start_flag;// Æô¶¯--1£»¹Ø±Õ--0£»
+    unsigned int start_flag;// å¯åŠ¨--1ï¼›å…³é—­--0ï¼›
     //unsigned int over_flag;// 1--over,0--counting
-    unsigned int jdtime;//ÌøÕ¢Ê§°Ü¼ì²âÊ±¼ä
+    unsigned int jdtime;//è·³é—¸å¤±è´¥æ£€æµ‹æ—¶é—´
     unsigned int timer_cnt;
     unsigned int timer_limit;
 } PROTECT_TIMER;
@@ -50,10 +50,10 @@ typedef struct gdjhh {
 	gdjhhyb enable;
 
 } GDJHH;
-/***************Ô½ÏŞµç²ÎÁ¿¶¨Öµ*********/
+/***************è¶Šé™ç”µå‚é‡å®šå€¼*********/
 typedef struct max_and_min {
-	float upper_limit;                  //ÉÏÏŞ
-	float lower_limit;                  //ÏÂÏŞ
+	float upper_limit;                  //ä¸Šé™
+	float lower_limit;                  //ä¸‹é™
 }BOUNDS;
 
 typedef struct boundyb{
@@ -93,163 +93,163 @@ typedef struct para_bounds{
 	 BOUNDS  cos;
 	 BOUNDS  s;
 	 BOUNDS  freq;
-	 float t ;                   //±¨¾¯Ê±ÏŞ
-	 YUEXIANYB enable;           //Ô½ÏŞ¸æ¾¯Ñ¹°å
+	 float t ;                   //æŠ¥è­¦æ—¶é™
+	 YUEXIANYB enable;           //è¶Šé™å‘Šè­¦å‹æ¿
 
 
 } PARABOUNDS;
 
-/******************************µçÁ÷±£»¤Êı¾İ***********************/
+/******************************ç”µæµä¿æŠ¤æ•°æ®***********************/
 typedef struct ctrword{
-	unsigned short en :8;       //0:¶¨Ê±ÏŞ£¬1:·´Ê±ÏŞ
-	unsigned short out:8;  		//·´Ê±ÏŞ¶¨ÖµÀà±ğ 1: 2: 3: 4:
+	unsigned short en :8;       //0:å®šæ—¶é™ï¼Œ1:åæ—¶é™
+	unsigned short out:8;  		//åæ—¶é™å®šå€¼ç±»åˆ« 1: 2: 3: 4:
 
 }CTRWD;
 //typedef
 //__attribute__ ((_packed_))
 typedef struct i_protect{
-	float i_limit;             //µçÁ÷¶¨Öµ
-	int32 t_limit ;            //Ê±ÏŞ
+	float i_limit;             //ç”µæµå®šå€¼
+	int32 t_limit ;            //æ—¶é™
 	struct{
-		uint16 enable;         //¸æ¾¯Ñ¹°å
-		uint16 enable_out;      // ³ö¿ÚÑ¹°å
-		uint16 dir_enable;      //·½ÏòÑ¹°å
-		uint16 ulose_enable;    //µçÑ¹±ÕËøÑ¹°å
+		uint16 enable;         //å‘Šè­¦å‹æ¿
+		uint16 enable_out;      // å‡ºå£å‹æ¿
+		uint16 dir_enable;      //æ–¹å‘å‹æ¿
+		uint16 ulose_enable;    //ç”µå‹é—­é”å‹æ¿
 	}Enable;
 }IPROTECT;
 
 typedef struct jyprotect{
 	float i_limit;              //
 	//int32 t_limit ;           //
-	int32 det_t;                //ÀÛ¼Æ´°¿ÚÊ±¼ä£»
+	int32 det_t;                //ç´¯è®¡çª—å£æ—¶é—´ï¼›
 	struct{
-		uint16 enable;          //¸æ¾¯Ñ¹°å
-		uint16 enable_out;       //³ö¿ÚÑ¹°å
-		uint16 dir_enable;       //·½ÏòÑ¹°å
-		uint16 ulose_enable;     //µçÑ¹±ÕËøÑ¹°å
+		uint16 enable;          //å‘Šè­¦å‹æ¿
+		uint16 enable_out;       //å‡ºå£å‹æ¿
+		uint16 dir_enable;       //æ–¹å‘å‹æ¿
+		uint16 ulose_enable;     //ç”µå‹é—­é”å‹æ¿
 	}Enable;
 }JYPROTECT;
 typedef struct angprotect{
-	uint16 rever_line;          //Í¶Èë·´Ïò¡£ÊÖ¶¯ÅĞ¶Ï·½ÏòÊ±ÓĞÓÃ¡£
-	float Edz;					//µç¶¯ÊÆ¶¨Öµ
-	float limit;                //½Ç¶È¶¨Öµ
-	int32 t_limit;              //Ê±¼ä¶¨Öµ
-	float i0_lock_down;			//ÁãĞòÏàÎ»±£»¤µçÁ÷ÏÂÏŞ£¬Ä¿µÄÊÇ·ÀÖ¹ÁãĞòµçÁ÷¹ıĞ¡
-	float u0_lock_down;			//ÁãĞò±£»¤µçÑ¹±ÕËø¶¨ÖµÏÂÏŞ£¬Ä¿µÄÊÇ·ÀÖ¹ÁãĞòµçÑ¹¹ıĞ¡
+	uint16 rever_line;          //æŠ•å…¥åå‘ã€‚æ‰‹åŠ¨åˆ¤æ–­æ–¹å‘æ—¶æœ‰ç”¨ã€‚
+	float Edz;					//ç”µåŠ¨åŠ¿å®šå€¼
+	float limit;                //è§’åº¦å®šå€¼
+	int32 t_limit;              //æ—¶é—´å®šå€¼
+	float i0_lock_down;			//é›¶åºç›¸ä½ä¿æŠ¤ç”µæµä¸‹é™ï¼Œç›®çš„æ˜¯é˜²æ­¢é›¶åºç”µæµè¿‡å°
+	float u0_lock_down;			//é›¶åºä¿æŠ¤ç”µå‹é—­é”å®šå€¼ä¸‹é™ï¼Œç›®çš„æ˜¯é˜²æ­¢é›¶åºç”µå‹è¿‡å°
 	struct{
-		uint16 enable;          //¸æ¾¯Ñ¹°å
-		uint16 auto_judge_dir;  //×Ô¶¯·½Ïò¼ì²âÑ¹°å
-		uint16 enable_out;       //³ö¿ÚÑ¹°å
-		uint16 dir_enable;       //·½ÏòÑ¹°å
-		uint16 ulose_enable;     //µçÑ¹±ÕËøÑ¹°å
+		uint16 enable;          //å‘Šè­¦å‹æ¿
+		uint16 auto_judge_dir;  //è‡ªåŠ¨æ–¹å‘æ£€æµ‹å‹æ¿
+		uint16 enable_out;       //å‡ºå£å‹æ¿
+		uint16 dir_enable;       //æ–¹å‘å‹æ¿
+		uint16 ulose_enable;     //ç”µå‹é—­é”å‹æ¿
 	}Enable;
 }ANGPROTECT;
-/*************************¹¦ÂÊ·½Ïò¹¦ÄÜÊı¾İ*************************/
+/*************************åŠŸç‡æ–¹å‘åŠŸèƒ½æ•°æ®*************************/
 typedef struct pir_protect{
-	unsigned int ContralWord;    //¹¦ÂÊ·½Ïò¿ØÖÆ×Ö£»
+	unsigned int ContralWord;    //åŠŸç‡æ–¹å‘æ§åˆ¶å­—ï¼›
 	unsigned int Dir ;
-	unsigned int Pdirvalue;      //¹¦ÂÊ·½Ïò½Ç¶È£»0-30£»1-45
+	unsigned int Pdirvalue;      //åŠŸç‡æ–¹å‘è§’åº¦ï¼›0-30ï¼›1-45
 }PIRPROTECT;
-/*****************************ÖØºÏÕ¢±£»¤***************************/
+/*****************************é‡åˆé—¸ä¿æŠ¤***************************/
 
 #define MAX_CHZ_NUM 3
 typedef struct chz_protect{
-	int16  enable[3];		// 0 Ïà¼ä¹ıÁ÷ÖØºÏÕ¢£¬1 ÁãĞò¹ıÁ÷ÖØºÏÕ¢£¬3 ÁãĞòÏàÎ»ÖØºÏÕ¢
-	int16  Times;			//<ÖØºÏÕ¢´ÎÊı
-	int16  Type;			//<ÖØºÏÕ¢·½Ê½
-	int32  cdtime;			//³äµçÊ±¼ä£»
-	int32 Time[3];			//<Èı´ÎÖØºÏÕ¢Ê±¼ä
+	int16  enable[3];		// 0 ç›¸é—´è¿‡æµé‡åˆé—¸ï¼Œ1 é›¶åºè¿‡æµé‡åˆé—¸ï¼Œ3 é›¶åºç›¸ä½é‡åˆé—¸
+	int16  Times;			//<é‡åˆé—¸æ¬¡æ•°
+	int16  Type;			//<é‡åˆé—¸æ–¹å¼
+	int32  cdtime;			//å……ç”µæ—¶é—´ï¼›
+	int32 Time[3];			//<ä¸‰æ¬¡é‡åˆé—¸æ—¶é—´
 
-	int32 LockTime;			//±ÕËø2´ÎÖØºÏÑÓÊ±
-	float DiffVol;			//¿ª¹ØÁ½²àµçÑ¹²î
-	float DiffPhase;		//ÏàÎ»²îÉèÖÃ
-	int16 DiffVolDefine[2];	//¿ª¹ØÁ½²àµçÑ¹¶¨Òå
+	int32 LockTime;			//é—­é”2æ¬¡é‡åˆå»¶æ—¶
+	float DiffVol;			//å¼€å…³ä¸¤ä¾§ç”µå‹å·®
+	float DiffPhase;		//ç›¸ä½å·®è®¾ç½®
+	int16 DiffVolDefine[2];	//å¼€å…³ä¸¤ä¾§ç”µå‹å®šä¹‰
 
 }CHZPROTECT;
-/*****************************ÆäËû±£»¤¹²ÓÃµÄ¶¨Öµ***************************/
+/*****************************å…¶ä»–ä¿æŠ¤å…±ç”¨çš„å®šå€¼***************************/
 typedef struct pub_value{
-	float StartI;				//Æô¶¯µçÁ÷,²»ÔÙÊ¹ÓÃ
-	float StartU;				//ÓĞÑ¹
-	float StopU;				//ÎŞÑ¹£¬²»ÔÙÊ¹ÓÃ
-	int32 InstantFaultChkTime;	//Ë²Ê±¹ÊÕÏÅĞ¶ÏÊ±¼ä
-	int32 ResetFaTime;			//ÑÓÊ±¸´¹éÊ±¼ä
-	int16 ResetFaType;			//¹ÊÕÏ¸´¹éÀàĞÍ  1°´Ê±¼ä¸´¹é 2»Ö¸´¹©µç¸´¹é 3ÊÖ¶¯¸´¹é
-	int16 GroundLinkType;		//1Ğ¡µçÁ÷½ÓµØ2 ´óµçÁ÷½ÓµØ
+	float StartI;				//å¯åŠ¨ç”µæµ,ä¸å†ä½¿ç”¨
+	float StartU;				//æœ‰å‹
+	float StopU;				//æ— å‹ï¼Œä¸å†ä½¿ç”¨
+	int32 InstantFaultChkTime;	//ç¬æ—¶æ•…éšœåˆ¤æ–­æ—¶é—´
+	int32 ResetFaTime;			//å»¶æ—¶å¤å½’æ—¶é—´
+	int16 ResetFaType;			//æ•…éšœå¤å½’ç±»å‹  1æŒ‰æ—¶é—´å¤å½’ 2æ¢å¤ä¾›ç”µå¤å½’ 3æ‰‹åŠ¨å¤å½’
+	int16 GroundLinkType;		//1å°ç”µæµæ¥åœ°2 å¤§ç”µæµæ¥åœ°
 }PUBVALUE;
 
 typedef   struct AllEnableSet{
-    int16 EnableYCEvent;		//Ò£²âÔ½ÏŞ¼ì²â¹¦ÄÜÍ¶ÍË
-    int16 EnableCurrentProtect; //»ù±¾±£»¤¹¦ÄÜÍ¶ÍË
-    int16 EnableFa;             //FA¹¦ÄÜÍ¶ÍË
-    int16 EnablePtFun;          //µ±PT¶ÏÏßÊ±ÊÇ·ñ×Ô¶¯ÍË³ö·½ÏòÔª¼şÒÔ¼°¼ìÍ¬ÆÚÔª¼ş,FA¹¦ÄÜ
+    int16 EnableYCEvent;		//é¥æµ‹è¶Šé™æ£€æµ‹åŠŸèƒ½æŠ•é€€
+    int16 EnableCurrentProtect; //åŸºæœ¬ä¿æŠ¤åŠŸèƒ½æŠ•é€€
+    int16 EnableFa;             //FAåŠŸèƒ½æŠ•é€€
+    int16 EnablePtFun;          //å½“PTæ–­çº¿æ—¶æ˜¯å¦è‡ªåŠ¨é€€å‡ºæ–¹å‘å…ƒä»¶ä»¥åŠæ£€åŒæœŸå…ƒä»¶,FAåŠŸèƒ½
 }AllEnableSet ;
-/********************************±£»¤µç²ÎÁ¿¶¨Öµ*********************/
+/********************************ä¿æŠ¤ç”µå‚é‡å®šå€¼*********************/
 typedef struct protect_limit{
-	 IPROTECT I_d1;				//ËÙ¶ÏµçÁ÷±£»¤¹¦ÄÜ²ÎÊı
-	 IPROTECT I_d2;      	    //¹ıÁ÷µçÁ÷±£»¤¹¦ÄÜ²ÎÊı
-	 IPROTECT I_d3;      	    //¹ı¸ººÉµçÁ÷±£»¤¹¦ÄÜ²ÎÊı
-	 IPROTECT I0_d1;     	    //ÁãĞòËÙ¶ÏµçÁ÷±£»¤¹¦ÄÜ²ÎÊı
-	 IPROTECT I0_d2;     	    //ÁãĞò¶¨Ê±ÏŞµçÁ÷±£»¤¹¦ÄÜ²ÎÊı
-	 IPROTECT I0_d3;     	    //ÁãĞò¹ı¸ººÉµçÁ÷±£»¤¹¦ÄÜ²ÎÊı
-	 JYPROTECT JY;              //ÁãĞòµçÁ÷½×Ô¾²ÎÊı
-	 IPROTECT U0;				//ÁãĞòµçÑ¹±£»¤¶¨ÖµU0,ÁãĞòµçÑ¹±£»¤Í¶Èë¶¨Öµ,ÁãĞòµçÑ¹±£»¤³ö¿ÚÑ¹°å
+	 IPROTECT I_d1;				//é€Ÿæ–­ç”µæµä¿æŠ¤åŠŸèƒ½å‚æ•°
+	 IPROTECT I_d2;      	    //è¿‡æµç”µæµä¿æŠ¤åŠŸèƒ½å‚æ•°
+	 IPROTECT I_d3;      	    //è¿‡è´Ÿè·ç”µæµä¿æŠ¤åŠŸèƒ½å‚æ•°
+	 IPROTECT I0_d1;     	    //é›¶åºé€Ÿæ–­ç”µæµä¿æŠ¤åŠŸèƒ½å‚æ•°
+	 IPROTECT I0_d2;     	    //é›¶åºå®šæ—¶é™ç”µæµä¿æŠ¤åŠŸèƒ½å‚æ•°
+	 IPROTECT I0_d3;     	    //é›¶åºè¿‡è´Ÿè·ç”µæµä¿æŠ¤åŠŸèƒ½å‚æ•°
+	 JYPROTECT JY;              //é›¶åºç”µæµé˜¶è·ƒå‚æ•°
+	 IPROTECT U0;				//é›¶åºç”µå‹ä¿æŠ¤å®šå€¼U0,é›¶åºç”µå‹ä¿æŠ¤æŠ•å…¥å®šå€¼,é›¶åºç”µå‹ä¿æŠ¤å‡ºå£å‹æ¿
 	 IPROTECT Ihjs;
 	 IPROTECT I0hjs;
 	 IPROTECT I0PhaseHjs;
 	 uint32 hjschecktime;
-	 CHZPROTECT chz;            //ÖØºÏÕ¢¹¦ÄÜ²ÎÊı¹¦ÄÜ²ÎÊı
-	 ANGPROTECT Angle_dz;       //ÁãĞòÏàÎ»±£»¤²ÎÊı	 
-	 ANGPROTECT Raise_dz;       //ÔöÁ¿µçÁ÷±£»¤²ÎÊı	 
-	 float U0_Lock;				//ÁãĞò±£»¤µçÑ¹±ÕËø¶¨Öµ
-	 uint16 pt_vol_lock;		//PT¶ÏÏß±ÕËøÁãĞòµçÑ¹
-	 PIRPROTECT P_direction;    //¹¦ÂÊ·½ÏòÔª¼ş²ÎÊı
-	 PIRPROTECT P0_direction;   //¹¦ÂÊ·½ÏòÔª¼ş²ÎÊı
-	 float P0_coff;				//p0ÏµÊı£¬for 3U0 or U0 ;3I0 or I0 ,default is 3U0 3I0
+	 CHZPROTECT chz;            //é‡åˆé—¸åŠŸèƒ½å‚æ•°åŠŸèƒ½å‚æ•°
+	 ANGPROTECT Angle_dz;       //é›¶åºç›¸ä½ä¿æŠ¤å‚æ•°	 
+	 ANGPROTECT Raise_dz;       //å¢é‡ç”µæµä¿æŠ¤å‚æ•°	 
+	 float U0_Lock;				//é›¶åºä¿æŠ¤ç”µå‹é—­é”å®šå€¼
+	 uint16 pt_vol_lock;		//PTæ–­çº¿é—­é”é›¶åºç”µå‹
+	 PIRPROTECT P_direction;    //åŠŸç‡æ–¹å‘å…ƒä»¶å‚æ•°
+	 PIRPROTECT P0_direction;   //åŠŸç‡æ–¹å‘å…ƒä»¶å‚æ•°
+	 float P0_coff;				//p0ç³»æ•°ï¼Œfor 3U0 or U0 ;3I0 or I0 ,default is 3U0 3I0
 } PROTECTLIMIT;
 
-/***************ÏµÍ³±£»¤,Ô½ÏŞ¶¨Öµ*********/
+/***************ç³»ç»Ÿä¿æŠ¤,è¶Šé™å®šå€¼*********/
 typedef struct total_limit_para{
-	PROTECTLIMIT  Para_limit[MAX_LINE_NUM][MAX_SECTION_NUM]; //±£»¤µç²ÎÁ¿¶¨Öµ116*2*6
-	int16 ctlock;					//CT¶ÏÏß±ÕËø·½Ïò±£»¤£»
-	uint16 totalenable;				// ³ö¿Ú×ÜÈíÑ¹°å£»
-	uint16 undefine;				//Î´¶¨Òå ±£ÁôÎ»ÖÃ£»
+	PROTECTLIMIT  Para_limit[MAX_LINE_NUM][MAX_SECTION_NUM]; //ä¿æŠ¤ç”µå‚é‡å®šå€¼116*2*6
+	int16 ctlock;					//CTæ–­çº¿é—­é”æ–¹å‘ä¿æŠ¤ï¼›
+	uint16 totalenable;				// å‡ºå£æ€»è½¯å‹æ¿ï¼›
+	uint16 undefine;				//æœªå®šä¹‰ ä¿ç•™ä½ç½®ï¼›
 	AllEnableSet protect_enable;
-	PUBVALUE public_value;			//Ò»Ğ©¹²ÓÃµÄ¶¨ÖÆ//8]
-	uint16 U0_source;				//0 ²É¼¯£¬1¼ÆËã»ñµÃ
-	uint16 I0_source;				//0²É¼¯£¬1¼ÆËã»ñµÃ
-	uint32 GZDefaulte;				//1 ´ú±í¸´¹é£»
-	uint16 section_num;				//¶¨ÖµÇøºÅ
+	PUBVALUE public_value;			//ä¸€äº›å…±ç”¨çš„å®šåˆ¶//8]
+	uint16 U0_source;				//0 é‡‡é›†ï¼Œ1è®¡ç®—è·å¾—
+	uint16 I0_source;				//0é‡‡é›†ï¼Œ1è®¡ç®—è·å¾—
+	uint32 GZDefaulte;				//1 ä»£è¡¨å¤å½’ï¼›
+	uint16 section_num;				//å®šå€¼åŒºå·
 	//unsigned long DefaultTime;
-	uint16 tort[MAX_LINE_NUM];      //À¡Ïß¹¦ÂÊ¼ÆËã·½·¨£¨2±í·¨/3±í·¨£©
-	int temp_lmt;                   //ÎÂ¶È¶¨Öµ
-	float pt_one_set;				//pt¶î¶¨Ò»´ÎÖµ
-	float pt_two_set;				//pt¶î¶¨¶ş´ÎÖµ
-	float ct_one_set;				//ct¶î¶¨Ò»´ÎÖµ
-	float ct_two_set;				//ct¶î¶¨¶ş´ÎÖµ
-	float ct0_one_set;				//ÁãĞòct¶î¶¨Ò»´ÎÖµ
-	float ct0_two_set;				//ÁãĞòct¶î¶¨¶ş´ÎÖµ
-	float pt0_one_set;				//ÁãĞòpt¶î¶¨Ò»´ÎÖµ
-	float pt0_two_set;				//ÁãĞòpt¶î¶¨¶ş´ÎÖµ
-	float ct_accuracy;				//ct¾«¶È
-	float ct_low_accuracy;			//ct¾«¶ÈÏÂÏŞ¾«¶È
-	float ct_low_ratio;				//ct¾«¶ÈÏÂÏŞ±ÈÀı
+	uint16 tort[MAX_LINE_NUM];      //é¦ˆçº¿åŠŸç‡è®¡ç®—æ–¹æ³•ï¼ˆ2è¡¨æ³•/3è¡¨æ³•ï¼‰
+	int temp_lmt;                   //æ¸©åº¦å®šå€¼
+	float pt_one_set;				//pté¢å®šä¸€æ¬¡å€¼
+	float pt_two_set;				//pté¢å®šäºŒæ¬¡å€¼
+	float ct_one_set;				//cté¢å®šä¸€æ¬¡å€¼
+	float ct_two_set;				//cté¢å®šäºŒæ¬¡å€¼
+	float ct0_one_set;				//é›¶åºcté¢å®šä¸€æ¬¡å€¼
+	float ct0_two_set;				//é›¶åºcté¢å®šäºŒæ¬¡å€¼
+	float pt0_one_set;				//é›¶åºpté¢å®šä¸€æ¬¡å€¼
+	float pt0_two_set;				//é›¶åºpté¢å®šäºŒæ¬¡å€¼
+	float ct_accuracy;				//ctç²¾åº¦
+	float ct_low_accuracy;			//ctç²¾åº¦ä¸‹é™ç²¾åº¦
+	float ct_low_ratio;				//ctç²¾åº¦ä¸‹é™æ¯”ä¾‹
 	
-	///*µçÑ¹ÉÏÏŞ¸æ¾¯ãĞÖµ£¬»Ö¸´ãĞÖµ£¬³ÖĞøÊ±¼ä*/
+	///*ç”µå‹ä¸Šé™å‘Šè­¦é˜ˆå€¼ï¼Œæ¢å¤é˜ˆå€¼ï¼ŒæŒç»­æ—¶é—´*/
 	limt UupData;
-	///*µçÑ¹ÏÂÏŞ¸æ¾¯ãĞÖµ£¬»Ö¸´ãĞÖµ£¬³ÖĞøÊ±¼ä*/
+	///*ç”µå‹ä¸‹é™å‘Šè­¦é˜ˆå€¼ï¼Œæ¢å¤é˜ˆå€¼ï¼ŒæŒç»­æ—¶é—´*/
 	limt UdownData;
-	///*µçÁ÷ÉÏÏŞãĞÖµ£¬»Ö¸´ãĞÖµ£¬³ÖĞøÊ±¼ä*/
+	///*ç”µæµä¸Šé™é˜ˆå€¼ï¼Œæ¢å¤é˜ˆå€¼ï¼ŒæŒç»­æ—¶é—´*/
 	limt IupData;
-	///*¸ººÉÔ½ÉÏÏŞãĞÖµ£¬»Ö¸´ãĞÖµ£¬³ÖĞøÊ±¼ä*/
+	///*è´Ÿè·è¶Šä¸Šé™é˜ˆå€¼ï¼Œæ¢å¤é˜ˆå€¼ï¼ŒæŒç»­æ—¶é—´*/
 	limt SupData;
-	//ÁãĞòµçÑ¹ÉÏÏŞ¸æ¾¯²ÎÊı
+	//é›¶åºç”µå‹ä¸Šé™å‘Šè­¦å‚æ•°
 	limt U0upData;
-	//ÁãĞòµçÁ÷ÉÏÏŞ¸æ¾¯²ÎÊı
+	//é›¶åºç”µæµä¸Šé™å‘Šè­¦å‚æ•°
 	limt I0upData;
 	uint16 cur_unit;
 	uint16 min_unit;
 	uint16 max_unit;
-	uint16 reverse[17];//Ô¤±¸
+	uint16 reverse[17];//é¢„å¤‡
 	uint16 crc;
 } TOTAL_LIMIT_BOUNDS;
 extern TOTAL_LIMIT_BOUNDS LimitBounds;
@@ -263,12 +263,12 @@ extern TOTAL_LIMIT_BOUNDS LimitBounds;
 typedef struct block_para_tab1 {
     Uint16 dataaddr;
     char unitName[5];
-    Uint16 datatype;		//Êı¾İÀàĞÍ
-    Uint16 len;				//×ÖÎªµ¥Î»
-    Uint16 *ppara;			//²ÎÊı
+    Uint16 datatype;		//æ•°æ®ç±»å‹
+    Uint16 len;				//å­—ä¸ºå•ä½
+    Uint16 *ppara;			//å‚æ•°
 
-    Uint16 secperlen;		//¶ÎÆ«ÒÆÁ¿
-    Uint16 *Para;			//²ÎÊıËùÔÚµÄÊı¾İ½á¹¹
+    Uint16 secperlen;		//æ®µåç§»é‡
+    Uint16 *Para;			//å‚æ•°æ‰€åœ¨çš„æ•°æ®ç»“æ„
 	int16 (*ParaInit)(void);
 }BLOCK_PARA_TABLE1;
 
