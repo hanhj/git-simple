@@ -89,6 +89,7 @@ int link_layer::process_summon(frame *out){
 }
 int link_layer::on_summon_acc(frame *in,frame *out){
 	summon_data.step=0;
+	has_data=1;
 	return 0;
 }
 int link_layer::process_summon_acc(frame *out){
@@ -98,6 +99,7 @@ int link_layer::process_summon_acc(frame *out){
 	}else if(summon_data.step==1){
 		ret=app->build_summon_acc_resp(out,this);
 	}else if(summon_data.step ==2){
+		has_data=0;
 		ret=app->build_summon_acc_term(out,this);
 		process&=~PROCESS_SUMMON_ACC;
 	}
@@ -332,6 +334,7 @@ int link_layer::on_rd_dz(frame *in,frame *out){
 	int ret=0;
 	int i=0;
 	int j;
+	has_data=1;
 	para_data.cur_read=0;
 	para_data.req_num=in->data[offset_vsq]&0x7f;
 	para_data.unit=in->data[offset_data+i++];
@@ -359,6 +362,7 @@ int link_layer::process_rd_dz(frame *out){
 	len=0;
 	int i,j;
 	j=0;
+	has_data=0;
 	for(i=para_data.cur_read;i<para_data.req_num;i++){
 		para_data.nodes[j].id=para_data.req_id[i];
 		len=app->get_dz_data(&para_data.nodes[j]);
@@ -379,10 +383,12 @@ int link_layer::process_rd_dz(frame *out){
 
 int link_layer::on_rd_unit(frame *in,frame *out){
 	int ret=0;
+	has_data=1;
 	return ret;
 }
 int link_layer::process_rd_unit(frame *out){
 	int ret=0;
+	has_data=0;
 	app->get_dz_unit(&para_data);
 	ret=app->build_rd_unit_con(out,this,&para_data);
 	return ret;
@@ -393,6 +399,7 @@ int link_layer::on_wr_dz(frame *in,frame *out){
 	int i=0;
 	int j;
 	int m;
+	has_data=1;
 	send_cause cause;
 	cause.data=in->data[offset_cause];
 
@@ -425,6 +432,7 @@ int link_layer::on_wr_dz(frame *in,frame *out){
 int link_layer::process_wr_dz(frame *out){
 	int ret=0;
 	int i;
+	has_data=0;
 	if(para_data.op==4){
 		for(i=0;i<para_data.req_num;i++){
 			app->set_dz(para_data.req_num,&para_data.nodes[0]);
@@ -443,12 +451,14 @@ int link_layer::process_wr_dz(frame *out){
 int link_layer::on_wr_unit(frame *in,frame *out){
 	int ret=0;
 	int i=0;
+	has_data=1;
 	para_data.unit=in->data[offset_data+i++];
 	para_data.unit|=in->data[offset_data+i++]<<8;
 	return ret;
 }
 int link_layer::process_wr_unit(frame *out){
 	int ret=0;
+	has_data=0;
 	app->set_dz_unit(para_data.unit);
 	ret=app->build_wr_unit_con(out,this,&para_data);
 	return ret;
@@ -878,6 +888,10 @@ int link_layer_101::on_req(frame *in,frame *out){
 			break;
 		case COMMAND_SUMMON_ACC:
 			process|=PROCESS_SUMMON_ACC;
+			ret=on_summon_acc(in,out);
+			if(balance == BALANCE){
+				ret=process_summon_acc(out);
+			}
 			break;
 		case COMMAND_UPDATE:
 			process|=PROCESS_UPDATE;
