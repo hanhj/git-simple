@@ -261,16 +261,17 @@ typedef struct _qoi{//召唤限定词
 ****************************/
 class link_layer;
 //process data
-typedef struct _summon_data{
+typedef struct __summon_data{
 	int sended_yx_num;
 	int sended_yc_num;
-	int summon_step;
-}SummonData;
-typedef struct _clock_data{
+	int sended_acc_num;
+	int step;
+}_summon_data;
+typedef struct __clock_data{
 	int clock_syn;
 	int clock_rd;
-}ClockData;
-typedef struct _yk_data{
+}_clock_data;
+typedef struct __yk_data{
 	int sel;
 	int act;
 	int act_over;
@@ -282,11 +283,11 @@ typedef struct _yk_data{
 	int fail;
 	Sco sco;
 	Dco dco;
-}YkData;
-typedef struct _event_data{
+}_yk_data;
+typedef struct __event_data{
 	int need_ack[4];
 	int need_yc_ack[4];
-}EventData;
+}_event_data;
 typedef struct __rd_dir{
 	long id;
 	int  len;
@@ -324,21 +325,31 @@ typedef struct __rd_file{
 #define FILE_FILE_SIZE_ERROR 3
 #define FILE_FILE_ID_ERROR 4
 
-typedef struct _file_data{
+typedef struct __file_data{
 	int op;
 	_rd_dir rd_dir;
 	_rd_file rd_file;
 	_rd_file wt_file;
-}FileData;
+}_file_data;
 typedef struct _para_node{
 	int id;
 	int tag;
 	int len;
 	char para[30];
 }para_node;
+typedef struct _para_iden_bit{
+	unsigned char con:1;
+	unsigned char res:5;
+	unsigned char cr:1;//0 -no use. 1-cancel prepare set
+	unsigned char se:1;//0 -fix.1- prepare set
+}para_iden_bit;
+typedef union _para_iden{
+	para_iden_bit bit;
+	unsigned char data;
+}para_iden;
 typedef struct __para_list{
-	int op;//操作
-	int pi;//parameter identification
+	int op;//操作:0- none,1-read mul para,2-read all para,3-prepare set,4-fix para,5-cancel set
+	para_iden pi;//parameter identification
 	int unit;//unit
 	int max_unit;
 	int min_unit;
@@ -367,6 +378,7 @@ class app_layer{
 			cause_lo.data=0;
 			get_yx_data=NULL;
 			get_yc_data=NULL;
+			get_acc_yc_data=NULL;
 			get_event_data=NULL;
 			get_clock = NULL;
 			do_yk=NULL;
@@ -443,10 +455,10 @@ class app_layer{
 
 		int (*get_dz_data)(para_node * );
 		int build_rd_dz_con(frame *out,link_layer *link,_para_list *);//cause 7
-		int (*set_dz)(para_node *);
+		int (*set_dz)(int,para_node *);
 		int build_wr_dz_con(frame *out,link_layer *link,_para_list *);//cause 7,sel =0 or 1 ,cr=0
-		int build_dz_dact_con(frame *out,link_layer *link);//cause 9,sel=0,cr=1
 
+		YC_TAB * (*get_acc_yc_data)(int);
 		int build_summon_acc_con(frame *out,link_layer *link);//cause 7
 		int build_summon_acc_term(frame *out,link_layer *link);//cause 10
 		int build_summon_acc_resp(frame *out,link_layer *link);//cause 37
@@ -502,11 +514,11 @@ class link_layer{
 		timer rcv_var_timer;//接收数据超时计时器
 
 		unsigned long process;//which process is in.
-		SummonData summon_data;
-		ClockData clock_data;
-		YkData yk_data;
-		EventData event_data;
-		FileData file_data;
+		_summon_data summon_data;
+		_clock_data clock_data;
+		_yk_data yk_data;
+		_event_data event_data;
+		_file_data file_data;
 		_para_list para_data;
 
 	public:
@@ -523,7 +535,6 @@ class link_layer{
 			cause_size=CAUSE_SIZE;
 			msg_id_size=MSG_ID_SIZE;//101 is 2,104 is 3,so generation class 104 need redefine it.----- 
 			all_call_data_type=11;
-
 			link_state=0;
 			link_step=0;
 			addr=18;
@@ -541,7 +552,9 @@ class link_layer{
 			rcv_var_timer.stop();
 
 			summon_data.sended_yx_num =0;
-			summon_data.summon_step = 0;
+			summon_data.sended_yc_num =0;
+			summon_data.sended_acc_num=0;
+			summon_data.step = 0;
 			process=0;
 			offset_len=1;
 			has_data=0;

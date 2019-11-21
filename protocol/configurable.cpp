@@ -13,10 +13,7 @@ using namespace std;
 #include "UserGpio.h"
 #include "Scada.h"
 
-unsigned int SelectYxNum;
-unsigned int SelectDpYxNum;
-unsigned int SelectYcNum;
-
+_config_scada_data config_scada_data;
 setmstime_t YcDeadTime[MAX_YC_NUM];
 passdata  DeadPass[MAX_YC_NUM];//越过死区的值；
 //上送标度化，归一化数据的时候放大数据的倍数
@@ -37,7 +34,6 @@ short coeftable[MAX_YC_NUM] = {
 		100,//hz
 };
 YC_DATA Yc[MAX_YC_NUM];
-YC_DATA Energy[MAX_ENERGY_NUM];
 /***************************************************************************************
 * 函数名:void default_init_yc_addr(void)
 * 输  入:
@@ -50,11 +46,17 @@ YC_DATA Energy[MAX_ENERGY_NUM];
 void default_init_yc_addr(void)
 {	
 	uint16 i;
-	for ( i = 0; i < CONFIG_YC_NUM; i++){
+	int j;
+	j=0;
+	for ( i = 0; j < CONFIG_YC_NUM; i++,j++){
 		ProPara.yc_dataaddr.addpos[i].addr = i + 0x4001;
 		ProPara.yc_dataaddr.addpos[i].pos = i;
 	}
-	for ( i = CONFIG_YC_NUM; i < MAX_YC_NUM; i++){
+	for(;j<CONFIG_ENERGY_NUM;i++,j++){
+		ProPara.yc_dataaddr.addpos[i].addr = i + 0x6401;
+		ProPara.yc_dataaddr.addpos[i].pos = i;
+	}
+	for ( ; i < MAX_YC_NUM; i++){
 		ProPara.yc_dataaddr.addpos[i].addr = 0xffff;
 		ProPara.yc_dataaddr.addpos[i].pos = i;
 	}
@@ -181,21 +183,42 @@ void init_ycdata ( void )
 	Yc[i].datasign = 0xffff;
 	Yc[i].changeflag = 0;	
 	*/
-
-	i=0;
-	Energy[i].src_yc = &scada.scada_cfg.YcData.pos_P.Data;
-	Energy[i].deadpass = NULL;
-	Energy[i].Coef = NULL;
-	Energy[i].range = NULL;
-	Energy[i].dead = &DeadBandParaValue.DeadP;
-	Energy[i].datasign = 0xffff;
-	Energy[i].changeflag = 0;	
+	i++;
+	Yc[i].src_yc = &scada.scada_cfg.YcData.pos_P.Data;
+	Yc[i].deadpass = NULL;
+	Yc[i].Coef = NULL;
+	Yc[i].range = NULL;
+	Yc[i].dead = NULL;
+	Yc[i].datasign = 0xffff;
+	Yc[i].changeflag = 0;	
+	i++;
+	Yc[i].src_yc = &scada.scada_cfg.YcData.neg_P.Data;
+	Yc[i].deadpass = NULL;
+	Yc[i].Coef = NULL;
+	Yc[i].range = NULL;
+	Yc[i].dead = NULL;
+	Yc[i].datasign = 0xffff;
+	Yc[i].changeflag = 0;	
+	i++;
+	Yc[i].src_yc = &scada.scada_cfg.YcData.pos_Q.Data;
+	Yc[i].deadpass = NULL;
+	Yc[i].Coef = NULL;
+	Yc[i].range = NULL;
+	Yc[i].dead = NULL;
+	Yc[i].datasign = 0xffff;
+	Yc[i].changeflag = 0;	
+	i++;
+	Yc[i].src_yc = &scada.scada_cfg.YcData.neg_Q.Data;
+	Yc[i].deadpass = NULL;
+	Yc[i].Coef = NULL;
+	Yc[i].range = NULL;
+	Yc[i].dead = NULL;
+	Yc[i].datasign = 0xffff;
+	Yc[i].changeflag = 0;	
 	memset(&scada.scada_cfg.YcData,0,sizeof(scada.scada_cfg.YcData));
-
-
 }
 /***************************************************************************************
-* 函数名:unsigned int init_yc_table ( void )
+* 函数名:void init_yc_table ( void )
 * 输  入:
 * 输  出:
 * 功  能:YcTable[]表初始化，
@@ -204,23 +227,38 @@ void init_ycdata ( void )
 * 备  注:必须在ProPara.yc_dataaddr表初始化后 也就是每次对ProPara.yc_dataaddr改变
 或者系统重启时 需要对对ProPara.yc_dataaddr赋值 并同时初始YcTable[]表;
 ****************************************************************************************/
-uint16 init_yc_table ( void )
+void init_yc_table ( void )
 {
 	uint16 i = 0 ;
+	int j;
+	int m;
 	uint16 pos = 0;
 	uint16 datasign = 0xffff;
-	SelectYcNum = 0;
-    for ( i = 0; i < CONFIG_YC_NUM ;i++ ) {
+	config_scada_data.SelectYcNum = 0;
+	config_scada_data.SelectAccNum = 0;
+	m=0;
+	j=0;
+    for ( i = 0; j < CONFIG_YC_NUM ;i++ ,j++) {
     	pos =ProPara.yc_dataaddr.addpos[i].pos;
     	datasign =ProPara.yc_dataaddr.addpos[i].addr ;
-		if ((datasign != 0xffff ) && (pos < CONFIG_YC_NUM) ){
+		if ((datasign != 0xffff ) && (datasign <0x6401) ){
 			Yc[pos].datasign = datasign;
-			YcTable[SelectYcNum].ycdata = &Yc[pos];
-			SelectYcNum ++;
+			YcTable[m].ycdata = &Yc[pos];
+			m++;
+			config_scada_data.SelectYcNum ++;
+		}
+	}
+	config_scada_data.pos_acc=m;
+    for ( ; j < CONFIG_ENERGY_NUM ;i++ ) {
+    	pos =ProPara.yc_dataaddr.addpos[i].pos;
+    	datasign =ProPara.yc_dataaddr.addpos[i].addr ;
+		if ( datasign != 0xffff && datasign >=0x6401 ){
+			Yc[pos].datasign = datasign;
+			YcTable[m++].ycdata = &Yc[pos];
+			config_scada_data.SelectAccNum++;
 		}
 	}
 	Yc[0].deadpass->intdata=100;
-	return  SelectYcNum ;
 }
 
 /***************************************************************************************
@@ -422,8 +460,8 @@ void  InitSortYxTable ( void )
             }
         }
     }
-    SelectYxNum = ( k );
-    SelectDpYxNum = ( j+k );
+    config_scada_data.SelectYxNum = ( k );
+    config_scada_data.SelectDpYxNum = ( j+k );
 }
 
 

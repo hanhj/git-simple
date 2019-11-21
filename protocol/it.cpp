@@ -467,6 +467,14 @@ int main(){
 	printf("%x %x ",PROCESS_YC_CHANGE,~PROCESS_YC_CHANGE);
 	printf("%lx %lx ",e,f);
 	dir_list::iterator dir_it;
+	unsigned char ddd;
+	long eee;
+	ddd=1;
+	eee=ddd;
+	eee|=ddd<<8;
+	eee|=ddd<<16;
+	eee|=ddd<<24;
+	printf("%lx \n",eee);
 	return 0;
 }
 

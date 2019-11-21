@@ -7,10 +7,14 @@
 #ifndef __Configurable_h
 #define __Configurable_h
 #include "datatype.h"
-extern unsigned int SelectYxNum ; 
-extern unsigned int SelectDpYxNum ; 
-extern unsigned int SelectYcNum ; 
-
+typedef struct __config_scada_data{
+	unsigned int SelectYxNum ; 
+	unsigned int SelectDpYxNum ; 
+	unsigned int SelectYcNum ; 
+	unsigned int SelectAccNum ; 
+	int pos_acc;
+}_config_scada_data;
+extern _config_scada_data config_scada_data;
 void default_init_yx_addr(void);
 void default_init_yc_addr(void);
 int16 init_yx();

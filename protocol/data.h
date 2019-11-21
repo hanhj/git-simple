@@ -36,11 +36,11 @@ extern "C" {
 #define _0_KAI_1_HE 0 //终端默认的分合与电平关系
 
 
+//定义终端最大数
 #define MAX_COUPLEYX_NUM 2
 #define MAX_YK_NUM 2
-//定义终端最大遥测数
 #define MAX_YC_NUM  26
-#define MAX_ENERGY_NUM  4
+#define CONFIG_ENERGY_NUM  4
 #define CONFIG_YC_NUM  13
 
 #define PI 3.1415926
@@ -194,7 +194,14 @@ typedef enum YKENUM{
 #define JDGZ(n)	(JDGZ1 + HE2*n)	//故障指示器指示线路2接地故障
 #define SP6GZ(n)(SP6GZ1 + HE2*n)	//SF6气体异常报警信号
 #define SP6BS(n)(SP6BS1 + HE2*n)	//SF6气压闭锁信号
-
+typedef struct time_data{
+	 unsigned int millisecond;//0-999毫秒
+	 unsigned int minute;//IV--是否有效 0有效 1无效 占字节最高位 第七位备用 低6位为数据（0-59分--在GB_T 18657.4-2002 远动设备及系统 第五部分 传输规约 第四篇 应用信息元素的编码和定义中例图有误写成0-99）
+	 unsigned int hour;//SU--是否夏令时 0标准时间，1夏令时 占字节最高位，第六、七位备用，低5位为数据（0-23小时）
+	 unsigned int day;//day_week:week占字节高3位(1-7星期的天)，day占字节低5位 （1-31月的天）
+	 unsigned int month;//高四位备用 month占低4位（1-12月）
+	 unsigned int year;//最高位备用 year占低7位（0-99年）
+}CP56Time2a;
 typedef struct fourchar{
 	long d1:8;
 	long d2:8;
@@ -219,26 +226,24 @@ typedef struct yc_data{
 	uint16 dataid;
 	uint16 datasign;
 	uint8 changeflag;
-} YC_DATA ;
+	CP56Time2a time;
+	int type;//0 normal,1 acc with time
+}YC_DATA ;
 typedef struct yc_table {
 	YC_DATA *ycdata;
-} YC_TAB;
+}YC_TAB;
 extern YC_TAB YcTable[MAX_YC_NUM ];
 typedef struct dpyx_table{
 	uint16 paddr;
 	uint16 changeflag;
 	unsigned int *yxdata;
-						
-} dpYX_TAB;
+}dpYX_TAB;
 extern YC_DATA Yc[MAX_YC_NUM];
-
 typedef struct BATTERYDATA{
 	unsigned long gap;
 	unsigned int StartHour;
 	unsigned int StartMinute;
-
 }BATTERYDATA_T;
-
 typedef struct serial_para_tag {
 	uint16 num:16;
     uint32 baudrate:32;
@@ -306,14 +311,6 @@ typedef struct terminal_para_tag {//终端参数
 } TER_PARA;
 extern TER_PARA TerPara;//终端参数
 
-typedef struct time_data{
-	 unsigned int millisecond;//0-999毫秒
-	 unsigned int minute;//IV--是否有效 0有效 1无效 占字节最高位 第七位备用 低6位为数据（0-59分--在GB_T 18657.4-2002 远动设备及系统 第五部分 传输规约 第四篇 应用信息元素的编码和定义中例图有误写成0-99）
-	 unsigned int hour;//SU--是否夏令时 0标准时间，1夏令时 占字节最高位，第六、七位备用，低5位为数据（0-23小时）
-	 unsigned int day;//day_week:week占字节高3位(1-7星期的天)，day占字节低5位 （1-31月的天）
-	 unsigned int month;//高四位备用 month占低4位（1-12月）
-	 unsigned int year;//最高位备用 year占低7位（0-99年）
-}CP56Time2a;
 typedef struct time16_data{
 	unsigned int millisecond;
 }CP16Time2a;
