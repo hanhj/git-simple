@@ -57,9 +57,9 @@ int main(int arg,char **argv){
 	}
 	init_data();
 	while(1){
-		cout<<endl<<"run loop:"<<loops<<endl;
+		pfunc(DEBUG_INFO,"run loop:%d\n",loops);
 		loops++;
-		sleep_ms(10);
+		sleep_ms(100);
 		for(i=0;i<3;i++){
 			com[i].read(100);
 		}
@@ -70,9 +70,6 @@ int main(int arg,char **argv){
 		}
 
 	}
-	CircleQueue<event> ll;
-	CircleQueue<event>::iterator it;
-
 	return 0;
 }
 // vim:tw=72 

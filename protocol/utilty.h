@@ -7,7 +7,7 @@
 #ifndef __utilty_h
 #define __utilty_h
 #include "all_h.h"
-#define DEBUG_LEVEL		3
+#define DEBUG_LEVEL		2
 #define DEBUG_ERROR		1
 #define DEBUG_WARNING	2
 #define DEBUG_INFO		3

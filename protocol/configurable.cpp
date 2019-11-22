@@ -185,7 +185,7 @@ void init_ycdata ( void )
 	*/
 	i++;
 	Yc[i].src_yc = &scada.scada_cfg.YcData.pos_P.Data;
-	Yc[i].deadpass = NULL;
+	Yc[i].deadpass = &DeadPass[i];
 	Yc[i].Coef = NULL;
 	Yc[i].range = NULL;
 	Yc[i].dead = NULL;
@@ -193,7 +193,7 @@ void init_ycdata ( void )
 	Yc[i].changeflag = 0;	
 	i++;
 	Yc[i].src_yc = &scada.scada_cfg.YcData.neg_P.Data;
-	Yc[i].deadpass = NULL;
+	Yc[i].deadpass = &DeadPass[i];
 	Yc[i].Coef = NULL;
 	Yc[i].range = NULL;
 	Yc[i].dead = NULL;
@@ -201,7 +201,7 @@ void init_ycdata ( void )
 	Yc[i].changeflag = 0;	
 	i++;
 	Yc[i].src_yc = &scada.scada_cfg.YcData.pos_Q.Data;
-	Yc[i].deadpass = NULL;
+	Yc[i].deadpass = &DeadPass[i];
 	Yc[i].Coef = NULL;
 	Yc[i].range = NULL;
 	Yc[i].dead = NULL;
@@ -209,7 +209,7 @@ void init_ycdata ( void )
 	Yc[i].changeflag = 0;	
 	i++;
 	Yc[i].src_yc = &scada.scada_cfg.YcData.neg_Q.Data;
-	Yc[i].deadpass = NULL;
+	Yc[i].deadpass = &DeadPass[i];
 	Yc[i].Coef = NULL;
 	Yc[i].range = NULL;
 	Yc[i].dead = NULL;

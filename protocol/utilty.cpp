@@ -48,12 +48,12 @@ int timer::start(int T){
 	}
 	start_flag=1;
 	exp_time=get_system_time()+T;
-	cout<<"start timer"<<endl;
+	pfunc(DEBUG_INFO,"start timer\n");
 	return 0;
 }
 int timer::stop(){
 	if(start_flag == 1){
-		cout<<"stop timer"<<endl;
+		pfunc(DEBUG_INFO,"stop timer\n");
 		start_flag =0;
 		return 0;
 	}

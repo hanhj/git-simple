@@ -194,11 +194,13 @@ typedef struct _qoi{//召唤限定词
 #define COMMAND_CLOCK		103
 #define COMMAND_TEST_LINK	104
 #define COMMAND_RESET		105
-#define COMMAND_FILE		210
-#define COMMAND_RD_DZ		202
-#define COMMAND_WR_DZ		203
 #define COMMAND_WR_UNIT		200
 #define COMMAND_RD_UNIT		201
+#define COMMAND_RD_DZ		202
+#define COMMAND_WR_DZ		203
+#define COMMAND_ACC			206
+#define COMMAND_ACC_TIME	207
+#define COMMAND_FILE		210
 #define COMMAND_UPDATE		211
 
 //宏定义传送原因中的CODE
@@ -303,12 +305,13 @@ typedef struct __rd_dir{
 	}end_time;
 	dir_list res_list;
 	int cur_read;
-	int suc;
+	int con;
 }_rd_dir;
 typedef struct __rd_file{
 	long ack_offset;
 	long cur_offset;
-	char suc;//0无后续，1有后续
+	char con;//0无后续，1有后续
+	int suc;//successful
 	int	step;
 	dir_node req_file;
 	dir_node res_file;
@@ -324,12 +327,16 @@ typedef struct __rd_file{
 #define FILE_CHECK_ERROR 2
 #define FILE_FILE_SIZE_ERROR 3
 #define FILE_FILE_ID_ERROR 4
-
+typedef struct __update_flag{
+	int start;
+	int save_ok;
+}_update_flag;
 typedef struct __file_data{
 	int op;
 	_rd_dir rd_dir;
 	_rd_file rd_file;
 	_rd_file wt_file;
+	_update_flag update_flag;
 }_file_data;
 typedef struct _para_node{
 	int id;
@@ -372,6 +379,7 @@ class app_layer{
 		int addr;
 		int yc_data_type;
 		int need_reset;
+		int need_update;
 	public:
 		app_layer(){
 			vsq_lo.data=0;
@@ -382,6 +390,7 @@ class app_layer{
 			get_event_data=NULL;
 			get_clock = NULL;
 			do_yk=NULL;
+			do_update=NULL;
 			do_reset=NULL;
 			get_yc_cg_data=NULL;
 			get_dir_data=NULL;
@@ -391,10 +400,9 @@ class app_layer{
 			set_dz_unit=NULL;
 			get_dz_data=NULL;
 			set_dz=NULL;
-			get_summon_acc_data=NULL;
-			save_update_file=NULL;
 			yc_data_type=9;
 			need_reset=0;
+			need_update=0;
 		}
 		int get_link_info(link_layer*);
 		void set_yc_data_type(int da){
@@ -462,10 +470,9 @@ class app_layer{
 		int build_summon_acc_con(frame *out,link_layer *link);//cause 7
 		int build_summon_acc_term(frame *out,link_layer *link);//cause 10
 		int build_summon_acc_resp(frame *out,link_layer *link);//cause 37
-		int (*get_summon_acc_data)(buffer*data);
 
-		int (*save_update_file)(_rd_file *,buffer *seg);
-		int build_update_con(frame *out,link_layer *link,int sel);//cause 7 sel=1 start,0 stop
+		int (*do_update)();
+		int build_update_con(frame *out,link_layer *link,_update_flag *);//cause 7 sel=1 start,0 stop
 };
 /****************************
  * common link_layer

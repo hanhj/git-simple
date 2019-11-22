@@ -18,7 +18,7 @@ int basic_com::get_byte(unsigned char *c){
 		*c=read_buff_ptr[read_consume];
 		read_consume++;
 		read_consume=(read_consume) % MAX_COM_BUFFER;
-		printf("get byte:%02hhx\n",*c);
+		pfunc(DEBUG_INFO,"get byte:%02hhx\n",*c);
 		return 0;
 	}
 	return -1;
@@ -43,7 +43,7 @@ int serial::close(){
 	return 0;
 }
 int serial::read(int len){
-	cout<<"read serial:"<<len<<endl;
+	pfunc(DEBUG_INFO,"read serial\n");
 	int l;
 	int i;
 	int c;
@@ -52,7 +52,7 @@ int serial::read(int len){
 	char buff[100];
 	unsigned char tmpbuf[100];
 	if(len>100){
-		pfunc(DEBUG_ERROR,"too many read size,limit to 100");
+		pfunc(DEBUG_ERROR,"too many read size,limit to 100\n");
 		len=100;
 	}
 	m=0;
@@ -91,7 +91,7 @@ int serial::read(int len){
 int serial::send(unsigned char *data,int len){
 	int ret;
 	ret=0;
-	ret=pdump(DEBUG_INFO,"send serial",data,len);
+	ret=pdump(DEBUG_WARNING,"send serial",data,len);
 	if(ret<0){
 		errno=ERR_SEND;
 		pfunc(DEBUG_ERROR,"serial fail send\n");
@@ -135,7 +135,7 @@ int ethernet::close(){
 	return 0;
 }
 int ethernet::read(int len){
-	cout<<"read ethernet:"<<len<<endl;
+	pfunc(DEBUG_INFO,"read ethernet\n");
 	return len;
 }
 /**
@@ -189,7 +189,7 @@ int wireless::close(){
 	return 0;
 }
 int wireless::read(int len){
-	cout<<"read wireless:"<<len<<endl;
+	pfunc(DEBUG_INFO,"read wireless\n");
 	return len;
 }
 /**
