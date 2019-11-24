@@ -37,6 +37,10 @@ int link_layer::set_app(app_layer*ap){
 	app=ap;
 	return 0;
 }
+int link_layer::save_frame(frame *f){
+	memcpy(&last_send_frame,f,sizeof(last_send_frame));
+	return 0;
+}
 int link_layer::send_frame(frame *f){
 	int ret;
 	ret=0;
@@ -921,12 +925,6 @@ int link_layer_101::on_req(frame *in,frame *out){
 	}
 	return ret;
 }
-int link_layer_101::save_frame(frame *f){
-	if(f->type==VAR_FRAME){
-		memcpy(&last_send_frame,f,sizeof(last_send_frame));
-	}
-	return 0;
-}
 int link_layer_101::get_frame(){
 	int ret;
 	unsigned char c;
@@ -1505,7 +1503,232 @@ int link_layer_101::on_fc11(frame *f){
 err:
 	return ret;
 }
+/****************************
+ *	realize link_layer_104 
+****************************/
+void link_layer_104::set_loc_ctl(){
 
+}
+int link_layer_104::check_type(unsigned char c){
+	if((c&1)==0)
+		return TYPE_I;
+	if(c&3)
+		return TYPE_U;
+	if(c&1)
+		return TYPE_S;
+	return 0;
+}
+int link_layer_104::get_frame(){
+	int ret;
+	unsigned char c;
+	int flag;
+	if(com==NULL)
+		return -1;
+	pfunc(DEBUG_INFO,"get frame of link [%d]\n",port);
+	ret=com->get_byte(&c);
+	if(ret==-1)
+		return -1;
+	ret=0;
+	if(c==0x68){
+		if(!start_rcv_s_flag){
+			start_rcv_s_flag=1;
+		}else if(!start_rcv_u_flag){
+			start_rcv_u_flag=1;
+		}else if(!start_rcv_var_flag){
+			start_rcv_var_flag=1;
+		}
+	}
+	flag=start_rcv_s_flag+start_rcv_u_flag+start_rcv_var_flag;
+	if(flag){
+		r_tmp_frame.data[r_tmp_pos++]=c;
+		if(r_tmp_pos==2){
+			exp_len=c+2;
+		}
+		if(r_tmp_pos==3){
+			frame_type=check_type(c);
+			if(frame_type==TYPE_I){
+				t2_timer.start(3);
+				start_rcv_u_flag=0;
+				start_rcv_s_flag=0;
+			}else if(frame_type==TYPE_S){
+				t3_timer.start(3);
+				start_rcv_var_flag=0;
+				start_rcv_u_flag=0;
+			}else if(frame_type==TYPE_U){
+				rcv_var_timer.start(3);
+				start_rcv_var_flag=0;
+				start_rcv_s_flag=0;
+			}
+		}
+
+		if(r_tmp_pos==exp_len){
+			r_tmp_pos=0;
+		}
+	}
+	if(start_rcv_s_flag){
+		r_s_frame.data[r_s_pos++]=c;
+		if(r_s_pos==exp_len){
+			r_s_frame.len=r_s_pos;
+			deal_frame(&r_s_frame);
+			ret=1;
+			rcv_fix_timer.stop();
+			start_rcv_s_flag=0;
+			r_s_frame.len=0;
+			exp_len=0;
+		}else if(r_s_pos>exp_len){
+			start_rcv_s_flag=0;
+			r_s_frame.len=0;
+			exp_len=0;
+		}
+	}else if(start_rcv_u_flag){
+		r_u_frame.data[r_u_pos++]=c;
+		if(r_u_pos==exp_len){
+			r_u_frame.len=r_u_pos;
+			deal_frame(&r_u_frame);
+			ret=1;
+			rcv_fix_timer.stop();
+			start_rcv_u_flag=0;
+			r_u_frame.len=0;
+			exp_len=0;
+		}else if(r_u_pos>exp_len){
+			rcv_fix_timer.stop();
+			start_rcv_u_flag=0;
+			r_u_frame.len=0;
+			exp_len=0;
+		}
+	}else if(start_rcv_var_flag){
+		r_var_frame.data[r_var_pos++]=c;
+		if(r_var_pos==exp_len){
+			r_var_frame.len=r_var_pos;
+			deal_frame(&r_var_frame);
+			ret=1;
+			rcv_var_timer.stop();
+			start_rcv_s_flag=0;
+			r_var_frame.len=0;
+			exp_len=0;
+		}else if(r_var_pos>exp_len){
+			rcv_var_timer.stop();
+			start_rcv_s_flag=0;
+			r_var_frame.len=0;
+			exp_len=0;
+		}
+	}
+	if(rcv_fix_timer.is_reached()==1){//receive timeout
+		start_rcv_s_flag=0;
+		start_rcv_u_flag=0;
+		r_u_pos=0;
+		r_s_pos=0;
+	}else if(rcv_var_timer.is_reached()==1){
+		start_rcv_var_flag=0;
+		r_var_pos=0;
+	}
+	return ret;		
+}
+int link_layer_104::deal_frame(frame *in){
+	int ret;
+	int ti;
+	ret=0;
+	if(in->type==TYPE_I){
+		ti=in->data[offset_ti];
+		switch(ti){
+			case COMMAND_SUMMON://total sum
+				process|=PROCESS_SUMMON;
+				ret=on_summon(in,out);
+				ret=process_summon(out);
+				break;
+			case COMMAND_CLOCK://clock 
+				process|=PROCESS_CLOCK;
+				ret=on_clock(in,out);
+				if(balance ==BALANCE)
+					ret=process_clock(out);
+				break;
+			case COMMAND_RM_CTL:
+			case COMMAND_RM_CTL_D:
+				process|=PROCESS_RM_CTL;
+				ret=on_yk(in,out);
+				if(balance == BALANCE)
+					ret=process_yk(out);
+				break;
+			case COMMAND_TEST_LINK:
+				process|=PROCESS_TEST_LINK;
+				ret=on_test_link(in,out);
+				if(balance == BALANCE)
+					ret=process_test_link(out);
+				break;
+			case COMMAND_RESET:
+				process|=PROCESS_RESET;
+				ret=on_reset_terminal(in,out);
+				if(balance==BALANCE)
+					ret=process_reset_terminal(out);
+				break;
+			case COMMAND_FILE:
+				process|=PROCESS_FILE;
+				ret=on_file(in,out);
+				if(balance ==BALANCE){
+					ret=process_file(out);
+				}
+				break;
+			case COMMAND_RD_UNIT:
+				process|=PROCESS_RD_UNIT;
+				ret=on_rd_unit(in,out);
+				if(balance == BALANCE){
+					ret = process_rd_unit(out);
+				}
+				break;
+			case COMMAND_WR_UNIT:
+				process|=PROCESS_WR_UNIT;
+				ret=on_wr_unit(in,out);
+				if(balance){
+					ret=process_wr_unit(out);
+				}
+				break;
+			case COMMAND_RD_DZ:
+				process|=PROCESS_RD_DZ;
+				ret=on_rd_dz(in,out);
+				if(balance == BALANCE)
+					ret=process_rd_dz(out);
+				break;
+			case COMMAND_WR_DZ:
+				process|=PROCESS_WR_DZ;
+				ret=on_wr_dz(in,out);
+				if(balance == BALANCE){
+					ret=process_wr_dz(out);
+				}
+				break;
+			case COMMAND_SUMMON_ACC:
+				process|=PROCESS_SUMMON_ACC;
+				ret=on_summon_acc(in,out);
+				if(balance == BALANCE){
+					ret=process_summon_acc(out);
+				}
+				break;
+			case COMMAND_UPDATE:
+				process|=PROCESS_UPDATE;
+				ret=on_update(in,out);
+				if(balance==BALANCE)
+					ret=process_update(out);
+				break;
+		}
+		return ret;
+
+	}else if(in->type==TYPE_S){
+
+	}else if(in->type==TYPE_U){
+		
+	}
+	return ret;
+}
+int link_layer_104::build_link_layer(frame *out,int asdu_len){
+	int ret=0;
+	return ret;
+}
+void link_layer_104::deal_timeout(){
+
+}
+int link_layer_104::link_time(){
+	int ret=0;
+	return ret;
+}
 /****************************
  *	extern function for app_layer 
 ****************************/
@@ -1562,6 +1785,31 @@ err:
 }
 /**
 ***********************************************************************
+*  @brief	build asdu header  
+*  @param[out]  out point to out frame 
+*  @return upon successful return header number of asdu size\n
+*  @note use this function should prepare global data:cmd_id,vsq,cause 	
+*  @see		
+***********************************************************************
+*/
+int app_layer::build_asdu_header(frame *out){
+	int ret;
+	int i=0;
+	out->data[offset_asdu+i++]=cmd_id;
+	out->data[offset_asdu+i++]=vsq_lo.data;
+	out->data[offset_asdu+i++]=cause_lo.data;
+	if(cause_size==2){
+		out->data[offset_asdu+i++]=(cause_lo.data>>8&0x00ff);
+	}
+	out->data[offset_asdu+i++]=addr&0x00ff;
+	if(addr_size==2){
+		out->data[offset_asdu+i++]=addr>>8&0x00ff;
+	}
+	ret=i;
+	return ret;
+}
+/**
+***********************************************************************
 *  @brief	build asdu of link_fini command 
 *  @param[in] link point to link_layer  
 *  @param[out]  out point to out frame 
@@ -1586,18 +1834,9 @@ int app_layer::build_link_fini(frame*out,link_layer*link){
 	vsq_lo.bit.n=1;
 	vsq_lo.bit.sq=0;
 	cause_lo.bit.cause=CAUSE_Init;
-
-	i=0;
-	out->data[offset_asdu+i++]=COMMAND_LINK_FINI;
-	out->data[offset_asdu+i++]=vsq_lo.data;
-	out->data[offset_asdu+i++]=cause_lo.data;
-	if(cause_size==2){
-		out->data[offset_asdu+i++]=(cause_lo.data>>8&0x00ff);
-	}
-	out->data[offset_asdu+i++]=addr&0x00ff;
-	if(addr_size==2){
-		out->data[offset_asdu+i++]=addr>>8&0x00ff;
-	}
+	cmd_id=COMMAND_LINK_FINI;
+	ret=build_asdu_header(out);
+	i=ret;
 	out->data[offset_asdu+i++]=0x0;
 	out->data[offset_asdu+i++]=0x0;
 	if(msg_id_size==3)
@@ -1635,23 +1874,13 @@ int app_layer::build_summon_con(frame*out,link_layer*link){
 	if(ret<0)
 		goto err;
 
+	link->summon_data.step++;
 	vsq_lo.bit.n=1;
 	vsq_lo.bit.sq=0;
 	cause_lo.bit.cause=CAUSE_Actcon;
-
-	link->summon_data.step++;
-
-	i=0;
-	out->data[offset_asdu+i++]=COMMAND_SUMMON;
-	out->data[offset_asdu+i++]=vsq_lo.data;
-	out->data[offset_asdu+i++]=cause_lo.data;
-	if(cause_size==2){
-		out->data[offset_asdu+i++]=(cause_lo.data>>8&0x00ff);
-	}
-	out->data[offset_asdu+i++]=addr&0x00ff;
-	if(addr_size==2){
-		out->data[offset_asdu+i++]=addr>>8&0x00ff;
-	}
+	cmd_id=COMMAND_SUMMON;
+	ret=build_asdu_header(out);
+	i=ret;
 	out->data[offset_asdu+i++]=0x0;
 	out->data[offset_asdu+i++]=0x0;
 	if(msg_id_size==3)
@@ -1693,18 +1922,9 @@ int app_layer::build_summon_term(frame *out,link_layer *link){
 	vsq_lo.bit.n=1;
 	vsq_lo.bit.sq=0;
 	cause_lo.bit.cause=CAUSE_Actterm;
-
-	i=0;
-	out->data[offset_asdu+i++]=COMMAND_SUMMON;
-	out->data[offset_asdu+i++]=vsq_lo.data;
-	out->data[offset_asdu+i++]=cause_lo.data;
-	if(cause_size==2){
-		out->data[offset_asdu+i++]=(cause_lo.data>>8&0x00ff);
-	}
-	out->data[offset_asdu+i++]=addr&0x00ff;
-	if(addr_size==2){
-		out->data[offset_asdu+i++]=addr>>8&0x00ff;
-	}
+	cmd_id=COMMAND_SUMMON;
+	ret=build_asdu_header(out);
+	i=ret;
 	out->data[offset_asdu+i++]=0x0;
 	out->data[offset_asdu+i++]=0x0;
 	if(msg_id_size==3)
@@ -1754,18 +1974,9 @@ int app_layer::build_yx_data(frame *out,link_layer *link){//cause 20
 	vsq_lo.bit.n=send_num;
 	vsq_lo.bit.sq=1;
 	cause_lo.bit.cause=CAUSE_Introgen;
-
-	i=0;
-	out->data[offset_asdu+i++]=COMMAND_SP;
-	out->data[offset_asdu+i++]=vsq_lo.data;
-	out->data[offset_asdu+i++]=cause_lo.data;
-	if(cause_size==2){
-		out->data[offset_asdu+i++]=(cause_lo.data>>8&0x00ff);
-	}
-	out->data[offset_asdu+i++]=addr&0x00ff;
-	if(addr_size==2){
-		out->data[offset_asdu+i++]=addr>>8&0x00ff;
-	}
+	cmd_id=COMMAND_SP;
+	ret=build_asdu_header(out);
+	i=ret;
 	out->data[offset_asdu+i++]=pyx->pdata->addr;
 	out->data[offset_asdu+i++]=pyx->pdata->addr>>8;
 	if(msg_id_size==3)
@@ -1820,18 +2031,9 @@ int app_layer::build_dyx_data(frame *out,link_layer *link){//cause 20
 	vsq_lo.bit.n=send_num;
 	vsq_lo.bit.sq=1;
 	cause_lo.bit.cause=CAUSE_Introgen;
-
-	i=0;
-	out->data[offset_asdu+i++]=COMMAND_DP;
-	out->data[offset_asdu+i++]=vsq_lo.data;
-	out->data[offset_asdu+i++]=cause_lo.data;
-	if(cause_size==2){
-		out->data[offset_asdu+i++]=(cause_lo.data>>8&0x00ff);
-	}
-	out->data[offset_asdu+i++]=addr&0x00ff;
-	if(addr_size==2){
-		out->data[offset_asdu+i++]=addr>>8&0x00ff;
-	}
+	cmd_id=COMMAND_DP;
+	ret=build_asdu_header(out);
+	i=ret;
 	out->data[offset_asdu+i++]=pyx->pdata->addr;
 	out->data[offset_asdu+i++]=pyx->pdata->addr>>8;
 	if(msg_id_size==3)
@@ -1886,16 +2088,9 @@ err:
 	vsq_lo.bit.sq=1;
 	cause_lo.bit.cause=CAUSE_Introgen;
 
-	out->data[offset_asdu+i++]=yc_data_type;
-	out->data[offset_asdu+i++]=vsq_lo.data;
-	out->data[offset_asdu+i++]=cause_lo.data;
-	if(cause_size==2){
-		out->data[offset_asdu+i++]=(cause_lo.data>>8&0x00ff);
-	}
-	out->data[offset_asdu+i++]=addr&0x00ff;
-	if(addr_size==2){
-		out->data[offset_asdu+i++]=addr>>8&0x00ff;
-	}
+	cmd_id=yc_data_type;
+	ret=build_asdu_header(out);
+	i=ret;
 	out->data[offset_asdu+i++]=pyc->ycdata->datasign;
 	out->data[offset_asdu+i++]=pyc->ycdata->datasign>>8;
 	if(msg_id_size==3)
@@ -1952,21 +2147,14 @@ int app_layer::build_event_data(frame *out,link_layer *link,event* e){//cause 3
 	cause_lo.bit.cause=CAUSE_Spont;
 
 	if(e->soe.type==S_YX){
-		out->data[offset_asdu+i++]=COMMAND_SP_TIME;
+		cmd_id=COMMAND_SP_TIME;
 		siq.bit.spi=e->soe.status;
 	}else if(e->soe.type == D_YX){
-		out->data[offset_asdu+i++]=COMMAND_DP_TIME;
+		cmd_id=COMMAND_DP_TIME;
 		diq.bit.dpi=e->soe.status==0?1:2;
 	}
-	out->data[offset_asdu+i++]=vsq_lo.data;
-	out->data[offset_asdu+i++]=cause_lo.data;
-	if(cause_size==2){
-		out->data[offset_asdu+i++]=(cause_lo.data>>8&0x00ff);
-	}
-	out->data[offset_asdu+i++]=addr&0x00ff;
-	if(addr_size==2){
-		out->data[offset_asdu+i++]=addr>>8&0x00ff;
-	}
+	ret=build_asdu_header(out);
+	i=ret;
 	out->data[offset_asdu+i++]=e->soe.datasign;
 	out->data[offset_asdu+i++]=e->soe.datasign>>8;
 	if(msg_id_size==3)
@@ -2021,16 +2209,9 @@ int app_layer::build_clock(frame *out,link_layer *link){//cause 7
 		link->clock_data.clock_rd = 0;
 	}
 
-	out->data[offset_asdu+i++]=COMMAND_CLOCK;
-	out->data[offset_asdu+i++]=vsq_lo.data;
-	out->data[offset_asdu+i++]=cause_lo.data;
-	if(cause_size==2){
-		out->data[offset_asdu+i++]=(cause_lo.data>>8&0x00ff);
-	}
-	out->data[offset_asdu+i++]=addr&0x00ff;
-	if(addr_size==2){
-		out->data[offset_asdu+i++]=addr>>8&0x00ff;
-	}
+	cmd_id=COMMAND_CLOCK;
+	ret=build_asdu_header(out);
+	i=ret;
 	out->data[offset_asdu+i++]=0;
 	out->data[offset_asdu+i++]=0;
 	if(msg_id_size==3)
@@ -2086,16 +2267,9 @@ int app_layer::build_yk(frame *out,link_layer *link){//cause=7,sel=0 or 1
 		cause_lo.data=CAUSE_Actterm;
 		link->reset_yk_data();
 	}
-	out->data[offset_asdu+i++]=link->yk_data.cmd_id;
-	out->data[offset_asdu+i++]=vsq_lo.data;
-	out->data[offset_asdu+i++]=cause_lo.data;
-	if(cause_size==2){
-		out->data[offset_asdu+i++]=(cause_lo.data>>8&0x00ff);
-	}
-	out->data[offset_asdu+i++]=addr&0x00ff;
-	if(addr_size==2){
-		out->data[offset_asdu+i++]=addr>>8&0x00ff;
-	}
+	cmd_id=link->yk_data.cmd_id;
+	ret=build_asdu_header(out);
+	i=ret;
 	out->data[offset_asdu+i++]=link->yk_data.ctrl_id;
 	out->data[offset_asdu+i++]=link->yk_data.ctrl_id>>8;
 	if(msg_id_size==3)
@@ -2130,16 +2304,9 @@ int app_layer::build_link_test_con(frame *out,link_layer *link){//cause 7
 	vsq_lo.bit.sq=0;
 	cause_lo.bit.cause=CAUSE_Actcon;
 
-	out->data[offset_asdu+i++]=COMMAND_TEST_LINK;
-	out->data[offset_asdu+i++]=vsq_lo.data;
-	out->data[offset_asdu+i++]=cause_lo.data;
-	if(cause_size==2){
-		out->data[offset_asdu+i++]=(cause_lo.data>>8&0x00ff);
-	}
-	out->data[offset_asdu+i++]=addr&0x00ff;
-	if(addr_size==2){
-		out->data[offset_asdu+i++]=addr>>8&0x00ff;
-	}
+	cmd_id=COMMAND_TEST_LINK;
+	ret=build_asdu_header(out);
+	i=ret;
 	out->data[offset_asdu+i++]=0;
 	out->data[offset_asdu+i++]=0;
 	if(msg_id_size==3)
@@ -2178,16 +2345,9 @@ err:
 	vsq_lo.bit.sq=0;
 	cause_lo.bit.cause=CAUSE_Spont;
 
-	out->data[offset_asdu+i++]=yc_data_type;
-	out->data[offset_asdu+i++]=vsq_lo.data;
-	out->data[offset_asdu+i++]=cause_lo.data;
-	if(cause_size==2){
-		out->data[offset_asdu+i++]=(cause_lo.data>>8&0x00ff);
-	}
-	out->data[offset_asdu+i++]=addr&0x00ff;
-	if(addr_size==2){
-		out->data[offset_asdu+i++]=addr>>8&0x00ff;
-	}
+	cmd_id=yc_data_type;
+	ret=build_asdu_header(out);
+	i=ret;
 	out->data[offset_asdu+i++]=e->data->datasign;
 	out->data[offset_asdu+i++]=e->data->datasign>>8;
 	if(msg_id_size==3)
@@ -2236,18 +2396,13 @@ err:
 	vsq_lo.bit.sq=0;
 	cause_lo.bit.cause=CAUSE_Actcon;
 
-	out->data[offset_asdu+i++]=COMMAND_RESET;
-	out->data[offset_asdu+i++]=vsq_lo.data;
-	out->data[offset_asdu+i++]=cause_lo.data;
-	if(cause_size==2){
-		out->data[offset_asdu+i++]=(cause_lo.data>>8&0x00ff);
-	}
-	out->data[offset_asdu+i++]=addr&0x00ff;
-	if(addr_size==2){
-		out->data[offset_asdu+i++]=addr>>8&0x00ff;
-	}
+	cmd_id=COMMAND_RESET;
+	ret=build_asdu_header(out);
+	i=ret;
 	out->data[offset_asdu+i++]=0;
 	out->data[offset_asdu+i++]=0;
+	if(msg_id_size==3)
+		out->data[offset_asdu+i++]=0;
 	ret=i;
 	ret=link->build_link_layer(out,ret);				
 	if(ret<0){
@@ -2287,18 +2442,13 @@ int app_layer::build_rd_dir_resp(frame *out,link_layer *link,_rd_dir *dir){//cau
 	vsq_lo.bit.sq=0;
 	cause_lo.bit.cause=CAUSE_Req;
 
-	out->data[offset_asdu+i++]=COMMAND_FILE;
-	out->data[offset_asdu+i++]=vsq_lo.data;
-	out->data[offset_asdu+i++]=cause_lo.data;
-	if(cause_size==2){
-		out->data[offset_asdu+i++]=(cause_lo.data>>8&0x00ff);
-	}
-	out->data[offset_asdu+i++]=addr&0x00ff;
-	if(addr_size==2){
-		out->data[offset_asdu+i++]=addr>>8&0x00ff;
-	}
+	cmd_id=COMMAND_FILE;
+	ret=build_asdu_header(out);
+	i=ret;
 	out->data[offset_asdu+i++]=0;
 	out->data[offset_asdu+i++]=0;
+	if(msg_id_size==3)
+		out->data[offset_asdu+i++]=0;
 	out->data[offset_asdu+i++]=2;//addition data type: 2:file transfer
 	out->data[offset_asdu+i++]=2;//act: 2:rd dir
 	out->data[offset_asdu+i++]=0;//result: 0:successful 1 fail
@@ -2375,18 +2525,13 @@ int app_layer::build_rd_file_con(frame *out,link_layer *link,_rd_file *file){//c
 	vsq_lo.bit.sq=0;
 	cause_lo.bit.cause=CAUSE_Actcon;
 
-	out->data[offset_asdu+i++]=COMMAND_FILE;
-	out->data[offset_asdu+i++]=vsq_lo.data;
-	out->data[offset_asdu+i++]=cause_lo.data;
-	if(cause_size==2){
-		out->data[offset_asdu+i++]=(cause_lo.data>>8&0x00ff);
-	}
-	out->data[offset_asdu+i++]=addr&0x00ff;
-	if(addr_size==2){
-		out->data[offset_asdu+i++]=addr>>8&0x00ff;
-	}
+	cmd_id=COMMAND_FILE;
+	ret=build_asdu_header(out);
+	i=ret;
 	out->data[offset_asdu+i++]=0;
 	out->data[offset_asdu+i++]=0;
+	if(msg_id_size==3)
+		out->data[offset_asdu+i++]=0;
 	out->data[offset_asdu+i++]=2;//addition data type: 2:file transfer
 	out->data[offset_asdu+i++]=4;//act: 4:rd file confirm
 	out->data[offset_asdu+i++]=0;//result: 0:successful 1 fail
@@ -2438,18 +2583,13 @@ int app_layer::build_rd_file_resp(frame *out,link_layer *link,_rd_file *file){//
 	vsq_lo.bit.sq=0;
 	cause_lo.bit.cause=CAUSE_Req;
 
-	out->data[offset_asdu+i++]=COMMAND_FILE;
-	out->data[offset_asdu+i++]=vsq_lo.data;
-	out->data[offset_asdu+i++]=cause_lo.data;
-	if(cause_size==2){
-		out->data[offset_asdu+i++]=(cause_lo.data>>8&0x00ff);
-	}
-	out->data[offset_asdu+i++]=addr&0x00ff;
-	if(addr_size==2){
-		out->data[offset_asdu+i++]=addr>>8&0x00ff;
-	}
+	cmd_id=COMMAND_FILE;
+	ret=build_asdu_header(out);
+	i=ret;
 	out->data[offset_asdu+i++]=0;
 	out->data[offset_asdu+i++]=0;
+	if(msg_id_size==3)
+		out->data[offset_asdu+i++]=0;
 	out->data[offset_asdu+i++]=2;//addition data type: 2:file transfer
 	out->data[offset_asdu+i++]=5;//act: 4:rd file segment
 	out->data[offset_asdu+i++]=file->res_file.file_id;
@@ -2502,18 +2642,13 @@ int app_layer::build_wt_file_con(frame *out,link_layer *link,_rd_file *file){//c
 	vsq_lo.bit.sq=0;
 	cause_lo.bit.cause=CAUSE_Actcon;
 
-	out->data[offset_asdu+i++]=COMMAND_FILE;
-	out->data[offset_asdu+i++]=vsq_lo.data;
-	out->data[offset_asdu+i++]=cause_lo.data;
-	if(cause_size==2){
-		out->data[offset_asdu+i++]=(cause_lo.data>>8&0x00ff);
-	}
-	out->data[offset_asdu+i++]=addr&0x00ff;
-	if(addr_size==2){
-		out->data[offset_asdu+i++]=addr>>8&0x00ff;
-	}
+	cmd_id=COMMAND_FILE;
+	ret=build_asdu_header(out);
+	i=ret;
 	out->data[offset_asdu+i++]=0;
 	out->data[offset_asdu+i++]=0;
+	if(msg_id_size==3)
+		out->data[offset_asdu+i++]=0;
 	out->data[offset_asdu+i++]=2;//addition data type: 2:file transfer
 	out->data[offset_asdu+i++]=8;//act: 8:wt file confirm
 	out->data[offset_asdu+i++]=file->result;//result: 0:successful 1 fail
@@ -2562,18 +2697,13 @@ int app_layer::build_wt_file_resp(frame *out,link_layer *link,_rd_file *file){//
 	vsq_lo.bit.sq=0;
 	cause_lo.bit.cause=CAUSE_Req;
 
-	out->data[offset_asdu+i++]=COMMAND_FILE;
-	out->data[offset_asdu+i++]=vsq_lo.data;
-	out->data[offset_asdu+i++]=cause_lo.data;
-	if(cause_size==2){
-		out->data[offset_asdu+i++]=(cause_lo.data>>8&0x00ff);
-	}
-	out->data[offset_asdu+i++]=addr&0x00ff;
-	if(addr_size==2){
-		out->data[offset_asdu+i++]=addr>>8&0x00ff;
-	}
+	cmd_id=COMMAND_FILE;
+	ret=build_asdu_header(out);
+	i=ret;
 	out->data[offset_asdu+i++]=0;
 	out->data[offset_asdu+i++]=0;
+	if(msg_id_size==3)
+		out->data[offset_asdu+i++]=0;
 	out->data[offset_asdu+i++]=2;//addition data type: 2:file transfer
 	out->data[offset_asdu+i++]=10;//act: 8:wt file segment response
 	out->data[offset_asdu+i++]=file->res_file.file_id;
@@ -2620,18 +2750,13 @@ int app_layer::build_rd_unit_con(frame *out,link_layer *link,_para_list *para){/
 	vsq_lo.bit.sq=0;
 	cause_lo.bit.cause=CAUSE_Actcon;
 
-	out->data[offset_asdu+i++]=COMMAND_RD_UNIT;
-	out->data[offset_asdu+i++]=vsq_lo.data;
-	out->data[offset_asdu+i++]=cause_lo.data;
-	if(cause_size==2){
-		out->data[offset_asdu+i++]=(cause_lo.data>>8&0x00ff);
-	}
-	out->data[offset_asdu+i++]=addr&0x00ff;
-	if(addr_size==2){
-		out->data[offset_asdu+i++]=addr>>8&0x00ff;
-	}
+	cmd_id=COMMAND_RD_UNIT;
+	ret=build_asdu_header(out);
+	i=ret;
 	out->data[offset_asdu+i++]=0;
 	out->data[offset_asdu+i++]=0;
+	if(msg_id_size==3)
+		out->data[offset_asdu+i++]=0;
 	out->data[offset_asdu+i++]=para->unit;
 	out->data[offset_asdu+i++]=para->unit>>8;
 	out->data[offset_asdu+i++]=para->min_unit;
@@ -2678,18 +2803,13 @@ int app_layer::build_wr_unit_con(frame *out,link_layer *link,_para_list *para){/
 	vsq_lo.bit.sq=0;
 	cause_lo.bit.cause=CAUSE_Actcon;
 
-	out->data[offset_asdu+i++]=COMMAND_WR_UNIT;
-	out->data[offset_asdu+i++]=vsq_lo.data;
-	out->data[offset_asdu+i++]=cause_lo.data;
-	if(cause_size==2){
-		out->data[offset_asdu+i++]=(cause_lo.data>>8&0x00ff);
-	}
-	out->data[offset_asdu+i++]=addr&0x00ff;
-	if(addr_size==2){
-		out->data[offset_asdu+i++]=addr>>8&0x00ff;
-	}
+	cmd_id=COMMAND_WR_UNIT;
+	ret=build_asdu_header(out);
+	i=ret;
 	out->data[offset_asdu+i++]=0;
 	out->data[offset_asdu+i++]=0;
+	if(msg_id_size==3)
+		out->data[offset_asdu+i++]=0;
 	out->data[offset_asdu+i++]=para->unit;
 	out->data[offset_asdu+i++]=para->unit>>8;
 	ret=i;
@@ -2728,18 +2848,13 @@ int app_layer::build_rd_dz_con(frame *out,link_layer *link,_para_list *para){//c
 	vsq_lo.bit.sq=0;
 	cause_lo.bit.cause=CAUSE_Actcon;
 
-	out->data[offset_asdu+i++]=COMMAND_WR_UNIT;
-	out->data[offset_asdu+i++]=vsq_lo.data;
-	out->data[offset_asdu+i++]=cause_lo.data;
-	if(cause_size==2){
-		out->data[offset_asdu+i++]=(cause_lo.data>>8&0x00ff);
-	}
-	out->data[offset_asdu+i++]=addr&0x00ff;
-	if(addr_size==2){
-		out->data[offset_asdu+i++]=addr>>8&0x00ff;
-	}
+	cmd_id=COMMAND_WR_UNIT;
+	ret=build_asdu_header(out);
+	i=ret;
 	out->data[offset_asdu+i++]=0;
 	out->data[offset_asdu+i++]=0;
+	if(msg_id_size==3)
+		out->data[offset_asdu+i++]=0;
 	out->data[offset_asdu+i++]=para->unit;
 	out->data[offset_asdu+i++]=para->unit>>8;
 	out->data[offset_asdu+i++]=para->pi.data;
@@ -2792,18 +2907,13 @@ int app_layer::build_wr_dz_con(frame *out,link_layer *link,_para_list*para){//ca
 	}else
 		cause_lo.bit.cause=CAUSE_Actcon;
 
-	out->data[offset_asdu+i++]=COMMAND_WR_DZ;
-	out->data[offset_asdu+i++]=vsq_lo.data;
-	out->data[offset_asdu+i++]=cause_lo.data;
-	if(cause_size==2){
-		out->data[offset_asdu+i++]=(cause_lo.data>>8&0x00ff);
-	}
-	out->data[offset_asdu+i++]=addr&0x00ff;
-	if(addr_size==2){
-		out->data[offset_asdu+i++]=addr>>8&0x00ff;
-	}
+	cmd_id=COMMAND_WR_DZ;
+	ret=build_asdu_header(out);
+	i=ret;
 	out->data[offset_asdu+i++]=0;
 	out->data[offset_asdu+i++]=0;
+	if(msg_id_size==3)
+		out->data[offset_asdu+i++]=0;
 	out->data[offset_asdu+i++]=para->unit;
 	out->data[offset_asdu+i++]=para->unit>>8;
 	out->data[offset_asdu+i++]=para->pi.data;
@@ -2851,18 +2961,13 @@ int app_layer::build_summon_acc_con(frame *out,link_layer *link){//cause 7
 	vsq_lo.bit.sq=0;
 	cause_lo.bit.cause=CAUSE_Actcon;
 
-	out->data[offset_asdu+i++]=COMMAND_SUMMON_ACC;
-	out->data[offset_asdu+i++]=vsq_lo.data;
-	out->data[offset_asdu+i++]=cause_lo.data;
-	if(cause_size==2){
-		out->data[offset_asdu+i++]=(cause_lo.data>>8&0x00ff);
-	}
-	out->data[offset_asdu+i++]=addr&0x00ff;
-	if(addr_size==2){
-		out->data[offset_asdu+i++]=addr>>8&0x00ff;
-	}
+	cmd_id=COMMAND_SUMMON_ACC;
+	ret=build_asdu_header(out);
+	i=ret;
 	out->data[offset_asdu+i++]=0;
 	out->data[offset_asdu+i++]=0;
+	if(msg_id_size==3)
+		out->data[offset_asdu+i++]=0;
 	out->data[offset_asdu+i++]=5;//QCC summon acc data
 	ret=link->build_link_layer(out,ret);				
 	if(ret<0){
@@ -2897,18 +3002,13 @@ int app_layer::build_summon_acc_term(frame *out,link_layer *link){//cause 10
 	vsq_lo.bit.sq=0;
 	cause_lo.bit.cause=CAUSE_Actterm;
 
-	out->data[offset_asdu+i++]=COMMAND_SUMMON_ACC;
-	out->data[offset_asdu+i++]=vsq_lo.data;
-	out->data[offset_asdu+i++]=cause_lo.data;
-	if(cause_size==2){
-		out->data[offset_asdu+i++]=(cause_lo.data>>8&0x00ff);
-	}
-	out->data[offset_asdu+i++]=addr&0x00ff;
-	if(addr_size==2){
-		out->data[offset_asdu+i++]=addr>>8&0x00ff;
-	}
+	cmd_id=COMMAND_SUMMON_ACC;
+	ret=build_asdu_header(out);
+	i=ret;
 	out->data[offset_asdu+i++]=0;
 	out->data[offset_asdu+i++]=0;
+	if(msg_id_size==3)
+		out->data[offset_asdu+i++]=0;
 	out->data[offset_asdu+i++]=5;//QCC summon acc data
 	ret=link->build_link_layer(out,ret);				
 	if(ret<0){
@@ -2956,19 +3056,12 @@ int app_layer::build_summon_acc_resp(frame *out,link_layer *link){//cause 37
 	cause_lo.bit.cause=CAUSE_Reqcogen;
 
 	if(pyc[0].ycdata->type == 0){
-		out->data[offset_asdu+i++]=COMMAND_ACC;
+		cmd_id=COMMAND_ACC;
 	}else{
-		out->data[offset_asdu+i++]=COMMAND_ACC_TIME;
+		cmd_id=COMMAND_ACC_TIME;
 	}
-	out->data[offset_asdu+i++]=vsq_lo.data;
-	out->data[offset_asdu+i++]=cause_lo.data;
-	if(cause_size==2){
-		out->data[offset_asdu+i++]=(cause_lo.data>>8&0x00ff);
-	}
-	out->data[offset_asdu+i++]=addr&0x00ff;
-	if(addr_size==2){
-		out->data[offset_asdu+i++]=addr>>8&0x00ff;
-	}
+	ret=build_asdu_header(out);
+	i=ret;
 	out->data[offset_asdu+i++]=pyc->ycdata->datasign;
 	out->data[offset_asdu+i++]=pyc->ycdata->datasign>>8;
 	if(msg_id_size==3)
@@ -3031,16 +3124,9 @@ int app_layer::build_update_con(frame *out,link_layer *link,_update_flag *data){
 	vsq_lo.bit.sq=0;
 	cause_lo.bit.cause=CAUSE_Actcon;
 
-	out->data[offset_asdu+i++]=COMMAND_UPDATE;
-	out->data[offset_asdu+i++]=vsq_lo.data;
-	out->data[offset_asdu+i++]=cause_lo.data;
-	if(cause_size==2){
-		out->data[offset_asdu+i++]=(cause_lo.data>>8&0x00ff);
-	}
-	out->data[offset_asdu+i++]=addr&0x00ff;
-	if(addr_size==2){
-		out->data[offset_asdu+i++]=addr>>8&0x00ff;
-	}
+	cmd_id=COMMAND_UPDATE;
+	ret=build_asdu_header(out);
+	i=ret;
 	out->data[offset_asdu+i++]=0;
 	out->data[offset_asdu+i++]=0;
 	if(msg_id_size==3)

@@ -27,7 +27,6 @@ class message{
 };
 #define VAR_FRAME 1
 #define FIX_FRAME 2
-#define FRAME_104 3
 #define FRAME_BUFF 300
 class frame{
 	public:
@@ -53,13 +52,7 @@ class fix_frame:public frame{
 			type=FIX_FRAME;
 		}
 };
-class frame_104:public frame{
-	public:
-		frame_104(){
-			type=FRAME_104;
-		}
-};
-
+//data struct for 101
 //dir:0 is master,1 is terminal
 typedef struct _prm_ctl{
 		unsigned char fc:4;
@@ -80,6 +73,79 @@ typedef union _ctrl_word{
 	slv_ctl sl;
 	unsigned char data;
 }ctrl_word;
+//define data struct for 104 
+struct sfmt_bit{
+	unsigned long res1:1;
+	unsigned long res2:8;
+	unsigned long res3:1;
+	unsigned long r_no:15;
+	sfmt_bit(){
+		res1=1;
+		res2=0;
+		res3=0;
+		r_no=0;
+	}
+};
+typedef union _sfmt{
+	struct sfmt_bit bit;
+	unsigned long d1:8;
+	unsigned long d2:8;
+	unsigned long d3:8;
+	unsigned long d4:8;
+}sfmt;
+struct ifmt_bit{
+	unsigned int res1:1;
+	unsigned int s_no:15;
+	unsigned int res2:1;
+	unsigned int r_no:15;
+	ifmt_bit(){
+		res1=0;
+		res2=0;
+		s_no=0;
+		r_no=0;
+	}
+};
+typedef union _ifmt{
+	struct ifmt_bit bit;
+	unsigned long d1:8;
+	unsigned long d2:8;
+	unsigned long d3:8;
+	unsigned long d4:8;
+}ifmt;
+struct ufmt_bit{
+	unsigned char res1:1;
+	unsigned char res2:1;
+	unsigned char startdt_cmd:1;
+	unsigned char startdt_ack:1;
+	unsigned char stopdt_cmd:1;
+	unsigned char stopdt_ack:1;
+	unsigned char testfr_cmd:1;
+	unsigned char testfr_ack:1;
+	unsigned char res3:8;
+	unsigned int  res4:1;
+	unsigned int  res5:15;
+	ufmt_bit(){
+		res1=1;
+		res2=1;
+		startdt_cmd=0;
+		startdt_ack=0;
+		stopdt_cmd=0;
+		stopdt_ack=0;
+		testfr_cmd=0;
+		testfr_ack=0;
+		res3=0;
+		res4=0;
+		res5=0;
+	}
+};
+typedef union _ufmt{
+	struct ufmt_bit bit;
+	unsigned long d1:8;
+	unsigned long d2:8;
+	unsigned long d3:8;
+	unsigned long d4:8;
+}ufmt;
+//define data struct for asdu
 typedef struct _vsq_bit{
 	unsigned char n:7;
 	unsigned char sq:1;
@@ -160,7 +226,8 @@ typedef struct _qoi{//召唤限定词
 //规约系统参数
 #define ADDR_SIZE			2
 #define CAUSE_SIZE			2
-#define MSG_ID_SIZE			2
+#define MSG_ID_SIZE_101		2
+#define MSG_ID_SIZE_104		3
 #define BALANCE				1
 //正在执行的过程
 #define PROCESS_LINK		0x01
@@ -372,6 +439,7 @@ class app_layer{
 	public:
 		vsq vsq_lo;
 		send_cause cause_lo;
+		int cmd_id;
 		int offset_asdu;//position of asdu in frame.
 		int addr_size;
 		int cause_size;
@@ -416,6 +484,7 @@ class app_layer{
 		//term->termination
 		//fini->finish
 		//cg->change
+		int build_asdu_header(frame *out);
 		int build_link_fini(frame *out,link_layer *link);
 		int build_summon_con(frame *out,link_layer *link);
 		int build_summon_term(frame *out,link_layer *link);
@@ -535,17 +604,15 @@ class link_layer{
 			memset(&yk_data,0,sizeof(yk_data));
 			memset(&event_data,0,sizeof(event_data));
 			memset(&file_data,0,sizeof(file_data));
+			memset(&para_data,0,sizeof(para_data));
 			port=0;
 			com=NULL;
-			protocol=101;
-			addr_size=ADDR_SIZE;
-			cause_size=CAUSE_SIZE;
-			msg_id_size=MSG_ID_SIZE;//101 is 2,104 is 3,so generation class 104 need redefine it.----- 
 			all_call_data_type=11;
 			link_state=0;
 			link_step=0;
 			addr=18;
 			rm_addr=0;
+			exp_len=0;
 		
 			start_rcv_var_flag=0;
 			r_var_pos=0;
@@ -582,6 +649,7 @@ class link_layer{
 		void reset_yk_data();
 		int check_state();//cycle check link state
 		int send_frame(frame *);
+		int save_frame(frame *);
 
 		int build_link_fini(frame *out);//set fc=3(balance) or fc=8(unbalance),var frame
 		int on_summon(frame *in,frame *out);
@@ -625,7 +693,6 @@ class link_layer_101:public link_layer{
 		fix_frame s_fix_frame;
 		int start_rcv_fix_flag;
 		int r_fix_pos;
-		int s_fix_pos;
 
 		ctrl_word ctl_rm;//saved control word from remote.
 		ctrl_word ctl_lo;
@@ -639,13 +706,16 @@ class link_layer_101:public link_layer{
 			balance=0;
 			start_rcv_fix_flag=0;
 			r_fix_pos=0;
-			s_fix_pos=0;
 
 			rcv_fix_timer.stop();
 
 			ctl_rm.data=0;
 			ctl_lo.data=0;
 
+			protocol=101;
+			addr_size=ADDR_SIZE;
+			cause_size=CAUSE_SIZE;
+			msg_id_size=MSG_ID_SIZE_101;//101 is 2,104 is 3,so generation class 104 need redefine it.----- 
 			offset_control=4;
 			offset_addr=5;
 			offset_asdu=offset_addr+addr_size;
@@ -676,7 +746,6 @@ class link_layer_101:public link_layer{
 		//build fix frame
 		int build_ack(frame *out,int has_data=0);//set fc=0,fix frame,has_data indicator if have class 1 data,used for unbalance.
 		int build_nak(frame *out);//set fc=1, fix frame
-		int build_err_rep(frame *out,int err);//?
 		int build_link_ack(frame *out);//set fc=11,fix frame,
 		int build_link_req(frame *out);//set fc=9,fix frame,for balance.
 		int build_reset_link(frame *out);//set fc=0,fix frame,for balance
@@ -692,7 +761,89 @@ class link_layer_101:public link_layer{
 		int get_frame();
 		int link_time();//for balance
 		int deal_frame(frame *in);
-		int save_frame(frame *);
+};
+/****************************
+ * link_layer_104
+****************************/
+#define TYPE_I 1
+#define TYPE_S 2
+#define TYPE_U 3
+class link_layer_104:public link_layer{
+	public:
+		//fix frame is only for 101,so i define it in this.
+		fix_frame r_s_frame;
+		fix_frame r_u_frame;
+		fix_frame r_tmp_frame;
+		CircleQueue<var_frame> s_frames;
+		int start_rcv_s_flag;
+		int start_rcv_u_flag;
+		int r_s_pos;
+		int r_u_pos;
+		int r_tmp_pos;
+		int frame_type;
+		int r_no;
+		int s_no;
+		int ack_no;
+		int send_num;//连续发送send_num个数据包后未被确认停止发送数据。
+		int rcv_num;//接受rcv_num个数据包后，发送确认帧。
+		int offset_control;
+		timer t1_timer;//发送数据超时计时器，发送数据后等待确认。t1 超时重新建立连接
+		timer t2_timer;//接收数据超时计时器，接收I帧数据后，t2重新计数，超时则发送S帧。t2 超时发送测试帧
+		timer t3_timer;//接收数据超时计时器，t3 超时发送测试帧
+	public:
+		link_layer_104(){
+			r_s_frame.type=TYPE_S;
+			r_s_frame.len=0;
+			r_u_frame.type=TYPE_U;
+			r_u_frame.len=0;
+			r_var_frame.type=TYPE_I;
+			r_var_frame.len=0;
+			s_var_frame.type=TYPE_I;
+			s_var_frame.len=0;
+			send_num=10;
+			rcv_num=6;
+			r_s_pos=0;
+			r_u_pos=0;
+			r_tmp_pos=0;
+			r_no=0;
+			s_no=0;
+			ack_no=0;
+			start_rcv_u_flag=0;
+			start_rcv_s_flag=0;
+			t1_timer.stop();
+			t2_timer.stop();
+			t3_timer.stop();
+
+			protocol=104;
+			addr_size=ADDR_SIZE;
+			cause_size=CAUSE_SIZE;
+			msg_id_size=MSG_ID_SIZE_104;//101 is 2,104 is 3,so generation class 104 need redefine it.----- 
+			offset_len=1;
+			offset_control=2;
+			offset_asdu=6;
+			offset_ti=offset_asdu;
+			offset_vsq=offset_asdu+1;
+			offset_cause=offset_vsq+1;
+			offset_pub_addr=offset_cause+cause_size;
+			offset_msg_id=offset_pub_addr+addr_size;
+			offset_data=offset_msg_id+msg_id_size;
+		}
+	public:
+		int check_type(unsigned char);
+	public:
+		//build fix frame
+		int build_ack(frame *out,int has_data=0);//set fc=0,fix frame,has_data indicator if have class 1 data,used for unbalance.
+		int build_nak(frame *out);//set fc=1, fix frame
+		int build_link_ack(frame *out);//set fc=11,fix frame,
+		int build_link_req(frame *out);//set fc=9,fix frame,for balance.
+		int build_reset_link(frame *out);//set fc=0,fix frame,for balance
+//the next functions  is implement of parent virtual function. inheritance 继承
+		void set_loc_ctl();	//set respose frame's control word.
+		int get_frame();
+		int deal_frame(frame *in);
+		int build_link_layer(frame *out,int asdu_len);//by asdu build link frame.
+		void deal_timeout();
+		int link_time();//for balance
 };
 #define REP_TIMES 3
 #define REP_TIME  1

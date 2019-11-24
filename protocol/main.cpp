@@ -15,6 +15,19 @@ char g_filename[20];
  *	main 
 ****************************/
 int main(int arg,char **argv){
+	int i;
+	com_port com[3];
+	serial_set serial_set_1;
+	serial serial_1;
+	ethernet_set eth_set_1;
+	ethernet eth_1;
+	wireless_set wire_set_1;
+	wireless wire_1;
+	link_layer_101 link[2];
+	link_layer_104 link_104;
+	app_layer app;
+	int loops=0;
+
 	if(arg<=1){
 		g_balance=1;
 		strcpy(g_filename,"test.dat");
@@ -25,16 +38,6 @@ int main(int arg,char **argv){
 		g_balance=atoi(argv[1]);
 		strcpy(g_filename,argv[2]);
 	}
-	int i;
-	com_port com[3];
-	serial_set serial_set_1;
-	serial serial_1;
-	ethernet_set eth_set_1;
-	ethernet eth_1;
-	wireless_set wire_set_1;
-	wireless wire_1;
-	link_layer_101 link[3];
-	app_layer app;
 	set_app_interface(&app);
 
 	com[0].set_com_handle(&serial_1);
@@ -46,14 +49,15 @@ int main(int arg,char **argv){
 	com[2].set_com_handle(&wire_1);
 	com[2].set_com_para((void *)&wire_set_1,3);
 	com[2].init();
-	for(i=0;i<3;i++){
+	for(i=0;i<2;i++){
 		link[i].set_link_com(&com[i],i);
 		link[i].set_app(&app);
 		link[i].set_balance(g_balance);
 	}
-	int loops=0;
+	link_104.set_link_com(&com[2],2);
+	link_104.set_app(&app);
 	for(i=0;i<3;i++){
-			com[i].connect();
+		com[i].connect();
 	}
 	init_data();
 	while(1){
@@ -63,11 +67,14 @@ int main(int arg,char **argv){
 		for(i=0;i<3;i++){
 			com[i].read(100);
 		}
-		for(i=0;i<3;i++){
+		for(i=0;i<2;i++){
 			link[i].deal_timeout();
 			link[i].check_state();
 			link[i].get_frame();
 		}
+		link_104.deal_timeout();
+		link_104.check_state();
+		link_104.get_frame();
 
 	}
 	return 0;
