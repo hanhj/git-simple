@@ -3,6 +3,7 @@
 	> Author: hanhj
 	> Mail: hanhj@zx-jy.com 
 	> Created Time: 2019年02月19日 星期二 22时09分40秒
+	> Relize 101 and 104 protocol
 ************************************************************************/
 #include "protocol.h"
 #include "configurable.h"
@@ -1509,26 +1510,6 @@ err:
 void link_layer_104::set_loc_ctl(){
 
 }
-int link_layer_104::build_test_link(){
-	int ret;
-	int i;
-	ufmt uf;
-	frame *out;
-	i=0;
-	uf.bit.testfr_cmd=1;
-	out=&s_u_frame;
-	out->data[i++]=0x68;
-	out->data[i++]=0x4;
-	out->data[i++]=uf.d1;
-	out->data[i++]=uf.d2;
-	out->data[i++]=uf.d3;
-	out->data[i++]=uf.d4;
-
-	out->len=i;
-	ret=i;
-	return ret;
-
-}
 int link_layer_104::check_type(unsigned char c){
 	if((c&1)==0)
 		return TYPE_I;
@@ -1787,6 +1768,24 @@ int link_layer_104::build_uframe(frame *out,ufmt &uf){
 	out->data[i++]=uf.d4;
 	ret=i;
 	out->len=ret;
+	return ret;
+}
+int link_layer_104::build_test_link(){
+	int ret;
+	int i;
+	ufmt uf;
+	frame *out;
+	i=0;
+	uf.bit.testfr_cmd=1;
+	out=&s_u_frame;
+	out->data[i++]=0x68;
+	out->data[i++]=0x4;
+	out->data[i++]=uf.d1;
+	out->data[i++]=uf.d2;
+	out->data[i++]=uf.d3;
+	out->data[i++]=uf.d4;
+	out->len=i;
+	ret=i;
 	return ret;
 }
 int link_layer_104::build_link_layer(frame *out,int asdu_len){
