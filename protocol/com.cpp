@@ -180,12 +180,12 @@ int	wireless::init(void *para){
 	return 0;
 }
 int wireless::connect(){
-	cout<<"connect wireless"<<endl;
+	pfunc(DEBUG_INFO,"connect wireless\n");
 	return 0;
 
 }
 int wireless::close(){
-	cout<<"close wireless"<<endl;
+	pfunc(DEBUG_INFO,"close wireless\n");
 	return 0;
 }
 int wireless::read(int len){
@@ -204,7 +204,7 @@ int wireless::read(int len){
 ***********************************************************************
 */
 int wireless::send(unsigned char *data,int len){
-	cout<<"send wireless:"<<len<<endl;
+	pfunc(DEBUG_INFO,"send wireless:\n");
 	return len;
 }
 int wireless::get_com_state(){
