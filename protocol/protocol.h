@@ -223,8 +223,11 @@ typedef struct _qoi{//召唤限定词
 //gb101中的传输规则：
 //线路上低位在前，高位在后；低字节在前，高字节在后。
 //define link state
-#define LINK_NOCONNECT		0
+#define LINK_DISCONNECT		0
 #define LINK_CONNECT		1
+#define LINK_CLOSE			3
+#define LINK_OPEN			4
+#define LINK_ERROR			5
 //规约系统参数
 #define ADDR_SIZE			2
 #define CAUSE_SIZE			2
@@ -436,7 +439,7 @@ typedef struct __para_list{
 	int res_num;
 	para_node nodes[30];
 }_para_list;
-//app_layer is y deal asdu part
+//app_layer deal asdu part
 class app_layer{
 	public:
 		vsq vsq_lo;
@@ -608,10 +611,8 @@ class link_layer{
 			rm_addr=0;
 			exp_len=0;
 		
-
 			vsq_rm.data=0;
 			cause_rm.data=0;
-	
 
 			summon_data.sended_yx_num =0;
 			summon_data.sended_yc_num =0;
@@ -635,11 +636,13 @@ class link_layer{
 		int set_link_com(com_port*,int port);
 		int set_app(app_layer*);
 		void reset_yk_data();
-		int check_state();//cycle check link state
 		int send_frame(frame *);
 		int save_frame(frame *);
+		int check_state();//cycle check link state
 
-		int build_link_fini(frame *out);//set fc=3(balance) or fc=8(unbalance),var frame
+		int build_link_fini(frame *out);//
+		int on_link(frame *in,frame *out);
+		int process_link(frame *out);//
 		int on_summon(frame *in,frame *out);
 		int process_summon(frame *out);//set fc=3(balance) or fc=8(unbalance),var frame
 		int on_summon_acc(frame *in,frame *out);
@@ -692,7 +695,6 @@ class link_layer_101:public link_layer{
 		int offset_control;
 		int offset_addr;
 
-		
 		int rep_times;
 		timer rep_timer;
 		timer rcv_var_timer;//接收数据超时计时器
@@ -770,9 +772,6 @@ class link_layer_101:public link_layer{
 #define TYPE_I 1
 #define TYPE_S 2
 #define TYPE_U 3
-#define LINK_CLOSE 1
-#define LINK_OPEN	2
-#define LINK_ERROR	3
 class link_layer_104:public link_layer{
 	public:
 		//fix frame is only for 101,so i define it in this.
@@ -803,10 +802,13 @@ class link_layer_104:public link_layer{
 		int ack_no;
 		int send_num;//连续发送send_num个数据包后未被确认停止发送数据。
 		int rcv_num;//接受rcv_num个数据包后，发送确认帧。
+		int send_count;
+		int rcv_count;
 		int offset_control;
 		timer t1_timer;//发送数据计时器，发送数据后等待确认。超时重新建立连接
 		timer t2_timer;//接收数据计时器，接收I帧数据后，超时则发送S帧。
 		timer t3_timer;//接收数据计时器，超时发送测试帧
+		timer t4_timer;//接收数据计时器，超时发送测试帧
 	public:
 		link_layer_104(){
 			balance=BALANCE;
@@ -854,6 +856,8 @@ class link_layer_104:public link_layer{
 		int build_sframe(frame *out,sfmt &);//
 		int build_uframe(frame *out,ufmt &);//
 		int build_test_link();
+		int deal_process();
+		int clear_sq();
 		//the next functions  is implement of parent virtual function. inheritance 继承
 		void set_loc_ctl();	//set respose frame's control word.
 		int get_frame();
@@ -861,12 +865,9 @@ class link_layer_104:public link_layer{
 		int build_link_layer(frame *out,int asdu_len);//by asdu build link frame.
 		void deal_timeout();
 		int link_time();//for balance
-		int deal_process();
-		int clear_sq();
 };
 #define REP_TIMES 3
 #define REP_TIME  1
-
 
 void set_app_interface(app_layer *app);
 #endif //__protocol_h

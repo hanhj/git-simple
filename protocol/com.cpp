@@ -101,7 +101,7 @@ err:
 	return ret;
 }
 int serial::get_com_state(){
-	cout<<"get com state of serial"<<endl;
+	pfunc(DEBUG_INFO,"get com state of serial\n");
 	return 0;
 }
 int serial::set_set(void *){
@@ -154,7 +154,7 @@ int ethernet::send(unsigned char *data,int len){
 	return len;
 }
 int ethernet::get_com_state(){
-	cout<<"get com state of ethernet"<<endl;
+	pfunc(DEBUG_INFO,"get com state of ethernet\n");
 	return 0;
 }
 int ethernet::set_set(void *){
@@ -208,7 +208,7 @@ int wireless::send(unsigned char *data,int len){
 	return len;
 }
 int wireless::get_com_state(){
-	cout<<"get com state of wireless"<<endl;
+	pfunc(DEBUG_INFO,"get com state of wireless\n");
 	return 0;
 }
 int wireless::set_set(void *){

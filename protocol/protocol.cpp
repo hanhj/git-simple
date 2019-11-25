@@ -68,7 +68,15 @@ err:
 	return ret;
 }
 int link_layer::check_state(){
-	pfunc(DEBUG_INFO,"check state of link [%d] state=%d\n",port,link_state);
+	int ret;
+	ret=com->get_com_state();
+	pfunc(DEBUG_INFO,"check state of link [%d] state=%d\n",port,ret);
+	return ret;
+}
+int link_layer::on_link(frame *in,frame *out){
+	return 0;
+}
+int link_layer::process_link(frame *out){
 	return 0;
 }
 int link_layer::on_summon(frame *in,frame *out){
@@ -844,6 +852,10 @@ int link_layer_101::on_req(frame *in,frame *out){
 	int ti;
 	ti=in->data[offset_ti];
 	switch(ti){
+		case COMMAND_LINK_FINI://link finish
+			ret=on_link(in,out);
+			ret=process_link(out);
+			break;
 		case COMMAND_SUMMON://total sum
 			process|=PROCESS_SUMMON;
 			ret=on_summon(in,out);
@@ -1036,7 +1048,7 @@ int link_layer_101::link_time(){
 		}
 		rep_times++;
 		if(rep_times>=REP_TIMES){
-			link_state=LINK_NOCONNECT;
+			link_state=LINK_DISCONNECT;
 		}else{
 			rep_timer.start(REP_TIME);
 		}
@@ -1368,7 +1380,7 @@ int link_layer_101::on_fc9(frame*f){
 	cout<<"on_fc9"<<endl;
 	process=PROCESS_LINK;
 	link_step=1;
-	link_state=LINK_NOCONNECT;
+	link_state=LINK_DISCONNECT;
 	ret=build_link_ack(&s_fix_frame);
 	if(ret<0){
 		goto err;
@@ -1632,12 +1644,16 @@ int link_layer_104::deal_frame(frame *in){
 		}
 		t2_timer.restart(3);
 		t3_timer.restart(3);
-
+		rcv_count++;
 		ack_no=tmpif.bit.r_no;
 		clear_sq();
 		r_no=(r_no+1)%N;
 		ti=in->data[offset_ti];
 		switch(ti){
+			case COMMAND_LINK_FINI://link finish
+				ret=on_link(in,out);
+				ret=process_link(out);
+				break;
 			case COMMAND_SUMMON://total sum
 				process|=PROCESS_SUMMON;
 				ret=on_summon(in,out);
@@ -1700,7 +1716,10 @@ int link_layer_104::deal_frame(frame *in){
 				ret=process_update(out);
 				break;
 		}
-		if(ret>0)
+		send_count=s_i_frames.size();
+		if(s_i_frames.full()||send_count>=send_num)
+			return ret;
+		if(ret>0&&link_state==LINK_OPEN)
 			send_frame(&s_i_frame);
 	}else if(in->type==TYPE_S){
 		t3_timer.restart(3);
@@ -1723,6 +1742,9 @@ int link_layer_104::deal_frame(frame *in){
 			tmpuf.bit.startdt_ack=1;
 			build_uframe(&s_u_frame,tmpuf);
 			send_frame(&s_u_frame);
+			link_state=LINK_OPEN;
+			app->build_link_fini(&s_i_frame,this);
+			send_frame(&s_i_frame);
 		}else if(tmpuf.bit.startdt_ack==1){
 			link_state=LINK_OPEN;
 		}else if(tmpuf.bit.stopdt_cmd==1){
@@ -1827,8 +1849,16 @@ int link_layer_104::deal_process(){
 	int ret=0;
 	frame *out;
 	out=&s_i_frame;
-	if(s_i_frames.full())
+	send_count=s_i_frames.size();
+	if(s_i_frames.full()||send_count>=send_num)
 		return ret;
+	if(rcv_count>=rcv_num){
+		sfmt sf;
+		sf.bit.r_no=r_no;
+		build_sframe(&s_s_frame,sf);
+		send_frame(&s_s_frame);
+		rcv_count=0;
+	}
 	if(process & PROCESS_EVENT){
 		ret = process_event(out);
 	}else if(process & PROCESS_SUMMON){
@@ -1852,7 +1882,7 @@ int link_layer_104::deal_process(){
 	}else if(process & PROCESS_UPDATE){
 		ret=process_update(out);
 	}
-	if(ret>0){
+	if(ret>0&&link_state==LINK_OPEN){
 		send_frame(&s_i_frame);
 	}
 	return ret;
@@ -1893,7 +1923,7 @@ int link_layer_104::link_time(){
 	int ret=0;
 	if(t1_timer.is_reached()){
 		if(r_no!=ack_no){
-			link_state=0;
+			link_state=LINK_ERROR;
 		}
 	}
 	if(t3_timer.is_reached()==1){//receive timeout
@@ -1906,9 +1936,28 @@ int link_layer_104::link_time(){
 		ret=build_sframe(&s_s_frame,sf);
 		send_frame(&s_s_frame);
 	}
-	if(link_state==0){
-		com->close();
-		com->connect();
+	int com_state;
+	com_state=check_state();
+	switch(link_state){
+		case LINK_ERROR:
+			com->close();
+			com->connect();
+			link_state=LINK_DISCONNECT;
+			t4_timer.start(3);
+			break;
+		case LINK_DISCONNECT:
+			if(t4_timer.is_reached()==1){
+				if(com_state!=LINK_CONNECT){
+					link_state=LINK_ERROR;
+				}else if(com_state==LINK_CONNECT){
+					link_state=LINK_CLOSE;
+					r_no=0;
+					s_no=0;
+					ack_no=0;
+					s_i_frames.clear();
+				}
+			}
+			break;
 	}
 	return ret;
 }
