@@ -33,10 +33,12 @@ class frame{
 		int len;
 		int valid;
 		int type;
+		int id;//frame no
 		unsigned char data[FRAME_BUFF];
 		frame(){
 			valid=0;
 			len=0;
+			id=0;
 			memset(&data,0,sizeof(data));
 		}
 };
@@ -79,12 +81,6 @@ struct sfmt_bit{
 	unsigned long res2:8;
 	unsigned long res3:1;
 	unsigned long r_no:15;
-	sfmt_bit(){
-		res1=1;
-		res2=0;
-		res3=0;
-		r_no=0;
-	}
 };
 typedef union _sfmt{
 	struct sfmt_bit bit;
@@ -92,18 +88,18 @@ typedef union _sfmt{
 	unsigned long d2:8;
 	unsigned long d3:8;
 	unsigned long d4:8;
+	_sfmt(){
+		bit.res1=1;
+		bit.res2=0;
+		bit.res3=0;
+		bit.r_no=0;
+	}
 }sfmt;
 struct ifmt_bit{
 	unsigned int res1:1;
 	unsigned int s_no:15;
 	unsigned int res2:1;
 	unsigned int r_no:15;
-	ifmt_bit(){
-		res1=0;
-		res2=0;
-		s_no=0;
-		r_no=0;
-	}
 };
 typedef union _ifmt{
 	struct ifmt_bit bit;
@@ -111,6 +107,12 @@ typedef union _ifmt{
 	unsigned long d2:8;
 	unsigned long d3:8;
 	unsigned long d4:8;
+	_ifmt(){
+		bit.res1=0;
+		bit.res2=0;
+		bit.s_no=0;
+		bit.r_no=0;
+	}
 }ifmt;
 struct ufmt_bit{
 	unsigned char res1:1;
@@ -124,19 +126,6 @@ struct ufmt_bit{
 	unsigned char res3:8;
 	unsigned int  res4:1;
 	unsigned int  res5:15;
-	ufmt_bit(){
-		res1=1;
-		res2=1;
-		startdt_cmd=0;
-		startdt_ack=0;
-		stopdt_cmd=0;
-		stopdt_ack=0;
-		testfr_cmd=0;
-		testfr_ack=0;
-		res3=0;
-		res4=0;
-		res5=0;
-	}
 };
 typedef union _ufmt{
 	struct ufmt_bit bit;
@@ -144,6 +133,19 @@ typedef union _ufmt{
 	unsigned long d2:8;
 	unsigned long d3:8;
 	unsigned long d4:8;
+	_ufmt(){
+		bit.res1=1;
+		bit.res2=1;
+		bit.startdt_cmd=0;
+		bit.startdt_ack=0;
+		bit.stopdt_cmd=0;
+		bit.stopdt_ack=0;
+		bit.testfr_cmd=0;
+		bit.testfr_ack=0;
+		bit.res3=0;
+		bit.res4=0;
+		bit.res5=0;
+	}
 }ufmt;
 //define data struct for asdu
 typedef struct _vsq_bit{
@@ -548,6 +550,7 @@ class app_layer{
 ****************************/
 class link_layer{
 	public:
+		int balance;//1 balance,0 no balance
 		int port;
 		com_port *com;
 		app_layer*app;
@@ -560,17 +563,11 @@ class link_layer{
 		int addr;
 		int rm_addr;
 
+		var_frame last_send_frame;
 		int link_state;
 		int link_step;
 		int has_data;
 
-		//101的可变帧与104的帧用同一缓冲区
-		var_frame last_send_frame;
-		var_frame r_var_frame;
-		var_frame s_var_frame;
-		int start_rcv_var_flag;
-		int r_var_pos;
-		int s_var_pos;
 		int exp_len;
 
 		vsq vsq_rm;
@@ -585,9 +582,6 @@ class link_layer{
 		int offset_data;
 		int offset_len;//for 101,offset of length 
 
-		timer rep_timer;
-		int rep_times;
-		timer rcv_var_timer;//接收数据超时计时器
 
 		unsigned long process;//which process is in.
 		_summon_data summon_data;
@@ -614,16 +608,10 @@ class link_layer{
 			rm_addr=0;
 			exp_len=0;
 		
-			start_rcv_var_flag=0;
-			r_var_pos=0;
-			s_var_pos=0;
 
 			vsq_rm.data=0;
 			cause_rm.data=0;
 	
-			rep_times=0;
-			rep_timer.stop();
-			rcv_var_timer.stop();
 
 			summon_data.sended_yx_num =0;
 			summon_data.sended_yc_num =0;
@@ -687,12 +675,17 @@ class link_layer{
 ****************************/
 class link_layer_101:public link_layer{
 	public:
-		int balance;//1 balance,0 no balance
 		//fix frame is only for 101,so i define it in this.
+		//101的可变帧与104的帧用同一缓冲区
+		var_frame r_var_frame;
+		var_frame s_var_frame;
 		fix_frame r_fix_frame;
 		fix_frame s_fix_frame;
 		int start_rcv_fix_flag;
+		int start_rcv_var_flag;
 		int r_fix_pos;
+		int r_var_pos;
+		int s_var_pos;
 
 		ctrl_word ctl_rm;//saved control word from remote.
 		ctrl_word ctl_lo;
@@ -700,6 +693,9 @@ class link_layer_101:public link_layer{
 		int offset_addr;
 
 		
+		int rep_times;
+		timer rep_timer;
+		timer rcv_var_timer;//接收数据超时计时器
 		timer rcv_fix_timer;//接收数据超时计时器
 	public:
 		link_layer_101(){
@@ -707,7 +703,13 @@ class link_layer_101:public link_layer{
 			start_rcv_fix_flag=0;
 			r_fix_pos=0;
 
+			rep_times=0;
+			rep_timer.stop();
+			rcv_var_timer.stop();
 			rcv_fix_timer.stop();
+			start_rcv_var_flag=0;
+			r_var_pos=0;
+			s_var_pos=0;
 
 			ctl_rm.data=0;
 			ctl_lo.data=0;
@@ -768,38 +770,48 @@ class link_layer_101:public link_layer{
 #define TYPE_I 1
 #define TYPE_S 2
 #define TYPE_U 3
+#define LINK_CLOSE 1
+#define LINK_OPEN	2
+#define LINK_ERROR	3
 class link_layer_104:public link_layer{
 	public:
 		//fix frame is only for 101,so i define it in this.
-		fix_frame r_s_frame;
-		fix_frame r_u_frame;
-		fix_frame r_tmp_frame;
-		CircleQueue<var_frame> s_frames;
+		frame r_s_frame;
+		frame r_u_frame;
+		frame r_i_frame;
+		frame s_s_frame;
+		frame s_u_frame;
+		frame s_i_frame;
+		frame r_tmp_frame;
+		//CircleQueue<var_frame> s_i_frames;
+		CircleQueue<int> s_i_frames;
 		int start_rcv_s_flag;
 		int start_rcv_u_flag;
+		int start_rcv_i_flag;
 		int r_s_pos;
 		int r_u_pos;
+		int r_i_pos;
 		int r_tmp_pos;
 		int frame_type;
+		int N;
+		//record current receive frame no. mod by n.
+		//when receive a valid frame r_no++;
+		//if peer send no not equal to r_no,the error will
+		//raise
 		int r_no;
-		int s_no;
+		int s_no;//record current send frame no.mod by n.when send a valid frame s_no++.
 		int ack_no;
 		int send_num;//连续发送send_num个数据包后未被确认停止发送数据。
 		int rcv_num;//接受rcv_num个数据包后，发送确认帧。
 		int offset_control;
-		timer t1_timer;//发送数据超时计时器，发送数据后等待确认。t1 超时重新建立连接
-		timer t2_timer;//接收数据超时计时器，接收I帧数据后，t2重新计数，超时则发送S帧。t2 超时发送测试帧
-		timer t3_timer;//接收数据超时计时器，t3 超时发送测试帧
+		timer t1_timer;//发送数据计时器，发送数据后等待确认。超时重新建立连接
+		timer t2_timer;//接收数据计时器，接收I帧数据后，超时则发送S帧。
+		timer t3_timer;//接收数据计时器，超时发送测试帧
 	public:
 		link_layer_104(){
-			r_s_frame.type=TYPE_S;
-			r_s_frame.len=0;
-			r_u_frame.type=TYPE_U;
-			r_u_frame.len=0;
-			r_var_frame.type=TYPE_I;
-			r_var_frame.len=0;
-			s_var_frame.type=TYPE_I;
-			s_var_frame.len=0;
+			balance=BALANCE;
+			s_i_frames.init(100);
+			N=32767;
 			send_num=10;
 			rcv_num=6;
 			r_s_pos=0;
@@ -808,8 +820,15 @@ class link_layer_104:public link_layer{
 			r_no=0;
 			s_no=0;
 			ack_no=0;
+			r_s_frame.type=TYPE_S;
+			r_u_frame.type=TYPE_U;
+			r_i_frame.type=TYPE_I;
+			s_s_frame.type=TYPE_S;
+			s_u_frame.type=TYPE_U;	
+			s_i_frame.type=TYPE_I;	
 			start_rcv_u_flag=0;
 			start_rcv_s_flag=0;
+			start_rcv_i_flag=0;
 			t1_timer.stop();
 			t2_timer.stop();
 			t3_timer.stop();
@@ -832,18 +851,18 @@ class link_layer_104:public link_layer{
 		int check_type(unsigned char);
 	public:
 		//build fix frame
-		int build_ack(frame *out,int has_data=0);//set fc=0,fix frame,has_data indicator if have class 1 data,used for unbalance.
-		int build_nak(frame *out);//set fc=1, fix frame
-		int build_link_ack(frame *out);//set fc=11,fix frame,
-		int build_link_req(frame *out);//set fc=9,fix frame,for balance.
-		int build_reset_link(frame *out);//set fc=0,fix frame,for balance
-//the next functions  is implement of parent virtual function. inheritance 继承
+		int build_sframe(frame *out,sfmt &);//
+		int build_uframe(frame *out,ufmt &);//
+		int build_test_link();
+		//the next functions  is implement of parent virtual function. inheritance 继承
 		void set_loc_ctl();	//set respose frame's control word.
 		int get_frame();
 		int deal_frame(frame *in);
 		int build_link_layer(frame *out,int asdu_len);//by asdu build link frame.
 		void deal_timeout();
 		int link_time();//for balance
+		int deal_process();
+		int clear_sq();
 };
 #define REP_TIMES 3
 #define REP_TIME  1

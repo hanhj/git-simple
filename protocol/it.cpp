@@ -9,7 +9,7 @@
 using namespace std;
 #include <list>
 #include <vector>
-
+#include "it.h"
 /*如何构造迭代器：
  * 1、迭代器需要的类：
  * 节点类，用于封装数据。
@@ -191,18 +191,6 @@ void myswap(Iter a,Iter b){
 	*b=tmp;
 	cout<<"after:"<<*a<<" "<<*b<<endl;
 }
-template <typename T>
-class AA{
-	public:
-		T aa;
-		AA(const T &da):aa(da){
-
-		}
-		T & operator *(){
-			cout<<"aaa:"<<aa<<endl;
-			return aa;
-		}
-};
 template <typename T>
 class _cir_iterator{
 	public:
@@ -386,6 +374,7 @@ typedef struct _dir_node{//directory
 	long file_size;
 }dir_node;
 typedef CircleQueue<dir_node> dir_list;
+
 int main(){
 	vector<std::string> bb {"1","2"};
 	myswap(begin(bb),begin(bb)+1);

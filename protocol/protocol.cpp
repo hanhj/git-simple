@@ -1509,6 +1509,26 @@ err:
 void link_layer_104::set_loc_ctl(){
 
 }
+int link_layer_104::build_test_link(){
+	int ret;
+	int i;
+	ufmt uf;
+	frame *out;
+	i=0;
+	uf.bit.testfr_cmd=1;
+	out=&s_u_frame;
+	out->data[i++]=0x68;
+	out->data[i++]=0x4;
+	out->data[i++]=uf.d1;
+	out->data[i++]=uf.d2;
+	out->data[i++]=uf.d3;
+	out->data[i++]=uf.d4;
+
+	out->len=i;
+	ret=i;
+	return ret;
+
+}
 int link_layer_104::check_type(unsigned char c){
 	if((c&1)==0)
 		return TYPE_I;
@@ -1534,11 +1554,11 @@ int link_layer_104::get_frame(){
 			start_rcv_s_flag=1;
 		}else if(!start_rcv_u_flag){
 			start_rcv_u_flag=1;
-		}else if(!start_rcv_var_flag){
-			start_rcv_var_flag=1;
+		}else if(!start_rcv_i_flag){
+			start_rcv_i_flag=1;
 		}
 	}
-	flag=start_rcv_s_flag+start_rcv_u_flag+start_rcv_var_flag;
+	flag=start_rcv_s_flag+start_rcv_u_flag+start_rcv_i_flag;
 	if(flag){
 		r_tmp_frame.data[r_tmp_pos++]=c;
 		if(r_tmp_pos==2){
@@ -1547,20 +1567,16 @@ int link_layer_104::get_frame(){
 		if(r_tmp_pos==3){
 			frame_type=check_type(c);
 			if(frame_type==TYPE_I){
-				t2_timer.start(3);
 				start_rcv_u_flag=0;
 				start_rcv_s_flag=0;
 			}else if(frame_type==TYPE_S){
-				t3_timer.start(3);
-				start_rcv_var_flag=0;
+				start_rcv_i_flag=0;
 				start_rcv_u_flag=0;
 			}else if(frame_type==TYPE_U){
-				rcv_var_timer.start(3);
-				start_rcv_var_flag=0;
+				start_rcv_i_flag=0;
 				start_rcv_s_flag=0;
 			}
 		}
-
 		if(r_tmp_pos==exp_len){
 			r_tmp_pos=0;
 		}
@@ -1571,12 +1587,13 @@ int link_layer_104::get_frame(){
 			r_s_frame.len=r_s_pos;
 			deal_frame(&r_s_frame);
 			ret=1;
-			rcv_fix_timer.stop();
+			r_s_pos=0;
 			start_rcv_s_flag=0;
 			r_s_frame.len=0;
 			exp_len=0;
 		}else if(r_s_pos>exp_len){
 			start_rcv_s_flag=0;
+			r_s_pos=0;
 			r_s_frame.len=0;
 			exp_len=0;
 		}
@@ -1586,49 +1603,58 @@ int link_layer_104::get_frame(){
 			r_u_frame.len=r_u_pos;
 			deal_frame(&r_u_frame);
 			ret=1;
-			rcv_fix_timer.stop();
 			start_rcv_u_flag=0;
+			r_u_pos=0;
 			r_u_frame.len=0;
 			exp_len=0;
 		}else if(r_u_pos>exp_len){
-			rcv_fix_timer.stop();
 			start_rcv_u_flag=0;
+			r_u_pos=0;
 			r_u_frame.len=0;
 			exp_len=0;
 		}
-	}else if(start_rcv_var_flag){
-		r_var_frame.data[r_var_pos++]=c;
-		if(r_var_pos==exp_len){
-			r_var_frame.len=r_var_pos;
-			deal_frame(&r_var_frame);
+	}else if(start_rcv_i_flag){
+		r_i_frame.data[r_i_pos++]=c;
+		if(r_i_pos==exp_len){
+			r_i_frame.len=r_i_pos;
+			deal_frame(&r_i_frame);
 			ret=1;
-			rcv_var_timer.stop();
-			start_rcv_s_flag=0;
-			r_var_frame.len=0;
+			start_rcv_i_flag=0;
+			r_i_frame.len=0;
+			r_i_pos=0;
 			exp_len=0;
-		}else if(r_var_pos>exp_len){
-			rcv_var_timer.stop();
-			start_rcv_s_flag=0;
-			r_var_frame.len=0;
+		}else if(r_i_pos>exp_len){
+			start_rcv_i_flag=0;
+			r_i_frame.len=0;
+			r_i_pos=0;
 			exp_len=0;
 		}
 	}
-	if(rcv_fix_timer.is_reached()==1){//receive timeout
-		start_rcv_s_flag=0;
-		start_rcv_u_flag=0;
-		r_u_pos=0;
-		r_s_pos=0;
-	}else if(rcv_var_timer.is_reached()==1){
-		start_rcv_var_flag=0;
-		r_var_pos=0;
-	}
+	deal_process();
 	return ret;		
 }
 int link_layer_104::deal_frame(frame *in){
 	int ret;
 	int ti;
 	ret=0;
+	frame *out;
+	out=&s_i_frame;
 	if(in->type==TYPE_I){
+		ifmt tmpif;
+		tmpif.d1=in->data[offset_control];
+		tmpif.d2=in->data[offset_control+1];
+		tmpif.d3=in->data[offset_control+2];
+		tmpif.d4=in->data[offset_control];
+		if(tmpif.bit.s_no!=r_no){//sequence error
+			link_state=0;
+			return ret;
+		}
+		t2_timer.restart(3);
+		t3_timer.restart(3);
+
+		ack_no=tmpif.bit.r_no;
+		clear_sq();
+		r_no=(r_no+1)%N;
 		ti=in->data[offset_ti];
 		switch(ti){
 			case COMMAND_SUMMON://total sum
@@ -1639,94 +1665,252 @@ int link_layer_104::deal_frame(frame *in){
 			case COMMAND_CLOCK://clock 
 				process|=PROCESS_CLOCK;
 				ret=on_clock(in,out);
-				if(balance ==BALANCE)
-					ret=process_clock(out);
+				ret=process_clock(out);
 				break;
 			case COMMAND_RM_CTL:
 			case COMMAND_RM_CTL_D:
 				process|=PROCESS_RM_CTL;
 				ret=on_yk(in,out);
-				if(balance == BALANCE)
-					ret=process_yk(out);
+				ret=process_yk(out);
 				break;
 			case COMMAND_TEST_LINK:
 				process|=PROCESS_TEST_LINK;
 				ret=on_test_link(in,out);
-				if(balance == BALANCE)
-					ret=process_test_link(out);
+				ret=process_test_link(out);
 				break;
 			case COMMAND_RESET:
 				process|=PROCESS_RESET;
 				ret=on_reset_terminal(in,out);
-				if(balance==BALANCE)
-					ret=process_reset_terminal(out);
+				ret=process_reset_terminal(out);
 				break;
 			case COMMAND_FILE:
 				process|=PROCESS_FILE;
 				ret=on_file(in,out);
-				if(balance ==BALANCE){
-					ret=process_file(out);
-				}
+				ret=process_file(out);
 				break;
 			case COMMAND_RD_UNIT:
 				process|=PROCESS_RD_UNIT;
 				ret=on_rd_unit(in,out);
-				if(balance == BALANCE){
-					ret = process_rd_unit(out);
-				}
+				ret = process_rd_unit(out);
 				break;
 			case COMMAND_WR_UNIT:
 				process|=PROCESS_WR_UNIT;
 				ret=on_wr_unit(in,out);
-				if(balance){
-					ret=process_wr_unit(out);
-				}
+				ret=process_wr_unit(out);
 				break;
 			case COMMAND_RD_DZ:
 				process|=PROCESS_RD_DZ;
 				ret=on_rd_dz(in,out);
-				if(balance == BALANCE)
-					ret=process_rd_dz(out);
+				ret=process_rd_dz(out);
 				break;
 			case COMMAND_WR_DZ:
 				process|=PROCESS_WR_DZ;
 				ret=on_wr_dz(in,out);
-				if(balance == BALANCE){
-					ret=process_wr_dz(out);
-				}
+				ret=process_wr_dz(out);
 				break;
 			case COMMAND_SUMMON_ACC:
 				process|=PROCESS_SUMMON_ACC;
 				ret=on_summon_acc(in,out);
-				if(balance == BALANCE){
-					ret=process_summon_acc(out);
-				}
+				ret=process_summon_acc(out);
 				break;
 			case COMMAND_UPDATE:
 				process|=PROCESS_UPDATE;
 				ret=on_update(in,out);
-				if(balance==BALANCE)
-					ret=process_update(out);
+				ret=process_update(out);
 				break;
 		}
-		return ret;
-
+		if(ret>0)
+			send_frame(&s_i_frame);
 	}else if(in->type==TYPE_S){
-
+		t3_timer.restart(3);
+		sfmt tmpsf;
+		tmpsf.d1=in->data[offset_control];
+		tmpsf.d2=in->data[offset_control+1];
+		tmpsf.d3=in->data[offset_control+2];
+		tmpsf.d4=in->data[offset_control+3];
+		ack_no=tmpsf.bit.r_no;
+		clear_sq();
 	}else if(in->type==TYPE_U){
-		
+		t3_timer.restart(3);
+		ufmt tmpuf;
+		tmpuf.d1=in->data[offset_control];
+		tmpuf.d2=in->data[offset_control+1];
+		tmpuf.d3=in->data[offset_control+2];
+		tmpuf.d4=in->data[offset_control+3];
+		if(tmpuf.bit.startdt_cmd){
+			tmpuf.bit.startdt_cmd=0;
+			tmpuf.bit.startdt_ack=1;
+			build_uframe(&s_u_frame,tmpuf);
+			send_frame(&s_u_frame);
+		}else if(tmpuf.bit.startdt_ack==1){
+			link_state=LINK_OPEN;
+		}else if(tmpuf.bit.stopdt_cmd==1){
+			tmpuf.bit.stopdt_cmd=0;
+			tmpuf.bit.stopdt_ack=1;
+			link_state=LINK_CLOSE;
+			build_uframe(&s_u_frame,tmpuf);
+			send_frame(&s_u_frame);
+		}else if(tmpuf.bit.stopdt_ack==1){
+			link_state=LINK_CLOSE;
+		}else if(tmpuf.bit.testfr_cmd==1){
+			tmpuf.bit.testfr_cmd=0;
+			tmpuf.bit.testfr_ack=1;
+			build_uframe(&s_u_frame,tmpuf);
+			send_frame(&s_u_frame);
+		}
 	}
+	return ret;
+}
+int link_layer_104::build_sframe(frame *out,sfmt &sf){
+	int ret=0;
+	int i;
+	i=0;
+	out->data[i++]=0x68;
+	out->data[i++]=4;
+	out->data[i++]=sf.d1;
+	out->data[i++]=sf.d2;
+	out->data[i++]=sf.d3;
+	out->data[i++]=sf.d4;
+	ret=i;
+	out->len=ret;
+	return ret;
+}
+int link_layer_104::build_uframe(frame *out,ufmt &uf){
+	int ret=0;
+	int i;
+	i=0;
+	out->data[i++]=0x68;
+	out->data[i++]=4;
+	out->data[i++]=uf.d1;
+	out->data[i++]=uf.d2;
+	out->data[i++]=uf.d3;
+	out->data[i++]=uf.d4;
+	ret=i;
+	out->len=ret;
 	return ret;
 }
 int link_layer_104::build_link_layer(frame *out,int asdu_len){
 	int ret=0;
+	int i;
+	i=0;
+	ifmt tmpif;
+	tmpif.bit.r_no=r_no;
+	tmpif.bit.s_no=s_no;
+	out->data[i++]=0x68;
+	out->data[i++]=asdu_len+4;
+	out->data[i++]=tmpif.d1;
+	out->data[i++]=tmpif.d2;
+	out->data[i++]=tmpif.d3;
+	out->data[i++]=tmpif.d4;
+	ret=i+asdu_len;
+	out->len=ret;
+	s_i_frames.push(s_no);
+	s_no=(s_no+1)%N;
+	return ret;
+}
+int link_layer_104::clear_sq(){
+	int ret;
+	ret=0;
+	int da;
+	CircleQueue<int>::iterator it(s_i_frames.MaxQueue);
+	it=s_i_frames.begin();
+	while(it!=s_i_frames.end()){
+		da=*it;
+		if(da<=ack_no){
+			if(it==s_i_frames.begin())
+				s_i_frames.pop();
+		}
+		it++;
+	}
+	return ret;
+}
+int link_layer_104::deal_process(){
+	int ret=0;
+	frame *out;
+	out=&s_i_frame;
+	if(s_i_frames.full())
+		return ret;
+	if(process & PROCESS_EVENT){
+		ret = process_event(out);
+	}else if(process & PROCESS_SUMMON){
+		ret=process_summon(out);
+	}else if(process & PROCESS_SUMMON_ACC){
+		ret=process_summon_acc(out);
+	}else if(process & PROCESS_YC_CHANGE){
+		ret=process_yc_change(out);
+	}else if(process & PROCESS_FILE){
+		ret=process_file(out);
+	}else if(process & PROCESS_RESET){
+		app->need_reset=1;
+	}else if(process & PROCESS_RM_CTL){
+		ret=process_yk(out);
+	}else if(process & PROCESS_CLOCK){
+		ret=process_clock(out);
+	}else if(process & PROCESS_TEST_LINK){
+		ret=process_test_link(out);
+	}else if(process & PROCESS_FILE){
+		ret=process_file(out);
+	}else if(process & PROCESS_UPDATE){
+		ret=process_update(out);
+	}
+	if(ret>0){
+		send_frame(&s_i_frame);
+	}
 	return ret;
 }
 void link_layer_104::deal_timeout(){
+	event *e;
+	e=NULL;
+	link_time();
+	if(yk_data.start_timeout==1){
+		yk_data.timeout++;
+		if(yk_data.timeout ==6000){//60s
+			yk_data.start_timeout = 0;
+			yk_data.timeout=0;
+			yk_data.sel=0;
+			yk_data.act=0;
+			yk_data.deactive=0;
+			yk_data.act_over=0;
+		}
+	}
+	if(app->get_event_data(port,e,0)==1){
+		process|=PROCESS_EVENT;
+	}else{
+		process &=(~PROCESS_EVENT);
+	}
+	event_yc *e_yc;
+	if(app->get_yc_cg_data(port,e_yc)){
+		process|=PROCESS_YC_CHANGE;
+	}else{
+		process &=~PROCESS_YC_CHANGE;
+	}
 
+	if(app->need_reset)
+		app->do_reset();
+	if(app->need_update)
+		app->do_update();
 }
 int link_layer_104::link_time(){
 	int ret=0;
+	if(t1_timer.is_reached()){
+		if(r_no!=ack_no){
+			link_state=0;
+		}
+	}
+	if(t3_timer.is_reached()==1){//receive timeout
+		build_test_link();
+		send_frame(&s_u_frame);
+		t3_timer.start(3);
+	}else if(t2_timer.is_reached()==1){
+		sfmt sf;
+		sf.bit.r_no=r_no;
+		ret=build_sframe(&s_s_frame,sf);
+		send_frame(&s_s_frame);
+	}
+	if(link_state==0){
+		com->close();
+		com->connect();
+	}
 	return ret;
 }
 /****************************

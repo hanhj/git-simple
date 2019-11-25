@@ -28,6 +28,7 @@ class timer{
 		int exp_time;
 		int start_flag;
 		int start(int T);
+		int restart(int T);
 		int stop();
 		int is_reached();
 };

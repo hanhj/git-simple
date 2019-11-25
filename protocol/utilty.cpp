@@ -51,6 +51,11 @@ int timer::start(int T){
 	pfunc(DEBUG_INFO,"start timer\n");
 	return 0;
 }
+int timer::restart(int T){
+	stop();
+	start(T);
+	return 0;
+}
 int timer::stop(){
 	if(start_flag == 1){
 		pfunc(DEBUG_INFO,"stop timer\n");
