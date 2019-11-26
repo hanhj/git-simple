@@ -43,7 +43,7 @@ int timer::is_reached(){
 }
 int timer::start(int T){
 	if(start_flag == 1){
-		cout<<"timer has started"<<endl;
+		pfunc(DEBUG_INFO,"timer has started\n");
 		return -1;
 	}
 	start_flag=1;

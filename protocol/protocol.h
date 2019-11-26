@@ -31,12 +31,10 @@ class message{
 class frame{
 	public:
 		int len;
-		int valid;
 		int type;
 		int id;//frame no
 		unsigned char data[FRAME_BUFF];
 		frame(){
-			valid=0;
 			len=0;
 			id=0;
 			memset(&data,0,sizeof(data));
@@ -193,12 +191,12 @@ typedef union _diq{
 typedef struct _sco_bit{//单命令
 	unsigned char scs:1;//0开，1合
 	unsigned char res:1;
-	unsigned char qu:6;
+	unsigned char qu:5;
 	unsigned char sel:1;
 }sco_bit;
 typedef struct _dco_bit{//双命令
 	unsigned char dcs:2;//1开，2合
-	unsigned char qu:6;
+	unsigned char qu:5;
 	unsigned char sel:1;
 }dco_bit;
 typedef union _sco{
@@ -352,11 +350,10 @@ typedef struct __yk_data{
 	int deactive;
 	int cmd_id;
 	int ctrl_id;
-	int start_timeout;
-	int timeout;
 	int fail;
 	Sco sco;
 	Dco dco;
+	timer time;
 }_yk_data;
 typedef struct __event_data{
 	int need_ack[4];

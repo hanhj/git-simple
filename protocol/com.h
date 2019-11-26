@@ -60,6 +60,7 @@ class serial:public basic_com{
 	private:
 		serial_set set;
 		FILE *f;
+		char file_name[20];
 	public:	
 		serial(){
 			com_type=TYPE_SERIAL;
@@ -83,6 +84,8 @@ typedef struct _ethernet_set{
 class ethernet:public basic_com{
 	private:
 		ethernet_set set;
+		FILE *f;
+		char file_name[20];
 	public:
 		ethernet(){
 			com_type=TYPE_ETHERNET;
@@ -104,6 +107,8 @@ typedef struct _wireless_set{
 class wireless:public basic_com{
 	private:
 		wireless_set set;
+		FILE *f;
+		char file_name[20];
 	public:
 		wireless(){
 			com_type=TYPE_WIRELESS;

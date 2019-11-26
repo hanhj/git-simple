@@ -63,17 +63,15 @@ int main(int arg,char **argv){
 	while(1){
 		pfunc(DEBUG_INFO,"run loop:%d\n",loops);
 		loops++;
-		sleep_ms(100);
+		sleep_ms(10);
 		for(i=0;i<3;i++){
 			com[i].read(100);
 		}
 		for(i=0;i<2;i++){
 			link[i].deal_timeout();
-			link[i].check_state();
 			link[i].get_frame();
 		}
 		link_104.deal_timeout();
-		link_104.check_state();
 		link_104.get_frame();
 
 	}

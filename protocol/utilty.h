@@ -11,7 +11,7 @@
 #define DEBUG_ERROR		1
 #define DEBUG_WARNING	2
 #define DEBUG_INFO		3
-#define DEBUG_NORMAL	4
+#define DEBUG_NORMAL	0
 #define DEBUG_BUFF 1000
 #define pfunc(mode,msg...) debug(mode,__FILE__,__func__,__LINE__,msg)
 #define pdump(mode,head,data,len) dump(mode,__FILE__,__func__,__LINE__,data,len,head)

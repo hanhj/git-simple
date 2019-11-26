@@ -7,9 +7,9 @@
 #include<iostream>
 using namespace std;
 #include "com.h"
+#include "protocol.h"
 #include "system.h"
 #include "utilty.h"
-extern char g_filename[];
 /****************************
  * physical layer
 ****************************/
@@ -29,11 +29,12 @@ ostream & operator<<(ostream &os,serial_set &a){
 int	serial::init(void *para){
 	cout<<"init serial"<<",port no:"<<port_no<<",com_type:"<<com_type<<endl;
 	cout<<"para: "<<set<<endl;
+	strcpy(file_name,"test.dat");
 	return 0;
 }
 int serial::connect(){
 	cout<<"connect serial"<<endl;
-	f=fopen(g_filename,"rt");
+	f=fopen(file_name,"rt");
 	return 0;
 
 }
@@ -74,7 +75,7 @@ int serial::read(int len){
 		read_produce++;
 		read_produce=read_produce % MAX_COM_BUFFER;
 	}
-	pdump(DEBUG_NORMAL,"read serial",&tmpbuf[0],m);
+	pdump(DEBUG_INFO,"read serial",&tmpbuf[0],m);
 	return l;
 }
 /**
@@ -102,7 +103,7 @@ err:
 }
 int serial::get_com_state(){
 	pfunc(DEBUG_INFO,"get com state of serial\n");
-	return 0;
+	return LINK_CONNECT;
 }
 int serial::set_set(void *){
 	cout<<"set set of serial"<<endl;
@@ -123,15 +124,18 @@ ostream & operator<<(ostream &os,ethernet_set &a){
 int	ethernet::init(void *para){
 	cout<<"init ethernet"<<",port no:"<<port_no<<",com_type:"<<com_type<<endl;
 	cout<<"para: "<<endl<<set<<endl;
+	strcpy(file_name,"test2.dat");
 	return 0;
 }
 int ethernet::connect(){
 	cout<<"connect ethernet"<<endl;
+	f=fopen(file_name,"rt");
 	return 0;
 
 }
 int ethernet::close(){
 	cout<<"close ethernet"<<endl;
+	fclose(f);
 	return 0;
 }
 int ethernet::read(int len){
@@ -150,12 +154,20 @@ int ethernet::read(int len){
 ***********************************************************************
 */
 int ethernet::send(unsigned char *data,int len){
-	cout<<"send ethernet:"<<len<<endl;
-	return len;
+	int ret;
+	ret=0;
+	ret=pdump(DEBUG_WARNING,"send ethernet",data,len);
+	if(ret<0){
+		errno=ERR_SEND;
+		pfunc(DEBUG_ERROR,"ethernet fail send\n");
+		goto err;
+	}
+err:
+	return ret;
 }
 int ethernet::get_com_state(){
 	pfunc(DEBUG_INFO,"get com state of ethernet\n");
-	return 0;
+	return LINK_CONNECT;
 }
 int ethernet::set_set(void *){
 	cout<<"set set of ethernet"<<endl;
@@ -177,20 +189,54 @@ ostream & operator<<(ostream &os,wireless_set &a){
 int	wireless::init(void *para){
 	cout<<"init wireless"<<",port no:"<<port_no<<",com_type:"<<com_type<<endl;
 	cout<<"para: "<<endl<<set<<endl;
+	strcpy(file_name,"test3.dat");
 	return 0;
 }
 int wireless::connect(){
 	pfunc(DEBUG_INFO,"connect wireless\n");
+	f=fopen(file_name,"rt");
 	return 0;
 
 }
 int wireless::close(){
 	pfunc(DEBUG_INFO,"close wireless\n");
+	fclose(f);
 	return 0;
 }
 int wireless::read(int len){
 	pfunc(DEBUG_INFO,"read wireless\n");
-	return len;
+	int l;
+	int i;
+	int c;
+	int m;
+	char *ret;
+	char buff[100];
+	unsigned char tmpbuf[100];
+	if(len>100){
+		pfunc(DEBUG_ERROR,"too many read size,limit to 100\n");
+		len=100;
+	}
+	m=0;
+	ret=fgets(buff,len,f);
+	if(ret==NULL)
+		return -1;
+	if(buff[0]=='R')
+		return -1;
+	l=strlen(buff);
+	for(i=0;i<l;i++){
+		if(buff[i]=='T'||buff[i]=='X'||buff[i]==':'||buff[i]==' ')
+			continue;
+
+		c=strtol(&buff[i],NULL,16);
+		tmpbuf[m]=c;
+		i++;
+		m++;
+		*(read_buff_ptr+read_produce)=c;
+		read_produce++;
+		read_produce=read_produce % MAX_COM_BUFFER;
+	}
+	pdump(DEBUG_INFO,"read wireless",&tmpbuf[0],m);
+	return l;
 }
 /**
 ***********************************************************************
@@ -204,12 +250,20 @@ int wireless::read(int len){
 ***********************************************************************
 */
 int wireless::send(unsigned char *data,int len){
-	pfunc(DEBUG_INFO,"send wireless:\n");
-	return len;
+	int ret;
+	ret=0;
+	ret=pdump(DEBUG_WARNING,"send wireless",data,len);
+	if(ret<0){
+		errno=ERR_SEND;
+		pfunc(DEBUG_ERROR,"wireless fail send\n");
+		goto err;
+	}
+err:
+	return ret;
 }
 int wireless::get_com_state(){
 	pfunc(DEBUG_INFO,"get com state of wireless\n");
-	return 0;
+	return LINK_CONNECT;
 }
 int wireless::set_set(void *){
 	cout<<"set set of wireless"<<endl;
