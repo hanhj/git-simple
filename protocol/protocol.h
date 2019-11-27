@@ -343,11 +343,12 @@ typedef struct __clock_data{
 	int clock_syn;
 	int clock_rd;
 }_clock_data;
+#define YK_SEL 1
+#define YK_ACT 2
+#define YK_ACTOVER 3
+#define YK_DEACTIVE 4
 typedef struct __yk_data{
-	int sel;
-	int act;
-	int act_over;
-	int deactive;
+	int cur_state;
 	int cmd_id;
 	int ctrl_id;
 	int fail;

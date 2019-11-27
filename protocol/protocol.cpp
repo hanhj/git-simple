@@ -9,7 +9,7 @@
 #include "configurable.h"
 #include "para.h"
 using namespace std;
-
+int g_reset=0;
 /****************************
  * realize link_layer
 ****************************/
@@ -124,11 +124,11 @@ int link_layer::on_clock(frame *in,frame *out){
 int link_layer::process_clock(frame *out){
 	int ret;
 	ret=app->build_clock(out,this);
+	process &=~PROCESS_CLOCK;
 	return ret;
 }
 void link_layer::reset_yk_data(){
-	yk_data.sel=0;
-	yk_data.act=0;
+	yk_data.cur_state=0;
 	yk_data.time.stop();
 	process&=~PROCESS_RM_CTL;
 }
@@ -149,8 +149,8 @@ int link_layer::on_yk(frame *in,frame *out){
 	}
 	if(in->data[offset_cause]==CAUSE_Act){
 		if(yk_data.sco.bit.sel==0){//sel
-			if(yk_data.sel==0){
-				yk_data.sel=1;
+			if(yk_data.cur_state==0){
+				yk_data.cur_state=YK_SEL;
 				ret=app->do_yk(yk_data.ctrl_id,1,ctrl);//do check
 				if(ret<0)
 					yk_data.fail=1;
@@ -160,8 +160,8 @@ int link_layer::on_yk(frame *in,frame *out){
 			}else//re select
 				yk_data.fail=1;
 		}else if(yk_data.sco.bit.sel==1){//act
-			if(yk_data.sel==1){
-				yk_data.act=1;
+			if(yk_data.cur_state==YK_SEL){
+				yk_data.cur_state=YK_ACT;
 				ret=app->do_yk(yk_data.ctrl_id,0,ctrl);//do act 
 				if(ret<0)
 					yk_data.fail=1;
@@ -170,14 +170,14 @@ int link_layer::on_yk(frame *in,frame *out){
 			}
 		}
 	}else if(in->data[offset_cause] == CAUSE_Deact){
-		yk_data.deactive=1;
+		yk_data.cur_state=YK_DEACTIVE;
 	}
 	if(yk_data.fail){
 		ret=-1;
 		reset_yk_data();
 
 	}
-	if(yk_data.deactive){
+	if(yk_data.cur_state==YK_DEACTIVE){
 		reset_yk_data();
 	}
 
@@ -186,6 +186,11 @@ int link_layer::on_yk(frame *in,frame *out){
 int link_layer::process_yk(frame *out){
 	int ret;
 	ret=app->build_yk(out,this);
+	if(yk_data.cur_state==YK_SEL||yk_data.cur_state==YK_DEACTIVE||yk_data.cur_state==YK_ACTOVER){
+		process&=~PROCESS_RM_CTL;
+	}else if(yk_data.cur_state==YK_ACT){
+		yk_data.cur_state=YK_ACTOVER;
+	}
 	return ret;
 }
 int link_layer::process_event(frame *out){
@@ -194,6 +199,10 @@ int link_layer::process_event(frame *out){
 	e=NULL;
 	if(app->get_event_data(port,e,1)==1){
 		ret=app->build_event_data(out,this,e);
+	}else{
+		process &=(~PROCESS_EVENT);
+		event_data.need_ack[port] = 0;
+		has_data=0;
 	}
 	return ret;
 }
@@ -211,6 +220,10 @@ int link_layer::process_yc_change(frame *out){
 	event_yc *e;
 	if(app->get_yc_cg_data(port,e)==1)
 		ret=app->build_yc_cg_data(out,this,e);
+	else{
+		process &=~PROCESS_YC_CHANGE;
+		event_data.need_yc_ack[port] = 0;
+	}
 	return ret;
 }
 int link_layer::on_reset_terminal(frame *in,frame *out){
@@ -221,6 +234,7 @@ int link_layer::process_reset_terminal(frame *out){
 	int ret=0;
 	ret=app->build_reset_con(out,this);
 	process &=~PROCESS_RESET;
+	app->need_reset=1;
 	return ret;
 }
 int link_layer::on_file(frame *in,frame *out){
@@ -729,12 +743,20 @@ int link_layer_101::on_ack(frame *in,frame *out){
 		ret=process_summon(out);
 	}else if(process & PROCESS_SUMMON_ACC){
 		ret=process_summon_acc(out);
+	}else if(process & PROCESS_CLOCK){
+		ret = process_clock(out);
+	}else if(process & PROCESS_RM_CTL){
+		ret = process_yk(out);
+	}else if(process & PROCESS_TEST_LINK){
+		ret=process_test_link(out);
 	}else if(process & PROCESS_YC_CHANGE){
 		ret=process_yc_change(out);
 	}else if(process & PROCESS_FILE){
 		ret=process_file(out);
+	}else if(process & PROCESS_UPDATE){
+		ret=process_update(out);
 	}else if(process & PROCESS_RESET){
-		app->need_reset=1;
+		ret=process_reset_terminal(out);
 	}
 	return ret ;
 }
@@ -753,7 +775,6 @@ int link_layer_101::on_req_class_1(frame *in,frame *out){
 		ret=process_yk(out);
 	}else if(process & PROCESS_RESET){
 		ret=process_reset_terminal(out);
-		app->need_reset=1;
 	}
 	return ret ;
 }
@@ -784,11 +805,8 @@ void link_layer_101::deal_timeout(){
 	e=NULL;
 
 	link_time();
-	if(yk_data.time.is_reached()){//60s
-		yk_data.sel=0;
-		yk_data.act=0;
-		yk_data.deactive=0;
-		yk_data.act_over=0;
+	if(yk_data.time.is_reached()==1){//60s
+		yk_data.cur_state=0;
 	}
 	if(app->get_event_data(port,e,0)==1){
 		process|=PROCESS_EVENT;
@@ -800,10 +818,6 @@ void link_layer_101::deal_timeout(){
 				goto end;
 			}
 		}
-	}else{
-		process &=(~PROCESS_EVENT);
-		event_data.need_ack[port] = 0;
-		has_data=0;
 	}
 	event_yc *e_yc;
 	if(app->get_yc_cg_data(port,e_yc)){
@@ -814,9 +828,6 @@ void link_layer_101::deal_timeout(){
 				event_data.need_yc_ack[port]=1;
 			}
 		}
-	}else{
-		process &=~PROCESS_YC_CHANGE;
-		event_data.need_yc_ack[port] = 0;
 	}
 end:if(ret){
 		send_frame(&s_var_frame);
@@ -1850,7 +1861,7 @@ int link_layer_104::deal_process(){
 	}else if(process & PROCESS_FILE){
 		ret=process_file(out);
 	}else if(process & PROCESS_RESET){
-		app->need_reset=1;
+		ret=process_reset_terminal(out);
 	}else if(process & PROCESS_RM_CTL){
 		ret=process_yk(out);
 	}else if(process & PROCESS_CLOCK){
@@ -1871,22 +1882,15 @@ void link_layer_104::deal_timeout(){
 	event *e;
 	e=NULL;
 	link_time();
-	if(yk_data.time.is_reached()){//60s
-		yk_data.sel=0;
-		yk_data.act=0;
-		yk_data.deactive=0;
-		yk_data.act_over=0;
+	if(yk_data.time.is_reached()==1){//60s
+		yk_data.cur_state=0;
 	}
 	if(app->get_event_data(port,e,0)==1){
 		process|=PROCESS_EVENT;
-	}else{
-		process &=(~PROCESS_EVENT);
 	}
 	event_yc *e_yc;
 	if(app->get_yc_cg_data(port,e_yc)){
 		process|=PROCESS_YC_CHANGE;
-	}else{
-		process &=~PROCESS_YC_CHANGE;
 	}
 	if(app->need_reset)
 		app->do_reset();
@@ -1896,7 +1900,7 @@ void link_layer_104::deal_timeout(){
 int link_layer_104::link_time(){
 	int ret=0;
 	pfunc(DEBUG_INFO,"time of 104 frame of link [%d]\n",port);
-	if(t1_timer.is_reached()){
+	if(t1_timer.is_reached()==1){
 		if(r_no!=ack_no){
 			link_state=LINK_ERROR;
 		}
@@ -2464,14 +2468,13 @@ int app_layer::build_yk(frame *out,link_layer *link){//cause=7,sel=0 or 1
 		goto err;
 	vsq_lo.bit.n=1;
 	vsq_lo.bit.sq=0;
-	if(link->yk_data.sel==1){
+	if(link->yk_data.cur_state==YK_SEL){
 		cause_lo.data=CAUSE_Actcon;
-	}else if(link->yk_data.deactive==1){
+	}else if(link->yk_data.cur_state==YK_DEACTIVE){
 		cause_lo.data=CAUSE_Deactcon;
-	}else if(link->yk_data.act==1){
+	}else if(link->yk_data.cur_state==YK_ACT){
 		cause_lo.data=CAUSE_Actcon;
-		link->yk_data.act_over=1;
-	}else if(link->yk_data.act_over==1){
+	}else if(link->yk_data.cur_state==YK_ACTOVER){
 		cause_lo.data=CAUSE_Actterm;
 		link->reset_yk_data();
 	}
@@ -3409,7 +3412,7 @@ int do_yk(int id,int type,int cmd){
 	return 0;
 }
 void do_reset(){
-
+	g_reset=1;
 }
 int get_yc_cg_data(int port,event_yc *&e){
 	int ret;

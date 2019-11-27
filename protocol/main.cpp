@@ -9,8 +9,7 @@
 #include "configurable.h"
 #include "protocol.h"
 using namespace std;
-int g_balance=0;
-char g_filename[20];
+extern int g_reset;
 /****************************
  *	main 
 ****************************/
@@ -28,16 +27,6 @@ int main(int arg,char **argv){
 	app_layer app;
 	int loops=0;
 
-	if(arg<=1){
-		g_balance=1;
-		strcpy(g_filename,"test.dat");
-	}else if(arg<=2){
-		g_balance=atoi(argv[1]);
-		strcpy(g_filename,"test.dat");
-	}else if(arg<=3){
-		g_balance=atoi(argv[1]);
-		strcpy(g_filename,argv[2]);
-	}
 	set_app_interface(&app);
 
 	com[0].set_com_handle(&serial_1);
@@ -52,7 +41,7 @@ int main(int arg,char **argv){
 	for(i=0;i<2;i++){
 		link[i].set_link_com(&com[i],i);
 		link[i].set_app(&app);
-		link[i].set_balance(g_balance);
+		link[i].set_balance(BALANCE);
 	}
 	link_104.set_link_com(&com[2],2);
 	link_104.set_app(&app);
@@ -74,7 +63,10 @@ int main(int arg,char **argv){
 		link_104.deal_timeout();
 		link_104.get_frame();
 
+		if(g_reset==1)
+			break;
 	}
+	pfunc(DEBUG_ERROR,"terminal .\n");
 	return 0;
 }
 // vim:tw=72 
