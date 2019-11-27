@@ -38,8 +38,12 @@ int link_layer::set_app(app_layer*ap){
 	app=ap;
 	return 0;
 }
-int link_layer::save_frame(frame *f){
-	memcpy(&last_send_frame,f,sizeof(last_send_frame));
+int link_layer::save_frame(frame *f,int type){
+	if(type==1)
+		memcpy(&last_send_frame,f,sizeof(last_send_frame));
+	else
+		memcpy(&last_fix_frame,f,sizeof(last_fix_frame));
+
 	return 0;
 }
 int link_layer::send_frame(frame *f){
@@ -1184,7 +1188,7 @@ int link_layer_101::on_fc0(frame*f){
 				goto err;
 			}
 			link_step++;//9
-			save_frame(&s_var_frame);//save frame
+			save_frame(&s_var_frame,1);//save frame
 			rep_timer.start(REP_TIME);
 		}else if(link_step==9){
 			rep_timer.stop();
@@ -1261,6 +1265,25 @@ int link_layer_101::on_fc3(frame *f){
 						goto err;
 					}
 				}
+				save_frame(&s_fix_frame,2);
+			}else{
+				ret=send_frame(&last_fix_frame);
+				if(ret<0){
+					goto err;
+				}
+			}
+		}else{
+			ctl_rm.data=ctl.data;//save control
+			ret=on_req(f,&s_var_frame);
+			if(ret>=0){
+				ret=build_ack(&s_fix_frame,has_data);
+				if(ret<0){
+					goto err;
+				}
+				ret=send_frame(&s_fix_frame);
+				if(ret<0){
+					goto err;
+				}//ack
 			}else{
 				ret=build_nak(&s_fix_frame);
 				if(ret<0){
@@ -1270,15 +1293,6 @@ int link_layer_101::on_fc3(frame *f){
 				if(ret<0){
 					goto err;
 				}
-			}
-		}else{
-			ret=build_nak(&s_fix_frame);
-			if(ret<0){
-				goto err;
-			}
-			ret=send_frame(&s_fix_frame);
-			if(ret<0){
-				goto err;
 			}
 		}
 	}else if(balance==BALANCE){
@@ -1292,6 +1306,7 @@ int link_layer_101::on_fc3(frame *f){
 						goto err;
 					}
 					ret=send_frame(&s_fix_frame);
+					save_frame(&s_fix_frame,1);
 					if(ret<0){
 						goto err;
 					}//ack
@@ -1299,7 +1314,7 @@ int link_layer_101::on_fc3(frame *f){
 					if(ret<0){
 						goto err;
 					}
-					save_frame(&s_var_frame);//save frame
+					save_frame(&s_var_frame,1);//save frame
 					rep_timer.start(REP_TIME);
 				}else{
 					ret=build_nak(&s_fix_frame);
@@ -1310,21 +1325,43 @@ int link_layer_101::on_fc3(frame *f){
 					if(ret<0){
 						goto err;
 					}
+					save_frame(&s_fix_frame,1);
 				}
 			}else{
+				send_frame(&last_fix_frame);
 				ret=send_frame(&last_send_frame);
 				if(ret<0){
 					goto err;
 				}
 			}
 		}else{
-			ret=build_nak(&s_fix_frame);
-			if(ret<0){
-				goto err;
-			}
-			ret=send_frame(&s_fix_frame);
-			if(ret<0){
-				goto err;
+			ctl_rm.data=ctl.data;//save control
+			ret=on_req(f,&s_var_frame);
+			if(ret>=0){
+				ret=build_ack(&s_fix_frame);
+				if(ret<0){
+					goto err;
+				}
+				ret=send_frame(&s_fix_frame);
+				save_frame(&s_fix_frame,1);
+				if(ret<0){
+					goto err;
+				}//ack
+				ret=send_frame(&s_var_frame);
+				if(ret<0){
+					goto err;
+				}
+				save_frame(&s_var_frame,1);//save frame
+				rep_timer.start(REP_TIME);
+			}else{
+				ret=build_nak(&s_fix_frame);
+				if(ret<0){
+					goto err;
+				}
+				ret=send_frame(&s_fix_frame);
+				if(ret<0){
+					goto err;
+				}
 			}
 		}
 	}
@@ -1416,7 +1453,7 @@ int link_layer_101::on_fc10(frame*f){
 						if(ret<0){
 							goto err;
 						}
-						save_frame(&s_var_frame);//save frame
+						save_frame(&s_var_frame,1);//save frame
 					}else{
 						ret=build_nak(&s_fix_frame);
 						if(ret<0){
@@ -1464,7 +1501,7 @@ int link_layer_101::on_fc11(frame *f){
 					if(ret<0){
 						goto err;
 					}
-					save_frame(&s_var_frame);//save frame
+					save_frame(&s_var_frame,1);//save frame
 				}else{
 					ret=build_nak(&s_fix_frame);
 					if(ret<0){

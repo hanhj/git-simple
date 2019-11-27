@@ -565,6 +565,7 @@ class link_layer{
 		int rm_addr;
 
 		var_frame last_send_frame;
+		fix_frame last_fix_frame;
 		int link_state;
 		int link_step;
 		int has_data;
@@ -635,7 +636,7 @@ class link_layer{
 		int set_app(app_layer*);
 		void reset_yk_data();
 		int send_frame(frame *);
-		int save_frame(frame *);
+		int save_frame(frame *,int );
 		int check_state();//cycle check link state
 
 		int build_link_fini(frame *out);//
