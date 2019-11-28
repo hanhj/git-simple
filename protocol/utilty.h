@@ -21,6 +21,7 @@ time_t get_system_time();
 int debug(int mode,const char*file,const char*func,int line,const char	*fmt...);
 int dump(int mode,const char*file,const char*func,int line,unsigned char*data,int len,const char *head=NULL);
 class timer{
+		int duration;
 	public:
 		timer(){
 			start_flag=0;
@@ -29,6 +30,7 @@ class timer{
 		int start_flag;
 		int start(int T);
 		int restart(int T);
+		int restart();
 		int stop();
 		int is_reached();
 };

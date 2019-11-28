@@ -63,8 +63,8 @@ int main(int arg,char **argv){
 		link_104.deal_timeout();
 		link_104.get_frame();
 
-		if(g_reset==1)
-			break;
+	//	if(g_reset==1)
+	//		break;
 	}
 	pfunc(DEBUG_ERROR,"terminal .\n");
 	return 0;

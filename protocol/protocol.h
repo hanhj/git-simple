@@ -232,6 +232,7 @@ typedef struct _qoi{//召唤限定词
 #define MSG_ID_SIZE_101		2
 #define MSG_ID_SIZE_104		3
 #define BALANCE				1
+#define UNBALANCE			0
 //正在执行的过程
 #define PROCESS_LINK		0x01
 #define PROCESS_SUMMON		0x02	
@@ -564,8 +565,6 @@ class link_layer{
 		int addr;
 		int rm_addr;
 
-		var_frame last_send_frame;
-		fix_frame last_fix_frame;
 		int link_state;
 		int link_step;
 		int has_data;
@@ -636,7 +635,6 @@ class link_layer{
 		int set_app(app_layer*);
 		void reset_yk_data();
 		int send_frame(frame *);
-		int save_frame(frame *,int );
 		int check_state();//cycle check link state
 
 		int build_link_fini(frame *out);//
@@ -694,6 +692,9 @@ class link_layer_101:public link_layer{
 		int offset_control;
 		int offset_addr;
 
+		var_frame last_send_frame;
+		fix_frame last_fix_frame;
+		int last_type;
 		int rep_times;
 		timer rep_timer;
 		timer rcv_var_timer;//接收数据超时计时器
@@ -746,6 +747,8 @@ class link_layer_101:public link_layer{
 		int on_fc10(frame *);
 		int on_fc11(frame *);
 	public:
+		int save_frame(frame *,int );
+		int send_last_frame();
 		//build fix frame
 		int build_ack(frame *out,int has_data=0);//set fc=0,fix frame,has_data indicator if have class 1 data,used for unbalance.
 		int build_nak(frame *out);//set fc=1, fix frame
@@ -771,6 +774,10 @@ class link_layer_101:public link_layer{
 #define TYPE_I 1
 #define TYPE_S 2
 #define TYPE_U 3
+#define T3_TIME 20 
+#define T2_TIME 10 
+#define T1_TIME 15
+#define T0_TIME 30
 class link_layer_104:public link_layer{
 	public:
 		//fix frame is only for 101,so i define it in this.
@@ -807,14 +814,14 @@ class link_layer_104:public link_layer{
 		timer t1_timer;//发送数据计时器，发送数据后等待确认。超时重新建立连接
 		timer t2_timer;//接收数据计时器，接收I帧数据后，超时则发送S帧。
 		timer t3_timer;//接收数据计时器，超时发送测试帧
-		timer t4_timer;//接收数据计时器，超时发送测试帧
+		timer t0_timer;//连接计时器，超时重新建立连接
 	public:
 		link_layer_104(){
 			balance=BALANCE;
 			s_i_frames.init(100);
 			N=32767;
-			send_num=10;
-			rcv_num=6;
+			send_num=12;
+			rcv_num=8;
 			r_s_pos=0;
 			r_u_pos=0;
 			r_tmp_pos=0;
@@ -866,7 +873,8 @@ class link_layer_104:public link_layer{
 		int link_time();//for balance
 };
 #define REP_TIMES 3
-#define REP_TIME  1
+#define REP_TIME  1//for s2 service
+#define REP_TIME_S3 10 //for s3 service
 
 void set_app_interface(app_layer *app);
 #endif //__protocol_h

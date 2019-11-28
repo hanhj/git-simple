@@ -38,14 +38,6 @@ int link_layer::set_app(app_layer*ap){
 	app=ap;
 	return 0;
 }
-int link_layer::save_frame(frame *f,int type){
-	if(type==1)
-		memcpy(&last_send_frame,f,sizeof(last_send_frame));
-	else
-		memcpy(&last_fix_frame,f,sizeof(last_fix_frame));
-
-	return 0;
-}
 int link_layer::send_frame(frame *f){
 	int ret;
 	ret=0;
@@ -515,6 +507,24 @@ int link_layer::process_update(frame *out){
 /****************************
  *  realize link_layer_101
 ****************************/
+int link_layer_101::save_frame(frame *f,int type){
+	if(type==2)
+		memcpy(&last_send_frame,f,sizeof(last_send_frame));
+	else if(type ==1)
+		memcpy(&last_fix_frame,f,sizeof(last_fix_frame));
+	last_type=type;
+	return 0;
+}
+int link_layer_101::send_last_frame(){
+	int ret;
+	ret=-1;
+	if(last_type==2)
+		ret=send_frame(&last_send_frame);
+	else if(last_type==1){
+		ret=send_frame(&last_fix_frame);
+	}
+	return ret;
+}
 int link_layer_101::build_ack(frame*out,int has_data){
 	int ret;
 	ret=0;
@@ -1033,9 +1043,10 @@ int link_layer_101::link_time(){
 	int ret;
 	ret=0;
 	pfunc(DEBUG_INFO,"time of 101 frame of link [%d]\n",port);
-	if(balance==0)
+	if(balance==UNBALANCE)
 		return 0;
 	if(rep_timer.is_reached()==1){
+		pfunc(DEBUG_ERROR,"timeout\n");
 		ret=send_frame(&last_send_frame);
 		if(ret<0){
 			goto err;
@@ -1044,7 +1055,7 @@ int link_layer_101::link_time(){
 		if(rep_times>=REP_TIMES){
 			link_state=LINK_DISCONNECT;
 		}else{
-			rep_timer.start(REP_TIME);
+			rep_timer.restart();
 		}
 	}
 err:		
@@ -1092,43 +1103,64 @@ int link_layer_101::deal_frame(frame*f){
 		return -1;
 	}
 	ret=0;
-	switch(ctl.pm.fc){
-		case 0:
-			ret=on_fc0(f);
-			break;
-		case 1:
-			ret=on_fc1(f);
-			break;
-		case 2:
-			ret=on_fc2(f);
-			break;
-		case 3:
-			ret=on_fc3(f);
-			break;
-		case 4:
-			ret=on_fc4(f);
-			break;
-		case 5:
-			ret=on_fc5(f);
-			break;
-		case 6:
-			ret=on_fc6(f);
-			break;
-		case 7:
-			ret=on_fc7(f);
-			break;
-		case 8:
-			ret=on_fc8(f);
-			break;
-		case 9:
-			ret=on_fc9(f);
-			break;
-		case 10:
-			ret=on_fc10(f);
-			break;
-		case 11:
-			ret=on_fc11(f);
-			break;
+	if(balance==UNBALANCE){
+		switch(ctl.pm.fc){
+			case 0:
+				ret=on_fc0(f);
+				break;
+			case 1:
+				ret=on_fc1(f);
+				break;
+			case 3:
+				if(link_state==LINK_OPEN)
+					ret=on_fc3(f);
+				break;
+			case 4:
+				ret=on_fc4(f);
+				break;
+			case 5:
+				ret=on_fc5(f);
+				break;
+			case 8:
+				ret=on_fc8(f);
+				break;
+			case 9:
+				ret=on_fc9(f);
+				break;
+			case 10:
+				if(link_state==LINK_OPEN)
+					ret=on_fc10(f);
+				break;
+			case 11:
+				if(link_state==LINK_OPEN)
+					ret=on_fc11(f);
+				break;
+		}
+	}else if(balance==BALANCE){
+		switch(ctl.pm.fc){
+			case 0:
+				ret=on_fc0(f);
+				break;
+			case 1:
+				ret=on_fc1(f);
+				break;
+			case 2:
+				ret=on_fc2(f);
+				break;
+			case 3:
+				if(link_state==LINK_OPEN)
+					ret=on_fc3(f);
+				break;
+			case 4:
+				ret=on_fc4(f);
+				break;
+			case 9:
+				ret=on_fc9(f);
+				break;
+			case 11:
+				ret=on_fc11(f);
+				break;
+		}
 	}
 	return ret;
 }
@@ -1137,12 +1169,14 @@ int link_layer_101::on_fc0(frame*f){
 	int ret;
 	ret=0;
 	pfunc(DEBUG_INFO,"on_fc0\n");
-	if(balance!=BALANCE){
+	if(balance==UNBALANCE){
 		if(link_step==2){
-			link_step++;//3
 			//because remote reset link so reset ctl_lo and ctl_rm
 			ctl_lo.pm.fcb=0;
 			ctl_rm.pm.fcb=0;
+			rep_timer.stop();
+
+			link_step++;//3
 			ret=build_ack(&s_fix_frame,1);
 			if(ret<0){
 				goto err;
@@ -1158,6 +1192,8 @@ int link_layer_101::on_fc0(frame*f){
 			//because remote reset link so reset ctl_lo and ctl_rm
 			ctl_lo.pm.fcb=0;
 			ctl_rm.pm.fcb=0;
+			rep_timer.stop();
+
 			link_step++;//3
 			ret=build_ack(&s_fix_frame);
 			if(ret<0){
@@ -1168,7 +1204,7 @@ int link_layer_101::on_fc0(frame*f){
 				goto err;
 			}
 			link_step++;//4
-			ret=build_link_req(&s_fix_frame);
+			ret=build_link_req(&s_fix_frame);//build a s3 service
 			if(ret<0){
 				goto err;
 			}
@@ -1177,9 +1213,12 @@ int link_layer_101::on_fc0(frame*f){
 				goto err;
 			}
 			link_step++;//5
+			save_frame(&s_fix_frame,2);//s3 service need resend 
+			rep_timer.start(REP_TIME_S3);
 		}else if(link_step==7){
+			rep_timer.stop();
 			link_step++;//8
-			ret=app->build_link_fini(&s_var_frame,this);
+			ret=app->build_link_fini(&s_var_frame,this);//build a s2 service
 			if(ret<0){
 				goto err;
 			}
@@ -1188,7 +1227,7 @@ int link_layer_101::on_fc0(frame*f){
 				goto err;
 			}
 			link_step++;//9
-			save_frame(&s_var_frame,1);//save frame
+			save_frame(&s_var_frame,2);//save frame
 			rep_timer.start(REP_TIME);
 		}else if(link_step==9){
 			rep_timer.stop();
@@ -1197,7 +1236,7 @@ int link_layer_101::on_fc0(frame*f){
 			link_state=LINK_OPEN;
 			process=0;
 			pfunc(DEBUG_ERROR,"connect\n");
-		}else{//receive ack frame
+		}else if(link_state==LINK_OPEN){//receive ack frame
 			rep_timer.stop();
 			rep_times=0;
 			ret=on_ack(f,&s_var_frame);
@@ -1205,6 +1244,8 @@ int link_layer_101::on_fc0(frame*f){
 				goto err;
 			}
 			ret=send_frame(&s_var_frame);
+			save_frame(&s_var_frame,2);//save frame
+			rep_timer.start(REP_TIME);
 			if(ret<0){
 				goto err;
 			}
@@ -1216,6 +1257,7 @@ err:
 int link_layer_101::on_fc1(frame*f){
 	int ret;
 	ret=0;
+	app->do_reset();
 	pfunc(DEBUG_INFO,"on_fc1\n");
 //err:
 	return ret;
@@ -1241,7 +1283,7 @@ int link_layer_101::on_fc3(frame *f){
 	pfunc(DEBUG_INFO,"on_fc3\n");
 	ctrl_word ctl;
 	ctl.data=f->data[offset_control];
-	if(balance!=BALANCE){
+	if(balance==UNBALANCE){
 		if(ctl.pm.fcv){
 			if(ctl.pm.fcb!=ctl_rm.pm.fcb){
 				ctl_rm.data=ctl.data;//save control
@@ -1265,34 +1307,21 @@ int link_layer_101::on_fc3(frame *f){
 						goto err;
 					}
 				}
-				save_frame(&s_fix_frame,2);
-			}else{
+				save_frame(&s_fix_frame,1);
+			}else{//fcb not change ,resend last ack
 				ret=send_frame(&last_fix_frame);
 				if(ret<0){
 					goto err;
 				}
 			}
-		}else{
-			ctl_rm.data=ctl.data;//save control
-			ret=on_req(f,&s_var_frame);
-			if(ret>=0){
-				ret=build_ack(&s_fix_frame,has_data);
-				if(ret<0){
-					goto err;
-				}
-				ret=send_frame(&s_fix_frame);
-				if(ret<0){
-					goto err;
-				}//ack
-			}else{
-				ret=build_nak(&s_fix_frame);
-				if(ret<0){
-					goto err;
-				}
-				ret=send_frame(&s_fix_frame);
-				if(ret<0){
-					goto err;
-				}
+		}else{//code=3 is s2 service fcv must valid,so now return nak
+			ret=build_nak(&s_fix_frame);
+			if(ret<0){
+				goto err;
+			}
+			ret=send_frame(&s_fix_frame);
+			if(ret<0){
+				goto err;
 			}
 		}
 	}else if(balance==BALANCE){
@@ -1314,7 +1343,7 @@ int link_layer_101::on_fc3(frame *f){
 					if(ret<0){
 						goto err;
 					}
-					save_frame(&s_var_frame,1);//save frame
+					save_frame(&s_var_frame,2);//save frame
 					rep_timer.start(REP_TIME);
 				}else{
 					ret=build_nak(&s_fix_frame);
@@ -1327,41 +1356,20 @@ int link_layer_101::on_fc3(frame *f){
 					}
 					save_frame(&s_fix_frame,1);
 				}
-			}else{
-				send_frame(&last_fix_frame);
-				ret=send_frame(&last_send_frame);
+			}else{//fcb not change ,resend last ack
+				ret=send_frame(&last_fix_frame);
 				if(ret<0){
 					goto err;
 				}
 			}
-		}else{
-			ctl_rm.data=ctl.data;//save control
-			ret=on_req(f,&s_var_frame);
-			if(ret>=0){
-				ret=build_ack(&s_fix_frame);
-				if(ret<0){
-					goto err;
-				}
-				ret=send_frame(&s_fix_frame);
-				save_frame(&s_fix_frame,1);
-				if(ret<0){
-					goto err;
-				}//ack
-				ret=send_frame(&s_var_frame);
-				if(ret<0){
-					goto err;
-				}
-				save_frame(&s_var_frame,1);//save frame
-				rep_timer.start(REP_TIME);
-			}else{
-				ret=build_nak(&s_fix_frame);
-				if(ret<0){
-					goto err;
-				}
-				ret=send_frame(&s_fix_frame);
-				if(ret<0){
-					goto err;
-				}
+		}else{//code=3 is s2 service fcv must valid,so now return nak
+			ret=build_nak(&s_fix_frame);
+			if(ret<0){
+				goto err;
+			}
+			ret=send_frame(&s_fix_frame);
+			if(ret<0){
+				goto err;
 			}
 		}
 	}
@@ -1400,16 +1408,27 @@ int link_layer_101::on_fc8(frame*f){
 	int ret;
 	ret=0;
 	pfunc(DEBUG_INFO,"on_fc8\n");
-//err:
+	if(balance!=BALANCE){
+		ret=build_link_ack(&s_fix_frame);
+		if(ret<0){
+			goto err;
+		}
+		ret=send_frame(&s_fix_frame);
+		if(ret<0){
+			goto err;
+		}
+	}
+err:
 	return ret;
 }
 int link_layer_101::on_fc9(frame*f){
 	int ret;
 	ret=0;
 	pfunc(DEBUG_INFO,"on_fc9\n");
-	process=PROCESS_LINK;
-	link_step=1;
-	link_state=LINK_DISCONNECT;
+	if(link_state!=LINK_OPEN){
+		link_step=1;
+		link_state=LINK_DISCONNECT;
+	}
 	ret=build_link_ack(&s_fix_frame);
 	if(ret<0){
 		goto err;
@@ -1425,60 +1444,62 @@ err:
 int link_layer_101::on_fc10(frame*f){
 	int ret;
 	ret=0;
+	if(balance==BALANCE)
+		return ret;
 	pfunc(DEBUG_INFO,"on_fc10\n");
 	ctrl_word ctl;
 	ctl.data=f->data[offset_control];
-	if(balance!=BALANCE){
-		if(link_step==4){
-			link_step++;//5
-			ret=app->build_link_fini(&s_var_frame,this);
-			if(ret<0){
-				goto err;
-			}
-			ret=send_frame(&s_var_frame);
-			if(ret<0){
-				goto err;
-			}
-			link_step++;//6
-			link_state=LINK_OPEN;
-			pfunc(DEBUG_ERROR,"connect\n");
-			process=0;
-		}else{
-			if(ctl.pm.fcv){
-				if(ctl.pm.fcb!=ctl_rm.pm.fcb){
-					ctl_rm.data=ctl.data;//save control
-					ret=on_req_class_1(f,&s_var_frame);
-					if(ret>=0){
-						ret=send_frame(&s_var_frame);
-						if(ret<0){
-							goto err;
-						}
-						save_frame(&s_var_frame,1);//save frame
-					}else{
-						ret=build_nak(&s_fix_frame);
-						if(ret<0){
-							goto err;
-						}
-						ret=send_frame(&s_fix_frame);
-						if(ret<0){
-							goto err;
-						}
-					}
-				}else{
-					ret=send_frame(&last_send_frame);
+		
+	if(link_state!=LINK_OPEN){
+		link_step++;//5
+		ret=app->build_link_fini(&s_var_frame,this);
+		if(ret<0){
+			goto err;
+		}
+		ret=send_frame(&s_var_frame);
+		if(ret<0){
+			goto err;
+		}
+		link_step++;//6
+		link_state=LINK_OPEN;
+		pfunc(DEBUG_ERROR,"connect\n");
+		process=0;
+	}else{//link open
+		if(ctl.pm.fcv){
+			if(ctl.pm.fcb!=ctl_rm.pm.fcb){
+				ctl_rm.data=ctl.data;//save control
+				ret=on_req_class_1(f,&s_var_frame);
+				if(ret>=0){
+					ret=send_frame(&s_var_frame);
 					if(ret<0){
 						goto err;
 					}
+					save_frame(&s_var_frame,2);//save frame
+				}else{
+					ret=build_nak(&s_fix_frame);
+					if(ret<0){
+						goto err;
+					}
+					ret=send_frame(&s_fix_frame);
+					if(ret<0){
+						goto err;
+					}
+					save_frame(&s_fix_frame,1);//save frame
 				}
 			}else{
-				ret=build_nak(&s_fix_frame);
+				ret=send_last_frame();
 				if(ret<0){
 					goto err;
 				}
-				ret=send_frame(&s_fix_frame);
-				if(ret<0){
-					goto err;
-				}
+			}
+		}else{//code=10 is s3 service fcv must valid,so now return nak
+			ret=build_nak(&s_fix_frame);
+			if(ret<0){
+				goto err;
+			}
+			ret=send_frame(&s_fix_frame);
+			if(ret<0){
+				goto err;
 			}
 		}
 	}
@@ -1501,7 +1522,7 @@ int link_layer_101::on_fc11(frame *f){
 					if(ret<0){
 						goto err;
 					}
-					save_frame(&s_var_frame,1);//save frame
+					save_frame(&s_var_frame,2);//save frame
 				}else{
 					ret=build_nak(&s_fix_frame);
 					if(ret<0){
@@ -1511,14 +1532,15 @@ int link_layer_101::on_fc11(frame *f){
 					if(ret<0){
 						goto err;
 					}
+					save_frame(&s_fix_frame,2);
 				}
 			}else{
-				ret=send_frame(&last_send_frame);
+				ret=send_last_frame();
 				if(ret<0){
 					goto err;
 				}
 			}
-		}else{
+		}else{//code=11 is s3 service fcv must valid,so now return nak
 			ret=build_nak(&s_fix_frame);
 			if(ret<0){
 				goto err;
@@ -1530,8 +1552,9 @@ int link_layer_101::on_fc11(frame *f){
 		}
 	}else if(balance==BALANCE){
 		if(link_step==5){
+			rep_timer.stop();
 			link_step++;//6
-			ret=build_reset_link(&s_fix_frame);
+			ret=build_reset_link(&s_fix_frame);//build a s2 service
 			if(ret<0){
 				goto err;
 			}
@@ -1540,6 +1563,8 @@ int link_layer_101::on_fc11(frame *f){
 				goto err;
 			}
 			link_step++;//7
+			save_frame(&s_fix_frame,2);//s2 service need resend;
+			rep_timer.start(REP_TIME);
 		}
 	}	
 err:
@@ -1661,18 +1686,20 @@ int link_layer_104::deal_frame(frame *in){
 	ret=0;
 	frame *out;
 	out=&s_i_frame;
-	if(in->type==TYPE_I){
+	if(in->type==TYPE_I){//for I frame
 		ifmt tmpif;
 		tmpif.d1=in->data[offset_control];
 		tmpif.d2=in->data[offset_control+1];
 		tmpif.d3=in->data[offset_control+2];
 		tmpif.d4=in->data[offset_control];
+		/*//not check send no
 		if(tmpif.bit.s_no!=r_no){//sequence error
 			link_state=LINK_ERROR;
 			return ret;
 		}
-		t2_timer.restart(3);
-		t3_timer.restart(3);
+		*/
+		t2_timer.restart(T2_TIME);
+		t3_timer.restart(T3_TIME);
 		rcv_count++;
 		ack_no=tmpif.bit.r_no;
 		clear_sq();
@@ -1747,10 +1774,11 @@ int link_layer_104::deal_frame(frame *in){
 				ret=process_update(out);
 				break;
 		}
+		rcv_count --;
 		if(ret>0)
 			send_frame(&s_i_frame);
-	}else if(in->type==TYPE_S){
-		t3_timer.restart(3);
+	}else if(in->type==TYPE_S){//for S frame
+		t3_timer.restart(T3_TIME);
 		sfmt tmpsf;
 		tmpsf.d1=in->data[offset_control];
 		tmpsf.d2=in->data[offset_control+1];
@@ -1758,8 +1786,8 @@ int link_layer_104::deal_frame(frame *in){
 		tmpsf.d4=in->data[offset_control+3];
 		ack_no=tmpsf.bit.r_no;
 		clear_sq();
-	}else if(in->type==TYPE_U){
-		t3_timer.restart(3);
+	}else if(in->type==TYPE_U){//for U frame
+		t3_timer.restart(T3_TIME);
 		ufmt tmpuf;
 		tmpuf.d1=in->data[offset_control];
 		tmpuf.d2=in->data[offset_control+1];
@@ -1938,14 +1966,17 @@ int link_layer_104::link_time(){
 	int ret=0;
 	pfunc(DEBUG_INFO,"time of 104 frame of link [%d]\n",port);
 	if(t1_timer.is_reached()==1){
+		/*
 		if(r_no!=ack_no){
 			link_state=LINK_ERROR;
 		}
+		*/
+		//resend queen
 	}
 	if(t3_timer.is_reached()==1){//receive timeout
 		build_test_link();
 		send_frame(&s_u_frame);
-		t3_timer.start(3);
+		t3_timer.restart();
 	}else if(t2_timer.is_reached()==1){
 		sfmt sf;
 		sf.bit.r_no=r_no;
@@ -1960,12 +1991,12 @@ int link_layer_104::link_time(){
 			com->close();
 			com->connect();
 			link_state=LINK_DISCONNECT;
-			t4_timer.start(3);
 			break;
 		case LINK_DISCONNECT:
-			if(t4_timer.is_reached()==1){
+			t0_timer.start(T0_TIME);
+			if(t0_timer.is_reached()==1){
 				if(com_state!=LINK_CONNECT){
-					link_state=LINK_ERROR;
+					link_state=LINK_ERROR;//do relink
 				}else if(com_state==LINK_CONNECT){
 					link_state=LINK_CLOSE;
 					r_no=0;

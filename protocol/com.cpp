@@ -44,7 +44,6 @@ int serial::close(){
 	return 0;
 }
 int serial::read(int len){
-	pfunc(DEBUG_INFO,"read serial\n");
 	int l;
 	int i;
 	int c;
@@ -139,7 +138,38 @@ int ethernet::close(){
 	return 0;
 }
 int ethernet::read(int len){
-	pfunc(DEBUG_INFO,"read ethernet\n");
+	return 0;
+	int l;
+	int i;
+	int c;
+	int m;
+	char *ret;
+	char buff[100];
+	unsigned char tmpbuf[100];
+	if(len>100){
+		pfunc(DEBUG_ERROR,"too many read size,limit to 100\n");
+		len=100;
+	}
+	m=0;
+	ret=fgets(buff,len,f);
+	if(ret==NULL)
+		return -1;
+	if(buff[0]=='R')
+		return -1;
+	l=strlen(buff);
+	for(i=0;i<l;i++){
+		if(buff[i]=='T'||buff[i]=='X'||buff[i]==':'||buff[i]==' ')
+			continue;
+
+		c=strtol(&buff[i],NULL,16);
+		tmpbuf[m]=c;
+		i++;
+		m++;
+		*(read_buff_ptr+read_produce)=c;
+		read_produce++;
+		read_produce=read_produce % MAX_COM_BUFFER;
+	}
+	pdump(DEBUG_INFO,"read ethernet",&tmpbuf[0],m);
 	return len;
 }
 /**
@@ -204,7 +234,6 @@ int wireless::close(){
 	return 0;
 }
 int wireless::read(int len){
-	pfunc(DEBUG_INFO,"read wireless\n");
 	int l;
 	int i;
 	int c;

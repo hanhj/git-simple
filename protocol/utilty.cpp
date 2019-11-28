@@ -47,6 +47,7 @@ int timer::start(int T){
 		return -1;
 	}
 	start_flag=1;
+	duration=T;
 	exp_time=get_system_time()+T;
 	pfunc(DEBUG_INFO,"start timer\n");
 	return 0;
@@ -54,6 +55,11 @@ int timer::start(int T){
 int timer::restart(int T){
 	stop();
 	start(T);
+	return 0;
+}
+int timer::restart(){
+	stop();
+	start(duration);
 	return 0;
 }
 int timer::stop(){
