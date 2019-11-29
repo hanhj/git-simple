@@ -52,15 +52,16 @@ void default_init_yc_addr(void)
 		ProPara.yc_dataaddr.addpos[i].addr = i + 0x4001;
 		ProPara.yc_dataaddr.addpos[i].pos = i;
 	}
+	j=0;
 	for(;j<CONFIG_ENERGY_NUM;i++,j++){
-		ProPara.yc_dataaddr.addpos[i].addr = i + 0x6401;
+		ProPara.yc_dataaddr.addpos[i].addr = j + 0x6401;
 		ProPara.yc_dataaddr.addpos[i].pos = i;
 	}
 	for ( ; i < MAX_YC_NUM; i++){
 		ProPara.yc_dataaddr.addpos[i].addr = 0xffff;
 		ProPara.yc_dataaddr.addpos[i].pos = i;
 	}
-	ProPara.yc_dataaddr.num = CONFIG_YC_NUM;
+	ProPara.yc_dataaddr.num = i;
 }
 
 
@@ -249,7 +250,8 @@ void init_yc_table ( void )
 		}
 	}
 	config_scada_data.pos_acc=m;
-    for ( ; j < CONFIG_ENERGY_NUM ;i++ ) {
+	j=0;
+    for ( ; j < CONFIG_ENERGY_NUM ;j++,i++ ) {
     	pos =ProPara.yc_dataaddr.addpos[i].pos;
     	datasign =ProPara.yc_dataaddr.addpos[i].addr ;
 		if ( datasign != 0xffff && datasign >=0x6401 ){
@@ -296,17 +298,18 @@ int16 init_yc(void)
 void default_init_yx_addr(void)
 {	
  uint16 i;
-	for ( i = 0;i < TOTALYXNUM ;i++ ) {
+	for ( i = 0;i < MAX_YX_NUM ;i++ ) {
 		ProPara.yx_dataaddr.addpos[i].addr= i + 1;
 		ProPara.yx_dataaddr.addpos[i].dataid= i ;
 		ProPara.yx_dataaddr.addpos[i].attrb= 0;//0开1合
 	}
+	ProPara.yx_dataaddr.num=i;
 }
 
 void InitYxTable( void )
 {
 	Uint16 i = 0,l,m;
-	for ( i = 0;i < TOTALYXNUM ;i++ ) {
+	for ( i = 0;i < MAX_YX_NUM ;i++ ) {
 		YxTable[i].pdata=NULL;
 	}
 	i=0;
@@ -413,7 +416,7 @@ void InitYxTable( void )
 		YxTable[i].pdata = (yxdata_t*)&TerYx.Hyx[10];
 		YxTable[i].pdata->priority = 1;
 	}
-	for ( i = 0;i < TOTALYXNUM ;i++ ) {
+	for ( i = 0;i < MAX_YX_NUM ;i++ ) {
 		if(YxTable[i].pdata!=NULL){
 			YxTable[i].pdata->id = ProPara.yx_dataaddr.addpos[i].dataid;
 			YxTable[i].pdata->addr = ProPara.yx_dataaddr.addpos[i].addr;
@@ -437,8 +440,8 @@ void  InitSortYxTable ( void )
 	uint16 m=0;
     uint16 k = 0;
 	uint16 j = 0;
-    for ( datasign = 0x0001;datasign < TOTALYXNUM + 1;datasign++ ) {
-        for ( postemp = 0;postemp< TOTALYXNUM;postemp++ ) {
+    for ( datasign = 0x0001;datasign < MAX_YX_NUM + 1;datasign++ ) {
+        for ( postemp = 0;postemp< MAX_YX_NUM;postemp++ ) {
             if ( YxTable[postemp].pdata!=NULL && datasign == YxTable[postemp].pdata->addr ) {
 				m = YxTable[postemp].pdata->type;
 				if(m==S_YX){
@@ -449,8 +452,8 @@ void  InitSortYxTable ( void )
             }
         }
     }
-    for ( datasign = 0x0001;datasign < TOTALYXNUM+1;datasign++ ) {
-        for ( postemp = 0;postemp < TOTALYXNUM;postemp++ ) {
+    for ( datasign = 0x0001;datasign < MAX_YX_NUM+1;datasign++ ) {
+        for ( postemp = 0;postemp < MAX_YX_NUM;postemp++ ) {
             if ( YxTable[postemp].pdata!=NULL && datasign ==  YxTable[postemp].pdata->addr ) {
 				if(YxTable[postemp].pdata->type==D_YX){
 					SortYxTable[j+k].pdata = YxTable[postemp].pdata;

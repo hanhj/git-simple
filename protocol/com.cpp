@@ -59,11 +59,11 @@ int serial::read(int len){
 	ret=fgets(buff,len,f);
 	if(ret==NULL)
 		return -1;
-	if(buff[0]=='R')
+	if(buff[0]!='-' && buff[1]!='>')
 		return -1;
 	l=strlen(buff);
 	for(i=0;i<l;i++){
-		if(buff[i]=='T'||buff[i]=='X'||buff[i]==':'||buff[i]==' ')
+		if(buff[i]=='T'||buff[i]=='X'||buff[i]==':'||buff[i]==' '||buff[i]=='-'||buff[i]=='>')
 			continue;
 
 		c=strtol(&buff[i],NULL,16);
@@ -154,11 +154,11 @@ int ethernet::read(int len){
 	ret=fgets(buff,len,f);
 	if(ret==NULL)
 		return -1;
-	if(buff[0]=='R')
+	if(buff[0]!='-' && buff[1]!='>')
 		return -1;
 	l=strlen(buff);
 	for(i=0;i<l;i++){
-		if(buff[i]=='T'||buff[i]=='X'||buff[i]==':'||buff[i]==' ')
+		if(buff[i]=='T'||buff[i]=='X'||buff[i]==':'||buff[i]==' '||buff[i]=='-'||buff[i]=='>')
 			continue;
 
 		c=strtol(&buff[i],NULL,16);
@@ -249,11 +249,11 @@ int wireless::read(int len){
 	ret=fgets(buff,len,f);
 	if(ret==NULL)
 		return -1;
-	if(buff[0]=='R')
+	if(buff[0]!='-' && buff[1]!='>')
 		return -1;
 	l=strlen(buff);
 	for(i=0;i<l;i++){
-		if(buff[i]=='T'||buff[i]=='X'||buff[i]==':'||buff[i]==' ')
+		if(buff[i]=='T'||buff[i]=='X'||buff[i]==':'||buff[i]==' '||buff[i]=='-'||buff[i]=='>')
 			continue;
 
 		c=strtol(&buff[i],NULL,16);

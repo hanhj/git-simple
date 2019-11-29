@@ -10,6 +10,7 @@
 #include "para.h"
 using namespace std;
 int g_reset=0;
+void test_event();
 /****************************
  * realize link_layer
 ****************************/
@@ -92,6 +93,7 @@ int link_layer::process_summon(frame *out){
 int link_layer::on_summon_acc(frame *in,frame *out){
 	summon_data.step=0;
 	has_data=1;
+	summon_data.sended_acc_num=0;
 	return 0;
 }
 int link_layer::process_summon_acc(frame *out){
@@ -411,6 +413,7 @@ int link_layer::on_rd_unit(frame *in,frame *out){
 }
 int link_layer::process_rd_unit(frame *out){
 	int ret=0;
+	has_data=0;
 	app->get_dz_unit(&para_data);
 	ret=app->build_rd_unit_con(out,this,&para_data);
 	return ret;
@@ -454,6 +457,7 @@ int link_layer::on_wr_dz(frame *in,frame *out){
 int link_layer::process_wr_dz(frame *out){
 	int ret=0;
 	int i;
+	has_data=0;
 	if(para_data.op==4){
 		for(i=0;i<para_data.req_num;i++){
 			app->set_dz(para_data.req_num,&para_data.nodes[0]);
@@ -479,6 +483,7 @@ int link_layer::on_wr_unit(frame *in,frame *out){
 }
 int link_layer::process_wr_unit(frame *out){
 	int ret=0;
+	has_data=0;
 	app->set_dz_unit(para_data.unit);
 	ret=app->build_wr_unit_con(out,this,&para_data);
 	return ret;
@@ -771,6 +776,14 @@ int link_layer_101::on_ack(frame *in,frame *out){
 		ret=process_update(out);
 	}else if(process & PROCESS_RESET){
 		ret=process_reset_terminal(out);
+	}else if(process & PROCESS_RD_UNIT){
+		ret=process_rd_unit(out);
+	}else if(process & PROCESS_RD_DZ){
+		ret=process_rd_dz(out);
+	}else if(process & PROCESS_WR_UNIT){
+		ret=process_wr_unit(out);
+	}else if(process & PROCESS_WR_DZ){
+		ret=process_wr_dz(out);
 	}
 	return ret ;
 }
@@ -789,6 +802,14 @@ int link_layer_101::on_req_class_1(frame *in,frame *out){
 		ret=process_yk(out);
 	}else if(process & PROCESS_RESET){
 		ret=process_reset_terminal(out);
+	}else if(process & PROCESS_RD_UNIT){
+		ret=process_rd_unit(out);
+	}else if(process & PROCESS_RD_DZ){
+		ret=process_rd_dz(out);
+	}else if(process & PROCESS_WR_UNIT){
+		ret=process_wr_unit(out);
+	}else if(process & PROCESS_WR_DZ){
+		ret=process_wr_dz(out);
 	}
 	return ret ;
 }
@@ -844,7 +865,13 @@ void link_layer_101::deal_timeout(){
 		}
 	}
 end:if(ret){
-		send_frame(&s_var_frame);
+		if(link_state==LINK_OPEN){
+			if(!rep_timer.is_start()){
+				send_frame(&s_var_frame);
+				save_frame(&s_var_frame,2);//save frame
+				rep_timer.start(REP_TIME);
+			}
+		}
 	}
 	if(app->need_reset)
 		app->do_reset();
@@ -1046,6 +1073,7 @@ int link_layer_101::link_time(){
 	if(balance==UNBALANCE)
 		return 0;
 	if(rep_timer.is_reached()==1){
+		test_event();
 		pfunc(DEBUG_ERROR,"timeout\n");
 		ret=send_frame(&last_send_frame);
 		if(ret<0){
@@ -1881,19 +1909,20 @@ int link_layer_104::build_link_layer(frame *out,int asdu_len){
 	out->data[i++]=tmpif.d4;
 	ret=i+asdu_len;
 	out->len=ret;
-	s_i_frames.push(s_no);
+	out->id=s_no;
+	s_i_frames.push(*out);
 	s_no=(s_no+1)%N;
 	return ret;
 }
 int link_layer_104::clear_sq(){
 	int ret;
 	ret=0;
-	int da;
-	CircleQueue<int>::iterator it(s_i_frames.MaxQueue);
+	frame fm;
+	CircleQueue<frame>::iterator it(s_i_frames.MaxQueue);
 	it=s_i_frames.begin();
 	while(it!=s_i_frames.end()){
-		da=*it;
-		if(da<=ack_no){
+		fm=*it;
+		if(fm.id<=ack_no){
 			if(it==s_i_frames.begin())
 				s_i_frames.pop();
 		}
@@ -1962,6 +1991,16 @@ void link_layer_104::deal_timeout(){
 	if(app->need_update)
 		app->do_update();
 }
+void link_layer_104::resend(){
+	CircleQueue<frame >::iterator it;
+	it=s_i_frames.begin();
+	frame fm;
+	while(it!=s_i_frames.end()){
+		fm=*it;
+		send_frame(&fm);
+		it++;
+	}
+}
 int link_layer_104::link_time(){
 	int ret=0;
 	pfunc(DEBUG_INFO,"time of 104 frame of link [%d]\n",port);
@@ -1971,7 +2010,8 @@ int link_layer_104::link_time(){
 			link_state=LINK_ERROR;
 		}
 		*/
-		//resend queen
+		resend();
+		t1_timer.restart();
 	}
 	if(t3_timer.is_reached()==1){//receive timeout
 		build_test_link();
@@ -3234,8 +3274,7 @@ int app_layer::build_summon_acc_con(frame *out,link_layer *link){//cause 7
 	int ret;
 	i=0;
 	ret = -1;
-	
-	link->has_data=1;
+	link->summon_data.step++;	
 	link->set_loc_ctl();	
 	ret=get_link_info(link);
 	if(ret<0)
@@ -3252,6 +3291,7 @@ int app_layer::build_summon_acc_con(frame *out,link_layer *link){//cause 7
 	if(msg_id_size==3)
 		out->data[offset_asdu+i++]=0;
 	out->data[offset_asdu+i++]=5;//QCC summon acc data
+	ret=i;
 	ret=link->build_link_layer(out,ret);				
 	if(ret<0){
 		errno=ret;
@@ -3276,7 +3316,6 @@ int app_layer::build_summon_acc_term(frame *out,link_layer *link){//cause 10
 	int ret;
 	i=0;
 	ret = -1;
-	link->has_data=0;	
 	link->set_loc_ctl();	
 	ret=get_link_info(link);
 	if(ret<0)
@@ -3293,6 +3332,7 @@ int app_layer::build_summon_acc_term(frame *out,link_layer *link){//cause 10
 	if(msg_id_size==3)
 		out->data[offset_asdu+i++]=0;
 	out->data[offset_asdu+i++]=5;//QCC summon acc data
+	ret=i;
 	ret=link->build_link_layer(out,ret);				
 	if(ret<0){
 		errno=ret;
@@ -3446,7 +3486,30 @@ YC_TAB * get_acc_yc_data(int pos){
 	pfunc(DEBUG_INFO,"\n");
 	return p;
 }
-int get_event_data(int type,event *&e,int change){
+void test_event(){
+	event e;
+	static int tmp_id;
+	tmp_id++;
+	e.soe.dataid=0;
+	e.soe.datasign=tmp_id;
+	e.soe.status=1;
+	e.soe.type=1;
+	e.soe.time.year=20;
+	e.readflag[0]=0;
+	e.readflag[1]=0;
+	e.readflag[2]=0;
+	e.readflag[3]=0;
+	event_list.push(e);
+
+	event_yc e2;
+	e2.data=YcTable[0].ycdata;
+	e2.readflag[0]=0;
+	e2.readflag[1]=0;
+	e2.readflag[2]=0;
+	e2.readflag[3]=0;
+	event_yc_list.push(e2);
+}
+int get_event_data(int port,event *&e,int change){
 	int ret;
 	ret=0;
 	pfunc(DEBUG_INFO,"\n");
@@ -3454,9 +3517,9 @@ int get_event_data(int type,event *&e,int change){
 	end=event_list.end();
 	it=event_list.begin();
 	while(it!=end){
-		if(it->readflag[type]==0){
+		if(it->readflag[port]==0){
 			if(change)
-				it->readflag[type]=1;
+				it->readflag[port]=1;
 			e=&it;
 			ret=1;
 			break;

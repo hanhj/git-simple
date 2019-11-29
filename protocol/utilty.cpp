@@ -32,6 +32,9 @@ unsigned char sum(unsigned char *data,int len){
 time_t get_system_time(){
 	return time(NULL);
 }
+int timer::is_start(){
+	return start_flag;
+}
 int timer::is_reached(){
 	if(!start_flag)
 		return -1;

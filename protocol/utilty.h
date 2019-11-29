@@ -33,6 +33,7 @@ class timer{
 		int restart();
 		int stop();
 		int is_reached();
+		int is_start();
 };
 
 #endif //__utilty_h

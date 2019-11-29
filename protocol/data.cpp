@@ -9,8 +9,8 @@
 #include "data.h"
 using namespace std;
 allyx TerYx;
-YX_TAB YxTable[TOTALYXNUM];
-SORT_YX_TAB SortYxTable[TOTALYXNUM];
+YX_TAB YxTable[MAX_YX_NUM];
+SORT_YX_TAB SortYxTable[MAX_YX_NUM];
 YC_TAB YcTable[MAX_YC_NUM];
 EventList event_list;
 EventYcList event_yc_list;

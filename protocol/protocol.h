@@ -789,7 +789,7 @@ class link_layer_104:public link_layer{
 		frame s_i_frame;
 		frame r_tmp_frame;
 		//CircleQueue<var_frame> s_i_frames;
-		CircleQueue<int> s_i_frames;
+		CircleQueue<frame> s_i_frames;
 		int start_rcv_s_flag;
 		int start_rcv_u_flag;
 		int start_rcv_i_flag;
@@ -857,6 +857,7 @@ class link_layer_104:public link_layer{
 		}
 	public:
 		int check_type(unsigned char);
+		void resend();
 	public:
 		//build fix frame
 		int build_sframe(frame *out,sfmt &);//

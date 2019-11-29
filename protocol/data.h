@@ -56,7 +56,7 @@ extern "C" {
 #define JIUDI 0
 
 #define MAXHYXNUM 11
-#define TOTALYXNUM 100
+#define MAX_YX_NUM 100
 
 typedef struct yxdata{
 	uint16 id;
@@ -139,12 +139,12 @@ typedef struct yx_table{
 	//char *soe_p;
 	yxdata_t *pdata;
 }YX_TAB;
-extern YX_TAB YxTable[TOTALYXNUM] ;//按照POS固定顺序的排列表
+extern YX_TAB YxTable[MAX_YX_NUM] ;//按照POS固定顺序的排列表
 
 typedef struct _sort_yx_table{
 	yxdata_t *pdata;
 }SORT_YX_TAB;
-extern SORT_YX_TAB SortYxTable[TOTALYXNUM];// 按照地址顺序排列的表
+extern SORT_YX_TAB SortYxTable[MAX_YX_NUM];// 按照地址顺序排列的表
 
 typedef struct limt{
     float Limit;
@@ -454,7 +454,7 @@ typedef struct YXPARA{
 }YXPARA_T;
 typedef struct yxpara{
 	uint16 num;
-	YXPARA_T addpos[60];
+	YXPARA_T addpos[MAX_YX_NUM];
 }yxpara;
 
 typedef struct tagComPub{
