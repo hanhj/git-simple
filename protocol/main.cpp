@@ -54,7 +54,7 @@ int main(int arg,char **argv){
 		loops++;
 		sleep_ms(10);
 		for(i=0;i<3;i++){
-			com[i].read(100);
+			com[i].read(1000);
 		}
 		for(i=0;i<2;i++){
 			link[i].deal_timeout();

@@ -8,7 +8,7 @@
 #define __com_h
 #include "all_h.h"
 
-#define MAX_COM_BUFFER 1000
+#define MAX_COM_BUFFER 2000
 #define TYPE_SERIAL 1
 #define TYPE_ETHERNET 2
 #define TYPE_WIRELESS 3
