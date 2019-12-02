@@ -49,14 +49,10 @@ int serial::read(int len){
 	int c;
 	int m;
 	char *ret;
-	char buff[100];
-	unsigned char tmpbuf[100];
-	if(len>100){
-		pfunc(DEBUG_ERROR,"too many read size,limit to 100\n");
-		len=100;
-	}
+	char buff[1000];
+	unsigned char tmpbuf[500];
 	m=0;
-	ret=fgets(buff,len,f);
+	ret=fgets(buff,1000,f);
 	if(ret==NULL)
 		return -1;
 	if(buff[0]!='-' && buff[1]!='>')
@@ -144,14 +140,10 @@ int ethernet::read(int len){
 	int c;
 	int m;
 	char *ret;
-	char buff[100];
-	unsigned char tmpbuf[100];
-	if(len>100){
-		pfunc(DEBUG_ERROR,"too many read size,limit to 100\n");
-		len=100;
-	}
+	char buff[1000];
+	unsigned char tmpbuf[500];
 	m=0;
-	ret=fgets(buff,len,f);
+	ret=fgets(buff,1000,f);
 	if(ret==NULL)
 		return -1;
 	if(buff[0]!='-' && buff[1]!='>')
@@ -239,14 +231,10 @@ int wireless::read(int len){
 	int c;
 	int m;
 	char *ret;
-	char buff[100];
-	unsigned char tmpbuf[100];
-	if(len>100){
-		pfunc(DEBUG_ERROR,"too many read size,limit to 100\n");
-		len=100;
-	}
+	char buff[1000];
+	unsigned char tmpbuf[500];
 	m=0;
-	ret=fgets(buff,len,f);
+	ret=fgets(buff,1000,f);
 	if(ret==NULL)
 		return -1;
 	if(buff[0]!='-' && buff[1]!='>')

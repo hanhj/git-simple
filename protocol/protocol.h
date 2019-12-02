@@ -416,7 +416,7 @@ typedef struct _para_node{
 	char para[30];
 }para_node;
 typedef struct _para_iden_bit{
-	unsigned char con:1;
+	unsigned char con:1;//0 no succed;1 have succeed
 	unsigned char res:5;
 	unsigned char cr:1;//0 -no use. 1-cancel prepare set
 	unsigned char se:1;//0 -fix.1- prepare set
@@ -434,9 +434,9 @@ typedef struct __para_list{
 	int result;
 	int cur_read;
 	int req_num;
-	int req_id[30];
+	int req_id[40];
 	int res_num;
-	para_node nodes[30];
+	para_node nodes[40];
 }_para_list;
 //app_layer deal asdu part
 class app_layer{
