@@ -269,6 +269,7 @@ class CircleQueue{
 		CircleQueue(){
 			_front=_tail=0;
 			this->_size=0;
+			MaxQueue=0;
 			data=NULL;
 		}
 		~CircleQueue();
@@ -295,8 +296,10 @@ void CircleQueue<T>::init(int size){
 }
 template <typename T>
 CircleQueue<T>::~CircleQueue(){
-	if(data)
+	if(data){
 		free(data);
+		data=NULL;
+	}
 	_size=0;
 	_front=_tail=0;
 }

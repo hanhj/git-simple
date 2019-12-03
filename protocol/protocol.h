@@ -631,17 +631,6 @@ class link_layer{
 		virtual int deal_frame(frame *)=0;
 		virtual void set_loc_ctl()=0;
 
-/**
-***********************************************************************
-*  @brief	link link_layer with physical com_port	
-*  @param[in]  
-*  @param[out]  
-*  @return upon successful \n
-*	if fail a negative value returned.
-*  @note	
-*  @see		
-***********************************************************************
-*/
 		int set_link_com(com_port*,int port);
 		int set_app(app_layer*);
 		void reset_yk_data();

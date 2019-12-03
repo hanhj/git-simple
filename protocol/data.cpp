@@ -25,4 +25,5 @@ void init_data(){
 	g_dir_list.init(20);
 	load_file_list();
 }
+
 // vim:tw=72 

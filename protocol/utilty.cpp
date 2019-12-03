@@ -5,6 +5,7 @@
  * Created Time: 2019-10-18 11:53:31 week:5
 */
 #include<iostream>
+#include <termios.h>
 using namespace std;
 #include "utilty.h"
 /****************************
@@ -134,4 +135,41 @@ int dump(int mode,const char*file,const char*func,int line,unsigned char *data,i
 	return 0;
 }
 
+termios init_termios,new_termios;
+int peek_char=-1;
+void init_kb(){
+	tcgetattr(0,&init_termios);
+	new_termios=init_termios;
+	new_termios.c_lflag &=~ICANON;
+	new_termios.c_lflag &=~ECHO;
+	new_termios.c_lflag &=~ISIG;
+	new_termios.c_cc[VMIN]=1;
+	new_termios.c_cc[VTIME]=0;
+}
+void close_kb(){
+	tcsetattr(0,TCSANOW,&init_termios);
+}
+int kbhit(){
+	int ch;
+	int nread;
+	new_termios.c_cc[VMIN]=0;
+	tcsetattr(0,TCSANOW,&new_termios);
+	nread=read(0,&ch,1);
+	new_termios.c_cc[VMIN]=1;
+	tcsetattr(0,TCSANOW,&new_termios);
+	if(nread>0){
+		peek_char=ch;
+		return 1;
+	}
+	return 0;
+}
+int readch(){
+	int ch=-1;
+	if(peek_char!=-1){
+		ch=peek_char&0xff;
+		peek_char=-1;
+		return ch;
+	}
+	return ch;
+}
 // vim:tw=72 

@@ -35,6 +35,9 @@ class timer{
 		int is_reached();
 		int is_start();
 };
-
+extern void init_kb();
+extern void close_kb();
+extern int kbhit();
+extern int readch();
 #endif //__utilty_h
 // vim:tw=72 

@@ -10,6 +10,98 @@ using namespace std;
 #include <list>
 #include <vector>
 #include "it.h"
+#include <sys/select.h>
+#include <termios.h>
+#define STDIN 0
+//getchar from console by press key and return 
+//this function is polling
+int mygetc(){
+	timeval tm={0,0};
+	fd_set r;
+	FD_ZERO(&r);
+	FD_SET(STDIN,&r);
+	int ret;
+	int ch;
+	ret=select(STDIN+1,&r,NULL,NULL,&tm);
+	switch(ret){
+		case -1:
+			return -1;//error
+		case 0:
+			return 0;//timeout
+		default:
+			if(FD_ISSET(STDIN,&r)){
+				read(0,&ch,1);
+				return ch;
+			}
+	}
+	return ret;
+}
+termios init_termios,new_termios;
+int peek_char=-1;
+void init_kb(){
+	tcgetattr(0,&init_termios);
+	new_termios=init_termios;
+	new_termios.c_lflag &=~ICANON;
+	new_termios.c_lflag &=~ECHO;
+	new_termios.c_lflag &=~ISIG;
+	new_termios.c_cc[VMIN]=1;
+	new_termios.c_cc[VTIME]=0;
+}
+void close_kb(){
+	tcsetattr(0,TCSANOW,&init_termios);
+}
+/*
+int kbhit(){
+	int ch;
+	int nread;
+	if(peek_char!=-1){
+		return 1;
+	}
+	new_termios.c_cc[VMIN]=0;
+	tcsetattr(0,TCSANOW,&new_termios);
+	nread=read(0,&ch,1);
+	new_termios.c_cc[VMIN]=1;
+	tcsetattr(0,TCSANOW,&new_termios);
+	if(nread>0){
+		peek_char=ch;
+		return 1;
+	}
+	return 0;
+}
+int readch(){
+	int ch;
+	if(peek_char!=-1){
+		ch=peek_char&0xff;
+		peek_char=-1;
+		return ch;
+	}
+	read(0,&ch,1);
+	return ch;
+}
+*/
+int kbhit(){
+	int ch;
+	int nread;
+	new_termios.c_cc[VMIN]=0;
+	tcsetattr(0,TCSANOW,&new_termios);
+	nread=read(0,&ch,1);
+	new_termios.c_cc[VMIN]=1;
+	tcsetattr(0,TCSANOW,&new_termios);
+	if(nread>0){
+		peek_char=ch;
+		return 1;
+	}
+	return 0;
+}
+int readch(){
+	int ch=-1;
+	if(peek_char!=-1){
+		ch=peek_char&0xff;
+		peek_char=-1;
+		return ch;
+	}
+	return ch;
+}
 /*如何构造迭代器：
  * 1、迭代器需要的类：
  * 节点类，用于封装数据。
@@ -380,6 +472,13 @@ int main(){
 	myswap(begin(bb),begin(bb)+1);
 	
 	int a;
+	int i;
+	int *c;
+	int *d;
+	int ch;
+	unsigned long e,f;
+	unsigned char ddd;
+	long eee;
 	List<int> list;
 	a=1;
 	list.push_back(a);
@@ -407,7 +506,6 @@ int main(){
 	ll.push_back(7);
 	cout<<ll<<endl;
 	
-	int i;
 	cq.init(10);
 	for(i=0;i<23;i++){
 		a=i;
@@ -418,8 +516,6 @@ int main(){
 		a=i;
 		cq.push_pop(a);
 	}
-	int *c;
-	int *d;
 	CircleQueue<int>::iterator cit(cq.MaxQueue);
 	cit=cq.begin();
 	cout<<*cit<<endl;
@@ -450,20 +546,31 @@ int main(){
 	d=NULL;
 	get_data(d);
 	cout<<d<<endl;
-	unsigned long e,f;
 	e=PROCESS_YC_CHANGE;
 	f=~e;
 	printf("%x %x ",PROCESS_YC_CHANGE,~PROCESS_YC_CHANGE);
 	printf("%lx %lx ",e,f);
 	dir_list::iterator dir_it;
-	unsigned char ddd;
-	long eee;
 	ddd=1;
 	eee=ddd;
 	eee|=ddd<<8;
 	eee|=ddd<<16;
 	eee|=ddd<<24;
 	printf("%lx \n",eee);
+	
+	init_kb();
+	while(1){
+		//printf("press any key\n");
+		//a=getchar();
+		//a=mygetc();
+		if(kbhit()){
+			ch=readch();
+			printf("get %c %x %x\n",ch,ch,'q');
+			if(ch=='q')
+				break;
+		}
+	}
+	close_kb();
 	return 0;
 }
 

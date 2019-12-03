@@ -589,11 +589,11 @@ extern int16 do_clear_soe_info(void );
 extern int16 do_clear_action_info(void );
 extern int16 do_set_default_para(void );
 extern void ComBoxInit(void);
-extern int    CheckTerminalState();
+extern int  CheckTerminalState();
 extern void InitTerminalState();
 extern void show_ratio();
-extern void load_file_list();
 extern void init_data();
+extern void load_file_list();
 #ifdef __cplusplus
 }
 #endif

@@ -64,6 +64,7 @@ class serial:public basic_com{
 	public:	
 		serial(){
 			com_type=TYPE_SERIAL;
+			memset(&set,0,sizeof(set));
 		}
 		virtual int init(void *para);
 		virtual int connect();
@@ -89,6 +90,7 @@ class ethernet:public basic_com{
 	public:
 		ethernet(){
 			com_type=TYPE_ETHERNET;
+			memset(&set,0,sizeof(set));
 		}
 		virtual int init(void *para);
 		virtual int connect();
@@ -112,6 +114,7 @@ class wireless:public basic_com{
 	public:
 		wireless(){
 			com_type=TYPE_WIRELESS;
+			memset(&set,0,sizeof(set));
 		}
 		virtual int init(void *para);
 		virtual int connect();
