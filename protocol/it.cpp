@@ -12,6 +12,7 @@ using namespace std;
 #include "it.h"
 #include <sys/select.h>
 #include <termios.h>
+#include <unistd.h>
 #define STDIN 0
 //getchar from console by press key and return 
 //this function is polling
