@@ -259,6 +259,8 @@ int link_layer::on_file(frame *in,frame *out){
 		for(j=0;j<file_data.rd_file.req_file.name_len;j++){
 			file_data.rd_file.req_file.name[j]=in->data[offset_data+i++];
 		}
+		file_data.rd_file.req_file.name[j]=0;
+		file_data.rd_file.step=0;
 	}else if(file_data.op == 6){//rd file confirm
 		file_data.rd_file.req_file.file_id=in->data[offset_data+i++];
 		file_data.rd_file.req_file.file_id|=in->data[offset_data+i++]<<8;
@@ -323,9 +325,11 @@ int link_layer::process_file(frame *out){
 	}else if(file_data.op==3){//read file
 		if(file_data.rd_file.step==0){
 			ret=app->get_file_data(&file_data.rd_file);
-			if(ret>=0)
+			if(ret>=0){
 				ret=app->build_rd_file_con(out,this,&file_data.rd_file);
-		}else{
+				file_data.rd_file.step=1;
+			}
+		}else if(file_data.rd_file.step==1){
 			ret=app->get_file_segment(&file_data.rd_file);
 			if(ret>=0)
 				ret=app->build_rd_file_resp(out,this,&file_data.rd_file);
@@ -333,9 +337,12 @@ int link_layer::process_file(frame *out){
 	}else if(file_data.op==6){//read file ack confirm
 		ret=0;
 		//change file offset_asdu
-		if(file_data.rd_file.ack_offset == file_data.rd_file.cur_offset)
+		if(file_data.rd_file.ack_offset == file_data.rd_file.cur_offset){
 			file_data.rd_file.cur_offset=file_data.rd_file.cur_offset+file_data.rd_file.segment.len;
-		file_data.op=3;
+			ret=app->get_file_segment(&file_data.rd_file);
+			if(ret>=0)
+				ret=app->build_rd_file_resp(out,this,&file_data.rd_file);
+		}
 	}else if(file_data.op==7){//wr file
 		ret=app->save_file_data(&file_data.wt_file);
 		if(ret>=0)
@@ -386,7 +393,7 @@ int link_layer::process_rd_dz(frame *out){
 	len=0;
 	int i,j;
 	j=0;
-	data_len=6+1+1+2+2+2+1;//6:asdu,1:id,1:vsq,2:cause,2:pub addr,2:sn,1:pi 
+	data_len=6+1+addr_size+1+1+cause_size+addr_size+2+1;//6:len,1:c,addr,1:id,1:vsq,2:cause,2:pub addr,2:sn,1:pi 
 	has_data=0;
 	for(i=para_data.cur_read;i<para_data.req_num;i++){
 		para_data.nodes[j].id=para_data.req_id[i];
@@ -394,8 +401,13 @@ int link_layer::process_rd_dz(frame *out){
 		data_len+=len+2+1+1;//2:msg id,1:tag,1:len
 		para_data.cur_read++;
 		j++;
-		if(data_len>200)
+		if(data_len>200&&data_len<256)
 			break;
+		else if(data_len>256){
+			para_data.cur_read--;
+			j--;
+			break;
+		}
 	}
 	if(para_data.cur_read==para_data.req_num){
 		para_data.pi.bit.con=0;
@@ -427,9 +439,7 @@ int link_layer::on_wr_dz(frame *in,frame *out){
 	}
 	for(j=0;j<para_data.req_num;j++){
 		para_data.nodes[j].id=in->data[offset_msg_id+i++];
-		para_data.nodes[j].id|=in->data[offset_msg_id+i++]>>8;
-		para_data.nodes[j].id|=in->data[offset_msg_id+i++]>>16;
-		para_data.nodes[j].id|=in->data[offset_msg_id+i++]>>24;
+		para_data.nodes[j].id|=in->data[offset_msg_id+i++]<<8;
 		para_data.nodes[j].tag=in->data[offset_msg_id+i++];
 		para_data.nodes[j].len=in->data[offset_msg_id+i++];
 		for(m=0;m<para_data.nodes[j].len;m++){
@@ -1300,6 +1310,7 @@ err:
 }
 int link_layer_101::on_fc3(frame *f){
 	int ret;
+	int sret;
 	ret=0;
 	pfunc(DEBUG_INFO,"on_fc3\n");
 	ctrl_word ctl;
@@ -1310,37 +1321,37 @@ int link_layer_101::on_fc3(frame *f){
 				ctl_rm.data=ctl.data;//save control
 				ret=on_req(f,&s_var_frame);
 				if(ret>=0){
-					ret=build_ack(&s_fix_frame,has_data);
-					if(ret<0){
+					sret=build_ack(&s_fix_frame,has_data);
+					if(sret<0){
 						goto err;
 					}
-					ret=send_frame(&s_fix_frame);
-					if(ret<0){
+					sret=send_frame(&s_fix_frame);
+					if(sret<0){
 						goto err;
 					}//ack
 				}else{
-					ret=build_nak(&s_fix_frame);
-					if(ret<0){
+					sret=build_nak(&s_fix_frame);
+					if(sret<0){
 						goto err;
 					}
-					ret=send_frame(&s_fix_frame);
-					if(ret<0){
+					sret=send_frame(&s_fix_frame);
+					if(sret<0){
 						goto err;
 					}
 				}
 				save_frame(&s_fix_frame,1);
 			}else{//fcb not change ,resend last ack
-				ret=send_frame(&last_fix_frame);
-				if(ret<0){
+				sret=send_frame(&last_fix_frame);
+				if(sret<0){
 					goto err;
 				}
 			}
 		}else{//code=3 is s2 service fcv must valid,so now return nak
-			ret=build_nak(&s_fix_frame);
-			if(ret<0){
+			sret=build_nak(&s_fix_frame);
+			if(sret<0){
 				goto err;
 			}
-			ret=send_frame(&s_fix_frame);
+			sret=send_frame(&s_fix_frame);
 			if(ret<0){
 				goto err;
 			}
@@ -1351,51 +1362,53 @@ int link_layer_101::on_fc3(frame *f){
 				ctl_rm.data=ctl.data;//save control
 				ret=on_req(f,&s_var_frame);
 				if(ret>=0){
-					ret=build_ack(&s_fix_frame);
-					if(ret<0){
+					sret=build_ack(&s_fix_frame);
+					if(sret<0){
 						goto err;
 					}
-					ret=send_frame(&s_fix_frame);
+					sret=send_frame(&s_fix_frame);
 					save_frame(&s_fix_frame,1);
-					if(ret<0){
+					if(sret<0){
 						goto err;
 					}//ack
-					ret=send_frame(&s_var_frame);
-					if(ret<0){
-						goto err;
+					if(ret>0){
+						sret=send_frame(&s_var_frame);
+						if(sret<0){
+							goto err;
+						}
+						save_frame(&s_var_frame,2);//save frame
+						rep_timer.start(REP_TIME);
 					}
-					save_frame(&s_var_frame,2);//save frame
-					rep_timer.start(REP_TIME);
 				}else{
-					ret=build_nak(&s_fix_frame);
-					if(ret<0){
+					sret=build_nak(&s_fix_frame);
+					if(sret<0){
 						goto err;
 					}
-					ret=send_frame(&s_fix_frame);
-					if(ret<0){
+					sret=send_frame(&s_fix_frame);
+					if(sret<0){
 						goto err;
 					}
 					save_frame(&s_fix_frame,1);
 				}
 			}else{//fcb not change ,resend last ack
-				ret=send_frame(&last_fix_frame);
-				if(ret<0){
+				sret=send_frame(&last_fix_frame);
+				if(sret<0){
 					goto err;
 				}
 			}
 		}else{//code=3 is s2 service fcv must valid,so now return nak
-			ret=build_nak(&s_fix_frame);
-			if(ret<0){
+			sret=build_nak(&s_fix_frame);
+			if(sret<0){
 				goto err;
 			}
-			ret=send_frame(&s_fix_frame);
-			if(ret<0){
+			sret=send_frame(&s_fix_frame);
+			if(sret<0){
 				goto err;
 			}
 		}
 	}
 err:
-	return ret;
+	return sret;
 }
 int link_layer_101::on_fc4(frame*f){
 	int ret;
@@ -2725,7 +2738,8 @@ int app_layer::build_rd_dir_resp(frame *out,link_layer *link,_rd_dir *dir){//cau
 	int bak_pos;
 	int n;
 	dir_list::iterator it(dir->res_list.MaxQueue);
-	dir_node *node;
+	dir_node node;
+	int data_len;
 	i=0;
 	n=0;
 	
@@ -2735,11 +2749,12 @@ int app_layer::build_rd_dir_resp(frame *out,link_layer *link,_rd_dir *dir){//cau
 		goto err;
 	vsq_lo.bit.n=0;
 	vsq_lo.bit.sq=0;
-	cause_lo.bit.cause=CAUSE_Actcon;
+	cause_lo.bit.cause=CAUSE_Req;
 
 	cmd_id=COMMAND_FILE;
 	ret=build_asdu_header(out);
 	i=ret;
+	data_len=6+1+addr_size;//6:asdu,1:id,1:vsq,2:cause,2:pub addr 
 	out->data[offset_asdu+i++]=0;
 	out->data[offset_asdu+i++]=0;
 	if(msg_id_size==3)
@@ -2756,30 +2771,50 @@ int app_layer::build_rd_dir_resp(frame *out,link_layer *link,_rd_dir *dir){//cau
 	out->data[offset_asdu+i++]=n;//number of files
 
 	it=dir->res_list.begin();
+	n=0;
+	while(n<dir->cur_read){
+		it++;
+		n++;
+	}
+	int diff1,diff;
+	data_len+=i;//
+	n=0;
 	while(dir->cur_read<dir->res_list.size()){
-		node=&it[0];	
-		out->data[offset_asdu+i++]=node->name_len;
-		for(j=0;j<node->name_len;j++){
-			out->data[offset_asdu+i++]=node->name[j];
+		node=*it;	
+		it++;
+		diff1=i;
+		out->data[offset_asdu+i++]=node.name_len;
+		for(j=0;j<node.name_len;j++){
+			out->data[offset_asdu+i++]=node.name[j];
 		}
 		out->data[offset_asdu+i++]=0;//reverse 
-		out->data[offset_asdu+i++]=node->file_size;
-		out->data[offset_asdu+i++]=node->file_size>>8;
-		out->data[offset_asdu+i++]=node->file_size>>16;
-		out->data[offset_asdu+i++]=node->file_size>>24;
-		out->data[offset_asdu+i++]=node->time.year;
-		out->data[offset_asdu+i++]=node->time.month;
-		out->data[offset_asdu+i++]=node->time.day;
-		out->data[offset_asdu+i++]=node->time.hour;
-		out->data[offset_asdu+i++]=node->time.minute;
-		out->data[offset_asdu+i++]=node->time.millisecond>>8;
-		out->data[offset_asdu+i++]=node->time.millisecond & 0x00ff;
-		dir->cur_read++;
+		out->data[offset_asdu+i++]=node.file_size;
+		out->data[offset_asdu+i++]=node.file_size>>8;
+		out->data[offset_asdu+i++]=node.file_size>>16;
+		out->data[offset_asdu+i++]=node.file_size>>24;
+		out->data[offset_asdu+i++]=node.time.year;
+		out->data[offset_asdu+i++]=node.time.month;
+		out->data[offset_asdu+i++]=node.time.day;
+		out->data[offset_asdu+i++]=node.time.hour;
+		out->data[offset_asdu+i++]=node.time.minute;
+		out->data[offset_asdu+i++]=node.time.millisecond>>8;
+		out->data[offset_asdu+i++]=node.time.millisecond & 0x00ff;
 		n++;
-		if(n>5)break;
-		dir->con=1;
+		dir->cur_read++;
+		diff=i-diff1;
+		data_len+=diff;
+		if(data_len>200&&data_len<256){
+			dir->con=1;
+			break;
+		}else if(data_len>256){
+			dir->con=1;
+			dir->cur_read--;
+			i-=diff;
+			n--;
+			break;
+		}
 	}
-	if(n<=5){
+	if(data_len<=200){
 		dir->con=0;
 		dir->cur_read=0;
 		link->process&=~PROCESS_FILE;
@@ -2818,7 +2853,7 @@ int app_layer::build_rd_file_con(frame *out,link_layer *link,_rd_file *file){//c
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
-	vsq_lo.bit.n=1;
+	vsq_lo.bit.n=0;
 	vsq_lo.bit.sq=0;
 	cause_lo.bit.cause=CAUSE_Actcon;
 
@@ -2876,7 +2911,7 @@ int app_layer::build_rd_file_resp(frame *out,link_layer *link,_rd_file *file){//
 	ret=get_link_info(link);
 	if(ret<0)
 		goto err;
-	vsq_lo.bit.n=1;
+	vsq_lo.bit.n=0;
 	vsq_lo.bit.sq=0;
 	cause_lo.bit.cause=CAUSE_Req;
 

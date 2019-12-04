@@ -114,11 +114,12 @@ int get_file_data(_rd_file *file){
 	dir_list::iterator it(g_dir_list.MaxQueue);
 	it=g_dir_list.begin();
 	while(it!=g_dir_list.end()){
-		if(it->file_id==file->req_file.file_id){
+		if(strcmp(it->name,file->req_file.name)==0){
 			ret=1;
 			file->res_file=*it;
 			break;
 		}
+		it++;
 	}
 	return ret;
 }
@@ -131,7 +132,7 @@ int get_file_segment(_rd_file*file){
 	if(!f)
 	return ret;
 	fseek(f,file->cur_offset,SEEK_SET);
-	ret_len=fread(file->segment.data,200,1,f);
+	ret_len=fread(file->segment.data,1,200,f);
 	if(ret_len<200){
 		ret=0;
 		file->con=0;
@@ -141,7 +142,6 @@ int get_file_segment(_rd_file*file){
 		file->con=1;
 	}
 	file->segment.len=ret_len;
-	file->step=file->con;
 	fclose(f);
 	pfunc(DEBUG_INFO,"\n");
 	return ret;
@@ -149,6 +149,7 @@ int get_file_segment(_rd_file*file){
 void load_file_list(){
 	dir_node node;
 	FILE *f;
+	char *ret;
 	f=fopen("file_list.dat","r");
 	if(f==NULL)
 		return;
@@ -157,8 +158,11 @@ void load_file_list(){
 	char time[30];
 
 	while(!feof(f)){
-		fgets(buff,1000,f);
-		sscanf(buff,"%ld %s %ld %ld %s",&node.name_len,&node.name[0],&node.file_id,&node.file_size,&time[0]);
+		ret=fgets(buff,1000,f);
+		if(ret==NULL)
+			break;
+		sscanf(buff,"%s %ld %ld %s",&node.name[0],&node.file_id,&node.file_size,&time[0]);
+		node.name_len=strlen(node.name);
 		g_dir_list.push(node);
 		printf("%ld %s %ld %ld %s\n",node.name_len,&node.name[0],node.file_id,node.file_size,&time[0]);
 	}
