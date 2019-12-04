@@ -133,11 +133,10 @@ int get_file_segment(_rd_file*file){
 	return ret;
 	fseek(f,file->cur_offset,SEEK_SET);
 	ret_len=fread(file->segment.data,1,200,f);
-	if(ret_len<200){
+	if(ret_len<=0){
 		ret=0;
 		file->con=0;
-	}
-	else{
+	}else{
 		ret=1;
 		file->con=1;
 	}

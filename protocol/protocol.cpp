@@ -314,7 +314,7 @@ int link_layer::on_file(frame *in,frame *out){
 	return ret;
 }
 int link_layer::process_file(frame *out){
-	int ret=-1;
+	int ret=0;
 	if(file_data.op==1){//read dir
 		ret=app->get_dir_data(&file_data.rd_dir);
 		if(ret>=0){
@@ -331,17 +331,24 @@ int link_layer::process_file(frame *out){
 			}
 		}else if(file_data.rd_file.step==1){
 			ret=app->get_file_segment(&file_data.rd_file);
-			if(ret>=0)
+			if(ret>0){
 				ret=app->build_rd_file_resp(out,this,&file_data.rd_file);
+				file_data.rd_file.step=2;
+			}else if(ret==0){
+				process&=~PROCESS_FILE;
+			}
 		}
 	}else if(file_data.op==6){//read file ack confirm
-		ret=0;
 		//change file offset_asdu
 		if(file_data.rd_file.ack_offset == file_data.rd_file.cur_offset){
 			file_data.rd_file.cur_offset=file_data.rd_file.cur_offset+file_data.rd_file.segment.len;
 			ret=app->get_file_segment(&file_data.rd_file);
-			if(ret>=0)
+			if(ret>0){
 				ret=app->build_rd_file_resp(out,this,&file_data.rd_file);
+				file_data.rd_file.step=2;
+			}else if(ret==0){
+				process&=~PROCESS_FILE;
+			}
 		}
 	}else if(file_data.op==7){//wr file
 		ret=app->save_file_data(&file_data.wt_file);
@@ -1274,11 +1281,13 @@ int link_layer_101::on_fc0(frame*f){
 			if(ret<0){
 				goto err;
 			}
-			ret=send_frame(&s_var_frame);
-			save_frame(&s_var_frame,2);//save frame
-			rep_timer.start(REP_TIME);
-			if(ret<0){
-				goto err;
+			if(ret>0){
+				ret=send_frame(&s_var_frame);
+				save_frame(&s_var_frame,2);//save frame
+				rep_timer.start(REP_TIME);
+				if(ret<0){
+					goto err;
+				}
 			}
 		}
 	}
