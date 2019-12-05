@@ -558,7 +558,9 @@ int main(){
 	eee|=ddd<<16;
 	eee|=ddd<<24;
 	printf("%lx \n",eee);
-	
+	a='/';
+	cout<<isascii(a)<<","<<isalpha(a)<<","<<isxdigit(a)<<","<<isdigit(a)<<endl;
+
 	init_kb();
 	while(1){
 		//printf("press any key\n");

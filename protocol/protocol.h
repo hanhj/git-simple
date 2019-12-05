@@ -525,9 +525,9 @@ class app_layer{
 		int build_rd_file_resp(frame *out,link_layer *link,_rd_file *file);//cause 5
 
 		int (*save_file_data)(_rd_file *);
-		int build_wt_file_con(frame *out,link_layer *link,_rd_file *file);//cause 7
+		int build_wr_file_con(frame *out,link_layer *link,_rd_file *file);//cause 7
 		int (*save_file_segment)(_rd_file *);
-		int build_wt_file_resp(frame *out,link_layer *link,_rd_file *file);//cause 5
+		int build_wr_file_resp(frame *out,link_layer *link,_rd_file *file);//cause 5
 		
 		int (*get_dz_unit)(_para_list *);
 		int build_rd_unit_con(frame *out,link_layer *link,_para_list *);//cause 7

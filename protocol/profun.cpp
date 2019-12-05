@@ -17,26 +17,25 @@ int g_reset=0;
 SORT_YX_TAB * get_yx_data(int pos){
 	SORT_YX_TAB *p;
 	p=&SortYxTable[pos];
-	pfunc(DEBUG_INFO,"\n");
+	pfunc(DEBUG_ERROR,"get yx pos %d\n",pos);
 	return p;
 }
 YC_TAB * get_yc_data(int pos){
 	YC_TAB *p;
 	p=&YcTable[pos];
-	pfunc(DEBUG_INFO,"\n");
+	pfunc(DEBUG_ERROR,"get yc pos %d\n",pos);
 	return p;
 }
 YC_TAB * get_acc_yc_data(int pos){
 	YC_TAB *p;
 	pos+=config_scada_data.pos_acc;
 	p=&YcTable[pos];
-	pfunc(DEBUG_INFO,"\n");
+	pfunc(DEBUG_ERROR,"get acc yc pos %d\n",pos);
 	return p;
 }
 int get_event_data(int port,event *&e,int change){
 	int ret;
 	ret=0;
-	pfunc(DEBUG_INFO,"\n");
 	EventList::iterator end,it;
 	end=event_list.end();
 	it=event_list.begin();
@@ -50,10 +49,11 @@ int get_event_data(int port,event *&e,int change){
 		}
 		it++;
 	}
+	pfunc(DEBUG_INFO,"get event\n");
 	return ret;
 }
 int get_clock(CP56Time2a &time){
-	pfunc(DEBUG_INFO,"\n");
+	pfunc(DEBUG_ERROR,"get clock\n");
 	return 0;
 }
 //type:0 execute;1:check;
@@ -84,11 +84,11 @@ int get_yc_cg_data(int port,event_yc *&e){
 		}
 		it++;
 	}
-	pfunc(DEBUG_INFO,"\n");
+	pfunc(DEBUG_INFO,"get change yc data\n");
 	return ret;
 }
 int get_dir_data(_rd_dir *dir){
-	pfunc(DEBUG_INFO,"\n");
+	pfunc(DEBUG_ERROR,"dir:\n");
 	dir_list *list;
 	list=&dir->res_list;
 	list->clear();
@@ -103,12 +103,13 @@ int get_dir_data(_rd_dir *dir){
 		list->push(node);
 		it++;
 		n++;
+		pfunc(DEBUG_ERROR,"%s ",node.name);
 	}
 	//dir->res_list=g_dir_list;
+	pfunc(DEBUG_ERROR,"\n");
 	return n;
 }
 int get_file_data(_rd_file *file){
-	pfunc(DEBUG_INFO,"\n");
 	int ret;
 	ret=-1;
 	dir_list::iterator it(g_dir_list.MaxQueue);
@@ -121,6 +122,7 @@ int get_file_data(_rd_file *file){
 		}
 		it++;
 	}
+	pfunc(DEBUG_ERROR,"get file %s\n",file->req_file.name);
 	return ret;
 }
 int get_file_segment(_rd_file*file){
@@ -133,16 +135,19 @@ int get_file_segment(_rd_file*file){
 	return ret;
 	fseek(f,file->cur_offset,SEEK_SET);
 	ret_len=fread(file->segment.data,1,200,f);
-	if(ret_len<=0){
-		ret=0;
-		file->con=0;
-	}else{
+	if(ret_len==200){
+		if(!feof(f)){
+			file->con=1;
+		}else
+			file->con=0;
 		ret=1;
-		file->con=1;
+	}else if(ret_len<200&&ret_len>0){
+		file->con=0;
+		ret=1;
 	}
 	file->segment.len=ret_len;
 	fclose(f);
-	pfunc(DEBUG_INFO,"\n");
+	pfunc(DEBUG_ERROR,"get segment of %s\n",file->req_file.name);
 	return ret;
 }
 void load_file_list(){
@@ -153,35 +158,38 @@ void load_file_list(){
 	if(f==NULL)
 		return;
 	g_dir_list.clear();
-	char buff[1000];
+	char buff[500];
 	char time[30];
 
 	while(!feof(f)){
-		ret=fgets(buff,1000,f);
+		ret=fgets(buff,500,f);
 		if(ret==NULL)
 			break;
 		sscanf(buff,"%s %ld %ld %s",&node.name[0],&node.file_id,&node.file_size,&time[0]);
 		node.name_len=strlen(node.name);
 		g_dir_list.push(node);
-		printf("%ld %s %ld %ld %s\n",node.name_len,&node.name[0],node.file_id,node.file_size,&time[0]);
+		pfunc(DEBUG_WARNING,"%ld %s %ld %ld %s\n",node.name_len,&node.name[0],node.file_id,node.file_size,&time[0]);
 	}
 }
 void save_file_list(){
 	dir_node node;
 	dir_list::iterator it(g_dir_list.MaxQueue);
 	FILE *f;
-	f=fopen("file_list.dat","wb");
+	char buff[500];
+	char time[30]="19020200000000";
+	f=fopen("file_list.dat","wt");
 	if(f==NULL)
 		return;
+	it=g_dir_list.begin();
 	while(it!=g_dir_list.end()){
 		node=*it;
-		fwrite(&node,sizeof(node),1,f);
+		sprintf(buff,"%s %ld %ld %s\n",&node.name[0],node.file_id,node.file_size,&time[0]);
+		fputs(buff,f);
 		it++;
 	}
 	fclose(f);
 }
 int save_file_data(_rd_file *file){
-	pfunc(DEBUG_INFO,"\n");
 	int ret;
 	int find;
 	dir_node node;
@@ -218,20 +226,15 @@ int save_file_data(_rd_file *file){
 		g_dir_list.push(node);
 		save_file_list();
 	}
+	pfunc(DEBUG_ERROR,"save %s\n",file->req_file.name);
 	return ret;
 }
 int save_file_segment(_rd_file*file){
-	int ret=0;
+	int ret=1;
 	int j;
-	pfunc(DEBUG_INFO,"\n");
 	if(file->result!=0)
 		return ret;
 	FILE *f;
-	f=fopen(file->req_file.name,"w");
-	if(f==NULL){
-		file->result=FILE_UNKNOWN_ERROR;
-		return ret;
-	}
 	unsigned char sum;
 	sum=0;
 	for(j=0;j<file->segment.len;j++){
@@ -241,7 +244,15 @@ int save_file_segment(_rd_file*file){
 		file->result=FILE_CHECK_ERROR;
 		return ret;
 	}
-	file->file_size+=file->segment.len;
+	f=fopen(file->req_file.name,"a+");
+	if(f==NULL){
+		file->result=FILE_UNKNOWN_ERROR;
+		return ret;
+	}
+	file->file_size=file->cur_offset+file->segment.len;
+	fseek(f,file->cur_offset,SEEK_SET);
+	fwrite(file->segment.data,file->segment.len,1,f);
+	fclose(f);
 	if(file->con==0){
 		if(file->file_size!=file->req_file.file_size){
 			file->result=FILE_FILE_SIZE_ERROR;//file error
@@ -249,28 +260,25 @@ int save_file_segment(_rd_file*file){
 		}else{
 			file->result=0;
 			file->suc=1;
-
 		}
 	}
-	fseek(f,file->cur_offset,SEEK_SET);
-	fwrite(file->segment.data,file->segment.len,1,f);
-	fclose(f);
+	pfunc(DEBUG_ERROR,"save segment of %s\n",file->req_file.name);
 	return ret;
 }
 int get_dz_unit(_para_list *data){
-	pfunc(DEBUG_INFO,"\n");
 	data->unit=LimitBounds.cur_unit=2;
 	data->min_unit=LimitBounds.min_unit=1;//to do
 	data->max_unit=LimitBounds.max_unit=100;//to do
+	pfunc(DEBUG_ERROR,"get unit %d\n",data->unit);
 	return 0;
 }
 int set_dz_unit(int unit){
-	pfunc(DEBUG_INFO,"\n");
+	pfunc(DEBUG_ERROR,"set unit %d\n",unit);
 	LimitBounds.cur_unit=unit;
 	return 0;
 }
 int get_dz_data(para_node *para){
-	pfunc(DEBUG_INFO,"\n");
+	pfunc(DEBUG_ERROR,"get dz %x\n",para->id);
 	if(para->id==0x5001){
 		para->tag=1;
 		para->len=4;
@@ -297,7 +305,7 @@ int get_dz_data(para_node *para){
 	return para->len;
 }
 int set_dz(int num,para_node*para){
-	pfunc(DEBUG_WARNING,"set dz\n");
+	pfunc(DEBUG_ERROR,"set dz %x\n",para->id);
 	return 0;
 }
 int do_update(){

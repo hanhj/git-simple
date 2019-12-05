@@ -59,7 +59,8 @@ int serial::read(int len){
 		return -1;
 	l=strlen(buff);
 	for(i=0;i<l;i++){
-		if(buff[i]=='T'||buff[i]=='X'||buff[i]==':'||buff[i]==' '||buff[i]=='-'||buff[i]=='>')
+		//if(buff[i]=='T'||buff[i]=='X'||buff[i]==':'||buff[i]==' '||buff[i]=='-'||buff[i]=='>')
+		if(!isxdigit(buff[i]))
 			continue;
 
 		c=strtol(&buff[i],NULL,16);
