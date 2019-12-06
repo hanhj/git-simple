@@ -74,6 +74,12 @@ typedef union _ctrl_word{
 	unsigned char data;
 }ctrl_word;
 //define data struct for 104 
+typedef struct __byte_data{
+	unsigned char d1;
+	unsigned char d2;
+	unsigned char d3;
+	unsigned char d4;
+}_byte_data;
 struct sfmt_bit{
 	unsigned long res1:1;
 	unsigned long res2:8;
@@ -82,10 +88,7 @@ struct sfmt_bit{
 };
 typedef union _sfmt{
 	struct sfmt_bit bit;
-	unsigned long d1:8;
-	unsigned long d2:8;
-	unsigned long d3:8;
-	unsigned long d4:8;
+	_byte_data data;
 	_sfmt(){
 		bit.res1=1;
 		bit.res2=0;
@@ -94,17 +97,14 @@ typedef union _sfmt{
 	}
 }sfmt;
 struct ifmt_bit{
-	unsigned int res1:1;
-	unsigned int s_no:15;
-	unsigned int res2:1;
-	unsigned int r_no:15;
+	unsigned long res1:1;
+	unsigned long s_no:15;
+	unsigned long res2:1;
+	unsigned long r_no:15;
 };
 typedef union _ifmt{
 	struct ifmt_bit bit;
-	unsigned long d1:8;
-	unsigned long d2:8;
-	unsigned long d3:8;
-	unsigned long d4:8;
+	_byte_data data;
 	_ifmt(){
 		bit.res1=0;
 		bit.res2=0;
@@ -113,29 +113,26 @@ typedef union _ifmt{
 	}
 }ifmt;
 typedef struct __ufmt_bit{
-	unsigned char res1:1;
-	unsigned char res2:1;
-	unsigned char startdt_cmd:1;
-	unsigned char startdt_ack:1;
-	unsigned char stopdt_cmd:1;
-	unsigned char stopdt_ack:1;
-	unsigned char testfr_cmd:1;
-	unsigned char testfr_ack:1;
+	unsigned long res1:1;
+	unsigned long res2:1;
+	unsigned long startdt_cmd:1;
+	unsigned long startdt_ack:1;
+	unsigned long stopdt_cmd:1;
+	unsigned long stopdt_ack:1;
+	unsigned long testfr_cmd:1;
+	unsigned long testfr_ack:1;
+	unsigned long res3:8;
+	unsigned long res4:1;
+	unsigned long res5:15;
 }_ufmt_bit;
-typedef union __ufmt_d1{
-	_ufmt_bit bit;
-	unsigned data;
-}_ufmt_d1;
-typedef struct _ufmt{
-	_ufmt_d1 d1;
-	unsigned long d2:8;
-	unsigned long d3:8;
-	unsigned long d4:8;
+typedef union _ufmt{
+	_ufmt_bit  bit;
+	_byte_data data;
 	_ufmt(){
-		d1.data=3;
-		d2=0;
-		d3=0;
-		d4=0;
+		data.d1=3;
+		data.d2=0;
+		data.d3=0;
+		data.d4=0;
 	}
 }ufmt;
 //define data struct for asdu

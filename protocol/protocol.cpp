@@ -1762,10 +1762,10 @@ int link_layer_104::deal_frame(frame *in){
 	out=&s_i_frame;
 	if(in->type==TYPE_I){//for I frame
 		ifmt tmpif;
-		tmpif.d1=in->data[offset_control];
-		tmpif.d2=in->data[offset_control+1];
-		tmpif.d3=in->data[offset_control+2];
-		tmpif.d4=in->data[offset_control];
+		tmpif.data.d1=in->data[offset_control];
+		tmpif.data.d2=in->data[offset_control+1];
+		tmpif.data.d3=in->data[offset_control+2];
+		tmpif.data.d4=in->data[offset_control];
 		/*//not check send no sequence
 		if(tmpif.bit.s_no!=r_no){//sequence error
 			link_state=LINK_ERROR;
@@ -1854,40 +1854,40 @@ int link_layer_104::deal_frame(frame *in){
 	}else if(in->type==TYPE_S){//for S frame
 		t3_timer.restart(T3_TIME);
 		sfmt tmpsf;
-		tmpsf.d1=in->data[offset_control];
-		tmpsf.d2=in->data[offset_control+1];
-		tmpsf.d3=in->data[offset_control+2];
-		tmpsf.d4=in->data[offset_control+3];
+		tmpsf.data.d1=in->data[offset_control];
+		tmpsf.data.d2=in->data[offset_control+1];
+		tmpsf.data.d3=in->data[offset_control+2];
+		tmpsf.data.d4=in->data[offset_control+3];
 		ack_no=tmpsf.bit.r_no;
 		clear_sq();
 	}else if(in->type==TYPE_U){//for U frame
 		t3_timer.restart(T3_TIME);
 		ufmt tmpuf;
-		tmpuf.d1.data=in->data[offset_control];
-		tmpuf.d2=in->data[offset_control+1];
-		tmpuf.d3=in->data[offset_control+2];
-		tmpuf.d4=in->data[offset_control+3];
-		if(tmpuf.d1.bit.startdt_cmd){
-			tmpuf.d1.bit.startdt_cmd=0;
-			tmpuf.d1.bit.startdt_ack=1;
+		tmpuf.data.d1=in->data[offset_control];
+		tmpuf.data.d2=in->data[offset_control+1];
+		tmpuf.data.d3=in->data[offset_control+2];
+		tmpuf.data.d4=in->data[offset_control+3];
+		if(tmpuf.bit.startdt_cmd){
+			tmpuf.bit.startdt_cmd=0;
+			tmpuf.bit.startdt_ack=1;
 			build_uframe(&s_u_frame,tmpuf);
 			send_frame(&s_u_frame);
 			link_state=LINK_OPEN;
 			app->build_link_fini(&s_i_frame,this);
 			send_frame(&s_i_frame);
-		}else if(tmpuf.d1.bit.startdt_ack==1){
+		}else if(tmpuf.bit.startdt_ack==1){
 			link_state=LINK_OPEN;
-		}else if(tmpuf.d1.bit.stopdt_cmd==1){
-			tmpuf.d1.bit.stopdt_cmd=0;
-			tmpuf.d1.bit.stopdt_ack=1;
+		}else if(tmpuf.bit.stopdt_cmd==1){
+			tmpuf.bit.stopdt_cmd=0;
+			tmpuf.bit.stopdt_ack=1;
 			link_state=LINK_CLOSE;
 			build_uframe(&s_u_frame,tmpuf);
 			send_frame(&s_u_frame);
-		}else if(tmpuf.d1.bit.stopdt_ack==1){
+		}else if(tmpuf.bit.stopdt_ack==1){
 			link_state=LINK_CLOSE;
-		}else if(tmpuf.d1.bit.testfr_cmd==1){
-			tmpuf.d1.bit.testfr_cmd=0;
-			tmpuf.d1.bit.testfr_ack=1;
+		}else if(tmpuf.bit.testfr_cmd==1){
+			tmpuf.bit.testfr_cmd=0;
+			tmpuf.bit.testfr_ack=1;
 			build_uframe(&s_u_frame,tmpuf);
 			send_frame(&s_u_frame);
 		}
@@ -1900,10 +1900,10 @@ int link_layer_104::build_sframe(frame *out,sfmt &sf){
 	i=0;
 	out->data[i++]=0x68;
 	out->data[i++]=4;
-	out->data[i++]=sf.d1;
-	out->data[i++]=sf.d2;
-	out->data[i++]=sf.d3;
-	out->data[i++]=sf.d4;
+	out->data[i++]=sf.data.d1;
+	out->data[i++]=sf.data.d2;
+	out->data[i++]=sf.data.d3;
+	out->data[i++]=sf.data.d4;
 	ret=i;
 	out->len=ret;
 	return ret;
@@ -1914,10 +1914,10 @@ int link_layer_104::build_uframe(frame *out,ufmt &uf){
 	i=0;
 	out->data[i++]=0x68;
 	out->data[i++]=4;
-	out->data[i++]=uf.d1.data;
-	out->data[i++]=uf.d2;
-	out->data[i++]=uf.d3;
-	out->data[i++]=uf.d4;
+	out->data[i++]=uf.data.d1;
+	out->data[i++]=uf.data.d2;
+	out->data[i++]=uf.data.d3;
+	out->data[i++]=uf.data.d4;
 	ret=i;
 	out->len=ret;
 	return ret;
@@ -1928,14 +1928,14 @@ int link_layer_104::build_test_link(){
 	ufmt uf;
 	frame *out;
 	i=0;
-	uf.d1.bit.testfr_cmd=1;
+	uf.bit.testfr_cmd=1;
 	out=&s_u_frame;
 	out->data[i++]=0x68;
 	out->data[i++]=0x4;
-	out->data[i++]=uf.d1.data;
-	out->data[i++]=uf.d2;
-	out->data[i++]=uf.d3;
-	out->data[i++]=uf.d4;
+	out->data[i++]=uf.data.d1;
+	out->data[i++]=uf.data.d2;
+	out->data[i++]=uf.data.d3;
+	out->data[i++]=uf.data.d4;
 	out->len=i;
 	ret=i;
 	return ret;
@@ -1949,10 +1949,10 @@ int link_layer_104::build_link_layer(frame *out,int asdu_len){
 	tmpif.bit.s_no=s_no;
 	out->data[i++]=0x68;
 	out->data[i++]=asdu_len+4;
-	out->data[i++]=tmpif.d1;
-	out->data[i++]=tmpif.d2;
-	out->data[i++]=tmpif.d3;
-	out->data[i++]=tmpif.d4;
+	out->data[i++]=tmpif.data.d1;
+	out->data[i++]=tmpif.data.d2;
+	out->data[i++]=tmpif.data.d3;
+	out->data[i++]=tmpif.data.d4;
 	ret=i+asdu_len;
 	out->len=ret;
 	out->id=s_no;
