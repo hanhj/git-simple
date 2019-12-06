@@ -18,7 +18,7 @@ int basic_com::get_byte(unsigned char *c){
 		*c=read_buff_ptr[read_consume];
 		read_consume++;
 		read_consume=(read_consume) % MAX_COM_BUFFER;
-		pfunc(DEBUG_INFO,"get byte:%02hhx\n",*c);
+		pfunc(DEBUG_DEBUG,"get byte:%02hhx\n",*c);
 		return 0;
 	}
 	return -1;
@@ -33,46 +33,51 @@ int	serial::init(void *para){
 	return 0;
 }
 int serial::connect(){
-	cout<<"connect serial"<<endl;
+	pfunc(DEBUG_DEBUG,"connect serial");
 	f=fopen(file_name,"rt");
 	return 0;
 
 }
 int serial::close(){
-	cout<<"close serial"<<endl;
+	pfunc(DEBUG_DEBUG,"close serial");
 	fclose(f);
 	return 0;
 }
 int serial::read(int len){
 	int l;
 	int i;
-	int c;
 	int m;
+	int num;
 	char *ret;
 	char buff[1000];
-	unsigned char tmpbuf[500];
+	unsigned char tmpbuf[500]; 
 	m=0;
-	ret=fgets(buff,1000,f);
+	if(f==NULL)
+		return 0;
+	if(feof(f))
+		return 0;
+	ret=fgets(buff,len,f);
 	if(ret==NULL)
 		return -1;
 	if(buff[0]!='-' && buff[1]!='>')
 		return -1;
 	l=strlen(buff);
-	for(i=0;i<l;i++){
-		//if(buff[i]=='T'||buff[i]=='X'||buff[i]==':'||buff[i]==' '||buff[i]=='-'||buff[i]=='>')
-		if(!isxdigit(buff[i]))
+	i=5;
+	for(;i<l;i++){
+		if(buff[i]==' ')
 			continue;
-
-		c=strtol(&buff[i],NULL,16);
-		tmpbuf[m]=c;
-		i++;
-		m++;
-		*(read_buff_ptr+read_produce)=c;
-		read_produce++;
-		read_produce=read_produce % MAX_COM_BUFFER;
+		if(isxdigit(buff[i])){
+			sscanf(&buff[i],"%x",&num);
+			tmpbuf[m]=num;
+			i++;
+			m++;
+			*(read_buff_ptr+read_produce)=num;
+			read_produce++;
+			read_produce=read_produce % MAX_COM_BUFFER;
+		}
 	}
-	pdump(DEBUG_INFO,"read serial",&tmpbuf[0],m);
-	return l;
+	pdump(DEBUG_DEBUG,"read serial",&tmpbuf[0],m);
+	return m;
 }
 /**
 ***********************************************************************
@@ -88,7 +93,7 @@ int serial::read(int len){
 int serial::send(unsigned char *data,int len){
 	int ret;
 	ret=0;
-	ret=pdump(DEBUG_WARNING,"send serial",data,len);
+	ret=pdump(DEBUG_INFO,"send serial",data,len);
 	if(ret<0){
 		errno=ERR_SEND;
 		pfunc(DEBUG_ERROR,"serial fail send\n");
@@ -98,15 +103,15 @@ err:
 	return ret;
 }
 int serial::get_com_state(){
-	pfunc(DEBUG_INFO,"get com state of serial\n");
+	pfunc(DEBUG_DEBUG,"get com state of serial\n");
 	return LINK_CONNECT;
 }
 int serial::set_set(void *){
-	cout<<"set set of serial"<<endl;
+	pfunc(DEBUG_DEBUG,"set set of serial");
 	return 0;
 }
 int serial::get_set(void *){
-	cout<<"get set of serial"<<endl;
+	pfunc(DEBUG_DEBUG,"get set of serial");
 	return 0;
 }
 
@@ -124,46 +129,51 @@ int	ethernet::init(void *para){
 	return 0;
 }
 int ethernet::connect(){
-	cout<<"connect ethernet"<<endl;
+	pfunc(DEBUG_DEBUG,"connect ethernet");
 	f=fopen(file_name,"rt");
 	return 0;
 
 }
 int ethernet::close(){
-	cout<<"close ethernet"<<endl;
+	pfunc(DEBUG_DEBUG,"close ethernet");
 	fclose(f);
 	return 0;
 }
 int ethernet::read(int len){
-	return 0;
 	int l;
 	int i;
-	int c;
 	int m;
+	int num;
 	char *ret;
 	char buff[1000];
-	unsigned char tmpbuf[500];
+	unsigned char tmpbuf[500]; 
 	m=0;
-	ret=fgets(buff,1000,f);
+	if(f==NULL)
+		return 0;
+	if(feof(f))
+		return 0;
+	ret=fgets(buff,len,f);
 	if(ret==NULL)
 		return -1;
 	if(buff[0]!='-' && buff[1]!='>')
 		return -1;
 	l=strlen(buff);
-	for(i=0;i<l;i++){
-		if(buff[i]=='T'||buff[i]=='X'||buff[i]==':'||buff[i]==' '||buff[i]=='-'||buff[i]=='>')
+	i=5;
+	for(;i<l;i++){
+		if(buff[i]==' ')
 			continue;
-
-		c=strtol(&buff[i],NULL,16);
-		tmpbuf[m]=c;
-		i++;
-		m++;
-		*(read_buff_ptr+read_produce)=c;
-		read_produce++;
-		read_produce=read_produce % MAX_COM_BUFFER;
+		if(isxdigit(buff[i])){
+			sscanf(&buff[i],"%x",&num);
+			tmpbuf[m]=num;
+			i++;
+			m++;
+			*(read_buff_ptr+read_produce)=num;
+			read_produce++;
+			read_produce=read_produce % MAX_COM_BUFFER;
+		}
 	}
-	pdump(DEBUG_INFO,"read ethernet",&tmpbuf[0],m);
-	return len;
+	pdump(DEBUG_DEBUG,"read ethernet:",&tmpbuf[0],m);
+	return m;
 }
 /**
 ***********************************************************************
@@ -179,7 +189,7 @@ int ethernet::read(int len){
 int ethernet::send(unsigned char *data,int len){
 	int ret;
 	ret=0;
-	ret=pdump(DEBUG_WARNING,"send ethernet",data,len);
+	ret=pdump(DEBUG_INFO,"send ethernet",data,len);
 	if(ret<0){
 		errno=ERR_SEND;
 		pfunc(DEBUG_ERROR,"ethernet fail send\n");
@@ -189,15 +199,15 @@ err:
 	return ret;
 }
 int ethernet::get_com_state(){
-	pfunc(DEBUG_INFO,"get com state of ethernet\n");
+	pfunc(DEBUG_DEBUG,"get com state of ethernet\n");
 	return LINK_CONNECT;
 }
 int ethernet::set_set(void *){
-	cout<<"set set of ethernet"<<endl;
+	pfunc(DEBUG_DEBUG,"set set of ethernet");
 	return 0;
 }
 int ethernet::get_set(void *){
-	cout<<"get set of ethernet"<<endl;
+	pfunc(DEBUG_DEBUG,"get set of ethernet");
 	return 0;
 }
 
@@ -216,45 +226,51 @@ int	wireless::init(void *para){
 	return 0;
 }
 int wireless::connect(){
-	pfunc(DEBUG_INFO,"connect wireless\n");
+	pfunc(DEBUG_DEBUG,"connect wireless\n");
 	f=fopen(file_name,"rt");
 	return 0;
 
 }
 int wireless::close(){
-	pfunc(DEBUG_INFO,"close wireless\n");
+	pfunc(DEBUG_DEBUG,"close wireless\n");
 	fclose(f);
 	return 0;
 }
 int wireless::read(int len){
 	int l;
 	int i;
-	int c;
 	int m;
+	int num;
 	char *ret;
 	char buff[1000];
-	unsigned char tmpbuf[500];
+	unsigned char tmpbuf[500]; 
 	m=0;
-	ret=fgets(buff,1000,f);
+	if(f==NULL)
+		return 0;
+	if(feof(f))
+		return 0;
+	ret=fgets(buff,len,f);
 	if(ret==NULL)
 		return -1;
 	if(buff[0]!='-' && buff[1]!='>')
 		return -1;
 	l=strlen(buff);
-	for(i=0;i<l;i++){
-		if(buff[i]=='T'||buff[i]=='X'||buff[i]==':'||buff[i]==' '||buff[i]=='-'||buff[i]=='>')
+	i=5;
+	for(;i<l;i++){
+		if(buff[i]==' ')
 			continue;
-
-		c=strtol(&buff[i],NULL,16);
-		tmpbuf[m]=c;
-		i++;
-		m++;
-		*(read_buff_ptr+read_produce)=c;
-		read_produce++;
-		read_produce=read_produce % MAX_COM_BUFFER;
+		if(isxdigit(buff[i])){
+			sscanf(&buff[i],"%x",&num);
+			tmpbuf[m]=num;
+			i++;
+			m++;
+			*(read_buff_ptr+read_produce)=num;
+			read_produce++;
+			read_produce=read_produce % MAX_COM_BUFFER;
+		}
 	}
-	pdump(DEBUG_INFO,"read wireless",&tmpbuf[0],m);
-	return l;
+	pdump(DEBUG_DEBUG,"read wireless",&tmpbuf[0],m);
+	return m;
 }
 /**
 ***********************************************************************
@@ -270,7 +286,7 @@ int wireless::read(int len){
 int wireless::send(unsigned char *data,int len){
 	int ret;
 	ret=0;
-	ret=pdump(DEBUG_WARNING,"send wireless",data,len);
+	ret=pdump(DEBUG_INFO,"send wireless",data,len);
 	if(ret<0){
 		errno=ERR_SEND;
 		pfunc(DEBUG_ERROR,"wireless fail send\n");
@@ -280,15 +296,15 @@ err:
 	return ret;
 }
 int wireless::get_com_state(){
-	pfunc(DEBUG_INFO,"get com state of wireless\n");
+	pfunc(DEBUG_DEBUG,"get com state of wireless\n");
 	return LINK_CONNECT;
 }
 int wireless::set_set(void *){
-	cout<<"set set of wireless"<<endl;
+	pfunc(DEBUG_DEBUG,"set set of wireless\n");
 	return 0;
 }
 int wireless::get_set(void *){
-	cout<<"get set of wireless"<<endl;
+	pfunc(DEBUG_DEBUG,"get set of wireless\n");
 	return 0;
 }
 

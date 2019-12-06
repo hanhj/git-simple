@@ -28,7 +28,7 @@ int link_layer::set_link_com(com_port*c,int p){
 	if(c!=NULL){
 		port=p;
 		com=c;
-		pfunc(DEBUG_INFO,"set link link_layer [%d] to com_port %d\n",p,c->port_no);
+		pfunc(DEBUG_DEBUG,"set link link_layer [%d] to com_port %d\n",p,c->port_no);
 		return 0;
 	}
 	pfunc(DEBUG_ERROR,"invalid para\n");
@@ -47,7 +47,7 @@ int link_layer::send_frame(frame *f){
 		pfunc(DEBUG_ERROR,"invalid para\n");
 		goto err;
 	}
-	pfunc(DEBUG_INFO,"send frame of link [%d]\n",port);
+	pfunc(DEBUG_DEBUG,"send frame of link [%d]\n",port);
 	ret=com->send(f->data,f->len);
 	if(ret<0){
 		goto err;
@@ -58,7 +58,7 @@ err:
 int link_layer::check_state(){
 	int ret;
 	ret=com->get_com_state();
-	pfunc(DEBUG_INFO,"check state of link [%d] state=%d\n",port,ret);
+	pfunc(DEBUG_DEBUG,"check state of link [%d] state=%d\n",port,ret);
 	return ret;
 }
 int link_layer::on_link(frame *in,frame *out){
@@ -462,7 +462,7 @@ int link_layer::process_wr_dz(frame *out){
 		para_data.op=0;	
 	}else if(para_data.op==5){//撤销
 		para_data.op=0;
-		pfunc(DEBUG_WARNING,"cancel set\n");
+		pfunc(DEBUG_INFO,"cancel set\n");
 	}
 	ret=app->build_wr_dz_con(out,this,&para_data);
 	process&=~PROCESS_WR_DZ;
@@ -773,7 +773,7 @@ void link_layer_101::set_loc_ctl(){
 int link_layer_101::on_ack(frame *in,frame *out){
 	int ret;
 	ret=-1;
-	pfunc(DEBUG_INFO,"on_ack\n");
+	pfunc(DEBUG_DEBUG,"on_ack\n");
 	if(process & PROCESS_EVENT){
 		ret = process_event(out);
 	}else if(process & PROCESS_SUMMON){
@@ -808,7 +808,7 @@ int link_layer_101::on_ack(frame *in,frame *out){
 //for unbalance
 int link_layer_101::on_req_class_1(frame *in,frame *out){
 	int ret ;
-	pfunc(DEBUG_INFO,"on_req_class_1\n");
+	pfunc(DEBUG_DEBUG,"on_req_class_1\n");
 	ret=-1;
 	if(process & PROCESS_EVENT){
 		ret=process_event(out);
@@ -835,7 +835,7 @@ int link_layer_101::on_req_class_1(frame *in,frame *out){
 int link_layer_101::on_req_class_2(frame *in,frame *out){
 	int ret;
 	ret=-1;
-	pfunc(DEBUG_INFO,"on_req_class_2\n");
+	pfunc(DEBUG_DEBUG,"on_req_class_2\n");
 	if( process & PROCESS_EVENT){
 		ret=process_event(out);
 	}else if(process & PROCESS_CLOCK){
@@ -995,7 +995,7 @@ int link_layer_101::get_frame(){
 	int fail=0;
 	if(com==NULL)
 		return -1;
-	pfunc(DEBUG_INFO,"get frame of link [%d]\n",port);
+	pfunc(DEBUG_DEBUG,"get frame of link [%d]\n",port);
 	while(1){
 		ret=com->get_byte(&c);
 		if(ret==-1)
@@ -1017,17 +1017,20 @@ int link_layer_101::get_frame(){
 						rcv_fix_timer.stop();
 						start_rcv_fix_flag=0;
 						r_fix_pos=0;
-						pdump(DEBUG_WARNING,"get fix frame",&r_fix_frame.data[0],r_fix_frame.len);
+						pdump(DEBUG_INFO,"get fix frame",&r_fix_frame.data[0],r_fix_frame.len);
 						deal_frame(&r_fix_frame);
 						break;
 					}else{
+						pfunc(DEBUG_ERROR,"get fix frame err1\n");
 						fail=1;
 					}
 				}else{
+					pfunc(DEBUG_ERROR,"get fix frame err2\n");
 					fail=1;
 				}
 			}else if(r_fix_pos>(addr_size+4)){
 				fail=1;
+				pfunc(DEBUG_ERROR,"get fix frame err3\n");
 			}
 			if(rcv_fix_timer.is_reached()==1){//receive timeout
 				start_rcv_fix_flag=0;
@@ -1038,13 +1041,12 @@ int link_layer_101::get_frame(){
 				start_rcv_fix_flag=0;
 				r_fix_pos=0;
 				rcv_fix_timer.stop();
-				break;
 		}
 		fail=0;
 		if(c==0x68){
 			if(!start_rcv_var_flag){
 				start_rcv_var_flag=1;
-			//	rcv_var_timer.start(3);
+				rcv_var_timer.start(3);
 				r_var_pos=0;
 				exp_len=3;
 			}
@@ -1054,8 +1056,6 @@ int link_layer_101::get_frame(){
 			r_var_pos++;
 			if(r_var_pos==3){
 				exp_len=(r_var_frame.data[r_var_pos-1]+6);
-						pdump(DEBUG_ERROR,"get var frame",&r_var_frame.data[0],3);
-						pfunc(DEBUG_ERROR,"exp:%d\n",exp_len);
 			}
 			if(r_var_pos==exp_len){
 				if(r_var_frame.data[r_var_pos-1]==0x16&&r_var_frame.data[offset_len]==r_var_frame.data[offset_len+1]){
@@ -1064,21 +1064,20 @@ int link_layer_101::get_frame(){
 						r_var_pos=0;
 						start_rcv_var_flag=0;
 						rcv_var_timer.stop();
-						pdump(DEBUG_WARNING,"get var frame",&r_var_frame.data[0],r_var_frame.len);
+						pdump(DEBUG_INFO,"get var frame",&r_var_frame.data[0],r_var_frame.len);
 						deal_frame(&r_var_frame);
 						break;
 					}else{
 						fail=1;
-						pfunc(DEBUG_ERROR,"pos:%d\n",r_var_pos);
+						pfunc(DEBUG_ERROR,"get var frame err1\n");
 					}
 				}else{
-						pfunc(DEBUG_ERROR,"pos:%d\n",r_var_pos);
-						pdump(DEBUG_ERROR,"get var frame",&r_var_frame.data[0],exp_len);
+					pfunc(DEBUG_ERROR,"get var frame err2\n");
 					fail=1;
 				}
 			}else if(r_var_pos>exp_len){
 				fail=1;
-						pfunc(DEBUG_ERROR,"pos:%d\n",r_var_pos);
+				pfunc(DEBUG_ERROR,"get var frame err3\n");
 			}
 		}
 		if(rcv_var_timer.is_reached()==1){
@@ -1089,8 +1088,6 @@ int link_layer_101::get_frame(){
 				start_rcv_var_flag=0;
 				r_var_pos=0;
 				rcv_var_timer.stop();
-						pfunc(DEBUG_ERROR,"pos:%d\n",r_var_pos);
-				break;
 		}
 	}
 	return ret;
@@ -1098,7 +1095,7 @@ int link_layer_101::get_frame(){
 int link_layer_101::link_time(){
 	int ret;
 	ret=0;
-	pfunc(DEBUG_INFO,"time of 101 frame of link [%d]\n",port);
+	pfunc(DEBUG_DEBUG,"time of 101 frame of link [%d]\n",port);
 	if(balance==UNBALANCE)
 		return 0;
 	if(rep_timer.is_reached()==1){
@@ -1225,7 +1222,7 @@ int link_layer_101::deal_frame(frame*f){
 int link_layer_101::on_fc0(frame*f){
 	int ret;
 	ret=0;
-	pfunc(DEBUG_INFO,"on_fc0\n");
+	pfunc(DEBUG_DEBUG,"on_fc0\n");
 	if(balance==UNBALANCE){
 		if(link_step==2){
 			//because remote reset link so reset ctl_lo and ctl_rm
@@ -1317,14 +1314,14 @@ int link_layer_101::on_fc1(frame*f){
 	int ret;
 	ret=0;
 	app->do_reset();
-	pfunc(DEBUG_INFO,"on_fc1\n");
+	pfunc(DEBUG_DEBUG,"on_fc1\n");
 //err:
 	return ret;
 }
 int link_layer_101::on_fc2(frame*f){
 	int ret;
 	ret=0;
-	pfunc(DEBUG_INFO,"on_fc2\n");
+	pfunc(DEBUG_DEBUG,"on_fc2\n");
 	ret=build_ack(&s_fix_frame,has_data);
 	if(ret<0){
 		goto err;
@@ -1340,7 +1337,7 @@ int link_layer_101::on_fc3(frame *f){
 	int ret;
 	int sret;
 	ret=0;
-	pfunc(DEBUG_INFO,"on_fc3\n");
+	pfunc(DEBUG_DEBUG,"on_fc3\n");
 	ctrl_word ctl;
 	ctl.data=f->data[offset_control];
 	if(balance==UNBALANCE){
@@ -1441,35 +1438,35 @@ err:
 int link_layer_101::on_fc4(frame*f){
 	int ret;
 	ret=0;
-	pfunc(DEBUG_INFO,"on_fc4\n");
+	pfunc(DEBUG_DEBUG,"on_fc4\n");
 //err:
 	return ret;
 }
 int link_layer_101::on_fc5(frame*f){
 	int ret;
 	ret=0;
-	pfunc(DEBUG_INFO,"on_fc5\n");
+	pfunc(DEBUG_DEBUG,"on_fc5\n");
 //err:
 	return ret;
 }
 int link_layer_101::on_fc6(frame*f){
 	int ret;
 	ret=0;
-	pfunc(DEBUG_INFO,"on_fc6\n");
+	pfunc(DEBUG_DEBUG,"on_fc6\n");
 //err:
 	return ret;
 }
 int link_layer_101::on_fc7(frame*f){
 	int ret;
 	ret=0;
-	pfunc(DEBUG_INFO,"on_fc7\n");
+	pfunc(DEBUG_DEBUG,"on_fc7\n");
 //err:
 	return ret;
 }
 int link_layer_101::on_fc8(frame*f){
 	int ret;
 	ret=0;
-	pfunc(DEBUG_INFO,"on_fc8\n");
+	pfunc(DEBUG_DEBUG,"on_fc8\n");
 	if(balance!=BALANCE){
 		ret=build_link_ack(&s_fix_frame);
 		if(ret<0){
@@ -1486,7 +1483,7 @@ err:
 int link_layer_101::on_fc9(frame*f){
 	int ret;
 	ret=0;
-	pfunc(DEBUG_INFO,"on_fc9\n");
+	pfunc(DEBUG_DEBUG,"on_fc9\n");
 	if(link_state!=LINK_OPEN){
 		link_step=1;
 		link_state=LINK_DISCONNECT;
@@ -1508,7 +1505,7 @@ int link_layer_101::on_fc10(frame*f){
 	ret=0;
 	if(balance==BALANCE)
 		return ret;
-	pfunc(DEBUG_INFO,"on_fc10\n");
+	pfunc(DEBUG_DEBUG,"on_fc10\n");
 	ctrl_word ctl;
 	ctl.data=f->data[offset_control];
 		
@@ -1571,7 +1568,7 @@ err:
 int link_layer_101::on_fc11(frame *f){
 	int ret;
 	ret=0;
-	pfunc(DEBUG_INFO,"on_fc11\n");
+	pfunc(DEBUG_DEBUG,"on_fc11\n");
 	ctrl_word ctl;
 	ctl.data=f->data[offset_control];
 	if(balance!=BALANCE){
@@ -1653,7 +1650,7 @@ int link_layer_104::get_frame(){
 	int flag;
 	if(com==NULL)
 		return -1;
-	pfunc(DEBUG_INFO,"get frame of link [%d]\n",port);
+	pfunc(DEBUG_DEBUG,"get frame of link [%d]\n",port);
 	while(1){
 		ret=com->get_byte(&c);
 		if(ret==-1)
@@ -2041,7 +2038,7 @@ void link_layer_104::resend(){
 }
 int link_layer_104::link_time(){
 	int ret=0;
-	pfunc(DEBUG_INFO,"time of 104 frame of link [%d]\n",port);
+	pfunc(DEBUG_DEBUG,"time of 104 frame of link [%d]\n",port);
 	if(t1_timer.is_reached()==1){
 		/*
 		if(r_no!=ack_no){

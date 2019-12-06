@@ -467,7 +467,48 @@ typedef struct _dir_node{//directory
 	long file_size;
 }dir_node;
 typedef CircleQueue<dir_node> dir_list;
+#include "string.h"
+void read_file(){
+	FILE *f;
+	char buff[1000];
+	int tmp[500];
+	f=fopen("test.dat","r");
+	if(!f)
+		return;
+	char * ret;
+	while(!feof(f)){
+		ret=fgets(buff,1000,f);
+		if(ret!=NULL){
+			if(buff[0]!='-'&&buff[1]!='>')
+				continue;
+			int len;
+			int i;
+			int j;
+			int m;
+			int num;
+			len=strlen(buff);
+			i=5;
+			m=0;
+			for(j=i;j<len;j++){
+				if(buff[j]==' ')
+					continue;
+				if(isxdigit(buff[j])){
+					sscanf(&buff[j],"%x",&num);
+					tmp[m]=num;
+					m++;
+					j++;
+				}
+			}
+			printf("rcv:%d:",m);
+			for(j=0;j<m;j++){
+				printf("%x ",tmp[j]);
+			}
+			cout<<endl;
 
+		}
+	}
+	fclose(f);
+}
 int main(){
 	vector<std::string> bb {"1","2"};
 	myswap(begin(bb),begin(bb)+1);
@@ -560,6 +601,7 @@ int main(){
 	printf("%lx \n",eee);
 	a='/';
 	cout<<isascii(a)<<","<<isalpha(a)<<","<<isxdigit(a)<<","<<isdigit(a)<<endl;
+	read_file();
 
 	init_kb();
 	while(1){

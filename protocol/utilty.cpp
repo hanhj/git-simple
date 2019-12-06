@@ -47,13 +47,13 @@ int timer::is_reached(){
 }
 int timer::start(int T){
 	if(start_flag == 1){
-		pfunc(DEBUG_INFO,"timer has started\n");
+		pfunc(DEBUG_DEBUG,"timer has started\n");
 		return -1;
 	}
 	start_flag=1;
 	duration=T;
 	exp_time=get_system_time()+T;
-	pfunc(DEBUG_INFO,"start timer\n");
+	pfunc(DEBUG_DEBUG,"start timer\n");
 	return 0;
 }
 int timer::restart(int T){
@@ -68,7 +68,7 @@ int timer::restart(){
 }
 int timer::stop(){
 	if(start_flag == 1){
-		pfunc(DEBUG_INFO,"stop timer\n");
+		pfunc(DEBUG_DEBUG,"stop timer\n");
 		start_flag =0;
 		return 0;
 	}
@@ -79,21 +79,15 @@ int debug(int mode,const char*file,const char*func,int line,const char *fmt...){
 	const char *color="";
 	const char *default_col="\033[0;m";
 	if(mode>DEBUG_LEVEL)
-		return -1;
-	switch(mode){
-		case DEBUG_ERROR:
-			color="\033[031m";
-			break;
-		case DEBUG_WARNING:
-			color="\033[033m";
-			break;
-		case DEBUG_INFO:
-			color="\033[032m";
-			break;
-		case DEBUG_NORMAL:
-			color="\033[0;m";
-			break;
-	}
+		return 0;
+	if(mode==DEBUG_ERROR)
+		color="\033[031m";
+	else if(mode== DEBUG_WARNING)
+		color="\033[033m";
+	else if(mode == DEBUG_INFO)
+		color="\033[032m";
+	else
+		color=default_col;
 	va_list arg;
 	va_start(arg,fmt);
 	vsnprintf((char*)&debug_buff[0],DEBUG_BUFF,fmt,arg);
@@ -107,21 +101,15 @@ int dump(int mode,const char*file,const char*func,int line,unsigned char *data,i
 	const char *color="";
 	const char *default_col="\033[0;m";
 	if(mode>DEBUG_LEVEL)
-		return -1;
-	switch(mode){
-		case DEBUG_ERROR:
-			color="\033[031m";
-			break;
-		case DEBUG_WARNING:
-			color="\033[033m";
-			break;
-		case DEBUG_INFO:
-			color="\033[032m";
-			break;
-		case DEBUG_NORMAL:
-			color="\033[0;m";
-			break;
-	}
+		return 0;
+	if(mode==DEBUG_ERROR)
+		color="\033[031m";
+	else if(mode== DEBUG_WARNING)
+		color="\033[033m";
+	else if(mode == DEBUG_INFO)
+		color="\033[032m";
+	else
+		color=default_col;
 	if(head!=NULL){
 		fprintf(stderr,"[%s %s %d]%s%s %d:%s",file,func,line,color,head,len,default_col);
 	}

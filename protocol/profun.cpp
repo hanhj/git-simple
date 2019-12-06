@@ -17,20 +17,20 @@ int g_reset=0;
 SORT_YX_TAB * get_yx_data(int pos){
 	SORT_YX_TAB *p;
 	p=&SortYxTable[pos];
-	pfunc(DEBUG_ERROR,"get yx pos %d\n",pos);
+	pfunc(DEBUG_INFO,"get yx pos %d\n",pos);
 	return p;
 }
 YC_TAB * get_yc_data(int pos){
 	YC_TAB *p;
 	p=&YcTable[pos];
-	pfunc(DEBUG_ERROR,"get yc pos %d\n",pos);
+	pfunc(DEBUG_INFO,"get yc pos %d\n",pos);
 	return p;
 }
 YC_TAB * get_acc_yc_data(int pos){
 	YC_TAB *p;
 	pos+=config_scada_data.pos_acc;
 	p=&YcTable[pos];
-	pfunc(DEBUG_ERROR,"get acc yc pos %d\n",pos);
+	pfunc(DEBUG_INFO,"get acc yc pos %d\n",pos);
 	return p;
 }
 int get_event_data(int port,event *&e,int change){
@@ -49,20 +49,20 @@ int get_event_data(int port,event *&e,int change){
 		}
 		it++;
 	}
-	pfunc(DEBUG_INFO,"get event\n");
+	pfunc(DEBUG_DEBUG,"get event\n");
 	return ret;
 }
 int get_clock(CP56Time2a &time){
-	pfunc(DEBUG_ERROR,"get clock\n");
+	pfunc(DEBUG_INFO,"get clock\n");
 	return 0;
 }
 //type:0 execute;1:check;
 int do_yk(int id,int type,int cmd){
-	pfunc(DEBUG_ERROR,"do yk:id:%x\n",id);
+	pfunc(DEBUG_INFO,"do yk:id:%x\n",id);
 	if(type == 0){
-		pfunc(DEBUG_ERROR,"do execute:%x\n",cmd);
+		pfunc(DEBUG_INFO,"do execute:%x\n",cmd);
 	}else if(type == 1){
-		pfunc(DEBUG_ERROR,"do select:%x\n",cmd);
+		pfunc(DEBUG_INFO,"do select:%x\n",cmd);
 	}
 	return 0;
 }
@@ -84,11 +84,11 @@ int get_yc_cg_data(int port,event_yc *&e){
 		}
 		it++;
 	}
-	pfunc(DEBUG_INFO,"get change yc data\n");
+	pfunc(DEBUG_DEBUG,"get change yc data\n");
 	return ret;
 }
 int get_dir_data(_rd_dir *dir){
-	pfunc(DEBUG_ERROR,"dir:\n");
+	pfunc(DEBUG_INFO,"dir:\n");
 	dir_list *list;
 	list=&dir->res_list;
 	list->clear();
@@ -103,10 +103,9 @@ int get_dir_data(_rd_dir *dir){
 		list->push(node);
 		it++;
 		n++;
-		pfunc(DEBUG_ERROR,"%s ",node.name);
+		pfunc(DEBUG_INFO,"%s \n",node.name);
 	}
 	//dir->res_list=g_dir_list;
-	pfunc(DEBUG_ERROR,"\n");
 	return n;
 }
 int get_file_data(_rd_file *file){
@@ -122,7 +121,7 @@ int get_file_data(_rd_file *file){
 		}
 		it++;
 	}
-	pfunc(DEBUG_ERROR,"get file %s\n",file->req_file.name);
+	pfunc(DEBUG_INFO,"get file %s\n",file->req_file.name);
 	return ret;
 }
 int get_file_segment(_rd_file*file){
@@ -147,7 +146,7 @@ int get_file_segment(_rd_file*file){
 	}
 	file->segment.len=ret_len;
 	fclose(f);
-	pfunc(DEBUG_ERROR,"get segment of %s\n",file->req_file.name);
+	pfunc(DEBUG_INFO,"get segment of %s\n",file->req_file.name);
 	return ret;
 }
 void load_file_list(){
@@ -168,7 +167,7 @@ void load_file_list(){
 		sscanf(buff,"%s %ld %ld %s",&node.name[0],&node.file_id,&node.file_size,&time[0]);
 		node.name_len=strlen(node.name);
 		g_dir_list.push(node);
-		pfunc(DEBUG_WARNING,"%ld %s %ld %ld %s\n",node.name_len,&node.name[0],node.file_id,node.file_size,&time[0]);
+		pfunc(DEBUG_INFO,"%ld %s %ld %ld %s\n",node.name_len,&node.name[0],node.file_id,node.file_size,&time[0]);
 	}
 }
 void save_file_list(){
@@ -226,7 +225,7 @@ int save_file_data(_rd_file *file){
 		g_dir_list.push(node);
 		save_file_list();
 	}
-	pfunc(DEBUG_ERROR,"save %s\n",file->req_file.name);
+	pfunc(DEBUG_INFO,"save %s\n",file->req_file.name);
 	return ret;
 }
 int save_file_segment(_rd_file*file){
@@ -262,23 +261,23 @@ int save_file_segment(_rd_file*file){
 			file->suc=1;
 		}
 	}
-	pfunc(DEBUG_ERROR,"save segment of %s\n",file->req_file.name);
+	pfunc(DEBUG_INFO,"save segment of %s\n",file->req_file.name);
 	return ret;
 }
 int get_dz_unit(_para_list *data){
 	data->unit=LimitBounds.cur_unit=2;
 	data->min_unit=LimitBounds.min_unit=1;//to do
 	data->max_unit=LimitBounds.max_unit=100;//to do
-	pfunc(DEBUG_ERROR,"get unit %d\n",data->unit);
+	pfunc(DEBUG_INFO,"get unit %d\n",data->unit);
 	return 0;
 }
 int set_dz_unit(int unit){
-	pfunc(DEBUG_ERROR,"set unit %d\n",unit);
+	pfunc(DEBUG_INFO,"set unit %d\n",unit);
 	LimitBounds.cur_unit=unit;
 	return 0;
 }
 int get_dz_data(para_node *para){
-	pfunc(DEBUG_ERROR,"get dz %x\n",para->id);
+	pfunc(DEBUG_INFO,"get dz %x\n",para->id);
 	if(para->id==0x5001){
 		para->tag=1;
 		para->len=4;
@@ -305,7 +304,7 @@ int get_dz_data(para_node *para){
 	return para->len;
 }
 int set_dz(int num,para_node*para){
-	pfunc(DEBUG_ERROR,"set dz %x\n",para->id);
+	pfunc(DEBUG_INFO,"set dz %x\n",para->id);
 	return 0;
 }
 int do_update(){

@@ -54,7 +54,7 @@ int main(int arg,char **argv){
 	init_data();
 	init_kb();
 	while(1){
-		pfunc(DEBUG_INFO,"run loop:%d\n",loops);
+		pfunc(DEBUG_DEBUG,"run loop:%d\n",loops);
 		loops++;
 		sleep_ms(10);
 		if(kbhit()){
