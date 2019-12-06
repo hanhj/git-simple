@@ -1658,29 +1658,38 @@ int link_layer_104::get_frame(){
 		if(c==0x68){
 			if(!start_rcv_s_flag){
 				start_rcv_s_flag=1;
-			}else if(!start_rcv_u_flag){
+			}
+			if(!start_rcv_u_flag){
 				start_rcv_u_flag=1;
-			}else if(!start_rcv_i_flag){
+			}
+			if(!start_rcv_i_flag){
 				start_rcv_i_flag=1;
 			}
 		}
 		flag=start_rcv_s_flag+start_rcv_u_flag+start_rcv_i_flag;
 		if(flag){
 			r_tmp_frame.data[r_tmp_pos++]=c;
-			if(r_tmp_pos==2){
+			if(r_tmp_pos==1){
+				exp_len=4;
+			}else if(r_tmp_pos==2){
 				exp_len=c+2;
-			}
-			if(r_tmp_pos==3){
+			}else if(r_tmp_pos==3){
 				frame_type=check_type(c);
 				if(frame_type==TYPE_I){
 					start_rcv_u_flag=0;
 					start_rcv_s_flag=0;
+					r_s_pos=0;
+					r_u_pos=0;
 				}else if(frame_type==TYPE_S){
 					start_rcv_i_flag=0;
 					start_rcv_u_flag=0;
+					r_i_pos=0;
+					r_u_pos=0;
 				}else if(frame_type==TYPE_U){
 					start_rcv_i_flag=0;
 					start_rcv_s_flag=0;
+					r_s_pos=0;
+					r_i_pos=0;
 				}
 			}
 			if(r_tmp_pos==exp_len){
@@ -1704,7 +1713,8 @@ int link_layer_104::get_frame(){
 				r_s_frame.len=0;
 				exp_len=0;
 			}
-		}else if(start_rcv_u_flag){
+		}
+		if(start_rcv_u_flag){
 			r_u_frame.data[r_u_pos++]=c;
 			if(r_u_pos==exp_len){
 				r_u_frame.len=r_u_pos;
@@ -1721,7 +1731,8 @@ int link_layer_104::get_frame(){
 				r_u_frame.len=0;
 				exp_len=0;
 			}
-		}else if(start_rcv_i_flag){
+		}
+		if(start_rcv_i_flag){
 			r_i_frame.data[r_i_pos++]=c;
 			if(r_i_pos==exp_len){
 				r_i_frame.len=r_i_pos;
@@ -1852,31 +1863,31 @@ int link_layer_104::deal_frame(frame *in){
 	}else if(in->type==TYPE_U){//for U frame
 		t3_timer.restart(T3_TIME);
 		ufmt tmpuf;
-		tmpuf.d1=in->data[offset_control];
+		tmpuf.d1.data=in->data[offset_control];
 		tmpuf.d2=in->data[offset_control+1];
 		tmpuf.d3=in->data[offset_control+2];
 		tmpuf.d4=in->data[offset_control+3];
-		if(tmpuf.bit.startdt_cmd){
-			tmpuf.bit.startdt_cmd=0;
-			tmpuf.bit.startdt_ack=1;
+		if(tmpuf.d1.bit.startdt_cmd){
+			tmpuf.d1.bit.startdt_cmd=0;
+			tmpuf.d1.bit.startdt_ack=1;
 			build_uframe(&s_u_frame,tmpuf);
 			send_frame(&s_u_frame);
 			link_state=LINK_OPEN;
 			app->build_link_fini(&s_i_frame,this);
 			send_frame(&s_i_frame);
-		}else if(tmpuf.bit.startdt_ack==1){
+		}else if(tmpuf.d1.bit.startdt_ack==1){
 			link_state=LINK_OPEN;
-		}else if(tmpuf.bit.stopdt_cmd==1){
-			tmpuf.bit.stopdt_cmd=0;
-			tmpuf.bit.stopdt_ack=1;
+		}else if(tmpuf.d1.bit.stopdt_cmd==1){
+			tmpuf.d1.bit.stopdt_cmd=0;
+			tmpuf.d1.bit.stopdt_ack=1;
 			link_state=LINK_CLOSE;
 			build_uframe(&s_u_frame,tmpuf);
 			send_frame(&s_u_frame);
-		}else if(tmpuf.bit.stopdt_ack==1){
+		}else if(tmpuf.d1.bit.stopdt_ack==1){
 			link_state=LINK_CLOSE;
-		}else if(tmpuf.bit.testfr_cmd==1){
-			tmpuf.bit.testfr_cmd=0;
-			tmpuf.bit.testfr_ack=1;
+		}else if(tmpuf.d1.bit.testfr_cmd==1){
+			tmpuf.d1.bit.testfr_cmd=0;
+			tmpuf.d1.bit.testfr_ack=1;
 			build_uframe(&s_u_frame,tmpuf);
 			send_frame(&s_u_frame);
 		}
@@ -1903,7 +1914,7 @@ int link_layer_104::build_uframe(frame *out,ufmt &uf){
 	i=0;
 	out->data[i++]=0x68;
 	out->data[i++]=4;
-	out->data[i++]=uf.d1;
+	out->data[i++]=uf.d1.data;
 	out->data[i++]=uf.d2;
 	out->data[i++]=uf.d3;
 	out->data[i++]=uf.d4;
@@ -1917,11 +1928,11 @@ int link_layer_104::build_test_link(){
 	ufmt uf;
 	frame *out;
 	i=0;
-	uf.bit.testfr_cmd=1;
+	uf.d1.bit.testfr_cmd=1;
 	out=&s_u_frame;
 	out->data[i++]=0x68;
 	out->data[i++]=0x4;
-	out->data[i++]=uf.d1;
+	out->data[i++]=uf.d1.data;
 	out->data[i++]=uf.d2;
 	out->data[i++]=uf.d3;
 	out->data[i++]=uf.d4;

@@ -112,7 +112,7 @@ typedef union _ifmt{
 		bit.r_no=0;
 	}
 }ifmt;
-struct ufmt_bit{
+typedef struct __ufmt_bit{
 	unsigned char res1:1;
 	unsigned char res2:1;
 	unsigned char startdt_cmd:1;
@@ -121,28 +121,21 @@ struct ufmt_bit{
 	unsigned char stopdt_ack:1;
 	unsigned char testfr_cmd:1;
 	unsigned char testfr_ack:1;
-	unsigned char res3:8;
-	unsigned int  res4:1;
-	unsigned int  res5:15;
-};
-typedef union _ufmt{
-	struct ufmt_bit bit;
-	unsigned long d1:8;
+}_ufmt_bit;
+typedef union __ufmt_d1{
+	_ufmt_bit bit;
+	unsigned data;
+}_ufmt_d1;
+typedef struct _ufmt{
+	_ufmt_d1 d1;
 	unsigned long d2:8;
 	unsigned long d3:8;
 	unsigned long d4:8;
 	_ufmt(){
-		bit.res1=1;
-		bit.res2=1;
-		bit.startdt_cmd=0;
-		bit.startdt_ack=0;
-		bit.stopdt_cmd=0;
-		bit.stopdt_ack=0;
-		bit.testfr_cmd=0;
-		bit.testfr_ack=0;
-		bit.res3=0;
-		bit.res4=0;
-		bit.res5=0;
+		d1.data=3;
+		d2=0;
+		d3=0;
+		d4=0;
 	}
 }ufmt;
 //define data struct for asdu
@@ -824,6 +817,7 @@ class link_layer_104:public link_layer{
 			rcv_num=8;
 			r_s_pos=0;
 			r_u_pos=0;
+			r_i_pos=0;
 			r_tmp_pos=0;
 			r_no=0;
 			s_no=0;

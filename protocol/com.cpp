@@ -29,7 +29,7 @@ ostream & operator<<(ostream &os,serial_set &a){
 int	serial::init(void *para){
 	cout<<"init serial"<<",port no:"<<port_no<<",com_type:"<<com_type<<endl;
 	cout<<"para: "<<set<<endl;
-	strcpy(file_name,"test.dat");
+	strcpy(file_name,"xxtest.dat");
 	return 0;
 }
 int serial::connect(){
