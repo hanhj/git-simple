@@ -82,8 +82,8 @@ typedef struct __byte_data{
 }_byte_data;
 struct sfmt_bit{
 	unsigned long res1:1;
-	unsigned long res2:8;
-	unsigned long res3:1;
+	unsigned long res2:1;
+	unsigned long res3:15;
 	unsigned long r_no:15;
 };
 typedef union _sfmt{
@@ -765,7 +765,7 @@ class link_layer_101:public link_layer{
 #define TYPE_S 2
 #define TYPE_U 3
 #define T3_TIME 20 
-#define T2_TIME 10 
+#define T2_TIME 5//10 
 #define T1_TIME 15
 #define T0_TIME 30
 class link_layer_104:public link_layer{

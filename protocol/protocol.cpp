@@ -1636,11 +1636,11 @@ void link_layer_104::set_loc_ctl(){
 
 }
 int link_layer_104::check_type(unsigned char c){
+	if((c&3)==3)
+		return TYPE_U;
 	if((c&1)==0)
 		return TYPE_I;
-	if(c&3)
-		return TYPE_U;
-	if(c&1)
+	if((c&1)==1)
 		return TYPE_S;
 	return 0;
 }
@@ -1700,6 +1700,7 @@ int link_layer_104::get_frame(){
 			r_s_frame.data[r_s_pos++]=c;
 			if(r_s_pos==exp_len){
 				r_s_frame.len=r_s_pos;
+				pdump(DEBUG_INFO,"get s frame:",&r_s_frame.data[0],r_s_frame.len);
 				deal_frame(&r_s_frame);
 				ret=1;
 				r_s_pos=0;
@@ -1718,6 +1719,7 @@ int link_layer_104::get_frame(){
 			r_u_frame.data[r_u_pos++]=c;
 			if(r_u_pos==exp_len){
 				r_u_frame.len=r_u_pos;
+				pdump(DEBUG_INFO,"get u frame:",&r_u_frame.data[0],r_u_frame.len);
 				deal_frame(&r_u_frame);
 				ret=1;
 				start_rcv_u_flag=0;
@@ -1736,6 +1738,7 @@ int link_layer_104::get_frame(){
 			r_i_frame.data[r_i_pos++]=c;
 			if(r_i_pos==exp_len){
 				r_i_frame.len=r_i_pos;
+				pdump(DEBUG_INFO,"get i frame:",&r_i_frame.data[0],r_i_frame.len);
 				deal_frame(&r_i_frame);
 				ret=1;
 				start_rcv_i_flag=0;
@@ -1766,16 +1769,21 @@ int link_layer_104::deal_frame(frame *in){
 		tmpif.data.d2=in->data[offset_control+1];
 		tmpif.data.d3=in->data[offset_control+2];
 		tmpif.data.d4=in->data[offset_control];
-		/*//not check send no sequence
 		if(tmpif.bit.s_no!=r_no){//sequence error
+			//not check send no sequence
 			link_state=LINK_ERROR;
 			return ret;
 		}
-		*/
+		if(tmpif.bit.r_no==s_no){
+			t1_timer.stop();
+		}
 		t2_timer.restart(T2_TIME);
 		t3_timer.restart(T3_TIME);
 		rcv_count++;
 		ack_no=tmpif.bit.r_no;
+		if(ack_no==s_no){
+			t1_timer.stop();
+		}
 		clear_sq();
 		r_no=(r_no+1)%N;
 		ti=in->data[offset_ti];
@@ -1849,8 +1857,11 @@ int link_layer_104::deal_frame(frame *in){
 				break;
 		}
 		rcv_count --;
-		if(ret>0)
+		if(ret>0){
 			send_frame(&s_i_frame);
+			t2_timer.stop();//no need send s frame
+			t1_timer.start(T1_TIME);//send new i frame ,need ack
+		}
 	}else if(in->type==TYPE_S){//for S frame
 		t3_timer.restart(T3_TIME);
 		sfmt tmpsf;
@@ -1859,6 +1870,9 @@ int link_layer_104::deal_frame(frame *in){
 		tmpsf.data.d3=in->data[offset_control+2];
 		tmpsf.data.d4=in->data[offset_control+3];
 		ack_no=tmpsf.bit.r_no;
+		if(ack_no==s_no){
+			t1_timer.stop();
+		}
 		clear_sq();
 	}else if(in->type==TYPE_U){//for U frame
 		t3_timer.restart(T3_TIME);
@@ -1875,21 +1889,25 @@ int link_layer_104::deal_frame(frame *in){
 			link_state=LINK_OPEN;
 			app->build_link_fini(&s_i_frame,this);
 			send_frame(&s_i_frame);
+			t1_timer.start(T1_TIME);//send i frame ,need ack
 		}else if(tmpuf.bit.startdt_ack==1){
 			link_state=LINK_OPEN;
+			t1_timer.stop();//rcv strartdt ack,stop timer
 		}else if(tmpuf.bit.stopdt_cmd==1){
 			tmpuf.bit.stopdt_cmd=0;
 			tmpuf.bit.stopdt_ack=1;
 			link_state=LINK_CLOSE;
 			build_uframe(&s_u_frame,tmpuf);
-			send_frame(&s_u_frame);
+			send_frame(&s_u_frame);//rcv stopcmd send ack
 		}else if(tmpuf.bit.stopdt_ack==1){
 			link_state=LINK_CLOSE;
 		}else if(tmpuf.bit.testfr_cmd==1){
 			tmpuf.bit.testfr_cmd=0;
 			tmpuf.bit.testfr_ack=1;
 			build_uframe(&s_u_frame,tmpuf);
-			send_frame(&s_u_frame);
+			send_frame(&s_u_frame);//rcv testframe ,send ack
+		}else if(tmpuf.bit.testfr_ack==1){
+			t1_timer.stop();//rcv testframe ack,stop time1
 		}
 	}
 	return ret;
@@ -2050,22 +2068,21 @@ void link_layer_104::resend(){
 int link_layer_104::link_time(){
 	int ret=0;
 	pfunc(DEBUG_DEBUG,"time of 104 frame of link [%d]\n",port);
-	if(t1_timer.is_reached()==1){
-		/*
-		if(r_no!=ack_no){
-			link_state=LINK_ERROR;
-		}
-		*/
-		resend();
-		t1_timer.restart();
+	if(t1_timer.is_reached()==1){//t1 timeout for no ack testcmd,no ack for i frame,no ack for startdtcmd
+		link_state=LINK_ERROR;
+		pfunc(DEBUG_ERROR,"t1 timeout\n");
+		//resend();
+		//t1_timer.restart();
 	}
-	if(t3_timer.is_reached()==1){//receive timeout
+	if(t3_timer.is_reached()==1){//t3 timeout for send test cmd u frame
+		pfunc(DEBUG_ERROR,"t3 timeout\n");
 		build_test_link();
 		send_frame(&s_u_frame);
 		t3_timer.restart();
-	}else if(t2_timer.is_reached()==1){
+	}else if(t2_timer.is_reached()==1){//t2 timer for send s frame
 		sfmt sf;
 		sf.bit.r_no=r_no;
+		pfunc(DEBUG_ERROR,"t2 timeout\n");
 		ret=build_sframe(&s_s_frame,sf);
 		send_frame(&s_s_frame);
 	}
@@ -2089,6 +2106,11 @@ int link_layer_104::link_time(){
 					s_no=0;
 					ack_no=0;
 					s_i_frames.clear();
+					ufmt tmpuf;
+					tmpuf.bit.startdt_cmd=1;//send startdt cmd
+					build_uframe(&s_u_frame,tmpuf);
+					send_frame(&s_u_frame);
+					t1_timer.start(T1_TIME);
 				}
 			}
 			break;
