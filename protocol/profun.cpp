@@ -105,7 +105,6 @@ int get_dir_data(_rd_dir *dir){
 		n++;
 		pfunc(DEBUG_INFO,"%s \n",node.name);
 	}
-	//dir->res_list=g_dir_list;
 	return n;
 }
 int get_file_data(_rd_file *file){
