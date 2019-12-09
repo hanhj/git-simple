@@ -17,6 +17,9 @@ using namespace std;
  /****************************
  * protocol macros
 ****************************/
+#define PRO_101 1
+#define PRO_104 2
+
 class message{
 	public:
 		int type;
@@ -706,7 +709,7 @@ class link_layer_101:public link_layer{
 			ctl_rm.data=0;
 			ctl_lo.data=0;
 
-			protocol=101;
+			protocol=PRO_101;
 			addr_size=ADDR_SIZE;
 			cause_size=CAUSE_SIZE;
 			msg_id_size=MSG_ID_SIZE_101;//101 is 2,104 is 3,so generation class 104 need redefine it.----- 
@@ -805,6 +808,7 @@ class link_layer_104:public link_layer{
 		timer t2_timer;//接收数据计时器，接收I帧数据后，超时则发送S帧。
 		timer t3_timer;//接收数据计时器，超时发送测试帧
 		timer t0_timer;//连接计时器，超时重新建立连接
+		int t1_count;
 	public:
 		link_layer_104(){
 			balance=BALANCE;
@@ -831,8 +835,9 @@ class link_layer_104:public link_layer{
 			t1_timer.stop();
 			t2_timer.stop();
 			t3_timer.stop();
+			t1_count=0;
 
-			protocol=104;
+			protocol=PRO_104;
 			addr_size=ADDR_SIZE;
 			cause_size=CAUSE_SIZE;
 			msg_id_size=MSG_ID_SIZE_104;//101 is 2,104 is 3,so generation class 104 need redefine it.----- 

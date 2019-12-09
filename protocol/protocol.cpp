@@ -145,7 +145,7 @@ int link_layer::on_yk(frame *in,frame *out){
 		ctrl=yk_data.dco.bit.dcs==1?0:1;
 	}
 	if(in->data[offset_cause]==CAUSE_Act){
-		if(yk_data.sco.bit.sel==0){//sel
+		if(yk_data.sco.bit.sel==1){//sel
 			if(yk_data.cur_state==0){
 				yk_data.cur_state=YK_SEL;
 				ret=app->do_yk(yk_data.ctrl_id,1,ctrl);//do check
@@ -156,7 +156,7 @@ int link_layer::on_yk(frame *in,frame *out){
 				}
 			}else//re select
 				yk_data.fail=1;
-		}else if(yk_data.sco.bit.sel==1){//act
+		}else if(yk_data.sco.bit.sel==0){//act
 			if(yk_data.cur_state==YK_SEL){
 				yk_data.cur_state=YK_ACT;
 				ret=app->do_yk(yk_data.ctrl_id,0,ctrl);//do act 
@@ -293,7 +293,10 @@ int link_layer::on_file(frame *in,frame *out){
 	}else if(file_data.op == 9){
 		int data_len;
 		long tmp_id;
-		data_len=in->data[offset_len] -  1 - addr_size - 1 - 1 - cause_size - addr_size - msg_id_size - 1 - 1 - 4 - 4 - 1 - 1  ;
+		if(protocol==PRO_101)
+			data_len=in->data[offset_len] -  1 - addr_size - 1 - 1 - cause_size - addr_size - msg_id_size - 1 - 1 - 4 - 4 - 1 - 1  ;
+		else if(protocol==PRO_104)
+			data_len=in->data[offset_len] - 4 - 1 - 1 - cause_size - addr_size - msg_id_size - 1 - 1 - 4 - 4 - 1 - 1;
 		tmp_id=in->data[offset_data+i++];
 		tmp_id|=in->data[offset_data+i++]<<8;
 		tmp_id|=in->data[offset_data+i++]<<16;
@@ -374,8 +377,8 @@ int link_layer::on_rd_dz(frame *in,frame *out){
 	has_data=1;
 	para_data.cur_read=0;
 	para_data.req_num=in->data[offset_vsq]&0x7f;
-	para_data.unit=in->data[offset_msg_id];
-	para_data.unit|=in->data[offset_msg_id+1]<<8;
+	para_data.unit=in->data[offset_msg_id+i++];
+	para_data.unit|=in->data[offset_msg_id+i++]<<8;
 	if(para_data.req_num==0){
 		para_data.op=2;//read all para 
 		para_data.req_num=40;//to do
@@ -386,8 +389,8 @@ int link_layer::on_rd_dz(frame *in,frame *out){
 	else{
 		para_data.op=1;//read mul para 
 		for(j=0;j<para_data.req_num;j++){
-			para_data.req_id[j]=in->data[offset_data+i++];
-			para_data.req_id[j]|=in->data[offset_data+i++]<<8;
+			para_data.req_id[j]=in->data[offset_msg_id+i++];
+			para_data.req_id[j]|=in->data[offset_msg_id+i++]<<8;
 		}
 	}
 	return ret;
@@ -1712,7 +1715,6 @@ int link_layer_104::get_frame(){
 				start_rcv_s_flag=0;
 				r_s_pos=0;
 				r_s_frame.len=0;
-				exp_len=0;
 			}
 		}
 		if(start_rcv_u_flag){
@@ -1731,7 +1733,6 @@ int link_layer_104::get_frame(){
 				start_rcv_u_flag=0;
 				r_u_pos=0;
 				r_u_frame.len=0;
-				exp_len=0;
 			}
 		}
 		if(start_rcv_i_flag){
@@ -1750,7 +1751,6 @@ int link_layer_104::get_frame(){
 				start_rcv_i_flag=0;
 				r_i_frame.len=0;
 				r_i_pos=0;
-				exp_len=0;
 			}
 		}
 	}
@@ -1770,9 +1770,10 @@ int link_layer_104::deal_frame(frame *in){
 		tmpif.data.d3=in->data[offset_control+2];
 		tmpif.data.d4=in->data[offset_control];
 		if(tmpif.bit.s_no!=r_no){//sequence error
+			pfunc(DEBUG_ERROR,"sequence error\n");
 			//not check send no sequence
-			link_state=LINK_ERROR;
-			return ret;
+			//link_state=LINK_ERROR;
+			//return ret;
 		}
 		if(tmpif.bit.r_no==s_no){
 			t1_timer.stop();
@@ -2016,21 +2017,25 @@ int link_layer_104::deal_process(){
 		ret=process_summon_acc(out);
 	}else if(process & PROCESS_YC_CHANGE){
 		ret=process_yc_change(out);
-	}else if(process & PROCESS_FILE){
-		ret=process_file(out);
-	}else if(process & PROCESS_RESET){
-		ret=process_reset_terminal(out);
 	}else if(process & PROCESS_RM_CTL){
 		ret=process_yk(out);
-	}else if(process & PROCESS_CLOCK){
-		ret=process_clock(out);
-	}else if(process & PROCESS_TEST_LINK){
-		ret=process_test_link(out);
+	}else if(process & PROCESS_RD_DZ){
+		ret=process_rd_dz(out);
 	}else if(process & PROCESS_FILE){
 		ret=process_file(out);
 	}else if(process & PROCESS_UPDATE){
 		ret=process_update(out);
 	}
+	/*
+	else if(process & PROCESS_CLOCK){
+		ret=process_clock(out);
+	}else if(process & PROCESS_TEST_LINK){
+		ret=process_test_link(out);
+	}
+	else if(process & PROCESS_RESET){
+		ret=process_reset_terminal(out);
+	}
+	*/
 	if(ret>0){
 		send_frame(&s_i_frame);
 	}
@@ -2069,22 +2074,28 @@ int link_layer_104::link_time(){
 	int ret=0;
 	pfunc(DEBUG_DEBUG,"time of 104 frame of link [%d]\n",port);
 	if(t1_timer.is_reached()==1){//t1 timeout for no ack testcmd,no ack for i frame,no ack for startdtcmd
-		link_state=LINK_ERROR;
 		pfunc(DEBUG_ERROR,"t1 timeout\n");
-		//resend();
-		//t1_timer.restart();
+		t1_count++;
+		if(t1_count>3){//this part is not mention in 104 
+			link_state=LINK_ERROR;
+			pfunc(DEBUG_ERROR,"link error\n");
+		}else{
+			resend();
+			t1_timer.restart();
+		}
+	}
+	if(t2_timer.is_reached()==1){//t2 timer for send s frame
+		sfmt sf;
+		sf.bit.r_no=r_no;
+		pfunc(DEBUG_ERROR,"t2 timeout\n");
+		ret=build_sframe(&s_s_frame,sf);
+		send_frame(&s_s_frame);
 	}
 	if(t3_timer.is_reached()==1){//t3 timeout for send test cmd u frame
 		pfunc(DEBUG_ERROR,"t3 timeout\n");
 		build_test_link();
 		send_frame(&s_u_frame);
 		t3_timer.restart();
-	}else if(t2_timer.is_reached()==1){//t2 timer for send s frame
-		sfmt sf;
-		sf.bit.r_no=r_no;
-		pfunc(DEBUG_ERROR,"t2 timeout\n");
-		ret=build_sframe(&s_s_frame,sf);
-		send_frame(&s_s_frame);
 	}
 	send_count=s_i_frames.size();
 	int com_state;
@@ -2100,6 +2111,7 @@ int link_layer_104::link_time(){
 			if(t0_timer.is_reached()==1){
 				if(com_state!=LINK_CONNECT){
 					link_state=LINK_ERROR;//do relink
+					pfunc(DEBUG_ERROR,"re link\n");
 				}else if(com_state==LINK_CONNECT){
 					link_state=LINK_CLOSE;
 					r_no=0;
@@ -2111,6 +2123,7 @@ int link_layer_104::link_time(){
 					build_uframe(&s_u_frame,tmpuf);
 					send_frame(&s_u_frame);
 					t1_timer.start(T1_TIME);
+					pfunc(DEBUG_ERROR,"re open\n");
 				}
 			}
 			break;
