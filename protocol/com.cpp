@@ -9,7 +9,7 @@ using namespace std;
 #include "com.h"
 #include "protocol.h"
 #include "system.h"
-#include "utilty.h"
+#include "utility.h"
 /****************************
  * physical layer
 ****************************/

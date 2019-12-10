@@ -13,6 +13,7 @@ using namespace std;
 #include <sys/select.h>
 #include <termios.h>
 #include <unistd.h>
+#include <iconv.h>
 #define STDIN 0
 //getchar from console by press key and return 
 //this function is polling
@@ -509,6 +510,73 @@ void read_file(){
 	}
 	fclose(f);
 }
+void dump(const char *data,int len){
+	int i;
+	i=0;
+	unsigned char c;
+	while(i<len){
+		c=data[i++];
+		printf("%x ",c);
+		if(i%8==0)
+			printf("\n");
+	}
+	printf("\n");
+}
+typedef struct _hanzi{
+	unsigned long number;
+	char data[24];
+}hanzi;
+hanzi hanzi_tab[10]={
+	{0xe5958a,{1,2,3,4}},//啊
+	{0xe788b1,{4,5,6,7}},//爱
+	{0xe79a84,{7,8,9,0}}//的
+};
+void print_hanzi(const char *str){
+	unsigned long d;
+	unsigned char c;
+	unsigned int i;
+	dump(str,4);
+	c=*str;
+	if(c>0xc0){
+		c=*str++;
+		d=c<<16;
+		c=*str++;
+		d|=c<<8;
+		c=*str++;
+		d|=c;
+		for(i=0;i<sizeof(hanzi_tab)/sizeof(hanzi);i++){
+			if(hanzi_tab[i].number==d){
+				dump(hanzi_tab[i].data,4);
+				return;
+			}
+
+		}
+	}
+	printf("not find\n");
+		
+}
+void test_iconv(){
+	iconv_t cd;
+	string src="啊";
+	char dst[10];
+	char *in;
+	char *out;
+	in=(char *)src.c_str();
+	out=&dst[0];
+	size_t l1,l2;
+	l1=src.length();
+	l2=10;
+	printf("%d %d\n",l1,l2);
+	dump(in,4);
+	cd = iconv_open("GBK","utf-8");
+	iconv(cd,&in,&l1,&out,&l2);
+	dump(&dst[0],4);
+	printf("%d %d\n",l1,l2);
+	iconv_close(cd);
+	print_hanzi("啊");
+	print_hanzi("爱");
+	print_hanzi("反");
+}
 int main(){
 	vector<std::string> bb {"1","2"};
 	myswap(begin(bb),begin(bb)+1);
@@ -602,7 +670,7 @@ int main(){
 	a='/';
 	cout<<isascii(a)<<","<<isalpha(a)<<","<<isxdigit(a)<<","<<isdigit(a)<<endl;
 	read_file();
-
+	test_iconv();
 	init_kb();
 	while(1){
 		//printf("press any key\n");
