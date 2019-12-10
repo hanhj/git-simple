@@ -111,8 +111,16 @@ int link_layer::process_summon_acc(frame *out){
 int link_layer::on_clock(frame *in,frame *out){
 	int ret;
 	ret =0;
+	int i=0;
 	if(in->data[offset_cause]==CAUSE_Act){
 		clock_data.clock_syn = 1;
+		clock_data.time.year=in->data[offset_data+i++];
+		clock_data.time.month=in->data[offset_data+i++];
+		clock_data.time.day=in->data[offset_data+i++];
+		clock_data.time.hour=in->data[offset_data+i++];
+		clock_data.time.minute=in->data[offset_data+i++];
+		clock_data.time.millisecond=in->data[offset_data+i++]<<8;
+		clock_data.time.millisecond|=in->data[offset_data+i++];
 	}else if(in->data[offset_cause] == CAUSE_Req){
 		clock_data.clock_rd = 1;
 	}
@@ -120,7 +128,12 @@ int link_layer::on_clock(frame *in,frame *out){
 }
 int link_layer::process_clock(frame *out){
 	int ret;
-	ret=app->build_clock(out,this);
+	if(clock_data.clock_syn){
+		set_clock(clock_data.time);
+	}else if(clock_data.clock_rd){
+		get_clock(clock_data.time);
+	}
+	ret=app->build_clock(out,this,&clock_data.time);
 	process &=~PROCESS_CLOCK;
 	return ret;
 }
@@ -1869,10 +1882,12 @@ int link_layer_104::deal_frame(frame *in){
 			link_state=LINK_OPEN;
 			app->build_link_fini(&s_i_frame,this);
 			send_frame(&s_i_frame);
-			t1_timer.start(T1_TIME);//send i frame ,need ack
+			t1_timer.restart(T1_TIME);//send i frame ,need ack
+			pfunc(DEBUG_ERROR,"connect\n");
 		}else if(tmpuf.bit.startdt_ack==1){
 			link_state=LINK_OPEN;
 			t1_timer.stop();//rcv strartdt ack,stop timer
+			pfunc(DEBUG_ERROR,"connect\n");
 		}else if(tmpuf.bit.stopdt_cmd==1){
 			tmpuf.bit.stopdt_cmd=0;
 			tmpuf.bit.stopdt_ack=1;
@@ -1925,6 +1940,8 @@ int link_layer_104::deal_process(){
 	}
 	if(ret>0){
 		send_frame(&s_i_frame);
+		t2_timer.stop();
+		t1_timer.restart();//send new i frame ,need ack
 	}
 	return ret;
 }
@@ -1976,7 +1993,7 @@ int link_layer_104::get_frame(){
 					r_i_pos=0;
 				}
 			}
-			if(r_tmp_pos==exp_len){
+			if(r_tmp_pos>=exp_len||r_tmp_pos>=FRAME_BUFF){
 				r_tmp_pos=0;
 			}
 		}
@@ -1992,7 +2009,7 @@ int link_layer_104::get_frame(){
 				r_s_frame.len=0;
 				exp_len=0;
 				break;
-			}else if(r_s_pos>exp_len){
+			}else if(r_s_pos>exp_len||r_s_pos>=FRAME_BUFF){
 				start_rcv_s_flag=0;
 				r_s_pos=0;
 				r_s_frame.len=0;
@@ -2010,7 +2027,7 @@ int link_layer_104::get_frame(){
 				r_u_frame.len=0;
 				exp_len=0;
 				break;
-			}else if(r_u_pos>exp_len){
+			}else if(r_u_pos>exp_len||r_u_pos>=FRAME_BUFF){
 				start_rcv_u_flag=0;
 				r_u_pos=0;
 				r_u_frame.len=0;
@@ -2028,7 +2045,7 @@ int link_layer_104::get_frame(){
 				r_i_pos=0;
 				exp_len=0;
 				break;
-			}else if(r_i_pos>exp_len){
+			}else if(r_i_pos>exp_len||r_i_pos>=FRAME_BUFF){
 				start_rcv_i_flag=0;
 				r_i_frame.len=0;
 				r_i_pos=0;
@@ -2044,7 +2061,7 @@ int link_layer_104::link_time(){
 	if(t1_timer.is_reached()==1){//t1 timeout for no ack testcmd,no ack for i frame,no ack for startdtcmd
 		pfunc(DEBUG_ERROR,"t1 timeout\n");
 		t1_count++;
-		if(t1_count>3){//this part is not mention in 104 
+		if(t1_count>3){//this part is not mention by 104 
 			link_state=LINK_ERROR;
 			pfunc(DEBUG_ERROR,"link error\n");
 		}else{
@@ -2556,7 +2573,7 @@ err:
 *  @see		
 ***********************************************************************
 */
-int app_layer::build_clock(frame *out,link_layer *link){//cause 7
+int app_layer::build_clock(frame *out,link_layer *link,CP56Time2a* time){//cause 7
 	int i;
 	i=0;
 	int ret= 0;
@@ -2582,15 +2599,13 @@ int app_layer::build_clock(frame *out,link_layer *link){//cause 7
 	out->data[offset_asdu+i++]=0;
 	if(msg_id_size==3)
 		out->data[offset_asdu+i++]=0;
-	CP56Time2a time;
-	get_clock(time);
-	out->data[offset_asdu+i++]=time.year;
-	out->data[offset_asdu+i++]=time.month;
-	out->data[offset_asdu+i++]=time.day;
-	out->data[offset_asdu+i++]=time.hour;
-	out->data[offset_asdu+i++]=time.minute;
-	out->data[offset_asdu+i++]=time.millisecond>>8;
-	out->data[offset_asdu+i++]=time.millisecond & 0x00ff;
+	out->data[offset_asdu+i++]=time->year;
+	out->data[offset_asdu+i++]=time->month;
+	out->data[offset_asdu+i++]=time->day;
+	out->data[offset_asdu+i++]=time->hour;
+	out->data[offset_asdu+i++]=time->minute;
+	out->data[offset_asdu+i++]=time->millisecond>>8;
+	out->data[offset_asdu+i++]=time->millisecond & 0x00ff;
 	ret = i;
 	ret=link->build_link_layer(out,ret);				
 	if(ret<0){
@@ -3486,7 +3501,7 @@ err:
 }
 /**
 ***********************************************************************
-*  @brief	build asdu of link_fini command 
+*  @brief	build asdu of update confirm command 
 *  @param[in] link point to link_layer  
 *  @param[out]  out point to out frame 
 *  @return upon successful return number of asdu size\n

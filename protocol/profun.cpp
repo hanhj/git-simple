@@ -53,7 +53,18 @@ int get_event_data(int port,event *&e,int change){
 	return ret;
 }
 int get_clock(CP56Time2a &time){
+	time.year=1;
+	time.month=2;
+	time.day=3;
+	time.hour=4;
+	time.minute=5;
+	time.millisecond=7<<8;
+	time.millisecond|=8;
 	pfunc(DEBUG_INFO,"get clock\n");
+	return 0;
+}
+int set_clock(CP56Time2a &time){
+	pfunc(DEBUG_INFO,"set clock\n");
 	return 0;
 }
 //type:0 execute;1:check;

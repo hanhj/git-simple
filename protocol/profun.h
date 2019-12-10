@@ -14,6 +14,7 @@ extern YC_TAB * get_yc_data(int );
 extern YC_TAB * get_acc_yc_data(int );
 extern int get_event_data(int type,event *&e,int change);
 extern int get_clock(CP56Time2a &);
+extern int set_clock(CP56Time2a &);
 extern int do_yk(int id,int type,int cmd);
 extern void do_reset();
 extern int get_yc_cg_data(int port ,event_yc *&e);

@@ -336,6 +336,7 @@ typedef struct __summon_data{
 typedef struct __clock_data{
 	int clock_syn;
 	int clock_rd;
+	CP56Time2a time;
 }_clock_data;
 #define YK_SEL 1
 #define YK_ACT 2
@@ -494,8 +495,9 @@ class app_layer{
 		int (*get_event_data)(int type,event *&e,int change);
 		int build_event_data(frame *out,link_layer *link,event *e);//cause 3
 
-		int build_clock(frame *out,link_layer *link);//cause	5,7
+		int build_clock(frame *out,link_layer *link,CP56Time2a *time);//cause	5,7
 		int (*get_clock)(CP56Time2a &);
+		int (*set_clock)(CP56Time2a &);
 		
 		int (*do_yk)(int id,int type,int cmd);
 		int build_yk(frame *out,link_layer *link);//cause=7,sel=0 or 1
