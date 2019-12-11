@@ -510,10 +510,11 @@ void read_file(){
 	}
 	fclose(f);
 }
-void dump(const char *data,int len){
+void dump(const char * pre,const char *data,int len){
 	int i;
 	i=0;
 	unsigned char c;
+	printf("%s",pre);
 	while(i<len){
 		c=data[i++];
 		printf("%x ",c);
@@ -529,27 +530,32 @@ typedef struct _hanzi{
 hanzi hanzi_tab[10]={
 	{0xe5958a,{1,2,3,4}},//啊
 	{0xe788b1,{4,5,6,7}},//爱
-	{0xe79a84,{7,8,9,0}}//的
+	{0xe79a84,{7,8,9,0}},//的
+	{0xc2b0,{0,1,2,3}}//°
 };
-void print_hanzi(const char *str){
-	unsigned long d;
+void print_hz(const char *str){
+	unsigned long code;
 	unsigned char c;
-	unsigned int i;
-	dump(str,4);
+	int i;
+	int len;
 	c=*str;
-	if(c>0xc0){
-		c=*str++;
-		d=c<<16;
-		c=*str++;
-		d|=c<<8;
-		c=*str++;
-		d|=c;
-		for(i=0;i<sizeof(hanzi_tab)/sizeof(hanzi);i++){
-			if(hanzi_tab[i].number==d){
-				dump(hanzi_tab[i].data,4);
+	printf("%s",str);
+	len=2;
+	if((c&0xe0)==0xe0)
+		len=3;
+	else if((c&0xc0)==0xc0)
+		len=2;
+	if(len>=2){
+		code=0;
+		for(i=0;i<len;i++){
+			c=*str++;
+			code|=c<<(8*(len-i-1));
+		}
+		for(i=0;i<(int)sizeof(hanzi_tab)/(int)sizeof(hanzi);i++){
+			if(hanzi_tab[i].number==code){
+				dump("dot:",hanzi_tab[i].data,4);
 				return;
 			}
-
 		}
 	}
 	printf("not find\n");
@@ -561,21 +567,39 @@ void test_iconv(){
 	char dst[10];
 	char *in;
 	char *out;
+	size_t l1,l2;
+
 	in=(char *)src.c_str();
 	out=&dst[0];
-	size_t l1,l2;
 	l1=src.length();
 	l2=10;
-	printf("%d %d\n",l1,l2);
-	dump(in,4);
+	printf("%s",in);
+	printf("l1:%d l2:%d\n",l1,l2);
+	dump("utf8:",in,4);
 	cd = iconv_open("GBK","utf-8");
 	iconv(cd,&in,&l1,&out,&l2);
-	dump(&dst[0],4);
-	printf("%d %d\n",l1,l2);
+	dump("gbk:",&dst[0],4);
+	printf("l1:%d l2:%d\n",l1,l2);
 	iconv_close(cd);
-	print_hanzi("啊");
-	print_hanzi("爱");
-	print_hanzi("反");
+	
+	in=(char *)src.c_str();
+	out=&dst[0];
+	l1=src.length();
+	l2=10;
+	printf("%s",in);
+	printf("l1:%d l2:%d\n",l1,l2);
+	dump("utf8:",in,4);
+	cd = iconv_open("ucs-2","utf-8");
+	iconv(cd,&in,&l1,&out,&l2);
+	dump("unicode-16:",&dst[0],4);
+	printf("l1:%d l2:%d\n",l1,l2);
+	iconv_close(cd);
+
+
+	print_hz("啊");
+	print_hz("爱");
+	print_hz("反");
+	print_hz("°");
 }
 int main(){
 	vector<std::string> bb {"1","2"};

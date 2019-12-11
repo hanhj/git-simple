@@ -4,8 +4,8 @@
  * Mail: hanhj@zx-jy.com 
  * Created Time: 2019-10-18 11:55:10 week:5
 */
-#ifndef __utilty_h
-#define __utilty_h
+#ifndef __utility_h
+#define __utility_h
 #include "all_h.h"
 #define DEBUG_LEVEL		3
 #define DEBUG_ERROR		1
@@ -39,5 +39,5 @@ extern void init_kb();
 extern void close_kb();
 extern int kbhit();
 extern int readch();
-#endif //__utilty_h
+#endif //__utility_h
 // vim:tw=72 
