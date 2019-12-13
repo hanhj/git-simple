@@ -1,0 +1,2635 @@
+Linux中的同步问题
+操作系统中存在竞态问题,就是同时访问共享资源(包括程序,数据),引起竞态的原因有:smp,抢占式内核,中断(硬中断,软中断等).
+抢占式内核竞态问题的图示
+	A进程				B进程				C进程
+	------------------------------------------------------------------------
+	写				
+	------------------------------------------------------------------------
+						写
+	------------------------------------------------------------------------					
+	计数				
+	------------------------------------------------------------------------
+											读计数(这时,就会有问题)
+	------------------------------------------------------------------------										
+						计数
+	------------------------------------------------------------------------					
+
+保护共享资源的方法有:中断屏蔽,原子操作,自旋锁,信号量.
+
+中断屏蔽
+	变量
+	函数
+		local_irq_enable
+		local_irq_disable
+	用法
+		local_irq_disable
+		....
+		local_irq_enable
+	
+	扩展:
+		local_irq_save(flags)
+		local_irq_restore(flags)
+		
+		local_bh_enable
+		local_bh_disable
+
+原子操作
+	说明:原子操作,不会被打断
+	变量:
+		atomic_t 
+		ATOMIT_INIT(i)  初始化值
+	函数
+		atomic_inc(atomic_t*)
+		atomic_dec(atomic_t*)
+		
+		atomic_add(int,atomic_t*)
+		atomic_sub(int,atomic_t*)
+		
+		atomic_read(atomic_t*)
+		
+		atomic_inc_and_test(atomic_t*)
+		atomic_dec_and_test(atomic_t*)
+		atomic_sub_and_test(int,atomic_t*) 注意,没有加
+		
+		atomic_inc_return(atomic_t*)
+		atomic_dec_return(atomic_t*)
+		atomic_add_return(int,atomic_t*)
+		atomic_sub_return(int,atomic_t*)
+		
+		bit操作
+		set_bit(nr,void*)
+		clear_bit(nr,void*)
+		change_bit(nr,void*)
+		
+		test_bit(nr,void*)
+		
+		test_and_set(nr,void*) 先测试,再操作
+		test_and_clear(nr,void*)
+		test_and_change(nr,void*)
+
+自旋锁
+	说明:
+		自旋锁会在原地打转,所以临界区尽可能短,不能阻塞.
+	变量:
+		spinlock_t lock
+		
+	函数
+		spin_lock_init(spinlock_t*)
+		
+		spin_lock(spinlock_t*)
+		spin_unlock(spinlock_t*)
+	用法
+		spinlock_t lock
+		spin_lock_init(&lock)
+		spin_lock(&lock)
+		...
+		spin_unlock(&lock)
+	扩展
+		spin_trylock(&lock)
+		
+		spin_lock_irq(&lock)
+		spin_unlock_irq(&lock)
+		
+		spin_lock_irqsave(&lock,flags)
+		spin_unlock_irqrestore(&lock,flags)
+		
+		spin_lock_bh(&lock)
+		spin_unlock_bh(&lock)
+		
+		读写自旋锁
+			说明：读写锁是比自旋锁粒度更小的锁，自旋锁对于读写不加区分，而实际上对于读操作是可以并发的，读写锁就是解决这个问题。当然，读和写也是不能同时进行的。
+			变量:
+				rwlock_t lock=RW_LOCK_UNLOCKED;静态初始化
+			
+			函数
+				rwlock_init(rwlock_t*)动态初始化
+					
+				read_lock(rwlock_t*)
+				read_unlock(rwlock_t*)
+				write_lock(rwlock_t*)
+				write_unlock(rwlock_t*)
+			用法
+				rwlock_t lock;
+				rwlock_init(&lock)
+				读自旋锁
+				read_lock(&lock)
+				...
+				read_unlock(&lock)
+				
+				写自旋锁
+				write_lock(&lock)
+				...
+				write_unlock(&lock)
+			
+			扩展
+				read_lock_irq(&lock)
+				read_unlock_irq(&lock)
+				
+				read_lock_irqsave(&lock,flags)
+				read_unlock_irqrestore(&lock,flags)
+				
+				read_lock_bh(&lock)
+				read_unlock_bh(&lock)
+	
+				write_lock_irq(&lock)
+				write_unlock_irq(&lock)
+				
+				write_lock_irqsave(&lock,flags)
+				write_unlock_irqrestore(&lock,flags)
+				
+				write_lock_bh(&lock)
+				write_unlock_bh(&lock)
+		顺序锁
+			说明：顺序锁是读写锁的优化，读单元不会被写单元阻塞，写单元也不会被读单元阻塞。但是写单元之间仍然是互斥的。顺序锁有一个限制就是不能在其中使用指针，因为在保护的写单元中可能会使指针失效，而读单元此时使用指针就会失效。
+			变量:
+				seqlock_t lock;
+			函数:
+				write_seqlock(&lock)
+				write_sequnlock(&lock)
+				write_seqtrylock(&lock)
+				
+				read_seqbegin(&lock)
+				read_seqretry(&lock,iv)
+			用法:
+				写操作
+				write_seqlock
+				...
+				write_sequnlock
+				
+				读操作
+				do{
+					seqnum=read_seqbegin(&lock);
+					....
+				}while(read_seqretry(&lock,sequm))
+			扩展:
+				write_seqlock_irq(&lock)
+				write_sequnlock_irq(&lock)
+				
+				write_seqlock_irqsave(&lock,falgs)
+				write_sequnlock_irqrestore(&lock,falgs)
+				
+				write_seqlock_bh(&lock)
+				write_sequnlock_bh(&lock)
+				
+				read_seqbegin_irqsave(&lock,falgs)
+				read_seqretry_irqrestore(&lock,iv,flags)
+		RCU
+			说明:rcu是read copy update的意思,可以看做是读写锁的高级版本,可以对保护单元同时进行读写.
+			变量:rcu_head head
+			函数:
+				read_lock_rcu()
+				read_unlock_rcu()
+				call_rcu(struct rcu_head*,void(*fun)(struct rcu_head*))
+				
+			用法:
+				read_lock_rcu
+				...
+				read_unlock_rcu
+				
+			扩展
+				list_add_rcu
+				list_add_tail_rcu
+				list_del_rcu
+				list_replace_rcu
+				list_for_each_rcu
+				list_for_each_safe_rcu
+				list_for_each_entry_rcu
+				
+				hlist_add_head_rcu
+				hlist_del_rcu
+				hlist_for_each_rcu
+				hlost_for_each_entry_rcu
+			
+信号量
+	说明:
+		信号量与自旋锁不同,信号量会进入休眠状态,而自旋锁会在原地打转.			
+	变量:
+		semaphore sem;
+	函数:
+		sema_init(struct semaphore *,int val)
+		
+		DECLARE_MUTEX(name)
+		DECLARE_MUTEX_LOCKED(name)
+		init_MUTEX(&sem)
+		init_MUTEX_LOCKED(&sem)
+		
+		down(&sem)
+		up(&sem)
+	用法:
+		down
+		....
+		up
+			
+	扩展:
+		down_interruptible(&sem) 进入浅睡眠状态,可被打断.当调用此函数时需要检查其返回值如果返回非0,应当返回-ERESTARTSYS
+		down_trylock 尝试获得信号量,如果获得则立即返回0,否则返回非零值,此函数不会引起睡眠.
+		
+		读写信号量
+			说明:
+				读写信号量与信号量的关系与读写锁与自旋锁的关系是一样的.
+			变量:
+				rw_semaphore sem
+			函数:
+				init_rwsem(&sem)
+				
+				down_read
+				up_read
+				down_read_trylock
+				
+				down_write
+				up_write
+				down_write_trylock
+		完成量
+			说明:
+				完成量是为了同步两个进程.
+			变量:
+				completion comp;
+			函数:
+				init_completion(&comp);
+				DECLARE_COMPLETION(name)
+				
+				wait_for_completion
+				complete
+				complete_all
+			用法:
+				进程A						进程B
+				wait_for_completion			complete
+互斥体
+	说明:
+		互斥体与信号量是一样的.
+	变量:
+		mutex mux;
+	函数:
+		mutex_init(&mux)
+		
+		mutex_lock
+		mutex_unlock
+		
+		mutex_trylock
+		mutex_lock_interruptible	
+	用法:
+		mutex_lock
+		...
+		mutex_unlock
+				
+	
+阻塞和非阻塞IO
+	说明:
+		阻塞IO,当资源不可用时,进程就阻塞住.非阻塞IO,当资源不可用时,进程不被阻塞.
+		系统通过等待队列实现阻塞IO,等待队列的调度与系统调度有关.
+		非阻塞IO,需要用户不断查询状态.用户侧通过select,FD_SET等宏来实现,驱动侧需要实现poll函数.
+	变量
+		wait_queue_head_t head
+		wait_queue_t	wait
+	函数
+		DECLARE_WAIT_QUEUE_HEAD(name)
+		DECLARE_WAITQUEUE(name,tsk)
+		init_waitqueue_head(&head)
+		
+		wait_event(&head,condition)
+		wake_up(&head)
+		
+		add_wait_queue(&head,&wait)
+		remove_wait_queue(&head,&wait)
+		
+		wait_event_interruptible
+		wait_event_timeout
+		wait_event_interruptible_timeout
+		
+		wake_up_interruptible
+	用法:
+		阻塞IO
+			1、	xx_device{
+					cdev cdev;
+					...
+					wait_queue_head_t queue;//在设备定义中条件等待队列头.
+				}
+			2、处理阻塞的地方
+				DECLEAR_WAITQUEUE(wait,current);
+				add_wait_queue(dev->queue,&wait)	
+				...
+				
+				if(!available){//资源不可用
+					__set_current_state(TASK_INTERRUPTIBLE);//设置浅睡眠状态
+	
+					if(filep->flags & O_NOBLOCK){//非阻塞方式打开
+						ret= -EAGAIN;
+						goto out;
+					}
+					schedule();
+					if(signal_pending(current)){//被其他信号唤醒
+						ret=-ERESTARTSYS;
+						goto out;
+					}
+					
+				}
+				处理正常事务...
+				
+				out:remove_wait_queue(dev->queue,&wait);//移除等待队列
+				__set_current_state(TASK_RUNNING);//设置进程状态
+				return ret;
+				
+				别的函数
+				当允许访问资源时
+				wake_up_interruptible(&dev->queue);
+		非阻塞IO
+			1、用户侧
+				fd_set rd,wt;
+				FD_ZERO(&rd);FD_ZERO(&wt)
+				FD_SET(fd,&rd);FD_SET(fd,&wt);
+				....
+				select(fd+1,fd_set *rd,fd_set*wt,fd_set*exp,struct timeval *time);
+				if(FD_ISSET(fd,&rd))
+					do read work
+				if(FD_ISSET(fd,&wr))
+					do write work
+			2、驱动侧
+				xx_poll(struct file *filep,poll_table *wait)
+				{
+					dev=filep->private_data;
+					poll_wait(dev->rd_queue,wait);
+					poll_wait(dev->wr_queue,wait);
+					if(可读)
+						mask |=POLLIN|POLLRDNORMAL;
+					if(可写)
+						mask |=POLLOUT|POLLWRNORMAL;
+					return mask;
+				}
+				struct file_operations xx_fops={
+					...
+					.poll=xx_poll;
+				}
+
+异步通知
+	说明:
+		用户侧通过设置回调函数,当资源可用时,通过回调函数的形式,异步通知用户侧.相当于系统对用户侧的中断.
+	变量:
+		fasync_struct
+		typedef void(*sighandler_t)(int);
+	函数:
+		用户侧
+			signal(undigned long no,sighandler_t handler);//注册回调函数
+			fcntl(fd,cmd,data)
+		驱动侧
+			fasync_helper
+			kill_fasync
+	用法:
+		用户侧
+			xx_handler(int)
+			{
+				...
+			}
+			
+			signal(fd,handler)
+			fcntl(fd,F_SETOWN,getpid());//设置own,让驱动侧知道向哪里发送消息
+			flag=fcntl(fd,F_GETFL);
+			fcntl(fd,F_SETFL,flag|FASYNC);设置驱动侧fasync标志
+		驱动侧
+			设备结构体中定义fasync_struct
+			xx_dev{
+				cdev cdev;
+				...
+				struct fasync_struct *fasync_queue;
+			}
+			实现xx_fasync函数
+				xx_fasync(int fd,struct file *filep,int mode)
+				{
+					fasync_helper(fd,filep,mode,&dev->fasync_queue);//调用fasync_helper函数
+				}
+			在资源可用时调用kill_fasync函数
+				if(available)
+					kill_fasync(&dev->fasync_queue,sig,POLL_XX);
+			在release中,注销函数
+				xx_fasync(-1,filep,0);
+			
+中断
+	说明:
+		中断用于打断当前程序.在linux中为取得效率的平衡,采用下半部处理方式,处理中断.下半部处理方式有tasklet,work,softirq.
+		中断程序中上半部处理需要紧急处理部分,下半部处理不需要紧急处理部分.上下部处理根据情况来选择,不一定一定要.
+		tasklet和softirq工作于原子上下文,工作队列工作于进程上下文,所以工作队列可以阻塞,而tasklet和softirq不能有阻塞.
+	变量:
+		tasklet_t tsklet
+		work_struct wk
+
+		DECLARE_TASKLET(tsklet,tsklet_fun,data)//联系结构与下半部处理函数
+		
+
+	函数:
+		register_irq(unsigned int irq,irq_handler_t handler,unsigned long irqflags,const char * name,void *dev_id)
+		free_irq(unsigned int irq,void * dev_id);
+		
+		disable_irq(int irq);//需要等待中断处理完
+		enable_irq(int irq);
+		disable_irq_nosync(int irq);//不需要等待中断处理完
+		
+		tasklet_schedule(xx_tsk);
+		schedule_work(xx_wk);
+		
+		INIT_WORK(wk,xx_work_fun,data);//联系工作队列中的结构与处理函数
+	用法
+		xx_init()
+		{
+			request_irq(irq,xx_irqhandler,flags,"xx_irq",NULL);
+			if you want use work in bh
+			INIT_WORK(&xx_wk,work_fun,NULL);
+		}
+		xx_irqhandler(int irq,void *dev_id,struct pt_regs* regs)
+		{
+			...
+			schedule_work(&xx_wk);
+			or
+			tasklet_schedule(&xx_tsk);
+			return IRQ_HANDLED;
+		}
+		xx_exit()
+		{
+			...
+			free_irq(irq,NULL);
+		}
+			
+		如果想用tasklet下半部
+		void xx_tasklet_fun(unsigned int)
+		{
+			
+		}
+		DECLARE_TASKLET(xx_tsk,xx_tasklet_fun,NULL)
+	扩展:
+		local_irq_eanble,local_irq_disable//允许,禁止本地cpu中断
+		
+		共享中断:
+			说明:
+				多个设备,共享一个硬件中断线的情况.共享中断需要将flags设置成IRQF_SHARED,系统会遍历所有共享中断的处理函数,直到返回IRQ_HANDLED.在上半部,应当读取中断状态,如果不是属于本身的中断应当立即返回IRQ_NONE;
+			
+		时间定时器:
+			说明:
+				时间定时器最终依赖硬件定时器来工作,当时钟中断发生时,系统会检测各个时间定时器,到期的时间定时器函数作为软中断在底半部执行.
+			变量:
+				timer_list timer
+				HZ 每秒钟中断次数,一般100
+				jiffies 当前中断次数.一秒钟有hz个jiffies.
+			函数:	
+				init_timer(&timer)
+				add_timer(&timer)
+				del_timer(&timer)
+				mod_timer(&timer,unsigned long expries)
+				
+				DEFINE_TIEMER(name,fun,expires)
+				TIMER_INITIALIZER(name,fun,dara)
+				msecs_to_jiffies 将毫秒转换成jiffies
+				
+			用法:
+				sturct xx_dev={
+					struct cdev cdev;
+					...
+					struct timer_list xx_timer;
+				}
+				struct xx_dev dev;
+				
+				xx_init()
+				{
+					init_timer(&dev.xx_timer);
+					dev.xx_timer.function=do_timer;
+					dev.xx_timer.data=..
+					dev.xx_timer.expires=jiffies+时间间隔;
+				}
+				xx_exit()
+				{
+					del_timer(&dev.xx_timer);
+				}
+				
+				do_timer(unsigned long arg)
+				{
+					mod_timer(&dev.xx_timer,新时间)
+					或者
+					dev.xx_timer.expires=新时间
+					add_timer(&dev.xx_timer);
+				}
+				
+				扩展:delay_work
+					说明:
+						对于周期性任务,还可以用delay_work来完成.
+					变量:	
+						struct delay_work work;
+					函数:
+						schedule_delay_work(struct delay_work *,unsigned long dealy)
+					用法:
+						struct delay_work work;
+						
+						xx_fun1()
+						{
+							schedule_delay_work(&work,delay);
+						}
+						xx_do_work(unsigned long time)
+						{
+							schedule_delay_work(&work,delay);
+						}
+				
+		延迟:
+			说明:
+				延迟有忙延迟,休眠延迟.忙延迟占用cpu时间,休眠延迟不占用cpu时间.
+			函数:
+				ndelay
+				udelay
+				mdelay
+				
+				msleep 不可被打断
+				msleep_interruptiable 可被打断
+				ssleep
+				
+				timer_before(a,b) a在b之前
+				timer_after(a,b) a在b之后
+				
+内存与IO访问
+	说明:从操作系统角度内存可分为内存空间和IO空间,对于x86系统存在IO空间,但是对于arm系统只有内存空间.
+		内存空间,在linux系统中又分为用户内存和内核内存.用户内存在0~3G范围,内核内存在3G~4G范围.用户程序运行在用户内存中,各个用户具有自己的空间,互相不干扰.内核运行在内核内存中,具有固定分配.
+		内核内存从高向低分为几个部分:保留区,专用页面分配区,高端内存映射区,vmalloc分配区,物理内存映射区.vmalloc分配区与前后区之间有一定的间隔.物理映射区映射物理0~896M的内存，高于此地址的物理内存映射到高端内存映射区。
+		地址可分为物理地址,总线地址,虚拟地址.
+		高性能cpu一般具有mmu内存管理单元,其中包括tlb和ttw。tlb是转换旁路缓存，ttw是转换表漫游。当处理器给出地址后，具有mmu的cpu首先会查找tlb，如果没有找到会在ttw中查找，查找到后将地址放入tlb中。
+	变量：
+		kmem_cache_t slab缓存结构,用于slab缓存.
+		struct vma_area_struct vma结构,用于内存空间映射
+			成员:{
+				struct mm_struct *vm_mm;
+				unsigned long vm_strat;//虚拟空间起始地址
+				unsigned long vm_end;
+				
+				pgprot_t vm_page_prot;
+				unsigned long vm_flags;
+				
+				vm_operations_struct *vm_ops;//操作函数
+				...
+				}
+					
+		struct map_spec 用于静态空间映射.
+	函数:
+		kmalloc (size_t size,int flags) flags一般有GFP_KERNEL,GFP_ATOMIC,GFP_DMA等.使用GFP_KERNEL标志会导致阻塞,而使用GFP_ATOMIC
+		不会导致阻塞.
+		kfree
+		__get_free_pages(unsigned int flags,unsigned int order)
+		vmalloc (unsigned long size)
+		vfree
+		
+		//slab相关函数,slab是为了提高内存的使用效率,为频繁分配小内存使用而提出的解决方案.kmalloc就是用slab实现的.
+		kmem_cache_create
+		kmem_cache_alloc
+		kmem_cache_free
+		kmem_cache_destory
+		//内存池相关函数
+		mem_pool_create
+		mem_pool_alloc
+		mem_pool_free
+		mem_pool_destory
+		//低端内存的物理地址与虚拟地址的转换
+		virt_to_phys
+		phys_to_virt
+		virt_to_page
+		
+		virt_to_bus
+		bus_to_virt
+		
+		//IO空间访问函数
+		inb
+		outb
+		inw
+		outw
+		inl 
+		outl
+		insb
+		outsb
+		insw
+		outsw
+		insl
+		outsl
+		//IO内存空间访问函数
+		ioremap(unsigned long offset,unsigned long size) 将物理地址映射到虚拟地址
+		iounremap
+		
+		ioport_map
+		ioport_unmap
+		
+		ioread8 readb
+		iowrite8 writeb
+		ioread16 readw
+		iowrite16 writew
+		ioread32 readl
+		iowrite32 writel
+		
+		request_region
+		release_region
+		
+		request_mem_region
+		release_mem_region
+		//用于内核空间到用户空间内存映射函数
+		remap_pfn_range(struct vma_area_struct *,unsigned long start,unsigned long pfn,unsigned long size,pgprot_t prot)//创建页表
+		remap_page_range(unsigned long start,unsigned long page,unsigned long pagesize,pgprot_t prot)//
+		mem_map_reserve(unsigned long page)
+		pgprot_nocached(pgprot_t prot)//将page设置为no cache,一般io空间都要设置为no cache
+		用户侧:
+		mmap(void* addr,size_t len,int prot,int flags,int fd,off_t offset)
+			prot:PROT_READ,PROT_WRITE,PROT_EXEC...
+			flags:MAP_SHARE,MAP_PRIVATE,MAP_ANONYMOUS...		
+		munmap(void *addr,int len)
+	用法:
+		io空间
+		request_region
+		inb
+		outb
+		...
+		release_region
+		
+		io内存
+		request_region
+		ioport_map
+		ioread8
+		iowrite8
+		....
+		ioport_unmap
+		release_region
+		
+		request_mem_region
+		ioremap
+		ioread8
+		iowrite8
+		...
+		iounmap
+		release_mem_region
+		
+		内核空间映射
+			说明:
+				可以将内存中的保留页映射到用户空间,保留页是IO空间,或者通过程序设置.
+			用法:
+				用户端:
+					调用mmap函数
+					mmap(NULL,len,PROT_READ,MAP_PRIVATE,fd,0);
+					...
+					munmap();
+					
+				内核:
+					实现fileoperations中mmap函数
+					xx_mmap(struct file *file,struct vm_area_struct *vm)
+					{
+						remap_pfn_range(vm,vm->vm_start,vm->vm_pgoff,vm->vm_end-vm->vm_start,vm->vm_page_prot);
+						vm->vm_ops=xx_vm_ops;
+					}
+					sturct vm_operations_struct xx_vm_ops={
+						.open=xx_open;
+						.close=xx_close;
+					}
+		
+					实现kmalloc分配内存的映射
+					xx_init
+					{
+						share_mem=kmalloc();
+						for(page=virt_to_page(share_mem);page<virt_to_page(share_mem+BUFFER_SIZE);page++)
+							mem_map_reserve(page);将mem设置为保留页
+					}
+					xx_mmap(struct file*file,struct vm_area_struct *vm)
+					{
+						pos=(unsigned long)sheare_mem;
+						start=vm->vm_start;
+						while(size>0){
+							page=virt_to_phys(pos);
+							remap_page_range(start,page,PAGE_SIZE,PAGE_SHARED);
+							pos+=PAGE_SIZE;
+							start+=PAGE_SIZE;
+							size-=PAGE_SIZE;
+						}
+					}
+					xx_exit()
+					{
+						kfree();
+					}
+					
+		DMA操作
+			说明:
+				dma操作,可能导致cache不一致的情况,所以应当使用dma_alloc_coherent方法申请dma内存.dma的使用类似于中断.
+			变量:
+				struct scatterlist
+			函数:
+				void *dma_alloc_coherent(struct device*dev,size_t size,dma_addr_t *handler,gfp_t gfp)
+				dma_free_coherent(struct device*dev,size_t size,void *cpu_addr,gfp_t gfp)
+				request_dma(unsigned int dmanr,const char*device_id);
+				free_dma(unsigned int dmanr);
+			用法:
+				request_dma()
+				dma_alloc_coherent
+				
+				read,write,ioctl
+				
+				dma_free_coherent
+				free_dma
+				
+platform设备驱动
+	说明:
+		platform是Linux中总线的一种,与i2c,pci,isa一样.但是它并非实际存在,而是虚拟出来的,用于将soc中的外围器件挂接在这个总线中.
+	linux中的驱动包括总线,设备,设备驱动三个实体,总线将设备和驱动绑定.platform总线的驱动是platform_driver,设备是platform_device.
+	总线的match函数就是将驱动与设备的名字加以比较,相等认为匹配上了.
+	变量:
+		device_private{
+			..
+			void * driver_data;
+		}
+		device {
+			device_private *p;//设备的私有数据
+			void* platform_data;//平台设备数据
+			。。。
+		}
+		platform_device {
+			char *name;
+			u32 id;
+			struct device dev;
+			u32 num_resourecs;
+			struct resource *resource;
+		}
+		如果资源文件中的描述不够,可以在dev中的platform_data中自定义数据
+		
+		device_driver{
+			char * name;//描述驱动名称
+			struct module *owner;
+			...
+		} 
+		platform_driver{
+			probe
+			remove
+			shutdown
+			suspend
+			...
+			struct device_driver driver;
+		}
+		bus_type{
+			name
+			dev_attrs
+			match
+			uevent
+			pm
+		}
+		resource{
+			start
+			end
+			name
+			flags
+			resourec *parent,*sibling,*child;
+		}
+		flags:IORESOURCE_IO,IORESORECE_MEM,IORESOURCE_DMA...
+		
+	函数:
+		platform_driver_register(platform_driver*)
+		platform_driver_unregister(platform_driver*)
+		platform_get_resource(platform_device *dev,flags,num)
+		
+		platform_set_drvdata(platform_device*pdev,void *);
+		platform_get_drvdata(platform_device *pdev);
+	用法
+		xx_probe(struct platform_device *dev)
+		{
+			register_chrdev_region
+			alloc_chrdev_region
+			
+			cdev_init
+			cdev_add
+			...
+		}
+		xx_remove(struct platform_device *dev)
+		{
+			cdev_del();
+			unregister_chrdev_region();
+			...
+		}
+		
+		platform_driver xx_driver={
+			.probe=xx_probe;
+			.remove=xx_remove
+			.driver={
+				.name="xxdevice"
+				.owner=THIS_MODULE;
+			}
+		}
+		platform_device xx_device={
+			.name="xxdevice";
+			.id=-1;
+			...
+		}
+		xx_init()
+		{
+			platform_driver_register(&xx_driver);
+		}
+		xx_exit()
+		{
+			platform_driver_unregister(&xx_driver);
+		}
+		
+分层设计的驱动程序		
+	说明:
+		通过借用面向对象的思想linux中的驱动程序呈现两个特点,分层与分离.就是将重复的代码抽象出来,用户仅需关心不一样的部分.通过抽象,将一些设备的共同部分抽取出来,内核实现
+		通用部分,用户实现具体不一样部分.输入驱动,rtc驱动,i2c驱动等都是这样实现的.
+	gpio输入驱动:
+		说明:
+			gpio驱动是指用gpio来实现的按键输入驱动.内核drivers/input/keyboard/gpio_keys.c中实现通用的按键驱动.从这个例子可以看出,通过抽象,将数据与程序分离.用户只需关心按键的定义即可.
+		变量:
+			struct gpio_keys_button{//用于描述gpio按键的资源
+				code
+				gpio
+				type
+				desc
+				active_low
+				wakeup
+				...
+			}
+			struct gpio_keys_platform_data{
+				buttons	//上面描述的资源
+				nbuttons//数量
+			}
+		
+		函数:
+			input_dev* input_allocate_device(void)
+			input_free_device(input_dev*)
+			
+			input_register_device(input_dev*)
+			input_unregister_device(input_dev*)
+			
+			input_event(input_dev*,unsigned int code,unsigned int type,int value)
+			input_report_key(input_dev*,unsigned int code,unsigned int type,int value)
+			input_report_rel(input_dev*,unsigned int code,unsigned int type,int value)
+			input_report_abs(input_dev*,unsigned int code,unsigned int type,int value)
+			input_sync(input_dev*)
+			
+		用法:
+			定义gpio_keys_button结构成员
+			xx_buttons[]={
+				{
+					.gpio=
+					.code=
+					.wakeup=
+					.desc=
+					.active_low=
+				},
+				{
+					.gpio=
+					.code=
+					.wakeup=
+					.desc=
+					.active_low=
+				},
+			...				
+			}	
+			//定义platform_data
+			xx_key_platform_data={
+				.buttons=&xx_buttons;
+				.nbuttons=ARRAY_SIZE(xx_buttons)
+			}
+			//将platform_data赋予dev
+			xx_device={
+				.name="xx",//名字要为gpio-keys或者gpio-keys-polled
+				.id=1;
+				.dev={
+					.platform_data=&xx_key_platforn_data;	
+				}
+			}
+			//在合适的地方调用platform_device,系统自动回匹配相应的驱动
+			xx_fun()
+			{
+				platform_device_register(&xx_device);
+			}
+			
+	rtc时钟芯片驱动:
+		说明:rtc时钟驱动将大部分通用部分在rtc-dev.c文件中实现.通用部分实现了file_operations,并导出了rtc_class_ops结构,rtc_device_register
+		rtc_device_unregister函数,底层部分只要实现rtc_class_ops即可.
+		变量:
+			rtc_class_ops{
+				open
+				release
+				ioctl
+				read_time
+				set_time
+				read_alarm
+				set_alarm
+				irq_set_freq
+				irq_set_state
+				proc
+			}
+		函数:
+			rtc_device_register(char *name,device *dev,rtc_class_ops *class,MODULE)
+			rtc_decice_ungister
+		用法:
+			实现 rtc_class_ops中的函数
+			xx_read_time{
+			
+			}
+			xx_set_time{
+			
+			}
+			
+			rtc_class_ops xx_class_ops={
+				.read_time=xx_read_time;
+				.set_time=xx_set_time;
+			}
+			
+			xx_probe(struct platform_device*pdev){
+				...
+				rtc_device_register(name,pdev->dev,&xx_class_ops,THIS_MODULE);
+			}
+			
+			
+			xx_driver={
+				driver={
+					.name="xx";
+					.owner=THIS_MODULE;
+				}
+				.probe=xx_probe;
+				.remove
+				.id_table
+			}
+			
+			xx_init(void){
+				i2c_add_driver(&xx_driver);
+				或者spi_register_driver
+				或者其他类似的驱动函数
+			}
+			xx_exit(void){
+				i2c_del_driver(&xx_driver);
+				或者spi_unregister_driver
+				或者其他类似的驱动函数
+			}
+			
+		SPI驱动:
+		说明:
+			spi,i2c,usb等总线,在cpu上均有相应的控制器,与之对应的数据结构是spi_master,i2c_adapter等.主机控制器和外设分离,外设用于
+		驱动不同的芯片,通过这样设计避免了外设驱动与控制器关联.
+			spi驱动包括spi核心(/drivers/spi/spi.c),主要包括主机控制器,外设的注册,注销
+			driver和device的关系:driver用于将外设挂载到总线上,device描述设备的特性,与platform_device使用board_info来描述device类似,
+		spi使用spi_board_info来描述spi_device.通过spi_driver将spi外设挂载到spi总线,在driver的probe函数中,注册spi所属本身设备驱动.
+		变量:
+			spi_master{//用于描述spi主机控制器
+				struct device dev;
+				bus_num
+				num_chipselect
+				(*setup)(struct spi_device*)
+				(*transfer)(spi_device* dev,spi_message *msg);
+				(*cleanup)(spi_device *dev);
+			}
+			spi_driver{//用于描述外设,挂载外设驱动
+				probe
+				remove
+				shutdown
+				suspend
+				resume
+				device_driver driver;
+			}
+			spi_device{//用于描述外设
+				struct device dev;
+				struct spi_master *master;
+				max_speed_hz;
+				chip_select;
+				mode;
+				bits_per_word;
+				irq;
+				*controller_state;
+				*controller_data;
+				modalias[SPI_NAME_SIZE];				
+			}
+			spi_transfer{//用于描述传输数据
+				*tx_buf;
+				*rx_buf;
+				len
+				dma_addr_t tx_dma;
+				dma_addr_t rx_dma;
+				
+				cs_change;
+				bits_per_word;
+				delay_usecs;
+				speed_hz;
+				list_head transfer_list;
+			}
+			
+			spi_message{//用于组织spi_transfer
+				list_head transfers;
+				spi_device *spi;
+				is_dma_mapped;
+				
+				(*complete)(void*context);
+				void *context;
+				actual_length;
+				status;
+				
+				list_head queue;
+				void *state;
+			}
+			struct spi_board_info{//描述spi外设数据结构
+				modalias；外设驱动的名称
+				bus_num;//用到的spi主机控制器号
+				chip_select;//片选信号
+				max_speed_hz;//spi传输速率
+				plat_form_data;//平台数据,用在spi_device.dev.platform_data;
+				controller_data;//用在spi_device.controller_data中
+			}
+		函数:
+			spi核心函数:
+			spi外设函数
+			(struct spi_device *) 
+				spi_alloc_device(struct spi_master* master);
+			int spi_add_device(struct spi_device *dev);
+			int spi_new_device(struct spi_device *dev,struct spi_board_info* info);//调用alloc_device和add_device
+			void spi_unregister_device(struct spi_device *dev);
+			int spi_register_board_info(struct spi_board_info* info,int nr);//将外设与master联系的函数，会调用spi_new_device
+
+			int spi_register_driver(struct spi_driver *driver);
+			int spi_unregister_driver(struct spi_driver *driver);
+			spi控制器函数
+			struct spi_master * 
+				spi_alloc_master(stuct device *dev,int size);
+			int spi_register_master(struct spi_master *master);
+			int spi_unregister_master(struct spi_master *master);
+				spi_master_get_dev_data(struct spi_master*master)//通常通过此函数获得用户定义的控制器的spi资源,
+																xx_spi{
+																	int irq;
+																	struct clk *clk;
+																	void *buf;
+																	...
+																	struct spi_device *dev;
+																}
+				spi_master_set_dev_data(struct spi_master *master,void *data);
+			
+			//spi传输函数
+			spi_message_init 初始化spi message
+			spi_message_add_tail(struct spi_transfer *t,struct spi_message *msg)
+			spi_sync(spi_device *spi,spi_message *msg)
+			spi_write(spi_device *spi,char *buf,size_t len);
+			spi_read(spi_device*spi,char *buf,size_t len);
+			
+		
+		用法:
+			spi适配器驱动实现:
+				适配器驱动文件
+				xx_transfer(struct spi_device* dev,struct spi_message *msg){
+				
+				}
+				xx_setup(struct *spi_device *dev){
+				}
+				int xx_probe(struct platform_device *dev){
+					读取适配器资源,配置资源
+					spi_alloc_master();
+					...
+					填充spi_master中的setup,transfer等函数
+					spi_register_master();
+				}
+				struct platform_driver xx_spi_driver={
+					.driver={
+						.name="xx_spi_driver";
+						.owner=THIS_MODULE;
+					}
+					.probe=xx_probe;
+					.remove=xx_remove;
+					.resume=xx_resume;
+				}
+				xx_init(){
+					platform_driver_register(&xx_spi_driver);
+				}
+				xx_exit(){
+					platform_driver_unregister(&xx_spi_driver);
+				}
+				或者
+					module_platform_driver(&xx_spi_driver);//不需要init,exit函数
+				适配器资源描述
+				struct resources={
+					[0]={
+						.start
+						.end
+						.flags=
+					}
+					...
+				}
+				struct platform_device xx_spi_device={
+					[0]={
+						name="xx_spi_driver",
+						resources=&xx_spi_resources;
+						num_resorces=
+						dev={
+							.platform_data=xx_spi_data;
+						}	
+					}
+				}
+				在合适的地方调用
+				platform_device_register(&xx_spi_device);
+				
+				
+			spi外设驱动实现
+				xx外设驱动文件
+					定义外设自身的驱动
+					xx_fun();
+					
+					定义外设driver函数
+					xx_probe(struct platform_device *pdev){
+						注册外设功能函数
+					}
+				
+					定义driver
+					xx_driver={
+						.probe=xx_probe;
+						.remove=xx_remove;
+						.driver={
+							.name="xx_driver";
+							.owner=THIS_MODULE;
+						}
+					}
+					
+					xx_init(void){
+						spi_register_driver(&xx_driver);
+					}
+					xx_exit(void){
+						spi_unregister_driver(&xx_driver);
+					}
+				外设的资源描述，通常在板子的初始化文件中
+					描述spi外设,填充spi_board_info
+					struct spi_board_info xx_spi_device={
+						.modalias="xx_driver";//对应的外设驱动名称
+						.bus_num
+						.max_speed_hz
+						.chip_select
+						.platform_data
+						.mode;
+						...
+					}
+					在合适的地方调用spi_register_board_info（&xx_spi_device,ARRAY_SIZE(xx_spi_device)）;	
+				可以看出spi驱动与上面讲的rtc驱动很像,除了最后驱动注册函数不一样外,以上rtc部分均可以套用.
+				
+		时钟源相关函数:
+			函数:
+			clk* clk_get(struct device *dev,const char *id)//获得时钟
+				 clk_put(struct clk *clk)//释放时钟
+				 clk_enable(struct clk *clk);
+				 clk_disable(struct clk *clk);
+				 clk_get_rate(struct clk *clk);
+				 clk_round_rate(struct clk *clk);
+				 clk_set_rate(struct clk *clk);
+				 
+			clk* clk_get_parent(struct clk*clk);
+				 clk_set_parent(struct clk*clk,struct clk *parent);
+				 
+				 contain_of(void *ptr,结构类型,结构成员名)//通过此宏来获取包含某个成员的结构体指针
+		
+		misc混杂设备:
+			说明:
+				混杂设备包括nvram,看门狗,ds1286时钟,lcd等.混杂设备本质还是字符设备,其功能实现于file_operations.
+				混杂设备主设备号为10.
+			变量:
+				struct miscdevice{
+					int minor;
+					char *name
+					file_operatios *fops
+					list_head list;
+					struct device *parent;
+					struct device *this_device;
+				}
+			函数:
+				misc_register(struct miscdevice *dev);
+				misc_unregister(struct miscdevice *dev);
+		
+		sysfs设备:
+			说明:
+				sysfs设备没有在dev目录下有节点,但是可以在用户侧直接访问.通过sysfs_create_file创建的文件,每个device的attribute对应一个文件
+				文件通过show和store方法来存取.
+			变量:
+				sysdev_driver{
+					list_head entry;
+					(*add)(struct sys_device*);
+					(*remove)(struct sys_device *);
+					(*shutdown)(struct sys_device *);
+					(*suspend)(struct sys_device *);
+					(*resume)(struct sys_device*);
+				}
+				struct attribute{
+					const char name;
+					umode_t mode;
+				}
+				struct device_attribute{
+					struct attribute attr
+					ssize_t (*show)(struct device *dev,struct device_attribute*);
+					ssize_t (*store)(struct device *dev,struct device_attribute*);
+				}
+				struct bin_attribute{
+					struct attribute attr;
+					size
+					read
+				}
+				
+			函数:
+				sysdev_driver_register(struct sysdev_class*,struct sysdev_driver*);
+				sysdev_driver_unregister(struct sysdev_class *,struct sysdev_driver*);
+				
+				sysdev_create_file(struct sys_device *dev,struct sysdev_attribute*);
+				sysdev_remove_file(struct sys_device *dev,struct sysdev_attribute*);
+				相关函数:
+					sysfs_create_file(struct kobject*obj,struct attribute *);
+					sysfs_remove_file(struct kobject*obj,struct attribute *);
+					device_create_file(struct device*dev,struct device_arrtibute*);
+					device_remove_file(struct device*dev,struct device_arrtibute*);
+					sysfs_create_bin_file(struct kobject,struct bin_attribure *);
+					
+终端设备驱动
+	说明:
+		linux中的终端设备有以下几类:串口终端:ttySn,伪终端pty,控制终端ttyn,console.伪终端在linux中用pts(pseudo terminal slave)和ptmx(pseudo terminal master)实现.
+		控制终端用于登录linux,进行操作.在系统启动时,可以在初始化的时候通过console=device,options来配置控制终端,可以同时配置多个控制终端,当打开console时,返回的是最后一个console.
+		tty0是当前使用的控制终端别名.
+		tty驱动包括tty核心(tty_io.c),线路配置,tty具体驱动构成.
+		uart驱动是在tty_io之上通过serial_core再封装,将tty驱动转换成uart驱动.
+	变量:
+		struct ktermios{
+			c_cflag;//控制模式
+			c_iflag;//输入模式
+			c_oflag;//输出模式
+			c_lflag;//线路模式
+			c_cc;//控制字符
+			c_ispeed;//输入速率
+			c_ospeed;//输出速率
+		}
+		struct tty_operations{
+			struct tty_struct *(*lookup)(struct tty_driver*driver,struct inode *inode,int idx);
+			int (*install)(struct tty_driver* driver,struct tty_struct *tty);
+			void (*remove)(struct tty_driver *driver ,struct tty_struct *tty);
+			
+			int (*open)(struct tty_struct *tty,struct file *filep);
+			void (*close)(struct tty_struct *tty,struct file *filep);
+			int (*write)(struct tty_struct *tty,const char *buf,int len);
+			int (*put_char)(struct tty_struct *tty,unsigned char c);
+			int (*ioctl)(struct tty_struct *tty,struct file *filep,unsigned int cmd,unsigned int arg);
+			
+			...
+			void (*set_temios)(struct tty_struct *tty,kermios*old);//设置termios
+			int (*tiocmget)(struct tty_struct *tty,struct file *filep);//设置modem函数
+			int (*tiocmset)(struct tty_struct *tty,struct file *filep,unsigned int set ,unsigned int clear);
+			
+			
+		}
+		tty_struct{
+			struct kref kref;
+			struct device *dev;
+			struct tty_driver *driver;
+			struct tty_operations *ops;
+			...
+			struct ktermios *termios;
+			...
+			unsigned int receive_room;
+			
+			tty_struct *link;
+			fasync_struct *fasync;
+			...
+			wait_queue_head_t write_wait;
+			wait_queue_head_t read_wait;
+			void * driver_data;
+			...
+		}
+		tty_driver{
+			int magic;
+			struct kref kref;
+			struct cdev cdev;
+			struct module *owner;
+			const char * driver_name;//用于/proc/tty,sysfs中
+			const char *name;//设备节点
+			...
+			int major;
+			int minor_start;
+			int minor_num;
+			int num;
+			int type;
+			int subtype;
+			ktermios init_termios;
+			int flags;
+			tty_driver *other;//仅对pty驱动有用
+			
+			ktermios **termios;
+			tty_struct **ttys;
+			void * tty_state;
+			
+			...
+			
+			const tty_operatios * ops;
+		}
+		
+		struct tty_port {
+			struct tty_struct	*tty;		/* Back pointer */
+			const struct tty_port_operations *ops;	/* Port operations */
+			...
+			wait_queue_head_t	open_wait;	/* Open waiters */
+			...
+			unsigned long		flags;		/* TTY flags ASY_*/
+			unsigned char		console:1;	/* port is a console */
+			struct mutex		mutex;		/* Locking */
+			...
+			unsigned int		close_delay;	/* Close port delay */
+			unsigned int		closing_wait;	/* Delay for output */
+			...
+			struct kref		kref;		/* Ref counter */
+		};
+		
+		struct uart_ops{//此结构提供外设具体接口函数
+			unsigned int (*tx_empty)(struct uart_port *);
+			(*start_tx)
+			(*stop_tx)
+			(*send_xchar)
+			(*stop_rz)
+			...
+		}		
+		struct uart_port{//此结构用于描述外设资源
+			spinlock_t lock;
+			unsigned int iobase;
+			unsigned char __iomem *membase;
+			unsigned int irq;
+			unsigned int uartclk;
+			...
+			struct console *cons;
+			...
+			const struct uart_ops *ops;
+			void *private_data;
+			...
+		}
+
+		struct uart_driver{//此结构用于在用户空间呈现接口
+			struct module *owner;
+			const char *dev_name;//设备节点名ttyxx
+			const char *driver_name;//驱动名
+			int nr;
+			struct console *cons;
+			
+			struct uart_state *state;
+			struct tty_driver*tty_driver;
+		}
+		
+		struct uart_state{
+			struct tty_port *port;
+			struct uart_port* uart_port;
+			...
+		}
+		struct console{
+			char name[];
+			(*read)
+			(*write)
+			(*setup)
+			(*early_serup)
+			struct tty_driver*(*device)
+			void *data;
+			...
+		}
+	函数:
+		struct tty_driver* alloc_tty_driver(int lines);
+		int tty_register_driver(struct tty_driver*driver);
+		void tty_unregister_driver(struct tty_driver*driver);
+		void tty_register_device(struct tty_driver*driver,int index,struct tty_device*dev);
+		void tty_unregister_device(struct tty_driver*driver,int index);
+		void tty_set_operations(struct tty_driver*driver,struct tty_operations *ops);
+		
+		用户空间函数
+		包括termios.h文件
+		int tcgetattr(int fd,struct termios*termios);
+		int tcsetattr(int fd,int operatios,struct termios*termios);
+		int cfsetospeed(struct termios *termios,speed_t speed);
+		int cfsetispeed(struct termios * termios,speed_t speed);//speed 是B0 B50 等
+		speed_t cfgetospeed(struct termios*termios);
+		speed_t cfgetispeed(struct termios *termios);
+		
+		int tcdrain(int fd);//等待所有输出被发送
+		int tcflush(int fd,int queue_selector);//flush输入/输出
+		int tcflow(int fd,int actios);//对输入/输出进行流控制
+		int tcsendbreak(int fd,int duration);//发送break字符
+		
+		uart驱动函数
+		
+		int uart_register_driver(struct uart_driver*);
+		void uart_unregister_driver(struct uart_driver*);
+		int uart_add_one_port(struct uart_dirver*drv,struct uart_port *port);
+		int uart_remove_one_port(struct uart_driver *drv,struct uart_port*port);
+		
+		void register_console(struct console *con);
+		int unregister_console(struct console *con);
+		console_initcall(fn);//将cosole初始化函数放到系统的.con_initcall.init节中
+			扩展:
+				initcall节分为:initcall0.init,initcall.init ...initcall7.init,对应的宏有pure_initcall(fn),core_initcall(fn)
+				postcore_initcall(fn),arch_initcall(fn),subsys_initcall(fn),fs_initcall(fn),device_initcall(fn),late_initcall(fn).
+				同时对于1~7节对应有sync版本pure_initcall_sync(fn)...
+		
+	用法:
+		一:设备的资源
+		1 在设备的资源文件中定义uart的platform_device
+			struct resources xx_resources[]={
+				[0]={
+					.start=
+					.end=
+					.flags=
+				}
+				...
+			}
+			struct platform_device xx_uart_device={
+				.name="xx_uart";
+				.id=
+				.num_resources=ARRAY_SIZE(xx_resources);
+				.resources=&xx_resources;
+			}
+		2.在板子的初始化部分调用platform_device_register
+			platform_device_register(&xx_uart_device);
+		二:驱动部分
+		
+			定义uart_ops,uart_driver以及实现其中函数
+				xx_tx_empty(){
+					...
+				}
+				xx_start_tx(){
+					...
+				}
+			
+				struct uart_ops xx_ops={
+					.tx_empty=xx_tx_empty;
+					.start_tx=xx_start_tx;
+					...
+				}
+				struct uart_driver xx_uart_driver={
+					.dev_name="ttyxx"
+					.driver_name="xxuart";
+					...
+				}		
+			定义platform_driver
+				int xx_probe(struct platform_device *pdev){
+					...
+					填充合适的uart_port结构
+					uart_add_one_port(&xx_uart_driver,&xx_uart_port);//此部分完成具体设备的功能添加,不同设备调用不同函数
+					platform_set_drvdata(pdev,xx_data);
+				}
+				int xx_remove(struct platform_device *pdev){
+					...
+					进行必要的清除操作
+					uart_remove_one_port(&xx_uart_driver,&xx_uart_port);
+				}
+				struct platform_driver xx_platform_uart_driver={
+					.probe=xx_probe;
+					.remove=xx_remove;
+					.driver={
+						.name="xx_uart";
+					}
+				}
+				xx_init(void){
+					platform_driver_register(&xx_platform_uart_driver);
+				}
+				xx_exit(void){
+					platform_driver_unregister(&xx_platform_uart_driver);
+				}
+			
+
+			//console实现
+				xx_setup(){//console setup
+					根据填充的port信息
+					调用uart_set_options(uart_port,console,baund,parity,bits,flow);
+				}
+				xx_write(){//console write
+				
+				}
+				struct console xx_console={
+					.setup=xx_setup;
+					.write=xx_write;
+					
+				}
+				xx_console_init(){
+					填充uart_port结构
+					register_console(&xx_console);
+				}
+
+I2C设备驱动
+	说明:I2c驱动包括i2c核心,设备驱动,总线驱动.i2c核心提供总线与设备的注册,注销以及通信方法的上层(i2c-core.c).总线驱动提供i2c适配器以及algorithm方法(i2c-dev.c),是对应i2c适配器的字符设备驱动,随着外设的打开而打开,主设备号89.
+	设备驱动提供具体设备的驱动,完成设备功能.
+	变量:
+		struct i2c_algorithm{//传输方法
+			int (*master_xfer)(struct i2c_adapter*adap,struct i2c_msg *msg,int num);
+			int (*smbus_xfer)(struct i2c_adapter*adap,u16 addr,unsigned int flags,char read_write,u8 command,int size,union i2c_smbus_data *data);
+			u32 (*functionality)(struct i2c_adapter*);
+		}
+
+		struct i2c_adapter{//描述soc上的i2c适配器
+			struct module owner;
+			struct i2c_algorithm *algo;//
+			int (*client_register)(struct i2c_client *client);
+			int (*clinet_unregister)(struct i2c_client *client);
+			struct device dev;//适配器设备
+			struct class_device class_dev;
+			struct list_head client;
+			struct list_head list;
+			char name[];
+			struct completion dev_released;
+			....
+		}
+		struct i2c_driver{//i2c 总线
+			int id;
+			int class;
+			int (*attach_adapter)(struct i2c_adapter *);//即将被删除
+			int (*detach_adapter)(struct i2c_adapter*);//即将被删除
+			int (*detach_client)(struct i2c_client *);//即将被删除
+			
+			int (*probe)(struct i2c_client *,const struct i2c_device_id);
+			int (*remove)(struct i2c_client *);
+			...
+			struct list_head client;
+		}
+		struct i2c_client{//描述外设
+			unsigned int flags;
+			unsigned short addr;
+			char name;
+			struct i2c_adapter *adapter;
+			struct i2c_driver *driver;
+			struct device dev;
+			int irq;
+			struct list_head list;
+			struct completion released;
+		}
+		struct i2c_msg{
+			addr;
+			flags;
+			len;
+			*buf;
+		}
+		struct i2c_board_info{
+			char type[];
+			unsigned short flags;
+			unsigned short addr;
+			void *platform_data;
+			struct dev_archdata *archdata;
+			struct device_node *of_node;
+			int irq;
+		}
+		
+	函数:
+		i2c核心的函数
+			//适配器函数
+			i2c_add_adapter(struct i2c_adapter *);
+			i2c_del_adapter(struct i2c_adapter*);
+			//外设驱动函数
+			i2c_register_driver(sruct module *module ,struct i2c_driver*);//外设函数,注册driver到i2c总线中,联系driver与adapter
+			i2c_add_driver(struct i2c_driver *);将driver加入到i2c总线中
+			i2c_del_driver(struct i2c_driver*);
+			
+			i2c_register_board_info(int busnum, struct i2c_board_info const *info,unsigned n)
+			
+			i2c_attach_adapter(struct i2c_client*);
+			i2c_detach_adapter(struct i2c_client*);					
+			//传输函数
+			i2c_transfer(struct i2c_adapter*adapter,i2c_msg *msg,int num);//调用i2c_adapter中的master_xfer函数
+			i2c_master_send(struct i2c_adapter *adapter,char *buf,int count);//调用i2c_transfer函数
+			i2c_master_recv(struct i2c_adapter *adapter,char buf,int count);//调用i2c_transfer函数
+		用法:
+			适配器驱动:
+				驱动文件
+					xx_xfer(){
+						定义xfer传输函数
+					}
+					xx_smbus_xfer(){
+						定义smbus传输函数
+					}
+					struct i2c_algorithm xx_algo={//定义传输方法
+						.master_xfer=xx_xfer;
+						.smbus_xfer=xx_smbus_xfer;
+					}
+					xx_probe(){
+						i2c_adapter *adapter;
+						...
+						hw_init();//时钟,内存等资源
+						i2c_add_adapter(adapter);或者i2c_add_numbered_adapter  二者区别在于前者使用动态bus_num后者使用静态bus_num
+					}
+					xx_remove(){
+						i2c_adapter *adapter;
+						...
+						hw_uninit();
+						i2c_del_adapter(adapter);
+					}
+					struct platform_driver xx_i2c_driver={
+						.probe=xx_probe;
+						.remove=xx_remove
+						.driver={
+							.name="xx_driver";
+							.owner=THIS_MODULE;
+						}
+					}
+					xx_init(){
+						platform_driver_register(&xx_i2c_driver);
+					}
+					xx_exit(){
+						platform_driver_unregister(&xx_i2c_driver);
+					}
+					或者module_platform_driver（&xx_i2c_driver);
+				资源文件
+					struct resource xx_resources[]={
+						[0]={
+							.start=
+							.end=
+							.flag=
+						}
+						...
+					}
+					struct platform_device xx_device={
+						.name="xx_driver";
+						.id=;
+						.resource=&xx_resources;
+						.num_resources=ARRAY_SIZE(xx_resources);
+					}
+					在合适的地方调用
+					platform_decice_register(&xx_device);
+			外设驱动
+				外设驱动文件
+					xx_fun(){
+						外设功能函数	
+					}
+					xx_probe(struct i2c_client *client){
+						初始化外设.
+						...
+						i2c_set_client_data(&xx_device);
+					}
+					xx_remove(struct i2c_client *client){
+						释放资源
+					}
+					struct i2c_driver xx_driver={
+						.driver={
+							.name="xx_driver";
+							.owner=THIS_MODULE;
+							}
+						.probe=xx_probe;
+						.remove=xx_remove;
+					}
+					xx_init(){
+						i2c_add_driver(&xx_driver);
+					}
+					xx_exit(){
+						i2c_del_driver(&xx_driver);
+					}
+				
+				资源文件配置:
+					struct i2c_board_info xx_i2c_devices[]={
+						{
+							I2C_BOARD_INFO("xx_driver",irq);
+						}
+						...
+					} 
+					合适的地方调用
+					i2c_register_board_info(busnum,&xx_i2c_devices,num);
+网络设备驱动
+	说明:网络设备驱动分3层,包括协议接口,网络设备接口,设备驱动接口.
+	变量:
+		协议接口:
+		struct sk_buff{
+			undigned  int len;
+			data_len
+			mac_len;
+			har_len;
+			
+			struct sk_buff_data_t transport_header;
+			struct sk_buff_data_t network_header;
+			struct sk_buff_data_t mac_header;
+			
+			struct sk_buff_data_t tail;
+			struct sk_buff_data_t end;
+			
+			unsigned char *head;
+			unsigned char *data;
+		}
+		
+		网络设备接口:
+		struct net_device_ops{
+			int (*ndo_open)(struct net_device* ndev);
+			int (*ndo_stop)(struct net_device *ndev);
+			int (*ndo_strart_xmit)(struct sk_buff* buff,struct net_device *ndev);
+			void (*ndo_tx_timeout)(struct net_devcie*ndev);
+			
+			int (*ndo_do_ioctl)(struct net_device *ndev,struct ifreq*ifr,int cmd);
+			int (*ndo_set_config)(struct net_device *ndev,struct ifmap*map);
+			int (*ndo_set_mac_address)(struct net_device *ndev,void *addr);
+			void (*ndo_poll_controller)(struct net_device *ndev);//轮询方式接受数据		
+			...	
+		}
+		struct ethtool_ops{
+			int (*get_settings)(struct net_device *ndev,struct ethtool_cmd*);
+			...
+		}
+		struct header_ops{
+			int	(*create) (struct sk_buff *skb, struct net_device *dev,unsigned short type, const void *daddr,const void *saddr, unsigned len);
+			int	(*parse)(const struct sk_buff *skb, unsigned char *haddr);
+			int	(*rebuild)(struct sk_buff *skb);
+			int	(*cache)(const struct neighbour *neigh, struct hh_cache *hh, __be16 type);
+			void(*cache_update)(struct hh_cache *hh,const struct net_device *dev,const unsigned char *haddr);			
+		}
+		struct net_device{
+			char name[];
+			int (*init)(struct net_device*);
+			
+			unsigned long mem_start;
+			unsigned long mem_end;//设备共享内存地址
+			unsigned long base_addr;//设备io基地址
+			unsigned char irq;
+			unsigned char if_port;
+			unsigned char dma;
+			
+			unsigned short hard_header_len;
+			unsigned short type;
+			unsigned mtu;
+			unsigned short flags;//IFF_XX
+			
+			struct net_device_ops netdev_ops;
+			struct ethtool_ops ethtool_ops;
+			struct header_ops header_ops;
+
+			unsigned long trans_start;
+			unsignde long last_rx;
+
+			...		
+		}
+		函数:
+			协议层函数:
+			struct sk_buff* alloc_skb(unsigned int len,gfp_t priority);
+			struct sk_buff* dev_alloc_skb(unsigned int len);//priority=GFP_ATOMIC
+			kfree_skb(struct sk_buff*skb);
+			dev_kfree_skb(struct sk_buff*skb);//用于非中断上下文,
+				扩展:
+					dev_kfree_irq//用于中断中
+					dev_kfree_any//可用于中断或非中断上下文
+			设备层函数:
+			int register_netdev(struct net_device*ndev);
+			void unregister_netdev(struct net_device *ndev);
+			alloc_netdev(sizeof_priv,name,setup)
+			alloc_etherdev(sizeof_priv)
+			free_netdev(struct net_device *ndev);
+			
+			netdev_priv(struct net_device *ndev);//获得net_device 的私有数据指针
+			
+			netif_start_queue(struct net_device *);
+			netif_stop_queue(struct net_device*);//当传输缓冲区满的时候,阻止继续传输
+			netif_wakeup_queue(struct net_device *);
+			
+			netif_rx(struct sk_buff*);//提交缓冲区到上层
+			netif_receive_skb(struct sk_buff*);//采用poll方式的提交上层缓冲区
+
+			napi_schedule(struct napi_struct *);
+			napi_enable(struct napi_struct*);
+			napi_disable(struct napi_struct *);
+			
+			netif_carrier_on(struct net_device *);
+			netif_carrier_off(struct net_device *);
+	用法:
+		一.编写驱动程序
+		1.编写函数填充net_device_ops,ethtool_ops结构
+			xx_open(struct net_device *ndev){
+				...
+			}
+			...
+			struct net_device_ops xx_ndo_ops={
+				.open=xx_open;
+				...
+			}
+			
+			xx_get_settings(){
+			
+			}
+			xx_set_settings(){
+			
+			}
+			struct ethtool_ops xx_ethtool_ops={
+				.get_settings=xx_get_settings;
+				.set_settings=xx_set_settings;
+				...
+			}
+			static int xx_poll(struct napi_struct *napi,int weight){//poll处理函数
+				
+				处理数据
+				dev_alloc_skb //分配skb
+				...
+				skb_reserve(skb,2)
+				skb->dev=dev;
+				skb->protocol=eth_type_trans(skb,dev);//协议
+				netif_receive_skb(skb);//将数据上传
+				更改统计数据			
+			}
+			
+			static irqreturn_t xx_interrupt(int irq,void* data){
+				struct net_device *ndev=data;
+				struct priv * xx_priv=net_priv(ndev);
+				如果采用napi则
+					napi_schedule(&xx_priv->napi);
+				否则
+					处理数据
+					dev_alloc_skb //分配skb
+					...
+					skb_reserve(skb,2)
+					skb->dev=dev;
+					skb->protocol=eth_type_trans(skb,dev);//协议
+					netif_rx(skb);//将数据上传
+					更改统计数据			
+					
+			}
+		2.编写probe,remove,suspend等函数
+			`
+			xx_probe(struct platform_device* pdev){
+				struct net_device *ndev;
+				struct xx_priv *priv;
+				struct resources *res;
+				
+				
+				ndev=alloc_etherdev(sizeof(*xx_priv));//分配net_device
+				SET_NETDEV_DEV(ndev,&pdev->dev);//设置net device的device
+				platform_set_drvdata(pdev,ndev);//设置platform_device的驱动数据
+				
+				priv=net_priv(dev);//获取私有数据
+				priv->pdev=pdev;
+				priv->dev=ndev;
+				
+				clk=clk_get(&pdev->dev,"");//时钟处理
+				clk_enable(clk);
+				clk_hz=clk_get_rate(clk);
+				
+				res=platform_get_resource(pdev,IORESOURCE_MEM,0);//获取内存资源
+				request_mem_region(res->start,size,ndev->name);//申请资源访问
+				mem_base=ioremap(res->start,res->end-res->start+1);//映射资源
+
+				irq=platform_get_resource(pdev,IORESOURCE_IRQ,0);//获取中断资源
+				request_irq(irq,xx_interrupt,flags,ndev->name,ndev);//申请中断
+				
+				ndev->netdev_ops=&xx_ndo_ops;
+				SET_ETHTOOL_OPS(ndev,&xx_ethtool_ops);
+				netif_napi_add(ndev,&priv->napi,xx_poll,POLL_WEIGHT);//添加poll处理函数
+				
+				register_netdev(ndev);//注册net device
+			
+				err://错误处理
+
+			}
+			static int __devexit xx_remove(struct platform_device*dev){
+				struct net_device *ndev;
+				
+				ndev=platform_get_drvdata(dev);
+				if(ndev){
+					iounremap();//释放映射地址
+					free_irq();//释放中断
+					unregister_netdev(ndev);//注销网络设备
+					clk_disable();//关闭时钟
+					clk_put();//释放时钟
+					free_netdev(ndev);//释放网络设备
+					set_platform_drvdata(dev,NULL);//释放dev的驱动数据
+				}
+				return 0;
+			}
+			
+			//如果需要power控制函数,定义以下结构
+			xx_suspend(struct platform_device *pdev){
+				...
+			}
+			xx_resume(struct platform_device *pdev){
+				...
+			}
+			struct dev_pm_ops xx_pm_ops={//定义power manage结构
+				.suspend=xx_suspend;
+				.resume=xx_resume;
+			}
+		3 注册
+			struct platform_driver xx_driver={
+				.driver={
+					.name="xx";
+					.owner=THIS_MODULE;
+					.pm=xx_pm_ops;
+				}
+				.probe=xx_probe;
+				.remove=xx_remove;
+			}	
+			static __init xx_init(void){
+				return platform_driver_register(&xx_driver);
+			}
+			static __exit xx_exit(void){
+				platform_driver_unregister(&xx_driver);
+			}
+			module_init(xx_init);
+			module_exit(xx_exit);
+		二.设备注册
+			1.描述资源
+				struct resource xx_resources[]={
+					[0]={
+						.start=
+						.end=
+						.flags=
+					}
+					[1]={
+						.start=
+						.end=
+						.flags=
+					}	
+				}	
+				struct platform_device xx_device={
+					.name="xx";
+					.dev={
+						.platform_data=&xx_data;//私有平台数据
+					}
+					.resources=&xx_resources;
+					.num_resources=ARRAY_SIZE(xx_resources);
+				}
+			合适的地方调用
+			platform_device_register(&xx_device);
+			
+Flash设备驱动:
+	说明:flash驱动在linux中采用了mtd接口(memory teconolgy device).mtd将flash设备抽象出来,隔离了文件系统和flash驱动.mtd包括三个层次,底层是flash驱动(nor或nand),
+		其上是mtd原始设备,再上是mtd设备节点(字符设备或块设备).mtd设备节点是mtdX,字符设备主设备号31,块设备主设备号是90.		
+ 		在设备节点上层,文件系统在linux上有fat,cramfs,jffs/jffs2/jffs3,yaffs/yaffs2,ubifs等.fat文件系统需要有ftl(filesystem transfer layer 针对nor),nftl(针对nand)来转换.jffs,yaffs等
+ 		直接与mtd层接口.
+ 		cramfs实时的解压缩文件到内存中,适用于小的文件系统,最大16M.
+ 		jffs支持文件压缩,yaffs不支持,yaffs更偏向支持大的文件系统.yaffs使用oob组织文件结构,jffs将节点信息保存在nand的数据区,由于此jffs mout时间较yaffs时间长.
+ 		
+		linux通过physmap.c实现了nor的底层驱动(驱动名称:"physmap-flash"),用户只要定义资源文件即可.
+		nor的底层驱动可以使用通用驱动(physmap的platform驱动),也可自己按照模板编写,将资源与驱动在一个文件中实现.
+		nand的底层驱动可以按照platform驱动,也可按照自己模板编写,将资源与驱动在一个文件中实现.
+		nand和nor的区别:nand一般容量较大,最大可到8g,而nor只能达到M级.nand地址和数据采用复用接口,nor采用sdram相同接口.nor可靠性较高.典型的nand芯片如三星的k9xxxxx,nor芯片如sstxxx.
+		nand每块大小8k,每页512字节,每页还有16字节的oob(out of band)用于ecc校正.nor的块为64k.nor的写速度慢于nand.nand和nor都需要先擦除然后才能写入.
+	变量:
+		struct mtd_info{//mtd_info用于描述mtd原始设备
+			u_char type;//MTD_RAM MTD_ROM MTD_NORFLASH MTD_NANDFLASH
+			u_int_32 flags;//写标志 MTD_WRITEABLE MTD_BIT_WRITEABLE MTD_NO_ERASE MTD_POWERUP_LOCK
+			u_int_32 erasesize;//主要擦除块大小
+			u_int_32 writesize;//最小写单元大小
+			u_int_32 oobsize;//oob字节数
+			u_int_32 oobabil;//可用的oob大小
+			
+			char *name;
+			int index;
+			struct nand_ecclayout *ecclayout;
+			
+			u_int_32 band_size;
+			
+			int (*erase)(...)
+			int (*point)(...)//针对xip(eXecute-In-Place)
+			int (*unpoint)(...)
+			
+			int (*read)(...);//读写flash
+			int (*write)(...);
+			
+			void (*sync)(...);
+			
+			//pm函数
+			int (*suspend)(..)
+			int (resume)(...);
+			
+			//坏块管理
+			int (*block_isbad)(...);
+			int (*block_markbad)(...);
+			
+			void *priv;//私有数据
+			struct module *owner;
+		}
+		struct mtd_part{//用于描述分区
+			struct mtd_info mtd;//分区描述
+			struct mtd_info *master;//主分区描述
+			u_int_32 offset;//分区偏移地址
+			int index;//分区号
+			struct list_head list;
+			int registered;
+		}
+		struct mtd_partition{//用于描述分区,用于add_mtd_partitions函数的参数
+			char *name;
+			u_int_32 size;
+			u_int_32 offset;
+			u_int_32 mask_flags;
+			struct nand_ecclayout*ecclay_out;
+			struct mtd_info **mtdp;
+		}
+		
+		nor Flash变量
+			struct map_info{//用来描述nor flash
+				char *name;
+				unsigned long size;
+				unsigned long phys;
+				void __iomem *virt;//虚拟地址
+				...
+			}
+		nand flash 变量
+			struct nand_chip{//用于描述nand芯片
+				void __iomem *IO_ADDR_R;//读地址虚拟地址
+				void __iomem *IO_ADDR_W;//写地址虚拟地址
+				uint8_t (*read_byte)(struct mtd_info *mtd);
+				u16 (*read_word)(struct mtd_info *mtd);
+				void (*write_buf)(struct mtd_info *mtd,const uint8_t *buf,int len);
+				void (*read_buf)(struct mtd_info *mtd,uint8_t *buf,int len);
+				int (*verify_buf)(struct mtd_info *mtd ,const uint8_t *buf,int len);
+				...
+				stuct nand_hw_control *controller;
+				struct nand_ecclayout *ecclayout;
+				struct mtd_oob_ops ops;
+				...
+				void *priv;//私有数据
+			}	
+		
+	函数：
+	 	mtd 函数：
+	 		add_mtd_device（struct mtd_info* mtd);//添加删除mtd设备
+	 		del_mtd_device(struct mtd_info*mtd);
+	 		add_mtd_partitions（sttuct mtd_info *master，struct mtd_partition *part);//添加删除mtd分区
+			del_mtd_partitios(struct mtd_info *master);
+	 		mtd用户空间通过ioctl来交流,主要命令有MEMGETINFO,MEMERASE,MEMREADOOB,MEMWRITEOOB,MEMGETBADBLOCK
+	 		
+	 	底层驱动函数
+	 		struct mtd_info *do_map_probe(const char *name,struct map_info* map);//name 可以为 "cfi_probe","jedec_probe","map_rom" ,用于nor flash
+	 		int nand_scan(struct mtd_info *mtd,int maxchips);//用于探测nand flash 是否存在.
+	 用法:
+	 	非platform形式的nor底层驱动
+	 		//定义map_info
+	 		struct map_info xx_map={
+	 			.name="xx";
+	 			.size=xx_size;
+	 			.phys=xx_phys;
+	 			.bankwidth=xx_bank;
+	 		}
+	 		//定义分区
+	 		struct mtd_partition xx_partitions[]={
+	 			[0]={
+	 				.name="xx_part1";
+	 				.offset=xx_offset1;
+	 				.size=xx_size1;
+	 				.mask_flags=xx_flags1;
+	 			}
+	 			[1]={
+	 				.name="xx_part2";
+	 				.offset=xx_offset2;
+	 				.size=xx_size2;
+	 				.mask_flags=xx_flags2;
+	 			}
+	 		...	
+	 		}
+	 		//定义初始化函数
+	 		struct mtd_info *mymtd;
+	 		static int __init xx_init(void){
+	 			xx_map.virt=ioremap_nocache(xx_map.phys,xx_map.size);//将物理地址转化
+	 			if(!xx_map.virt){
+	 				printk("error ioremap xx_map.phys");
+	 				goto error;
+	 			}
+	 			simple_map_init(&xx_map);//赋值map_info中的read,write,copy_from,copy_to函数指针
+	 			mymtd=do_map_probe("cfi_probe",&xx_map);//探测nor flash
+	 			if(!mymtd){
+	 				printk("errot do map probe\n");
+	 				rc=-EXNIO;//no such device or address
+	 				goto error;
+	 			}
+	 			add_mtd_partitions(mymtd,xx_partitions,ARRAY_SIZE(xx_partitions);//加入分区
+	 			return 0;
+	 		error:
+	 			iounremap(xx_map.virt);
+	 			return rc;
+	 		
+	 		}
+	 		static void xx_exit(void){
+	 			if(mymtd){
+	 				del_mtd_partitions(mymtd);
+	 				map_destroy(mymtd);
+	 			}
+	 			if(xx_map.virt){
+	 				iounremap(xx_map.virt);
+	 				xx_map.virt=NULL;
+	 			}
+	 		}
+	 		module_init(xx_init);
+	 		module_exit(xx_exit);
+	 	platform形式的nor flash驱动:只用定义资源文件,驱动采用physmap-flash驱动
+	 		//定义分区
+	 		struct mtd_partition xx_partitions[]={
+	 			[0]={
+	 				.name="xx_part1";
+	 				.offset=xx_offset1;
+	 				.size=xx_size1;
+	 				.mask_flags=xx_flags1;
+	 			}
+	 			[1]={
+	 				.name="xx_part2";
+	 				.offset=xx_offset2;
+	 				.size=xx_size2;
+	 				.mask_flags=xx_flags2;
+	 			}
+	 		...	
+	 		}
+	 		//定义资源
+	 		static resource xx_resources={
+	 			.start=xx_nor_flash_start;
+	 			.end=xx_nor_flash_end;
+	 			.flags=IORESORCE_MEM;
+	 		}
+	 		//定义physmap的数据
+	 		static physmap_flash_data xx_nor_flash_data={
+	 			.width=xx_width;
+	 			.parts=&xx_partitions;
+	 			.nr_parts=ARRAY_SIZE(xx_partitions);
+	 		}
+	 		//定义platform_data
+	 		struct platform_device xx_flash_device={
+	 			.name="physmap-flash";
+	 			.id=0;
+	 			.dev={
+	 				.platform_data=&xx_nor_flash_data;
+	 			}
+	 			.resources=&xx_resources;
+	 			.num_resources=ARRAY_SIZE(xx_resources);
+	 		}
+	 		合适的地方调用:
+	 			platform_add_device(&xx_flash_device);
+	 			
+	 	非platform形式的nand驱动
+	 		//定义分区
+	 		struct mtd_partition xx_partitions[]={
+	 			[0]={
+					.name="part1";
+					.size=xx_size1;
+					.offset=xx_offset1;
+					.flags=xx_flags1;	 			
+	 			},
+	 			[1]={
+	 				.name="part2";
+	 				.size=MTDPART_SIZ_FULL;//定义为剩下的区域
+	 				.offset=xx_offset2;
+	 				.flags=xx_flags2;
+	 			}
+	 			
+	 		...
+	 		}
+	 		//定义初始化函数
+	 		struct mtd_info *mymtd;
+	 		void __iomem *base_addr;
+			static int __init xx_init(void){
+				struct nand_chip *this;
+				int rc;
+				base_addr=ioremap(xx_phys);//获取nand的虚拟地址
+				if(!base_addr){
+					printk("error on remap");
+					rc=-EIO;// io error
+					goto out;
+				}
+				
+				mymtd=kzalloc(sizeof(struct mtd_info)+sizeof(struct nand_chip),GFP_KERNEL);//分配内存
+				if(!mymtd){
+					printk("error on kzmalloc\n");
+					rc=-ENOMEM;//out of memory
+					goto to out_mem;
+				}
+				
+				this=(struct nand_chip *)(&mymtd[1]);//获取mymtd的私有数据指针
+				mymtd->priv=this;//将mtd中的私有数据指针指向nand chip
+				//对nand chip结构中赋值,如果nand chip 中的函数未被赋值，则使用nand_base。c中的默认函数。包括默认的ecc layout
+				this->IO_ADDR_R=base_addr;
+				this->IO_ADDR_W=base_addr;
+				this->cmd_ctl=xx_hw_ctl;
+				this->dev_ready=xx_ready;
+				...
+				
+				if(nand_scan(mymtd,1)){
+					printk("error on nand scan\n");
+					rc=-EXNIO;//no such device or address
+					goto to out_ior;
+				}
+				mtd_add_partitios(mymtd,xx_partitions,ARRAY_SIZE(xx_partitions));
+				out_ior:
+					kfree(mymtd);
+				out_mem:
+					iounmap(base_addr);
+				out:return rc;
+		
+			}
+			void __exit xx_exit(void){
+				nand_release(mymtd);
+				iounmap(base_addr);
+				kfree(mymtd);
+			}
+			
+		platform形式的nand驱动
+			驱动部分:
+			probe函数主要工作
+				分配内存包括mtd_info,nand_chip
+				根据板文件信息,获得nand的地址等参数
+				赋值nand_chip结构参数
+				调用nand_scan扫描是否存在
+				调用add_mtd_partitions加入板文件定义的分区
+				
+				下面是主要部分代码:
+				//定义一个设备的nand结构
+				struct xx_nand_info{
+					struct mtd_info mtd;
+					struct nand_chip chip;
+					struct ecc_layout ecc_layout;
+					void *__iomem base;
+					
+					...
+					
+				};
+				//定义platform data数据结构
+				struct xx_nand_data{
+					struct mtd_partition parts;
+					int	nrparts;
+				}
+				static int xx_probe(struct platform_device *pdev){
+					struct mtd_info *mtd;
+					struct nand_chip *chip;
+					struct resource *res;
+					struct xx_nand_data *pdata;//platform data
+					struct xx_nand_info *xx_info;
+					int rc;
+
+					xx_info=kzalloc((*xx_info),GFP_KERNEL);
+					if(!xx_info){
+						rc=-ENOMEM;
+						goto out;
+					}
+					mtd=xx_info->mtd;
+					chip=xx_info->chip;
+					
+					res=platform_get_resources(pdev,IORESOURCES_MEM,0);
+					info->base=ioremap(res->srart,resource_size(res));
+					pdata=(struct xx_nand_data*)pdev->dev.platform_data;
+					
+					mtd->owner=THIS_MODULE;
+					mtd->name=dev_name(&pdev->dev);
+					mtd->priv=chip;//赋值mtd 的私有数据为nand chip
+					mtd->dev.parent=&pdev->dev;
+
+					chip->IO_ADDR_W=info->base;
+					chip->IO_ADDR_R=info->base;
+					chip->cmd_ctl=xx_hw_ctl;
+					chip->dev_ready=xx_ready;
+					...
+					ret=nand_scan(mtd,1);//或者nand_scan_tail(mtd) 该函数是nand_scan的第二种型式,可以填充未被初始化的参数
+					if(ret<0){
+						rc=-ENODEV;
+						goto out_scan;
+					}
+					add_mtd_partitions(mtd,pdata->parts,pdata->nrparts);
+					
+					out_scan:
+						kfree(info);
+						iounmap(info->base);
+					out:
+						retrurn rc;
+				}
+	 		资源部分:
+	 			struct resources xx_resources={
+	 				.start=
+	 				.end=
+	 				.flags=
+	 			}
+	 			struct mtd_partition xx_parts={
+	 				[0]={
+	 					.name="";
+	 					.size=//可能的参数SZ_1,2,..512,1K,2K..512K,1M,2M..512M,1G,2G
+	 					.offset=;//可能的参数MTDPART_OFS_APPEND
+	 					.flags=;//可能的参数MTD_CAP_ROM,MTD_CAP_NORFLASH,MTD_CAP_NANDFLASH,MTD_CAP_RAM
+	 				}
+	 				[1]={
+	 					.name="";
+	 					.size=
+	 					.offset=;
+	 					.flags=;
+	 				}
+	 			}
+	 			struct xx_nand_data={
+	 				.parts=&xx_parts;
+	 				.nrparts=ARRAY_SIZE(xx_parts);
+	 			}
+	 			struct platform_device xx_platform_dev={
+	 				.name="xx";//soc设备的驱动名称
+	 				.reources=&xx_resources;
+	 				.num_resources=ARRAY_SIZE(xx_resources);
+	 				.dev={
+	 					.platform_data=&xx_nand_data;
+	 				}
+	 			}
+	 			合适的地方调用
+	 				platform_add_devices(&xx_platform_dev);
+	 	应用层:
+	 		文件系统制作
+	 		cramfs:
+	 			mkcramfs  文件系统根目录 输出文件   //制作文件系统
+	 			mount -t cramfs /dev/mtdblockx 挂载的目录 //将mtd设备分区挂载到目录上
+	 			mount -o loop xx.img 挂载的目录 //将映像文件挂载到目录上,只读模式
+	 		jffs:
+	 			mkfs.jffs -d 文件系统根目录 -o 输出文件
+	 			mount -t jffs /dev/mtdblockx 挂载的目录
+	 		yaffs:
+	 			mkyaffsimage dir imagename
+	 			mkyaffs2image dir imagename
+	 			mount -t yaffs /dev/mtdblockx 挂载的目录
+	 		ubifs:
+	 			mkfs.ubifs -d 文件系统根目录 -o 输出文件 -m 最小单元 -c 最大逻辑擦除块大小 -e 逻辑擦除块大小 //制作文件系统映像文件
+	 			ubinize -o 输出映像文件 -p 物理擦除块大小(xxKiB xxMiB) -m 最小页单元 -s 最小子页单元 xx.conf //制作ubi文件系统映像,ubi可以包含多个映像.在配置文件中配置
+		 			配置文件
+		 				[xx_volume]
+		 				mode=ubi
+		 				image=xx_image
+		 				vol_id=1
+		 				vol_size=30MiB
+		 				vol_type=dynamic
+		 				vol_name
+		 				vol_flags=autoresize
+		 				vol_alignment=1
+	 			ubiformat /dev/mtd1 -s  子页大小 -f 映像文件 //烧录映像
+	 			ubiattach /dev/ubi_ctrl -m 1 //将mtd1 联系到ubi
+	 				默认的ubi控制是/dev/ubi_ctrl 
+	 					ubiattach -p mtd路径 例如 ubiattach -p /dev/mtd1 将mtd1联系到ubi
+	 					ubiattach -m 0 	将mtd0 联系到ubi
+	 					ubiattach -m 0 -d 3 将mtd0 联系到ubi并且创建ubi设备3 ubi3
+	 			mount -t ubifs ubi0:rootfs 挂载目录  //挂载文件系统
+	 			
+usb驱动
+	说明:usb驱动包括主机侧驱动和设备侧驱动.主机侧驱动包括主机usb控制器驱动和设备驱动.usb控制器驱动用来驱动soc上的ohci,ehci和otg(on-the-go)接口.ohci用于非x86系统,ehci用于x86.,otg用于usb2.0接口.
+	usb控制器包括设备,配置,接口,端口四个层次.每个usb设备可以有多个配置,但是同时只能有一个配置起作用.每个接口代表设备的某项功能,每个配置可能有多个接口,接口可同时起效.接口中包括多个端点,端点0一般
+	作为控制接口,1,2作为数据接口.
+	设备驱动类似于i2c driver,用于将设备挂载到usb总线上.设备与主机控制器之间通过urb(usb request block)进行交流.
+	变量:
+		主机侧:
+			struct usb_endpoint_descripter{
+				__u8 bLength;
+				__u8 bDescriperType;
+				__u8 bEndpointAddress;
+				...
+			}
+			struct usb_host_endpoint{
+				struct usb_endpoint_descriptor;
+				...
+			}
+			struct usb_host_interface{
+				struct usb_interface_descriptor desc;
+				struct usb_host_endpoint *endpoint;
+				...
+			}
+			struct usb_interface{
+				struct usb_host_interface *altsetting;
+				struct usb_host_interface *cur_altersetting;
+				...
+				struct device dev;
+				struct devcie *usb_dev;
+			}
+			strut usb_host_config{
+				struct usb_config_descripor desc;
+				struct usb_interface *interface[MAXINTERFACES];//定义为32
+				struct usb_interface_cache *inf_cache[MAXINTERFACES];
+				...
+			}
+			struct usb_device{
+				int devnum;
+				char devpath[16];
+
+				stuct device dev;
+				struct usb_device *parent;
+				struct usb_bus *bus;
+				
+				struct usb_device_descripor descriptor;
+				struct usb_host_config *config;
+				struct usb_host_config *actconfig;
+				
+				struct usb_host_endpoint ep0;
+				struct usb_host_endpoint *ep_in[16];
+				struct usb_host_endpoint *ep_out[16];
+				...
+				
+			}
+	
+			usb_host_endpoint->usb_interface->usb_host_config->usb_device//usb结构关系
+			struct usb_driver{//usb外设驱动结构
+				const char *name;
+				int (*probe)(struct usb_interface *intf,const struct usb_device_id *id);
+				void (*disconnect)(struct usb_interface *intf);
+				int (*unlocked_ioctl)(struct usb_interface *intf,unsigned int code ,void *buf);
+				
+				int (*suspend)(struct usb_interface *intf,pm_message_t *message);
+				int (*resume)(struct usb_interface *intf);
+				int (*reset_resume)(struct usb_interface *intf);
+				
+				int (*pre_reset)(struct usb_interface *intf);
+				int (*post_reset)(struct usb_interface *intf);
+				
+				const struct usb_device_id *id_table;
+				....
+
+			}
+			
+			struct hc_driver{//usb 主机控制器的驱动函数
+				const char *description;//描述ohci,ehci
+				const char *product_desc;
+				irqreturn_t (*irq)(struct usb_hcd*);
+				
+				int(*reset)(struct usb_hcd *hcd);
+				int(*start)(struct usb_hcd *hcd);
+				
+				int (*urb_enqueue)(struct usb_hcd *hcd,struct urb *urb ,gfp_t mem_flags);//被usb_submit_urb调用
+				int (*urb_dequeue)(struct usb_hcd *hcd ,struct urb *urb,int status);
+				 
+				...
+				
+			}
+			struct usb_hcd{//usb_hcd用来描述主机控制器usb host controller driver
+				struct usb_bus self;
+				struct kref kref;
+				const char *product_desc;
+				
+				const struct hc_driver *driver;//主要驱动函数
+				
+				int irq;
+				void __iomem *regs;
+				u64 rsrc_start;
+				u64 rsrc_len;
+				unsigned power_budget;//电源容量 单位ma,0表示没有限制.
+				...
+				unsigned long hcd_priv[0] __attributr__((aligned(sizeof(s64)));//私有数据
+			}
+			struct ohci_hcd{//用来描述ohci接口,属于usb_hcd特例,存在于usb_hcd的私有数据中.
+				spinlock_t lock;
+				struct ohci_regs __iomem *regs;//与主机通讯的io内存,用readl,writel读写
+				struct ohci_hcca *hcca;//与主机通讯的内存,256字节
+				...
+			}
+		函数:
+			ohci相关函数:
+				struct ohci_hcd * hcd_to_ohci(strut usb_hcd *hcd);
+				struct usb_hcd * ohci_to_hcd(struct ohci_hcd *ohci);
+				
+				int ohci_init(struct ohci_hcd *ohci);
+				int ohci_run(struct ohci_hcd *ohci);
+				void ohci_stop(strut ohci_hcd* ohci);
+				void ohci_usb_reset(struct ohci_hcd *ohci);
+				
+				void usb_remove_hcd(struct usb_hcd *);
+				void usb_put_hcd(struct usb_hcd*);//put 函数释放资源,get 获得资源
+				int  usb_create_hcd(struct hc_driver*driver,struct device *,const char *devname);//devname:bus name可以用dev_name(struct device *dev)来获得
+				int  usb_add_hcd(struct usb_hcd *hcd);
+			usb设备相关函数:
+				struct usb_interface * usb_find_interface(struct usb_driver *,int minor);//根据usb_driver获得usb_interface
+				void *usb_get_infdata(struct usb_interface *);//根据usb_interface 获得usb_interface中的dev的私有数据,一般是自定义的usb设备数据
+				usb_rsvbulkpipe(struct usb_device *dev,__u8 endpoint);//创建usb device 的pipe,endpoint是endpoint地址.
+				usb_sndbulkpipe(struct usb_device *dev,__u8 endpoint);
+				usb_fill_control_urb(struct urb *urb,struct usb_device *udev,unsigned int pipe,unsigned char *setup_packet,void *transfer_buffer,int buffer_length,usb_complete_t complete_fn,void *context);//填充control urb
+				usb_fill_bulk_urb(struct urb *urb,struct usb_device *udev,unsigned int pipe,void *transfer_buffer,int buffer_length,usb_complete_t complete_fn,void *context);//填充bulk urb
+				usb_fill_int_urb(struct urb*urb,struct usb_device *dev,unsigned int pipe,void* transfer_buffer,int buffer_length,usb_complete_fn *complete_fn,void*context,int interval);//填充int urb
+				struct urb * usb_alloc_urb(int iso_packet,int flags)；//分配urb空间,会调用usb_init_urb.对于每个endpoint要分配bulk_in和bulk_out urb.bulk_in可以在probe时分配.bulk_out在write时分配.
+
+				usb_submit_urb(struct urb *urb,int flags);//提交urb
+				
+				usb_register_dev(struct usb_interface *interface,struct usb_class_driver*);//注册字符型usb设备.将设备链接到usb总线上.
+				usb_register(struct usb_driver *);//注册usb设备
+		用法:
+			ohci驱动:
+				主要工作是编写hc_driver函数,其中的主要函数采用ohci-hcd.c中的通用函数,只有少数函数需要编写如reset,start,stop,shutdown等
+			函数.
+				xx_reset(struct usb_hcd*hcd){
+						...
+						ohci=hcd_to_ohci(hcd);
+						ohci_init(ohci);
+				}
+				xx_start(struct usb_hcd*hcd){
+						ohci=hcd_to_ohci(hcd);
+						ohci_run(ohci);
+					
+				}
+				struct hc_driver xx_hc_driver={
+					.reset=xx_reset;
+					.start=xx_start;
+				}
+				static int xx_probe(struct platform_device *pdev){
+					...
+					res=platform_get_resources(pdev,IORESOURCES_IRQ,0);
+					irq=res->start;
+					
+					res=platform_get_resources(pdev,IORESOURCES_MEM,0)//获取资源
+					
+					hcd=usb_create_hcd(&xx_hc_driver,&pdev->dev,dev_name(&pdev->dev));//创建hcd
+					hcd->rsrc_start=res->start;
+					hcd->rsrc_len=res->end-res->start+1;
+					request_mem_region(hcd->rsrc_start,hcd->rsrc_len,driver->description);
+					hcd->regs=ioremap(hcd->rsrc_srtart,hcd->rsrc_len);//映射内存
+					ohci_hcd_init(hcd_to_ochi(hcd));//ohci初始化
+					usb_add_hcd(hcd,irq,IRQF_SHARED);///添加hcd设备
+				}
+				static int xx_remove(struct platform_device *pdev){
+					hcd=platform_get_drvdata(pdev);//?没有set
+					usb_remove_hcd(hcd);
+					usb_put_hcd(hcd);
+					iounmap(hcd->regs);
+					release_mem_region(hcd->rsrc_start,hcd->rsrc_len);
+					platform_set_drvdata(pdev,NULL);
+				}
+			主机侧usb外设驱动:
+			    主要步骤:
+			        1.定义私有的usb device结构,其中包括usb_device
+			        2.定义probe函数,
+			            2.1初始化必要的lock,semphore,completion等.
+			            2.2根据interface填充bulk_urb
+			            2.3设置interface的私有数据为私有usb_device
+			            2.4注册usb_device
+			        3.定义disconnect等其他函数
+			        4.注册usb设备
+			    演示代码如下:  
+			    struct xx_usb_dev{
+			        struct usb_device *udev;//usb device
+			        struct usb_interface * interface;
+			        struct urb *bulk_in_urb;//输入urb
+			        struct kref kref;
+			        ...
+			    };
+			    struct usb_driver xx_driver;//预定义usb driver
+			    
+			    static int xx_open(struct inode *inode,file *file){
+			    	struct xx_usb_dev *xx_dev;
+			    	struct usb_interface *intf;
+			    	int subminor ;
+			    	
+			    	subminor=iminor(inode);//获得子设备号
+			    	intf=usb_find_interface(&xx_driver,subminor);//从usb driver 获得interface
+			    	xx_dev=usb_get_infdata(intf);//从interface的私有数据获得私用的usb device
+			    	kref_get（&xx_dev->kref);//增加引用
+			    	file->private_data=xx_dev;//设置file的私用数据供其他函数使用
+			    	
+			    }
+			    static int xx_release(struct inode *inode,struct file *file){
+			    	struct xx_usb_dev *xx_dev;
+			    	xx_dev=file->private_data;
+			    	kref_put(&xx_dev->kref,xx_release_fn);
+			    }
+			    static int xx_read(struct file *file ,char *buffer,size_t count,loff_t *ppos){
+			    	struct xx_usb_dev *xx_dev;
+			    	xx_dev=file->private_data;
+			    	...
+			    }
+			    static int xx_write（struct file *file，char *buffer，size_t count ,loff_t *ppos){
+			    	struct xx_usb_dev *xx_dev;
+			    	xx_dev=file->private_data;
+			    	struct urb *urb;
+			    	
+			    	usb_alloc_urb(0,GFP_KERNEL);
+			    	usb_fill_bulk_urb(...);
+			    	usb_submit_urb(urb,GFP_KERNEL);
+			    	...
+			    	//也可以不用上述方法，采用简单的usb_control_msg,usb_bulk_msg也可以
+			    }
+			    
+			    static const struct file_operations xx_fops={
+			    	.owner=THIS_MODULE;
+			    	.read=xx_read;
+			    	.write=xx_write;
+			    	.open=xx_open;
+			    	...
+			    };
+			    static struct usb_class_driver xx_class={
+			    	.name="";
+			    	.fops=&xx_ops;
+			    	minor_base=XX;
+			    
+			    };
+			    
+				static int xx_probe(struct usb_interface *intf,struct usb_device_id *id){
+					struct xx_usb_dev *xx_dev;//定义私有的usb device
+					struct usb_host_interface* iface_desc;
+					struct usb_endpoint_descriptor *endpoint;
+					//初始化必要的lock,semphore,completion等.
+					xx_dev=kzalloc(sizeof(*xx_dev),GFP_KERNEL);//分配设备内存
+					kref_init(xx_dev->kref);
+					sema_init(&xx_dev->sem);
+					mutex_init(&xx_dev->mutex);
+					spin_lock_init(&xx_dev->lock);
+					init_completion(&xx_dev->completion);
+					//根据interface填充bulk_in_urb
+					xx_dev->udev=usb_get_dev(interface_to_usbdev(intf));//usb_get_dev是增加device的引用,interface_to_usbdev是一个container_of宏
+					xx_dev->interface=interface;
+					iface_desc=interface->cur_altsetting;
+					for(i=0;i<iface_desc->desc.bNumEndpoints;++i){
+					    endpoint=iface_desc->desc.endpointp[i].desc;
+					    if(usb_endpoint_is_bulk_in(endpoint)){
+					    	buff_size=usb_endpoint_maxp(endpoint);
+					    	xx_dev->bulk_in_size=buffer_size;
+					    	xx_dev->bulk_in_endpointAddr=endpoint->bEndpointAddress;
+					        xx_dev->bulk_in_buffer=kmalloc(buffer_size,GFP_KERNEL);
+					        xx_dev->bulk_in_ub=usb_alloc_urb(0,GFP_KERNEL);
+					    }
+					    if(usb_endpoint_is_bulk_out(endpoint)){
+					    	xx_dev->bulk_out_endpointAddr=endpoint->bEndpointAddress;
+					    }
+					}
+					//设置interface的私有数据为私有usb_device
+					usb_set_infata(interface,xx_dev);//设置interface私有数据
+					//注册usb_device
+					usb_register_dev(interface,&xx_class);//注册字符型usb设备，这个设备根据xx class中的minor base来确定子设备号，在后面的打开设备时要用到。
+				}
+				xx_disconnect（struct usb_interface *intf){
+					...
+				}
+				static usb_device_id xx_table={//定义匹配的usb device，宏有USB_DEVICE(vendor，prod） USB_DEVICE_VER,USB_DEVICE_INTERFACE_PROTOCOL,USB_DEVICE_INFO等
+					USB_DEVICE(vendor，prod）,
+					。。。
+				}
+				MODULE_DEVICE_TABLE(usb, xx_table);
+				struct usb_driver xx_driver={
+					.probe=xx_probe;
+					.disconnect=xx_disconnect;
+					id_table=xx_table;
+					....
+				};
+				
+				module_usb_driver(xx_driver);
+				
+					扩展：
+						在sys file中要定义attr，可以用简单的方法
+						DEVICE_ATTR(name,flags,show_fn,set_fn),可以定义dev_attr_name的属性
+				
+	 			
+
+	 			
+	 		
+	 		
+	 		
+	 	
+	 		
