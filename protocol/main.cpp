@@ -97,7 +97,7 @@ void test_event(){
 	event_list.push(e);
 
 	event_yc e2;
-	e2.data=YcTable[0].ycdata;
+	e2.data=YcTable[0];
 	e2.readflag[0]=0;
 	e2.readflag[1]=0;
 	e2.readflag[2]=0;

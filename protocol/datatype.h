@@ -19,22 +19,6 @@ typedef long long int64;
 typedef unsigned long long uint64;
 typedef unsigned long long Uint64;
 typedef float float32;
-class BaseDataType
-{
-public :
-    int32 DataType ;///<数据类型?-类型1,2-类型2.。?
-};
-class DataType4: public BaseDataType
-{
-
-public:
-    float  Data ;
-    DataType4() {
-        DataType = 4;
-        Data = 0;
-    }
-};
-
 template<typename T>
 class tmpComplex{
 	public:

@@ -148,7 +148,7 @@ int16 Scada::YueXianYxInit(void)
 {
 	uint16 i;
 	uint16 j;
-	DataType4	*YcDataP = NULL	;
+	float	*YcDataP = NULL	;
 
 	scada_cfg.UupData.ContinueTime =LimitBounds.UupData.ContinueTime;
 	scada_cfg.UupData.Limit = LimitBounds.UupData.Limit*NOMINAL_U*0.01;
@@ -169,7 +169,7 @@ int16 Scada::YueXianYxInit(void)
 	scada_cfg.SupData.ContinueTime =LimitBounds.SupData.ContinueTime;
 	scada_cfg.SupData.Limit = LimitBounds.SupData.Limit*NOMINAL_S*0.03;
 	scada_cfg.SupData.Recover = LimitBounds.SupData.Recover*NOMINAL_S*0.03;
-	YcDataP = (DataType4 *)&scada_cfg.YcData.ua1_4001;
+	YcDataP = (float *)&scada_cfg.YcData.ua1_4001;
 	j = 0;
 	for ( i = 0; i<MAX_LINE_NUM;i++ )
 	{
@@ -521,9 +521,9 @@ harmonicdata_t Scada:: GetHarmonicRmsAndRatio(float BaseHarmonicRms,float *src)
 void Scada:: GetHarmonicData(void)
 {
 	uint8 i;
-	//DataType4 *Pycia=&scada_cfg.YcData.ia1rms2_402E;
-	//DataType4 *Pycib=&scada_cfg.YcData.ib1rms2_4078;
-	//DataType4 *Pycic=&scada_cfg.YcData.ic1rms2_40C2;
+	//float *Pycia=&scada_cfg.YcData.ia1rms2_402E;
+	//float *Pycib=&scada_cfg.YcData.ib1rms2_4078;
+	//float *Pycic=&scada_cfg.YcData.ic1rms2_40C2;
 	for (i = 0; i < 14; i++ ){//key
 //		Pycia[i].Data= RFFTmagBuff[IA1(0)][BASEHARMONIC+i]*YcRatio[0].PortRatio[IA1(0)];
 //		Pycib[i].Data= RFFTmagBuff[IB1(0)][BASEHARMONIC+i]*YcRatio[0].PortRatio[IB1(0)];
@@ -634,8 +634,8 @@ void Scada:: GetRms(void)
 	uint8 i;
 	uint16 YcName;
 	Complex A,B,C;
-	DataType4 *Pyc1=&scada_cfg.YcData.ua1_4001;
-//	DataType4 *Pyc2=&scada_cfg.YcData.ua2_40FA;
+	float *Pyc1=&scada_cfg.YcData.ua1_4001;
+//	float *Pyc2=&scada_cfg.YcData.ua2_40FA;
 	//memset(&scada_cfg.YcData,0,sizeof(scada_cfg.YcData)); // 会影响中断 ?
 	for (i = 0; i < CHANNELNUM; i++ ){//key 8个模拟量通道
 		YcName = yc_configure.name[i];//只要在配置表中的遥测项才去计算
@@ -827,7 +827,7 @@ void Scada:: GetPQS(void)
 	power_t powertmp;
 	uint8 flag = 0,i;
 	float p,q,s;
-	DataType4 *Pyc;
+	float *Pyc;
 
 	for ( i = 0; i < MAX_LINE_NUM; i++){
 		if(scada_cfg.d_508B.line[LINE(i)]==Pt_3){//都配置了采样通道，有数据可采

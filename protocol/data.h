@@ -8,12 +8,29 @@
 #ifndef DATA_H_
 #define DATA_H_
 #include "datatype.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
+#define TRUE    1
+#define FALSE   0
+#define WRITE   1
+#define READ    0
+
 #define LOCK 1
 #define UNLOCK 0
+#define SETBIT(dest,mask)     (dest |= mask)//目标位置位
+#define CLRBIT(dest,mask)     (dest &= ~mask)//目标位清零
+#define TGLBIT(dest,mask)     (dest ^= mask)//目标位取反
+#define CHKBIT(dest,mask)     (dest & mask)//目标位检测
+
+#define SET_BIT 0
+#define CLR_BIT 1
+#define CHECK_BIT 2
+#define GET_BIT 3
+#define GET_BITNOMOVE 4
+
+#define READED 0
+#define NOREAD 1
+
 //定义终端最大串口数
+
 #define MAX_SERIAL_NUM 2
 #define MAX_NET_NUM 1
 #define MAX_SOCKET_NUM 1
@@ -39,6 +56,7 @@ extern "C" {
 //定义终端最大数
 #define MAX_COUPLEYX_NUM 2
 #define MAX_YK_NUM 2
+//定义终端最大遥测数
 #define MAX_YC_NUM  26
 #define CONFIG_ENERGY_NUM  4
 #define CONFIG_YC_NUM  13
@@ -132,19 +150,6 @@ typedef struct allyx{
 	 yxdata_t reverXuYx[MAX_LINE_NUM];//电流逆相序信号
 	 
 }allyx;
-extern allyx TerYx;
-
-
-typedef struct yx_table{
-	//char *soe_p;
-	yxdata_t *pdata;
-}YX_TAB;
-extern YX_TAB YxTable[MAX_YX_NUM] ;//按照POS固定顺序的排列表
-
-typedef struct _sort_yx_table{
-	yxdata_t *pdata;
-}SORT_YX_TAB;
-extern SORT_YX_TAB SortYxTable[MAX_YX_NUM];// 按照地址顺序排列的表
 
 typedef struct limt{
     float Limit;
@@ -194,92 +199,19 @@ typedef enum YKENUM{
 #define JDGZ(n)	(JDGZ1 + HE2*n)	//故障指示器指示线路2接地故障
 #define SP6GZ(n)(SP6GZ1 + HE2*n)	//SF6气体异常报警信号
 #define SP6BS(n)(SP6BS1 + HE2*n)	//SF6气压闭锁信号
-typedef struct time_data{
-	 unsigned int millisecond;//0-999毫秒
-	 unsigned int minute;//IV--是否有效 0有效 1无效 占字节最高位 第七位备用 低6位为数据（0-59分--在GB_T 18657.4-2002 远动设备及系统 第五部分 传输规约 第四篇 应用信息元素的编码和定义中例图有误写成0-99）
-	 unsigned int hour;//SU--是否夏令时 0标准时间，1夏令时 占字节最高位，第六、七位备用，低5位为数据（0-23小时）
-	 unsigned int day;//day_week:week占字节高3位(1-7星期的天)，day占字节低5位 （1-31月的天）
-	 unsigned int month;//高四位备用 month占低4位（1-12月）
-	 unsigned int year;//最高位备用 year占低7位（0-99年）
-}CP56Time2a;
-typedef struct fourchar{
-	long d1:8;
-	long d2:8;
-	long d3:8;
-	long d4:8;
-}fourchar;
-typedef union ycfloatdata{
-	float fdata;
-	fourchar bitdata;
-}ycfloatdata;
-
-typedef struct passdata{
-	ycfloatdata floatdata;
-	int16      intdata;
-}passdata;
-typedef struct yc_data{
-	float *src_yc;
-	passdata *deadpass;
-	short *Coef;//工程系数；
-	short *range;//量程;
-	float *dead;
-	uint16 dataid;
-	uint16 datasign;
-	uint8 changeflag;
-	CP56Time2a time;
-	int type;//0 normal,1 acc with time
-}YC_DATA ;
-typedef struct yc_table {
-	YC_DATA *ycdata;
-}YC_TAB;
-extern YC_TAB YcTable[MAX_YC_NUM ];
-typedef struct dpyx_table{
-	uint16 paddr;
-	uint16 changeflag;
-	unsigned int *yxdata;
-}dpYX_TAB;
-extern YC_DATA Yc[MAX_YC_NUM];
 typedef struct BATTERYDATA{
 	unsigned long gap;
 	unsigned int StartHour;
 	unsigned int StartMinute;
+
 }BATTERYDATA_T;
-typedef struct serial_para_tag {
-	uint16 num:16;
-    uint32 baudrate:32;
-    uint16 bitnum:8;
-    uint16 stopbit:8;
-    uint16 checkbit:8;
-    uint16 protocol:8;
-} SERIAL_PARA;
+
 typedef struct charip{
     unsigned long d1:8;
 	unsigned long d2:8;
 	unsigned long d3:8;
 	unsigned long d4:8;
 }charip_t;
-typedef struct eth_para_tag {//lenth 37
-	uint8 local_ip[4];
-	uint8 mac[6];
-	uint8 sub_mask[4];
-	uint8 net_gate[4];
-    uint8 enable;
-    uint8 linkstatu;
-    uint32 sendbyte;
-    uint32 recvbyte;
-} ETH_PARA;
-typedef struct eth_com_tag {
-	uint16 ethnum;//对应的网口好
-	uint16 comtype;//通道标志，1 主通道，0子通道，默认子通道；
-	int16 server_client;//1:是服务器，2是客户端，默认客户端
-	int16 enable ;//通道启用标志；
-	int16 tcpiptype;//1:TCP;2:UDP 默认tcp
-	int16 net_port;//本地做服务器时的监听端口；
-	uint8 remote_ip[4];//远端IP
-	int16 dport;//远端端口
-	int16 protocol;//规约
-} ETH_COM_PARA;
-
 typedef union charipunion{
 	charip_t bit;
 	long all;
@@ -292,25 +224,14 @@ typedef struct sntpdata{
 		unsigned int StartHour;
 		unsigned int StartMinute;
 }sntpdata_t;
-typedef struct terminal_para_tag {//终端参数
-	uint16 nulldata[8];//未定义数据
-	SERIAL_PARA ComPara[MAX_SERIAL_NUM];
-	ETH_PARA EthPara[MAX_NET_NUM];
-	ETH_COM_PARA EthSocketPara[MAX_SOCKET_NUM];
-    uint32 yx_filter_time;//遥信防抖时间；
-    uint32 ykchecktime;//遥控返校时间；
-    uint32 yk_he_pulse;//遥控合脉冲时间
-    uint32 yk_fen_pulse;//遥控分脉冲时间；
-    uint32 ykdelaytime;//遥控延迟断开电源时间。
-    unsigned int  cascadeport;//CASCADE_PORT；
-    BATTERYDATA_T battery_action_time ;
-	sntpdata_t sntppara;
-	uint16 show_data;//液晶显示一次值
-	uint16 reverse[18];
-	uint16 crc;
-} TER_PARA;
-extern TER_PARA TerPara;//终端参数
-
+typedef struct time_data{
+	 unsigned int millisecond;//0-59999毫秒
+	 unsigned int minute;//IV--是否有效 0有效 1无效 占字节最高位 第七位备用 低6位为数据（0-59分--在GB_T 18657.4-2002 远动设备及系统 第五部分 传输规约 第四篇 应用信息元素的编码和定义中例图有误写成0-99）
+	 unsigned int hour;//SU--是否夏令时 0标准时间，1夏令时 占字节最高位，第六、七位备用，低5位为数据（0-23小时）
+	 unsigned int day;//day_week:week占字节高3位(1-7星期的天)，day占字节低5位 （1-31月的天）
+	 unsigned int month;//高四位备用 month占低4位（1-12月）
+	 unsigned int year;//最高位备用 year占低7位（0-99年）
+}CP56Time2a;
 typedef struct time16_data{
 	unsigned int millisecond;
 }CP16Time2a;
@@ -319,7 +240,12 @@ typedef struct setmstime{
 	uint8 SetFlag;
 	uint64 *Psystime;
 } setmstime_t;
-
+typedef struct BASEPROSTATU{
+	uint64 CurrentMs1;
+	uint64 CurrentMs2;
+	bool CurrentBool;
+	bool Trigger;
+}BASEPROSTATU_T;
 #define MAXEVENTSOENUM 300
 #define MAXYKSOENUM 60
 #define MAXTERSOENUM 20
@@ -382,14 +308,42 @@ typedef struct action_soe_buffer {
 	 unsigned int  consume_cnt;
 	 ACTION_DATA SoeData[MAX_ACT_SOE_NUM];
 } ACTION_SOE_BUFF;
-extern ACTION_SOE_BUFF ActionSoeBuf;
+
+typedef struct fourchar{
+	long d1:8;
+	long d2:8;
+	long d3:8;
+	long d4:8;
+}fourchar;
+typedef union ycfloatdata{
+	float fdata;
+	fourchar bitdata;
+}ycfloatdata;
+
+typedef struct passdata{
+	ycfloatdata floatdata;
+	int16      intdata;
+}passdata;
+
+typedef struct _ycdata_t{
+	float *src_yc;
+	int type;
+	passdata *deadpass;
+	short *Coef;//工程系数；
+	short *range;//量程;
+	float *dead;
+	uint16 dataid;
+	uint16 addr;
+	uint8 changeflag;
+	CP56Time2a time;
+}ycdata_t ;
 
 typedef struct _event{
 	SoeData soe;
 	int readflag[4];
 }event;
 typedef struct _event_yc{
-	YC_DATA *data;	
+	ycdata_t *data;	
 	int readflag[4];
 }event_yc;
 typedef CircleQueue<event> EventList;
@@ -415,26 +369,10 @@ typedef struct _buffer{
 #define COM_SEND_BUFFER_SIZE 256
 #define COM_RECV_BUFFER_SIZE 512
 typedef struct combox{
-			unsigned int 	recv_time_out;//接收超时
-			unsigned int 	send_time_out;//发送超时
-			unsigned int 	inbyte_cnt;//接收缓存填入数据计数
-			unsigned int 	outbyte_cnt;//接收缓存取出数据计数
-			unsigned char short_pack_buffer[10];//固定帧缓存
-			unsigned char long_pack_buffer[COM_RECV_BUFFER_SIZE];//可变帧缓存
-			unsigned int 	short_pack_byte_cnt;//固定帧字节计数
-			unsigned int    long_pack_byte_cnt;//可变帧字节计数
-			unsigned int 	short_start_flag;//固定帧检包开始标志
-			unsigned int 	long_start_flag;//可变帧检包开始标志
-			unsigned int 	exp_len;//期待的帧长度
-			unsigned int 	wait_com_flag;//等待标志
-			unsigned int 	wait_com_time;//等待时间
-			unsigned int	link_wait_flag;
-			unsigned int	link_wait_time;//等待链路连接的时间
-			unsigned char	short_addr_buffer[10]; //这个是为马鞍山主站的招读终端地址准备的帧。
-			unsigned int	short_addr_byte_cnt;	//
-			unsigned int	short_addr_flag;
-			unsigned char 	com_send_buffer[COM_SEND_BUFFER_SIZE];//发送缓存
-			unsigned char 	com_recv_buffer[COM_RECV_BUFFER_SIZE];//接收缓存
+		unsigned int 	inbyte_cnt;//接收缓存填入数据计数
+		unsigned int 	outbyte_cnt;//接收缓存取出数据计数
+		unsigned char 	com_send_buffer[COM_SEND_BUFFER_SIZE];//发送缓存
+		unsigned char 	com_recv_buffer[COM_RECV_BUFFER_SIZE];//接收缓存
 } COMBOX;
 
 typedef struct YC_ADDR_POS {
@@ -454,7 +392,7 @@ typedef struct YXPARA{
 }YXPARA_T;
 typedef struct yxpara{
 	uint16 num;
-	YXPARA_T addpos[MAX_YX_NUM];
+	YXPARA_T addpos[60];
 }yxpara;
 
 typedef struct tagComPub{
@@ -466,6 +404,59 @@ typedef struct tagComPub{
 	uint16	per_grp_yc_cnt;
 }ComPub;
 
+typedef struct serial_para_tag {
+	uint16 num:16;
+    uint32 baudrate:32;
+    uint16 bitnum:8;
+    uint16 stopbit:8;
+    uint16 checkbit:8;
+    uint16 protocol:8;
+} SERIAL_PARA;
+
+typedef struct eth_para_tag {//lenth 37
+	uint8 local_ip[4];
+	uint8 mac[6];
+	uint8 sub_mask[4];
+	uint8 net_gate[4];
+    uint8 enable;
+    uint8 linkstatu;
+    uint32 sendbyte;
+    uint32 recvbyte;
+} ETH_PARA;
+
+typedef struct eth_com_tag {
+	uint16 ethnum;//对应的网口好
+	uint16 comtype;//通道标志，1 主通道，0子通道，默认子通道；
+	int16 server_client;//1:是服务器，2是客户端，默认客户端
+	int16 enable ;//通道启用标志；
+	int16 tcpiptype;//1:TCP;2:UDP 默认tcp
+	int16 net_port;//本地做服务器时的监听端口；
+	uint8 remote_ip[4];//远端IP
+	int16 dport;//远端端口
+	int16 protocol;//规约
+} ETH_COM_PARA;
+
+typedef struct terminal_para_tag {//终端参数
+//	uint16 ter_addr;
+//	uint16 master_addr;
+	uint16 nulldata[8];//未定义数据
+	SERIAL_PARA ComPara[MAX_SERIAL_NUM];
+	ETH_PARA EthPara[MAX_NET_NUM];
+	ETH_COM_PARA EthSocketPara[MAX_SOCKET_NUM];
+    uint32 yx_filter_time;//遥信防抖时间；
+    uint32 ykchecktime;//遥控返校时间；
+    uint32 yk_he_pulse;//遥控合脉冲时间
+    uint32 yk_fen_pulse;//遥控分脉冲时间；
+    uint32 ykdelaytime;//遥控延迟断开电源时间。
+  //  unsigned int  ter_pswd[6];
+    unsigned int  cascadeport;//CASCADE_PORT；
+    BATTERYDATA_T battery_action_time ;
+	sntpdata_t sntppara;
+	uint16 show_data;//液晶显示一次值
+	uint16 reverse[18];
+	uint16 crc;
+} TER_PARA;
+
 typedef struct protocol_para_tag {  //规约参数
 	yxpara	yx_dataaddr ;
 	ycpara	yc_dataaddr;
@@ -475,8 +466,6 @@ typedef struct protocol_para_tag {  //规约参数
 	uint16     reverse[20];
 	uint16     crc;
 } PRO_PARA;
-
-extern PRO_PARA ProPara;
 
 typedef struct dead_band_para{
 	int16 DeadTime;//遥测死区时间设置
@@ -492,8 +481,6 @@ typedef struct dead_band_para{
     uint16 reverse[20];
     uint16 crc;
 } DEAD_BAND_PARA;
-extern DEAD_BAND_PARA DeadBandPara;
-extern DEAD_BAND_PARA DeadBandParaValue;//转换成绝对值
 
 typedef struct unitary_table{
 	int U_bdata;
@@ -511,6 +498,7 @@ typedef struct angleratio{
 	float cos_a;//角度误差的余弦值
 	float sin_a;//角度误差的正弦值
 }angleratio_t;
+
 typedef struct ratio{
 	float PortRatio[13];//UA1,UB1,UC1,UAB1,UBC1,UCA1,U01,IA11,IB11,IC11,I011,IA12,IB12,IC12,
 	float PowerLineRatio[4];// Pa ; Pb ; Pc; Pall;  线性系数
@@ -518,14 +506,8 @@ typedef struct ratio{
 	uint16 reverse[20];
 	uint16 crc;
 }ratio_t;
-extern ratio_t YcRatio[MAX_LINE_NUM];
 
-typedef struct BASEPROSTATU{
-	uint64 CurrentMs1;
-	uint64 CurrentMs2;
-	bool CurrentBool;
-	bool Trigger;
-}BASEPROSTATU_T;
+
 
 //定义装置故障信息位
 #define ERROR_FLASH 0
@@ -544,18 +526,7 @@ typedef struct _terminal_msg{//终端信息
 	yxdata_t *SoeId;
 	int    soe_flag;
 }TerminalMsg;
-extern  TerminalMsg term_msg;
-#define SETBIT(dest,mask)     (dest |= mask)//目标位置位
-#define CLRBIT(dest,mask)     (dest &= ~mask)//目标位清零
-#define TGLBIT(dest,mask)     (dest ^= mask)//目标位取反
-#define CHKBIT(dest,mask)     (dest & mask)//目标位检测
 
-#define SET_BIT 0
-#define CLR_BIT 1
-#define CHECK_BIT 2
-#define GET_BIT 3
-#define GET_BITNOMOVE 4
-extern unsigned int Para_buffer[2048];
 //for  DEBUG_TIME 
 extern Uint64 t1,t2;
 extern int64 t3,max_t3,min_t3;
@@ -570,8 +541,29 @@ extern float *ptr_ct0;
 extern float *ptr_pt0;
 extern uint16 *ptr_d_yx;//双点遥信
 extern int16 DogFood;
-extern COMBOX ComBox[MAX_COM_PORT_NUM];
+
+extern ycdata_t Yc[MAX_YC_NUM];
+extern ycdata_t *YcTable[MAX_YC_NUM ];
+extern allyx TerYx;
+extern yxdata_t *YxTable[MAX_YX_NUM] ;//按照POS固定顺序的排列表
+extern yxdata_t *SortYxTable[MAX_YX_NUM];// 按照地址顺序排列的表
+extern passdata  DeadPass[MAX_YC_NUM];//越过死区的值；
+extern short coeftable[MAX_YC_NUM];
+
 extern SOE_BUFFER SoeBuffer;
+extern ACTION_SOE_BUFF ActionSoeBuf;
+extern TER_PARA TerPara;//终端参数
+extern PRO_PARA ProPara;
+extern DEAD_BAND_PARA DeadBandPara;
+extern DEAD_BAND_PARA DeadBandParaValue;//转换成绝对值
+extern ratio_t YcRatio[MAX_LINE_NUM];
+extern TerminalMsg term_msg;
+extern unsigned int Para_buffer[2048];
+
+extern COMBOX ComBox[MAX_COM_PORT_NUM];
+#ifdef __cplusplus
+extern "C" {
+#endif
 extern void FloatFFTInit(void);
 extern void _FFTdel(float *inbuff,float *outbuff,float *magbuff,float *phasebuff);
 extern void _16fft(Uint16 Chanel);
@@ -589,7 +581,7 @@ extern int16 do_clear_soe_info(void );
 extern int16 do_clear_action_info(void );
 extern int16 do_set_default_para(void );
 extern void ComBoxInit(void);
-extern int  CheckTerminalState();
+extern int    CheckTerminalState();
 extern void InitTerminalState();
 extern void show_ratio();
 extern void init_data();
