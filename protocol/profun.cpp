@@ -14,24 +14,15 @@ int g_reset=0;
 /****************************
  * realize extern interface functions for protocol
 ****************************/
-SORT_YX_TAB * get_yx_data(int pos){
-	SORT_YX_TAB *p;
-	p=&SortYxTable[pos];
-	pfunc(DEBUG_INFO,"get yx pos %d\n",pos);
-	return p;
+yxdata_t * get_yx_data(int pos){
+return SortYxTable[pos];
 }
-YC_TAB * get_yc_data(int pos){
-	YC_TAB *p;
-	p=&YcTable[pos];
-	pfunc(DEBUG_INFO,"get yc pos %d\n",pos);
-	return p;
+ycdata_t *get_yc_data(int pos){
+	return YcTable[pos];
 }
-YC_TAB * get_acc_yc_data(int pos){
-	YC_TAB *p;
+ycdata_t *get_acc_yc_data(int pos){
 	pos+=config_scada_data.pos_acc;
-	p=&YcTable[pos];
-	pfunc(DEBUG_INFO,"get acc yc pos %d\n",pos);
-	return p;
+	return YcTable[pos];
 }
 int get_event_data(int port,event *&e,int change){
 	int ret;
@@ -52,6 +43,7 @@ int get_event_data(int port,event *&e,int change){
 	pfunc(DEBUG_DEBUG,"get event\n");
 	return ret;
 }
+
 int get_clock(CP56Time2a &time){
 	time.year=1;
 	time.month=2;
@@ -78,7 +70,7 @@ int do_yk(int id,int type,int cmd){
 	return 0;
 }
 void do_reset(){
-	g_reset=1;
+	//g_reset=1;
 }
 int get_yc_cg_data(int port,event_yc *&e){
 	int ret;

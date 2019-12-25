@@ -9,9 +9,9 @@
 /****************************
  *	extern function for protocol app_layer 
 ****************************/
-extern SORT_YX_TAB * get_yx_data(int);
-extern YC_TAB * get_yc_data(int );
-extern YC_TAB * get_acc_yc_data(int );
+extern yxdata_t * get_yx_data(int);
+extern ycdata_t * get_yc_data(int );
+extern ycdata_t * get_acc_yc_data(int );
 extern int get_event_data(int type,event *&e,int change);
 extern int get_clock(CP56Time2a &);
 extern int set_clock(CP56Time2a &);

@@ -9,7 +9,7 @@
 using namespace std;
 #include "data.h"
 #include "com.h"
-#include "utility.h"
+#include "utilities.h"
 #include "configurable.h"
 #include "system.h"
 #define MAX_SEND_YX_PER_FRAME 28 
@@ -486,10 +486,10 @@ class app_layer{
 		int build_link_fini(frame *out,link_layer *link);
 		int build_summon_con(frame *out,link_layer *link);
 		int build_summon_term(frame *out,link_layer *link);
-		SORT_YX_TAB * (*get_yx_data)(int);
+		yxdata_t * (*get_yx_data)(int);
 		int build_yx_data(frame *out,link_layer *link);//cause 20
 		int build_dyx_data(frame *out,link_layer *link);//cause 20
-		YC_TAB * (*get_yc_data)(int);
+		ycdata_t * (*get_yc_data)(int);
 		int build_yc_data(frame *out,link_layer *link);//cause 20
 
 		int (*get_event_data)(int type,event *&e,int change);
@@ -534,7 +534,7 @@ class app_layer{
 		int (*set_dz)(int,para_node *);
 		int build_wr_dz_con(frame *out,link_layer *link,_para_list *);//cause 7,sel =0 or 1 ,cr=0
 
-		YC_TAB * (*get_acc_yc_data)(int);
+		ycdata_t * (*get_acc_yc_data)(int);
 		int build_summon_acc_con(frame *out,link_layer *link);//cause 7
 		int build_summon_acc_term(frame *out,link_layer *link);//cause 10
 		int build_summon_acc_resp(frame *out,link_layer *link);//cause 37

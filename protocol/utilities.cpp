@@ -7,7 +7,7 @@
 #include<iostream>
 #include <termios.h>
 using namespace std;
-#include "utility.h"
+#include "utilities.h"
 /****************************
  * utilty
 ****************************/

@@ -1,6 +1,6 @@
 target =test it 
 all:$(target)
-objs1 =main.o Scada.o para.o protocol.o data.o configurable.o com.o system.o utility.o profun.o
+objs1 =main.o Scada.o para.o protocol.o data.o configurable.o com.o system.o utilities.o profun.o
 objs2 =it.o
 objs  =$(objs1) 
 objs  += $(objs2)

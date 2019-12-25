@@ -160,44 +160,44 @@ extern ADCONFIG yc_configure;
 
 typedef struct scada_yc{
 	//遥测类数据
-	DataType4 ua1_4001;	///<线路1 A相电压
-	DataType4 ub1_4002;	///<线路1 B相电压
-	DataType4 uc1_4003;	///<线路1 C相电压
-	DataType4 uab1_4004;	///<线路1 AB线电压
-	DataType4 ucb1_4005;	///<线路1 CB线电压
-	DataType4 uca1;
-	DataType4 u011_4006;	///<线路1 零序电压
-	DataType4 ia11_4007;	///<线路1 A相测量电流
-	DataType4 ib11_4008;	///<线路1 B相测量电流
-	DataType4 ic11_4009;	///<线路1 C相测量电流
-	DataType4 i011_400A;	///<线路1 零序电流
-	DataType4 P1_4017;	///<线路1 总有功功率
-	DataType4 Q1_4018;	///<线路1 总无功功率
-	DataType4 S1_4019;	///<线路1 总视在功率
-	DataType4 COS1_401A;	///<线路1 总功率因数
-	DataType4 freq1_401B;	///<线路1 频率
-//	DataType4 ia12_400B;	///<线路1 A相保护电流
-//	DataType4 ib12_400C;	///<线路1 B相保护电流
-//	DataType4 ic12_400D;	///<线路1 C相保护电流
-	DataType4 Ip;//正序电流；
-	DataType4 In;//反序电流；
-	DataType4 pa1_400E;	///<线路1 A相有功功率
-	DataType4 qa1_400F;	///<线路1 A相无功功率
-	DataType4 cosa1_4010;	///<线路1 A相功率因数
-	DataType4 pb1_4011;	///<线路1 B相有功功率
-	DataType4 qb1_4012;	///<线路1 B相无功功率
-	DataType4 cosb1_4013;	///<线路1 B相功率因数
-	DataType4 pc1_4014;	///<线路1 C相有功功率
-	DataType4 qc1_4015;	///<线路1 C相无功功率
-	DataType4 cosc1_4016;	///<线路1 C相功率因数
+	float ua1_4001;	///<线路1 A相电压
+	float ub1_4002;	///<线路1 B相电压
+	float uc1_4003;	///<线路1 C相电压
+	float uab1_4004;	///<线路1 AB线电压
+	float ucb1_4005;	///<线路1 CB线电压
+	float uca1;
+	float u011_4006;	///<线路1 零序电压
+	float ia11_4007;	///<线路1 A相测量电流
+	float ib11_4008;	///<线路1 B相测量电流
+	float ic11_4009;	///<线路1 C相测量电流
+	float i011_400A;	///<线路1 零序电流
+	float P1_4017;	///<线路1 总有功功率
+	float Q1_4018;	///<线路1 总无功功率
+	float S1_4019;	///<线路1 总视在功率
+	float COS1_401A;	///<线路1 总功率因数
+	float freq1_401B;	///<线路1 频率
+//	float ia12_400B;	///<线路1 A相保护电流
+//	float ib12_400C;	///<线路1 B相保护电流
+//	float ic12_400D;	///<线路1 C相保护电流
+	float Ip;//正序电流；
+	float In;//反序电流；
+	float pa1_400E;	///<线路1 A相有功功率
+	float qa1_400F;	///<线路1 A相无功功率
+	float cosa1_4010;	///<线路1 A相功率因数
+	float pb1_4011;	///<线路1 B相有功功率
+	float qb1_4012;	///<线路1 B相无功功率
+	float cosb1_4013;	///<线路1 B相功率因数
+	float pc1_4014;	///<线路1 C相有功功率
+	float qc1_4015;	///<线路1 C相无功功率
+	float cosc1_4016;	///<线路1 C相功率因数
 
-	DataType4 Up;//正序；
-	DataType4 Un;//反序；
+	float Up;//正序；
+	float Un;//反序；
 	
-	DataType4 pos_P	;//正向有功
-	DataType4 neg_P	;//反向有功
-	DataType4 pos_Q	;//正向无功
-	DataType4 neg_Q	;//反向无功
+	float pos_P	;//正向有功
+	float neg_P	;//反向有功
+	float pos_Q	;//正向无功
+	float neg_Q	;//反向无功
 
 }scada_yc_t;
 
@@ -251,9 +251,9 @@ typedef struct harmonicdata{
 }harmonicdata_t;
 
 typedef struct harmonictab{
-	DataType4 *Rms;
-	DataType4 *Ratio;
-	DataType4 *TotalRatio;
+	float *Rms;
+	float *Ratio;
+	float *TotalRatio;
 	uint16 YcName;
 }harmonictab_t;
 typedef struct maxavrmin{
@@ -268,7 +268,7 @@ typedef struct maxavrminpower{
 	power_t min;
 }maxavrminpower_t;
 typedef struct softyxtab{
-	DataType4 *SrcYcP;
+	float *SrcYcP;
 	limt *LimitParaP;
 	uint8 LimitType;
 	uint8 Enable;
@@ -323,7 +323,7 @@ public:
 	ScadaPara	scada_cfg;///<Scada配置参数
 	ptctdata_t PtCtReg[MAX_LINE_NUM];
 	SIGRCD FreqReg[MAX_LINE_NUM];
-	DataType4 MaxVol[MAX_LINE_NUM];
+	float MaxVol[MAX_LINE_NUM];
 	Counter TCount;
 	Scada();
 

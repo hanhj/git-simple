@@ -33,7 +33,7 @@ short coeftable[MAX_YC_NUM] = {
 		100,//cos
 		100,//hz
 };
-YC_DATA Yc[MAX_YC_NUM];
+ycdata_t Yc[MAX_YC_NUM];
 /***************************************************************************************
 * 函数名:void default_init_yc_addr(void)
 * 输  入:
@@ -69,110 +69,110 @@ void init_ycdata ( void )
 {
 	uint16 i;
 	i = 0;
-	Yc[i].src_yc = &scada.scada_cfg.YcData.ua1_4001.Data;
+	Yc[i].src_yc = &scada.scada_cfg.YcData.ua1_4001;
 	Yc[i].deadpass = &DeadPass[i];
 	Yc[i].Coef = &coeftable[i];
 	Yc[i].range = NULL;
 	Yc[i].dead = &DeadBandParaValue.DeadU;
-	Yc[i].datasign = 0xffff;
+	Yc[i].addr = 0xffff;
 	Yc[i].changeflag = 0;
 	i++;
-	Yc[i].src_yc = &scada.scada_cfg.YcData.ub1_4002.Data;
+	Yc[i].src_yc = &scada.scada_cfg.YcData.ub1_4002;
 	Yc[i].deadpass = &DeadPass[i];
 	Yc[i].Coef = &coeftable[i];
 	Yc[i].range = NULL;
 	Yc[i].dead = &DeadBandParaValue.DeadU;
-	Yc[i].datasign = 0xffff;
+	Yc[i].addr = 0xffff;
 	Yc[i].changeflag = 0;
 	i++;
-	Yc[i].src_yc = &scada.scada_cfg.YcData.uc1_4003.Data;
+	Yc[i].src_yc = &scada.scada_cfg.YcData.uc1_4003;
 	Yc[i].deadpass = &DeadPass[i];
 	Yc[i].Coef = &coeftable[i];
 	Yc[i].range = NULL;
 	Yc[i].dead = &DeadBandParaValue.DeadU;
-	Yc[i].datasign = 0xffff;
+	Yc[i].addr = 0xffff;
 	Yc[i].changeflag = 0;
 	i++;
-	Yc[i].src_yc = &scada.scada_cfg.YcData.u011_4006.Data;
+	Yc[i].src_yc = &scada.scada_cfg.YcData.u011_4006;
 	Yc[i].deadpass = &DeadPass[i];
 	Yc[i].Coef = &coeftable[i];
 	Yc[i].range = NULL;
 	Yc[i].dead = &DeadBandParaValue.DeadU;
-	Yc[i].datasign = 0xffff;
+	Yc[i].addr = 0xffff;
 	Yc[i].changeflag = 0;
 	i++;
-	Yc[i].src_yc = &scada.scada_cfg.YcData.ia11_4007.Data;
+	Yc[i].src_yc = &scada.scada_cfg.YcData.ia11_4007;
 	Yc[i].deadpass = &DeadPass[i];
 	Yc[i].Coef = &coeftable[i];
 	Yc[i].range = NULL;
 	Yc[i].dead = &DeadBandParaValue.DeadI;
-	Yc[i].datasign = 0xffff;
+	Yc[i].addr = 0xffff;
 	Yc[i].changeflag = 0;
 	i++;
-	Yc[i].src_yc = &scada.scada_cfg.YcData.ib11_4008.Data;
+	Yc[i].src_yc = &scada.scada_cfg.YcData.ib11_4008;
 	Yc[i].deadpass = &DeadPass[i];
 	Yc[i].Coef = &coeftable[i];
 	Yc[i].range = NULL;
 	Yc[i].dead = &DeadBandParaValue.DeadI;
-	Yc[i].datasign = 0xffff;
+	Yc[i].addr = 0xffff;
 	Yc[i].changeflag = 0;
 	i++;
-	Yc[i].src_yc = &scada.scada_cfg.YcData.ic11_4009.Data;
+	Yc[i].src_yc = &scada.scada_cfg.YcData.ic11_4009;
 	Yc[i].deadpass = &DeadPass[i];
 	Yc[i].Coef = &coeftable[i];
 	Yc[i].range = NULL;
 	Yc[i].dead = &DeadBandParaValue.DeadI;
-	Yc[i].datasign = 0xffff;
+	Yc[i].addr = 0xffff;
 	Yc[i].changeflag = 0;
 	i++;
-	Yc[i].src_yc = &scada.scada_cfg.YcData.i011_400A.Data;
+	Yc[i].src_yc = &scada.scada_cfg.YcData.i011_400A;
 	Yc[i].deadpass = &DeadPass[i];
 	Yc[i].Coef = &coeftable[i];
 	Yc[i].range = NULL;
 	Yc[i].dead = &DeadBandParaValue.DeadI;
-	Yc[i].datasign = 0xffff;
+	Yc[i].addr = 0xffff;
 	Yc[i].changeflag = 0;
 	i++;
 
-	Yc[i].src_yc = &scada.scada_cfg.YcData.P1_4017.Data;
+	Yc[i].src_yc = &scada.scada_cfg.YcData.P1_4017;
 	Yc[i].deadpass = &DeadPass[i];
 	Yc[i].Coef = &coeftable[i];
 	Yc[i].range = NULL;
 	Yc[i].dead = &DeadBandParaValue.DeadP;
-	Yc[i].datasign = 0xffff;
+	Yc[i].addr = 0xffff;
 	Yc[i].changeflag = 0;
 	i++;
-	Yc[i].src_yc = &scada.scada_cfg.YcData.Q1_4018.Data;
+	Yc[i].src_yc = &scada.scada_cfg.YcData.Q1_4018;
 	Yc[i].deadpass = &DeadPass[i];
 	Yc[i].Coef = &coeftable[i];
 	Yc[i].range = NULL;
 	Yc[i].dead = &DeadBandParaValue.DeadP;
-	Yc[i].datasign = 0xffff;
+	Yc[i].addr = 0xffff;
 	Yc[i].changeflag = 0;
 	i++;
-	Yc[i].src_yc = &scada.scada_cfg.YcData.S1_4019.Data;
+	Yc[i].src_yc = &scada.scada_cfg.YcData.S1_4019;
 	Yc[i].deadpass = &DeadPass[i];
 	Yc[i].Coef = &coeftable[i];
 	Yc[i].range = NULL;
 	Yc[i].dead = &DeadBandParaValue.DeadP;
-	Yc[i].datasign = 0xffff;
+	Yc[i].addr = 0xffff;
 	Yc[i].changeflag = 0;
 	i++;
-	Yc[i].src_yc = &scada.scada_cfg.YcData.COS1_401A.Data;
+	Yc[i].src_yc = &scada.scada_cfg.YcData.COS1_401A;
 	Yc[i].deadpass = &DeadPass[i];
 	Yc[i].Coef = &coeftable[i];
 	Yc[i].range = NULL;
 	Yc[i].dead = &DeadBandParaValue.DeadAngle;
-	Yc[i].datasign = 0xffff;
+	Yc[i].addr = 0xffff;
 	Yc[i].changeflag = 0;
 	i++;
 
-	Yc[i].src_yc = &scada.scada_cfg.YcData.freq1_401B.Data;
+	Yc[i].src_yc = &scada.scada_cfg.YcData.freq1_401B;
 	Yc[i].deadpass = &DeadPass[i];
 	Yc[i].Coef = &coeftable[i];
 	Yc[i].range = NULL;
 	Yc[i].dead = &DeadBandParaValue.DeadFreq;
-	Yc[i].datasign = 0xffff;
+	Yc[i].addr = 0xffff;
 	Yc[i].changeflag = 0;
 	/*
 	i++;
@@ -181,45 +181,45 @@ void init_ycdata ( void )
 	Yc[i].Coef = &coeftable[i];
 	Yc[i].range = NULL;
 	Yc[i].dead = &DeadBandParaValue.DeadP;
-	Yc[i].datasign = 0xffff;
+	Yc[i].addr = 0xffff;
 	Yc[i].changeflag = 0;	
 	*/
 	i++;
-	Yc[i].src_yc = &scada.scada_cfg.YcData.pos_P.Data;
+	Yc[i].src_yc = &scada.scada_cfg.YcData.pos_P;
 	Yc[i].deadpass = &DeadPass[i];
 	Yc[i].Coef = NULL;
 	Yc[i].range = NULL;
 	Yc[i].dead = NULL;
-	Yc[i].datasign = 0xffff;
+	Yc[i].addr = 0xffff;
 	Yc[i].changeflag = 0;	
 	i++;
-	Yc[i].src_yc = &scada.scada_cfg.YcData.neg_P.Data;
+	Yc[i].src_yc = &scada.scada_cfg.YcData.neg_P;
 	Yc[i].deadpass = &DeadPass[i];
 	Yc[i].Coef = NULL;
 	Yc[i].range = NULL;
 	Yc[i].dead = NULL;
-	Yc[i].datasign = 0xffff;
+	Yc[i].addr = 0xffff;
 	Yc[i].changeflag = 0;	
 	i++;
-	Yc[i].src_yc = &scada.scada_cfg.YcData.pos_Q.Data;
+	Yc[i].src_yc = &scada.scada_cfg.YcData.pos_Q;
 	Yc[i].deadpass = &DeadPass[i];
 	Yc[i].Coef = NULL;
 	Yc[i].range = NULL;
 	Yc[i].dead = NULL;
-	Yc[i].datasign = 0xffff;
+	Yc[i].addr = 0xffff;
 	Yc[i].changeflag = 0;	
 	i++;
-	Yc[i].src_yc = &scada.scada_cfg.YcData.neg_Q.Data;
+	Yc[i].src_yc = &scada.scada_cfg.YcData.neg_Q;
 	Yc[i].deadpass = &DeadPass[i];
 	Yc[i].Coef = NULL;
 	Yc[i].range = NULL;
 	Yc[i].dead = NULL;
-	Yc[i].datasign = 0xffff;
+	Yc[i].addr = 0xffff;
 	Yc[i].changeflag = 0;	
 	memset(&scada.scada_cfg.YcData,0,sizeof(scada.scada_cfg.YcData));
 }
 /***************************************************************************************
-* 函数名:void init_yc_table ( void )
+* 函数名:unsigned int init_yc_table ( void )
 * 输  入:
 * 输  出:
 * 功  能:YcTable[]表初始化，
@@ -228,23 +228,23 @@ void init_ycdata ( void )
 * 备  注:必须在ProPara.yc_dataaddr表初始化后 也就是每次对ProPara.yc_dataaddr改变
 或者系统重启时 需要对对ProPara.yc_dataaddr赋值 并同时初始YcTable[]表;
 ****************************************************************************************/
-void init_yc_table ( void )
+uint16 init_yc_table ( void )
 {
 	uint16 i = 0 ;
 	int j;
 	int m;
 	uint16 pos = 0;
-	uint16 datasign = 0xffff;
+	uint16 addr = 0xffff;
 	config_scada_data.SelectYcNum = 0;
 	config_scada_data.SelectAccNum = 0;
 	m=0;
 	j=0;
     for ( i = 0; j < CONFIG_YC_NUM ;i++ ,j++) {
     	pos =ProPara.yc_dataaddr.addpos[i].pos;
-    	datasign =ProPara.yc_dataaddr.addpos[i].addr ;
-		if ((datasign != 0xffff ) && (datasign <0x6401) ){
-			Yc[pos].datasign = datasign;
-			YcTable[m].ycdata = &Yc[pos];
+    	addr =ProPara.yc_dataaddr.addpos[i].addr ;
+		if ((addr != 0xffff ) && (addr <0x6401) ){
+			Yc[pos].addr = addr;
+			YcTable[m]= &Yc[pos];
 			m++;
 			config_scada_data.SelectYcNum ++;
 		}
@@ -253,14 +253,14 @@ void init_yc_table ( void )
 	j=0;
     for ( ; j < CONFIG_ENERGY_NUM ;j++,i++ ) {
     	pos =ProPara.yc_dataaddr.addpos[i].pos;
-    	datasign =ProPara.yc_dataaddr.addpos[i].addr ;
-		if ( datasign != 0xffff && datasign >=0x6401 ){
-			Yc[pos].datasign = datasign;
-			YcTable[m++].ycdata = &Yc[pos];
+    	addr =ProPara.yc_dataaddr.addpos[i].addr ;
+		if ( addr != 0xffff && addr>=0x6401 ){
+			Yc[pos].addr = addr;
+			YcTable[m++] = &Yc[pos];
 			config_scada_data.SelectAccNum++;
 		}
 	}
-	Yc[0].deadpass->intdata=100;
+  return  config_scada_data.SelectYcNum ;
 }
 
 /***************************************************************************************
@@ -283,7 +283,6 @@ int16 init_yc(void)
 	init_yc_table();
 	return 1;
 }
-
 
 ///////////////////////////////////遥信数据可配置////////////////////////////////////////
 /***************************************************************************************
@@ -310,171 +309,169 @@ void InitYxTable( void )
 {
 	Uint16 i = 0,l,m;
 	for ( i = 0;i < MAX_YX_NUM ;i++ ) {
-		YxTable[i].pdata=NULL;
+		YxTable[i]=NULL;
 	}
 	i=0;
 	//STEP1 将所有的软硬件的遥信按照固定的顺序注册到表格中，这个顺序和上位机遥信表是遥信的意义顺序是一致的
 	for (m = 0; m < 6; m++){
-		YxTable[i].pdata = (yxdata_t*)&TerYx.Hyx[m];
-		YxTable[i].pdata->priority = 1;
+		YxTable[i] = (yxdata_t*)&TerYx.Hyx[m];
+		YxTable[i]->priority = 1;
 		  i++;
 	}
 	for ( l= 0;l<MAX_LINE_NUM;l++){
 		 for(m=0;m<3;m++){
-	 	   YxTable[i].pdata = (yxdata_t*)&TerYx.CurrentAlarmYx[l][m];
-	 	   YxTable[i].pdata->priority = 1;
+	 	   YxTable[i] = (yxdata_t*)&TerYx.CurrentAlarmYx[l][m];
+	 	   YxTable[i]->priority = 1;
 	 	   i++;
 	 	 }
 	 	 for(m=0;m<3;m++){
-	 	   YxTable[i].pdata = (yxdata_t*)&TerYx.GrdAlarmYx[l][m];
-	 	   YxTable[i].pdata->priority = 1;
+	 	   YxTable[i] = (yxdata_t*)&TerYx.GrdAlarmYx[l][m];
+	 	   YxTable[i]->priority = 1;
 	 	   i++;
 	 	 }
-		YxTable[i].pdata = (yxdata_t*)&TerYx.U0Alarm[l];
-		YxTable[i].pdata->priority = 1;
+		YxTable[i] = (yxdata_t*)&TerYx.U0Alarm[l];
+		YxTable[i]->priority = 1;
 		i++;
-		YxTable[i].pdata = (yxdata_t*)&TerYx.JyYx[l];
-		YxTable[i].pdata->priority = 1;
+		YxTable[i] = (yxdata_t*)&TerYx.JyYx[l];
+		YxTable[i]->priority = 1;
 		i++;
 		 for(m=0;m<3;m++){
-	 	     YxTable[i].pdata = (yxdata_t*)&TerYx.CurrentActionYx[l][m];
-	 	     YxTable[i].pdata->priority = 1;
+	 	     YxTable[i] = (yxdata_t*)&TerYx.CurrentActionYx[l][m];
+	 	     YxTable[i]->priority = 1;
 	 	     i++;
 	 	 }
 	 	 for(m=0;m<3;m++){
-	 	     YxTable[i].pdata = (yxdata_t*)&TerYx.GrdActionYx[l][m];
-	 	     YxTable[i].pdata->priority = 1;
+	 	     YxTable[i] = (yxdata_t*)&TerYx.GrdActionYx[l][m];
+	 	     YxTable[i]->priority = 1;
 	 	     i++;
 	 	 }
-		YxTable[i].pdata = (yxdata_t*)&TerYx.U0Action[l];
-		YxTable[i].pdata->priority = 1;
+		YxTable[i] = (yxdata_t*)&TerYx.U0Action[l];
+		YxTable[i]->priority = 1;
 		i++;
-		YxTable[i].pdata = (yxdata_t*)&TerYx.JyActionYx[l];
-		YxTable[i].pdata->priority = 1;
+		YxTable[i] = (yxdata_t*)&TerYx.JyActionYx[l];
+		YxTable[i]->priority = 1;
 		i++;
-		YxTable[i].pdata = (yxdata_t*)&TerYx.P0Yx[l];
-		YxTable[i].pdata->priority = 1;
+		YxTable[i] = (yxdata_t*)&TerYx.P0Yx[l];
+		YxTable[i]->priority = 1;
 		i++;
-		YxTable[i].pdata = (yxdata_t*)&TerYx.P0ActionYx[l];
-		YxTable[i].pdata->priority = 1;
+		YxTable[i] = (yxdata_t*)&TerYx.P0ActionYx[l];
+		YxTable[i]->priority = 1;
 		i++;
-		YxTable[i].pdata = (yxdata_t*)&TerYx.JyP0Yx[l];
-		YxTable[i].pdata->priority = 1;
+		YxTable[i] = (yxdata_t*)&TerYx.JyP0Yx[l];
+		YxTable[i]->priority = 1;
 		i++;
-		YxTable[i].pdata = (yxdata_t*)&TerYx.JyP0ActionYx[l];
-		YxTable[i].pdata->priority = 1;
+		YxTable[i] = (yxdata_t*)&TerYx.JyP0ActionYx[l];
+		YxTable[i]->priority = 1;
 		i++;
-		YxTable[i].pdata = (yxdata_t*)&TerYx.ChzYx[l];
-		YxTable[i].pdata->priority = 1;
+		YxTable[i] = (yxdata_t*)&TerYx.ChzYx[l];
+		YxTable[i]->priority = 1;
 		i++;
-		YxTable[i].pdata = (yxdata_t*)&TerYx.HjsActionYx[l];
-		YxTable[i].pdata->priority = 1;
+		YxTable[i] = (yxdata_t*)&TerYx.HjsActionYx[l];
+		YxTable[i]->priority = 1;
 		i++;
-		YxTable[i].pdata = (yxdata_t*)&TerYx.pt_yx[l];
-		YxTable[i].pdata->priority = 1;
+		YxTable[i] = (yxdata_t*)&TerYx.pt_yx[l];
+		YxTable[i]->priority = 1;
 		i++;
-		YxTable[i].pdata = (yxdata_t*)&TerYx.ct_yx[l];
-		YxTable[i].pdata->priority = 1;
+		YxTable[i] = (yxdata_t*)&TerYx.ct_yx[l];
+		YxTable[i]->priority = 1;
 		i++;
-		YxTable[i].pdata = (yxdata_t*)&TerYx.gzfg[l][0];//瞬时
-		YxTable[i].pdata->priority = 1;
+		YxTable[i] = (yxdata_t*)&TerYx.gzfg[l][0];//瞬时
+		YxTable[i]->priority = 1;
 		i++;
-		YxTable[i].pdata = (yxdata_t*)&TerYx.gzfg[l][1];//永久
-		YxTable[i].pdata->priority = 1;
+		YxTable[i] = (yxdata_t*)&TerYx.gzfg[l][1];//永久
+		YxTable[i]->priority = 1;
 		i++;
 		for (m = 6;m < 8; m++){//电源管理的2个遥信
-			YxTable[i].pdata = (yxdata_t*)&TerYx.Hyx[m];
-			YxTable[i].pdata->priority = 1;
+			YxTable[i] = (yxdata_t*)&TerYx.Hyx[m];
+			YxTable[i]->priority = 1;
 			i++;
 		}
-		YxTable[i].pdata = (yxdata_t*)&TerYx.TerminalCkYx;//装置故障
-		YxTable[i].pdata->priority = 1;
+		YxTable[i] = (yxdata_t*)&TerYx.TerminalCkYx;//装置故障
+		YxTable[i]->priority = 1;
 		i++;
 		for(m=0;m<10;m++){
-		    YxTable[i].pdata = (yxdata_t*)&TerYx.YueXianYx[l][m];
-		    YxTable[i].pdata->priority = 2;
+		    YxTable[i] = (yxdata_t*)&TerYx.YueXianYx[l][m];
+		    YxTable[i]->priority = 2;
 		    i++;
 		}
-		YxTable[i].pdata = (yxdata_t*)&TerYx.AngleYx[l];
-		YxTable[i].pdata->priority = 1;
+		YxTable[i] = (yxdata_t*)&TerYx.AngleYx[l];
+		YxTable[i]->priority = 1;
 		i++;
-		YxTable[i].pdata = (yxdata_t*)&TerYx.AngleActionYx[l];
-		YxTable[i].pdata->priority = 1;
+		YxTable[i] = (yxdata_t*)&TerYx.AngleActionYx[l];
+		YxTable[i]->priority = 1;
 		i++;
-		YxTable[i].pdata = (yxdata_t*)&TerYx.RaiseYx[l];
-		YxTable[i].pdata->priority = 1;
+		YxTable[i] = (yxdata_t*)&TerYx.RaiseYx[l];
+		YxTable[i]->priority = 1;
 		i++;
-		YxTable[i].pdata = (yxdata_t*)&TerYx.RaiseActionYx[l];
-		YxTable[i].pdata->priority = 1;
+		YxTable[i] = (yxdata_t*)&TerYx.RaiseActionYx[l];
+		YxTable[i]->priority = 1;
 		i++;
-		YxTable[i].pdata = (yxdata_t*)&TerYx.reverLineYx[l];
-		YxTable[i].pdata->priority = 1;
+		YxTable[i] = (yxdata_t*)&TerYx.reverLineYx[l];
+		YxTable[i]->priority = 1;
 		i++;
-		YxTable[i].pdata = (yxdata_t*)&TerYx.reverXuYx[l];
-		YxTable[i].pdata->priority = 1;
+		YxTable[i] = (yxdata_t*)&TerYx.reverXuYx[l];
+		YxTable[i]->priority = 1;
 		i++;
-		YxTable[i].pdata = (yxdata_t*)&TerYx.Hyx[10];
-		YxTable[i].pdata->priority = 1;
+		YxTable[i] = (yxdata_t*)&TerYx.Hyx[10];
+		YxTable[i]->priority = 1;
 	}
 	for ( i = 0;i < MAX_YX_NUM ;i++ ) {
-		if(YxTable[i].pdata!=NULL){
-			YxTable[i].pdata->id = ProPara.yx_dataaddr.addpos[i].dataid;
-			YxTable[i].pdata->addr = ProPara.yx_dataaddr.addpos[i].addr;
-			YxTable[i].pdata->nature= ProPara.yx_dataaddr.addpos[i].attrb;
-			if (YxTable[i].pdata->id==0x33){//双点遥信在配置表中的位置，配置表更改时注意变化(是数据id 不是addr,遥信数据表xls中addr-1)
-				YxTable[i].pdata->type = D_YX;
+		if(YxTable[i]!=NULL){
+			YxTable[i]->id = ProPara.yx_dataaddr.addpos[i].dataid;
+			YxTable[i]->addr = ProPara.yx_dataaddr.addpos[i].addr;
+			YxTable[i]->nature= ProPara.yx_dataaddr.addpos[i].attrb;
+			if (YxTable[i]->id==0x33){//双点遥信在配置表中的位置，配置表更改时注意变化(是数据id 不是addr,遥信数据表xls中addr-1)
+				YxTable[i]->type = D_YX;
 
 			}else{
-				YxTable[i].pdata->type = S_YX;
+				YxTable[i]->type = S_YX;
 			}
-		}else{
-			YxTable[i].pdata=NULL;
 		}
 	}
 }
 
 void  InitSortYxTable ( void )
 {
-	uint16 postemp;
-    uint16 datasign;
+	uint16 i;
+    uint16 addr;
 	uint16 m=0;
     uint16 k = 0;
 	uint16 j = 0;
-    for ( datasign = 0x0001;datasign < MAX_YX_NUM + 1;datasign++ ) {
-        for ( postemp = 0;postemp< MAX_YX_NUM;postemp++ ) {
-            if ( YxTable[postemp].pdata!=NULL && datasign == YxTable[postemp].pdata->addr ) {
-				m = YxTable[postemp].pdata->type;
+    for ( addr = 0x0001;addr < MAX_YX_NUM+1;addr++ ) {
+        for ( i = 0;i< MAX_YX_NUM && YxTable[i]!=NULL;i++ ) {
+            if ( addr == YxTable[i]->addr ) {
+				m = YxTable[i]->type;
 				if(m==S_YX){
-                	SortYxTable[k].pdata = YxTable[postemp].pdata;
+                	SortYxTable[k] = YxTable[i];
 					k++;
 				}
                 break;
             }
         }
     }
-    for ( datasign = 0x0001;datasign < MAX_YX_NUM+1;datasign++ ) {
-        for ( postemp = 0;postemp < MAX_YX_NUM;postemp++ ) {
-            if ( YxTable[postemp].pdata!=NULL && datasign ==  YxTable[postemp].pdata->addr ) {
-				if(YxTable[postemp].pdata->type==D_YX){
-					SortYxTable[j+k].pdata = YxTable[postemp].pdata;
+    for ( addr = 0x0001;addr < MAX_YX_NUM+1;addr++ ) {
+        for ( i = 0;i < MAX_YX_NUM&& YxTable[i]!=NULL;i++ ) {
+            if ( addr ==  YxTable[i]->addr ) {
+				if(YxTable[i]->type==D_YX){
+					SortYxTable[j+k] = YxTable[i];
 					j++;
 				}
                 break;
             }
         }
     }
-    config_scada_data.SelectYxNum = ( k );
-    config_scada_data.SelectDpYxNum = ( j+k );
+    if ( k != 0 ) {
+    	config_scada_data.SelectYxNum = ( k );
+    	config_scada_data.SelectDpYxNum = ( j + k );
+    }
 }
-
-
 /* 在本项目中Hyx定义为
-0 	合位		
-1 	分位		
-2 	储能位		
-3 	远方就地位	
-4 	手动合闸	
-5     手动分闸		
+0 	合位
+1 	分位
+2 	储能位
+3 	远方就地位
+4 	手动合闸
+5     手动分闸
 6	VL
 7	POK
 8	VH
@@ -497,7 +494,7 @@ Uint16  YxStartStatu (void)
 	TerYx.Hyx[3].statu =( ~YX4 ) & 1;
 	TerYx.Hyx[4].statu= ( ~YX5 ) & 1;
 	TerYx.Hyx[5].statu =( ~YX6 ) & 1;
-	TerYx.Hyx[10].statu= (TerYx.Hyx[0].statu<<1) +	TerYx.Hyx[1].statu ;
+	TerYx.Hyx[10].statu= (TerYx.Hyx[0].statu<<1) +	(TerYx.Hyx[1].statu) ;
 	
 	TerYx.Hyx[6].statu= ( ~YX7 )  & 1;
 	TerYx.Hyx[7].statu= (~ YX8 ) & 1;
@@ -535,7 +532,6 @@ int16 init_yx ( void )
 //当pt,ct变比被设置时的调用
 //涉及的对象coftable ,影响上送的遥测值，保护定值，
 int16 CoefTableInit(void ){
-/*
 	scada.scada_cfg.pt 	= LimitBounds.pt_one_set/LimitBounds.pt_two_set*1000;//pt一次值单位是KV
 	scada.scada_cfg.ct 	= LimitBounds.ct_one_set/LimitBounds.ct_two_set;
 	scada.scada_cfg.ct0 = LimitBounds.ct0_one_set/LimitBounds.ct0_two_set;	
@@ -562,8 +558,7 @@ int16 CoefTableInit(void ){
 	coeftable[11] = 1;
 	coeftable[12] = 1;
 //	coeftable[13] =scada.scada_cfg.pt*scada.scada_cfg.ct0/1000;
-	LimitInit();
-*/
+	//LimitInit();
 	return 1;
 }
 // vim:tw=72 

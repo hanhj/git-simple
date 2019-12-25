@@ -8,7 +8,7 @@
 #include "configurable.h"
 #include "protocol.h"
 #include "data.h"
-#include "utility.h"
+#include "utilities.h"
 using namespace std;
 extern int g_reset;
 void test_event();
@@ -97,7 +97,7 @@ void test_event(){
 	event_list.push(e);
 
 	event_yc e2;
-	e2.data=YcTable[0].ycdata;
+	e2.data=YcTable[0];
 	e2.readflag[0]=0;
 	e2.readflag[1]=0;
 	e2.readflag[2]=0;

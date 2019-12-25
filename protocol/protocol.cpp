@@ -114,13 +114,13 @@ int link_layer::on_clock(frame *in,frame *out){
 	int i=0;
 	if(in->data[offset_cause]==CAUSE_Act){
 		clock_data.clock_syn = 1;
-		clock_data.time.year=in->data[offset_data+i++];
-		clock_data.time.month=in->data[offset_data+i++];
-		clock_data.time.day=in->data[offset_data+i++];
-		clock_data.time.hour=in->data[offset_data+i++];
+		clock_data.time.millisecond=in->data[offset_data+i++];
+		clock_data.time.millisecond|=in->data[offset_data+i++]<<8;
 		clock_data.time.minute=in->data[offset_data+i++];
-		clock_data.time.millisecond=in->data[offset_data+i++]<<8;
-		clock_data.time.millisecond|=in->data[offset_data+i++];
+		clock_data.time.hour=in->data[offset_data+i++];
+		clock_data.time.day=in->data[offset_data+i++];
+		clock_data.time.month=in->data[offset_data+i++];
+		clock_data.time.year=in->data[offset_data+i++];
 	}else if(in->data[offset_cause] == CAUSE_Req){
 		clock_data.clock_rd = 1;
 	}
@@ -253,9 +253,13 @@ int link_layer::on_file(frame *in,frame *out){
 	file_data.op=in->data[offset_data+i++];
 	if(file_data.op == 1){//rd dir
 		file_data.rd_dir.id=in->data[offset_data+i++];
-		file_data.rd_dir.id|=in->data[offset_data+i++]<<8;
-		file_data.rd_dir.id|=in->data[offset_data+i++]<<16;
-		file_data.rd_dir.id|=in->data[offset_data+i++]<<24;
+		file_data.rd_dir.id=file_data.rd_dir.id<<8;
+		file_data.rd_dir.id|=in->data[offset_data+i++];
+		file_data.rd_dir.id=file_data.rd_dir.id<<8;
+		file_data.rd_dir.id|=in->data[offset_data+i++];
+		file_data.rd_dir.id=file_data.rd_dir.id<<8;
+		file_data.rd_dir.id|=in->data[offset_data+i++];
+		file_data.rd_dir.id=file_data.rd_dir.id<<8;
 		file_data.rd_dir.len=in->data[offset_data+i++];
 		for(j=0;j<file_data.rd_dir.len;j++){
 			file_data.rd_dir.name[j]=in->data[offset_data+i++];
@@ -274,14 +278,22 @@ int link_layer::on_file(frame *in,frame *out){
 		file_data.rd_file.step=0;
 	}else if(file_data.op == 6){//rd file confirm
 		file_data.rd_file.req_file.file_id=in->data[offset_data+i++];
-		file_data.rd_file.req_file.file_id|=in->data[offset_data+i++]<<8;
-		file_data.rd_file.req_file.file_id|=in->data[offset_data+i++]<<16;
-		file_data.rd_file.req_file.file_id|=in->data[offset_data+i++]<<24;
+		file_data.rd_file.req_file.file_id=file_data.rd_file.req_file.file_id<<8;
+		file_data.rd_file.req_file.file_id|=in->data[offset_data+i++];
+		file_data.rd_file.req_file.file_id=file_data.rd_file.req_file.file_id<<8;
+		file_data.rd_file.req_file.file_id|=in->data[offset_data+i++];
+		file_data.rd_file.req_file.file_id=file_data.rd_file.req_file.file_id<<8;
+		file_data.rd_file.req_file.file_id|=in->data[offset_data+i++];
+		file_data.rd_file.req_file.file_id=file_data.rd_file.req_file.file_id<<8;
 		
 		file_data.rd_file.ack_offset=in->data[offset_data+i++];
-		file_data.rd_file.ack_offset|=in->data[offset_data+i++]<<8;
-		file_data.rd_file.ack_offset|=in->data[offset_data+i++]<<16;
-		file_data.rd_file.ack_offset|=in->data[offset_data+i++]<<24;
+		file_data.rd_file.ack_offset=file_data.rd_file.ack_offset<<8;
+		file_data.rd_file.ack_offset|=in->data[offset_data+i++];
+		file_data.rd_file.ack_offset=file_data.rd_file.ack_offset<<8;
+		file_data.rd_file.ack_offset|=in->data[offset_data+i++];
+		file_data.rd_file.ack_offset=file_data.rd_file.ack_offset<<8;
+		file_data.rd_file.ack_offset|=in->data[offset_data+i++];
+		file_data.rd_file.ack_offset=file_data.rd_file.ack_offset<<8;
 		file_data.rd_file.con=in->data[offset_data+i++];
 	}else if(file_data.op ==7){//write file act
 		file_data.wt_file.req_file.name_len=in->data[offset_data+i++];
@@ -292,14 +304,22 @@ int link_layer::on_file(frame *in,frame *out){
 		if(file_data.wt_file.req_file.name_len>30)
 			file_data.wt_file.result=FILE_LONGNAME_ERROR;//long name file error
 		file_data.wt_file.req_file.file_id=in->data[offset_data+i++];
-		file_data.wt_file.req_file.file_id|=in->data[offset_data+i++]<<8;
-		file_data.wt_file.req_file.file_id|=in->data[offset_data+i++]<<16;
-		file_data.wt_file.req_file.file_id|=in->data[offset_data+i++]<<24;
+		file_data.wt_file.req_file.file_id=file_data.wt_file.req_file.file_id<<8;
+		file_data.wt_file.req_file.file_id|=in->data[offset_data+i++];
+		file_data.wt_file.req_file.file_id=file_data.wt_file.req_file.file_id<<8;
+		file_data.wt_file.req_file.file_id|=in->data[offset_data+i++];
+		file_data.wt_file.req_file.file_id=file_data.wt_file.req_file.file_id<<8;
+		file_data.wt_file.req_file.file_id|=in->data[offset_data+i++];
+		file_data.wt_file.req_file.file_id=file_data.wt_file.req_file.file_id<<8;
 
 		file_data.wt_file.req_file.file_size=in->data[offset_data+i++];
-		file_data.wt_file.req_file.file_size|=in->data[offset_data+i++]<<8;
-		file_data.wt_file.req_file.file_size|=in->data[offset_data+i++]<<16;
-		file_data.wt_file.req_file.file_size|=in->data[offset_data+i++]<<24;
+		file_data.wt_file.req_file.file_size=file_data.wt_file.req_file.file_size<<8;
+		file_data.wt_file.req_file.file_size|=in->data[offset_data+i++];
+		file_data.wt_file.req_file.file_size=file_data.wt_file.req_file.file_size<<8;
+		file_data.wt_file.req_file.file_size|=in->data[offset_data+i++];
+		file_data.wt_file.req_file.file_size=file_data.wt_file.req_file.file_size<<8;
+		file_data.wt_file.req_file.file_size|=in->data[offset_data+i++];
+		file_data.wt_file.req_file.file_size=file_data.wt_file.req_file.file_size<<8;
 		file_data.wt_file.suc=0;
 	}else if(file_data.op == 9){
 		int data_len;
@@ -309,13 +329,21 @@ int link_layer::on_file(frame *in,frame *out){
 		else if(protocol==PRO_104)
 			data_len=in->data[offset_len] - 4 - 1 - 1 - cause_size - addr_size - msg_id_size - 1 - 1 - 4 - 4 - 1 - 1;
 		tmp_id=in->data[offset_data+i++];
-		tmp_id|=in->data[offset_data+i++]<<8;
-		tmp_id|=in->data[offset_data+i++]<<16;
-		tmp_id|=in->data[offset_data+i++]<<24;
+		tmp_id=tmp_id<<8;
+		tmp_id|=in->data[offset_data+i++];
+		tmp_id=tmp_id<<8;
+		tmp_id|=in->data[offset_data+i++];
+		tmp_id=tmp_id<<8;
+		tmp_id|=in->data[offset_data+i++];
+		tmp_id=tmp_id<<8;
 		file_data.wt_file.cur_offset=in->data[offset_data+i++];
-		file_data.wt_file.cur_offset|=in->data[offset_data+i++]<<8;
-		file_data.wt_file.cur_offset|=in->data[offset_data+i++]<<16;
-		file_data.wt_file.cur_offset|=in->data[offset_data+i++]<<24;
+		file_data.wt_file.cur_offset=file_data.wt_file.cur_offset<<8;
+		file_data.wt_file.cur_offset|=in->data[offset_data+i++];
+		file_data.wt_file.cur_offset=file_data.wt_file.cur_offset<<8;
+		file_data.wt_file.cur_offset|=in->data[offset_data+i++];
+		file_data.wt_file.cur_offset=file_data.wt_file.cur_offset<<8;
+		file_data.wt_file.cur_offset|=in->data[offset_data+i++];
+		file_data.wt_file.cur_offset=file_data.wt_file.cur_offset<<8;
 		file_data.wt_file.con=in->data[offset_data+i++];
 		file_data.wt_file.segment.len=data_len;
 		for(j=0;j<data_len;j++){
@@ -2338,7 +2366,7 @@ int app_layer::build_yx_data(frame *out,link_layer *link){//cause 20
 	i=0;
 	int ret= 0;
 	int send_num;
-	SORT_YX_TAB *pyx;
+	yxdata_t *pyx;
 	
 	link->has_data=1;
 	link->set_loc_ctl();
@@ -2360,12 +2388,12 @@ int app_layer::build_yx_data(frame *out,link_layer *link){//cause 20
 	cmd_id=COMMAND_SP;
 	ret=build_asdu_header(out);
 	i=ret;
-	out->data[offset_asdu+i++]=pyx->pdata->addr;
-	out->data[offset_asdu+i++]=pyx->pdata->addr>>8;
+	out->data[offset_asdu+i++]=pyx->addr;
+	out->data[offset_asdu+i++]=pyx->addr>>8;
 	if(msg_id_size==3)
 		out->data[offset_asdu+i++]=0;
 	for(j=0;j<send_num;j++){
-		out->data[offset_asdu+i]=pyx[j].pdata->statu;
+		out->data[offset_asdu+i]=pyx[j].statu;
 		i++;
 	}
 	ret=i;
@@ -2393,7 +2421,7 @@ int app_layer::build_dyx_data(frame *out,link_layer *link){//cause 20
 	i=0;
 	int ret= 0;
 	int send_num;
-	SORT_YX_TAB *pyx;
+	yxdata_t *pyx;
 	
 	link->has_data=1;
 	link->set_loc_ctl();	
@@ -2417,12 +2445,12 @@ int app_layer::build_dyx_data(frame *out,link_layer *link){//cause 20
 	cmd_id=COMMAND_DP;
 	ret=build_asdu_header(out);
 	i=ret;
-	out->data[offset_asdu+i++]=pyx->pdata->addr;
-	out->data[offset_asdu+i++]=pyx->pdata->addr>>8;
+	out->data[offset_asdu+i++]=pyx->addr;
+	out->data[offset_asdu+i++]=pyx->addr>>8;
 	if(msg_id_size==3)
 		out->data[offset_asdu+i++]=0;
 	for(j=0;j<send_num;j++){
-		out->data[offset_asdu+i]=pyx[j].pdata->statu;
+		out->data[offset_asdu+i]=pyx[j].statu;
 		i++;
 	}
 	ret=i;
@@ -2449,7 +2477,7 @@ err:
 	i=0;
 	int ret= 0;
 	int send_num;
-	YC_TAB *pyc;
+	ycdata_t *pyc;
 	
 	link->has_data=1;
 	link->set_loc_ctl();
@@ -2474,23 +2502,23 @@ err:
 	cmd_id=yc_data_type;
 	ret=build_asdu_header(out);
 	i=ret;
-	out->data[offset_asdu+i++]=pyc->ycdata->datasign;
-	out->data[offset_asdu+i++]=pyc->ycdata->datasign>>8;
+	out->data[offset_asdu+i++]=pyc->addr;
+	out->data[offset_asdu+i++]=pyc->addr>>8;
 	if(msg_id_size==3)
 		out->data[offset_asdu+i++]=0;
 	if(yc_data_type == 9 || yc_data_type ==11){
 		for(j=0;j<send_num;j++){
-			out->data[offset_asdu+i+3*j]=pyc[j].ycdata->deadpass->intdata;
-			out->data[offset_asdu+i+3*j+1]=pyc[j].ycdata->deadpass->intdata>>8;
+			out->data[offset_asdu+i+3*j]=pyc[j].deadpass->intdata;
+			out->data[offset_asdu+i+3*j+1]=pyc[j].deadpass->intdata>>8;
 			out->data[offset_asdu+i+3*j+2]=0;//qds
 		}
 		ret=i+3*j;
 	}else if(yc_data_type == 13){
 		for(j=0;j<send_num;j++){
-			out->data[offset_asdu+i+5*j]=pyc[j].ycdata->deadpass->floatdata.bitdata.d1;
-			out->data[offset_asdu+i+5*j+1]=pyc[j].ycdata->deadpass->floatdata.bitdata.d2;
-			out->data[offset_asdu+i+5*j+2]=pyc[j].ycdata->deadpass->floatdata.bitdata.d3;
-			out->data[offset_asdu+i+5*j+3]=pyc[j].ycdata->deadpass->floatdata.bitdata.d4;
+			out->data[offset_asdu+i+5*j]=pyc[j].deadpass->floatdata.bitdata.d1;
+			out->data[offset_asdu+i+5*j+1]=pyc[j].deadpass->floatdata.bitdata.d2;
+			out->data[offset_asdu+i+5*j+2]=pyc[j].deadpass->floatdata.bitdata.d3;
+			out->data[offset_asdu+i+5*j+3]=pyc[j].deadpass->floatdata.bitdata.d4;
 			out->data[offset_asdu+i+5*j+4]=0;//qds
 		}
 		ret=i+5*j;
@@ -2546,13 +2574,13 @@ int app_layer::build_event_data(frame *out,link_layer *link,event* e){//cause 3
 		out->data[offset_asdu + i++]=siq.data;
 	else if(e->soe.type == D_YX)
 		out->data[offset_asdu + i++] = diq.data;
-	out->data[offset_asdu+i++]=e->soe.time.year;
-	out->data[offset_asdu+i++]=e->soe.time.month;
-	out->data[offset_asdu+i++]=e->soe.time.day;
-	out->data[offset_asdu+i++]=e->soe.time.hour;
-	out->data[offset_asdu+i++]=e->soe.time.minute;
-	out->data[offset_asdu+i++]=e->soe.time.millisecond>>8;
 	out->data[offset_asdu+i++]=e->soe.time.millisecond & 0x00ff;
+	out->data[offset_asdu+i++]=e->soe.time.millisecond>>8;
+	out->data[offset_asdu+i++]=e->soe.time.minute;
+	out->data[offset_asdu+i++]=e->soe.time.hour;
+	out->data[offset_asdu+i++]=e->soe.time.day;
+	out->data[offset_asdu+i++]=e->soe.time.month;
+	out->data[offset_asdu+i++]=e->soe.time.year;
 	ret=i;
 	ret=link->build_link_layer(out,ret);				
 	if(ret<0){
@@ -2599,13 +2627,13 @@ int app_layer::build_clock(frame *out,link_layer *link,CP56Time2a* time){//cause
 	out->data[offset_asdu+i++]=0;
 	if(msg_id_size==3)
 		out->data[offset_asdu+i++]=0;
-	out->data[offset_asdu+i++]=time->year;
-	out->data[offset_asdu+i++]=time->month;
-	out->data[offset_asdu+i++]=time->day;
-	out->data[offset_asdu+i++]=time->hour;
-	out->data[offset_asdu+i++]=time->minute;
-	out->data[offset_asdu+i++]=time->millisecond>>8;
 	out->data[offset_asdu+i++]=time->millisecond & 0x00ff;
+	out->data[offset_asdu+i++]=time->millisecond>>8;
+	out->data[offset_asdu+i++]=time->minute;
+	out->data[offset_asdu+i++]=time->hour;
+	out->data[offset_asdu+i++]=time->day;
+	out->data[offset_asdu+i++]=time->month;
+	out->data[offset_asdu+i++]=time->year;
 	ret = i;
 	ret=link->build_link_layer(out,ret);				
 	if(ret<0){
@@ -2732,8 +2760,8 @@ err:
 	cmd_id=yc_data_type;
 	ret=build_asdu_header(out);
 	i=ret;
-	out->data[offset_asdu+i++]=e->data->datasign;
-	out->data[offset_asdu+i++]=e->data->datasign>>8;
+	out->data[offset_asdu+i++]=e->data->addr;
+	out->data[offset_asdu+i++]=e->data->addr>>8;
 	if(msg_id_size==3)
 		out->data[offset_asdu+i++]=0;
 	if(yc_data_type==9||yc_data_type == 11){
@@ -2868,13 +2896,13 @@ int app_layer::build_rd_dir_resp(frame *out,link_layer *link,_rd_dir *dir){//cau
 		out->data[offset_asdu+i++]=node.file_size>>8;
 		out->data[offset_asdu+i++]=node.file_size>>16;
 		out->data[offset_asdu+i++]=node.file_size>>24;
-		out->data[offset_asdu+i++]=node.time.year;
-		out->data[offset_asdu+i++]=node.time.month;
-		out->data[offset_asdu+i++]=node.time.day;
-		out->data[offset_asdu+i++]=node.time.hour;
-		out->data[offset_asdu+i++]=node.time.minute;
-		out->data[offset_asdu+i++]=node.time.millisecond>>8;
 		out->data[offset_asdu+i++]=node.time.millisecond & 0x00ff;
+		out->data[offset_asdu+i++]=node.time.millisecond>>8;
+		out->data[offset_asdu+i++]=node.time.minute;
+		out->data[offset_asdu+i++]=node.time.hour;
+		out->data[offset_asdu+i++]=node.time.day;
+		out->data[offset_asdu+i++]=node.time.month;
+		out->data[offset_asdu+i++]=node.time.year;
 		n++;
 		dir->cur_read++;
 		diff=i-diff1;
@@ -3434,7 +3462,7 @@ int app_layer::build_summon_acc_resp(frame *out,link_layer *link){//cause 37
 	i=0;
 	int ret= 0;
 	int send_num;
-	YC_TAB *pyc;
+	ycdata_t *pyc;
 	
 	link->set_loc_ctl();
 	ret=get_link_info(link);
@@ -3455,38 +3483,38 @@ int app_layer::build_summon_acc_resp(frame *out,link_layer *link){//cause 37
 	vsq_lo.bit.sq=1;
 	cause_lo.bit.cause=CAUSE_Reqcogen;
 
-	if(pyc[0].ycdata->type == 0){
+	if(pyc[0].type == 0){
 		cmd_id=COMMAND_ACC;
 	}else{
 		cmd_id=COMMAND_ACC_TIME;
 	}
 	ret=build_asdu_header(out);
 	i=ret;
-	out->data[offset_asdu+i++]=pyc->ycdata->datasign;
-	out->data[offset_asdu+i++]=pyc->ycdata->datasign>>8;
+	out->data[offset_asdu+i++]=pyc->addr;
+	out->data[offset_asdu+i++]=pyc->addr>>8;
 	if(msg_id_size==3)
 		out->data[offset_asdu+i++]=0;
-	if(pyc[0].ycdata->type == 0){
+	if(pyc[0].type == 0){
 		for(j=0;j<send_num;j++){
-			out->data[offset_asdu+i++]=pyc[j].ycdata->deadpass->floatdata.bitdata.d1;
-			out->data[offset_asdu+i++]=pyc[j].ycdata->deadpass->floatdata.bitdata.d2;
-			out->data[offset_asdu+i++]=pyc[j].ycdata->deadpass->floatdata.bitdata.d3;
-			out->data[offset_asdu+i++]=pyc[j].ycdata->deadpass->floatdata.bitdata.d4;
+			out->data[offset_asdu+i++]=pyc[j].deadpass->floatdata.bitdata.d1;
+			out->data[offset_asdu+i++]=pyc[j].deadpass->floatdata.bitdata.d2;
+			out->data[offset_asdu+i++]=pyc[j].deadpass->floatdata.bitdata.d3;
+			out->data[offset_asdu+i++]=pyc[j].deadpass->floatdata.bitdata.d4;
 			out->data[offset_asdu+i++]=5;//
 		}
 	}else{
 		for(j=0;j<send_num;j++){
-			out->data[offset_asdu+i++]=pyc[j].ycdata->deadpass->floatdata.bitdata.d1;
-			out->data[offset_asdu+i++]=pyc[j].ycdata->deadpass->floatdata.bitdata.d2;
-			out->data[offset_asdu+i++]=pyc[j].ycdata->deadpass->floatdata.bitdata.d3;
-			out->data[offset_asdu+i++]=pyc[j].ycdata->deadpass->floatdata.bitdata.d4;
-			out->data[offset_asdu+i++]=pyc[j].ycdata->time.year;
-			out->data[offset_asdu+i++]=pyc[j].ycdata->time.month;
-			out->data[offset_asdu+i++]=pyc[j].ycdata->time.day;
-			out->data[offset_asdu+i++]=pyc[j].ycdata->time.hour;
-			out->data[offset_asdu+i++]=pyc[j].ycdata->time.minute;
-			out->data[offset_asdu+i++]=pyc[j].ycdata->time.millisecond>>8;
-			out->data[offset_asdu+i++]=pyc[j].ycdata->time.millisecond & 0x00ff;
+			out->data[offset_asdu+i++]=pyc[j].deadpass->floatdata.bitdata.d1;
+			out->data[offset_asdu+i++]=pyc[j].deadpass->floatdata.bitdata.d2;
+			out->data[offset_asdu+i++]=pyc[j].deadpass->floatdata.bitdata.d3;
+			out->data[offset_asdu+i++]=pyc[j].deadpass->floatdata.bitdata.d4;
+			out->data[offset_asdu+i++]=pyc[j].time.millisecond & 0x00ff;
+			out->data[offset_asdu+i++]=pyc[j].time.millisecond>>8;
+			out->data[offset_asdu+i++]=pyc[j].time.minute;
+			out->data[offset_asdu+i++]=pyc[j].time.hour;
+			out->data[offset_asdu+i++]=pyc[j].time.day;
+			out->data[offset_asdu+i++]=pyc[j].time.month;
+			out->data[offset_asdu+i++]=pyc[j].time.year;
 			out->data[offset_asdu+i++]=5;//
 		}
 	}
