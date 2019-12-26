@@ -1,4 +1,4 @@
-/*************************************************************************
+﻿/*************************************************************************
 	> File Name: protocol.cpp
 	> Author: hanhj
 	> Mail: hanhj@zx-jy.com 
@@ -24,11 +24,11 @@ using namespace std;
 *  @see		
 ***********************************************************************
 */
-int link_layer::set_link_com(com_port*c,int p){
+int link_layer::set_link_com(com_port*c){
 	if(c!=NULL){
-		port=p;
+		port=c->port_no;
 		com=c;
-		pfunc(DEBUG_DEBUG,"set link link_layer [%d] to com_port %d\n",p,c->port_no);
+		pfunc(DEBUG_DEBUG,"set link link_layer to com_port %d\n",c->port_no);
 		return 0;
 	}
 	pfunc(DEBUG_ERROR,"invalid para\n");

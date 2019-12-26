@@ -13,11 +13,11 @@ using namespace std;
 /****************************
  * physical layer
 ****************************/
-int basic_com::get_byte(unsigned char *c){
+int com_port::get_byte(unsigned char *c){
 	if(read_produce!=read_consume){
-		*c=read_buff_ptr[read_consume];
+		*c=read_buff[read_consume];
 		read_consume++;
-		read_consume=(read_consume) % MAX_COM_BUFFER;
+		read_consume=(read_consume) % COM_RECV_BUFFER_SIZE ;
 		pfunc(DEBUG_DEBUG,"get byte:%02hhx\n",*c);
 		return 0;
 	}
@@ -26,7 +26,13 @@ int basic_com::get_byte(unsigned char *c){
 ostream & operator<<(ostream &os,serial_set &a){
 	return os<<"baund:"<<a.baund<<",even:"<<a.even<<",start_bits:"<<a.start_bits<<",stop_bits:"<<a.stop_bits<<",data_bits:"<<a.data_bits<<endl;
 }
+int serial::init(){
+	cout<<"init serial"<<",port no:"<<port_no<<",com_type:"<<com_type<<endl;
+	cout<<"para: "<<set<<endl;
+	return 0;
+}
 int	serial::init(void *para){
+	set=*(serial_set*)para;
 	cout<<"init serial"<<",port no:"<<port_no<<",com_type:"<<com_type<<endl;
 	cout<<"para: "<<set<<endl;
 	strcpy(file_name,"test.dat");
@@ -71,9 +77,9 @@ int serial::read(int len){
 			tmpbuf[m]=num;
 			i++;
 			m++;
-			*(read_buff_ptr+read_produce)=num;
+			read_buff[read_produce]=num;
 			read_produce++;
-			read_produce=read_produce % MAX_COM_BUFFER;
+			read_produce=read_produce % COM_RECV_BUFFER_SIZE;
 		}
 	}
 	pdump(DEBUG_DEBUG,"read serial",&tmpbuf[0],m);
@@ -106,14 +112,6 @@ int serial::get_com_state(){
 	pfunc(DEBUG_DEBUG,"get com state of serial\n");
 	return LINK_CONNECT;
 }
-int serial::set_set(void *){
-	pfunc(DEBUG_DEBUG,"set set of serial");
-	return 0;
-}
-int serial::get_set(void *){
-	pfunc(DEBUG_DEBUG,"get set of serial");
-	return 0;
-}
 
 ostream & operator<<(ostream &os,ethernet_set &a){
 	return os<<"dst_ip:"<<a.dst_ip[0]<<"."<<a.dst_ip[1]<<"."<<a.dst_ip[2]<<"."<<a.dst_ip[3]<<endl\
@@ -122,7 +120,13 @@ ostream & operator<<(ostream &os,ethernet_set &a){
 		<<",local_port:"<<a.local_port<<endl\
 		<<",server:"<<a.server<<endl;
 }
+int	ethernet::init(){
+	cout<<"init ethernet"<<",port no:"<<port_no<<",com_type:"<<com_type<<endl;
+	cout<<"para: "<<endl<<set<<endl;
+	return 0;
+}
 int	ethernet::init(void *para){
+	set=*(ethernet_set*)para;
 	cout<<"init ethernet"<<",port no:"<<port_no<<",com_type:"<<com_type<<endl;
 	cout<<"para: "<<endl<<set<<endl;
 	strcpy(file_name,"test2.dat");
@@ -167,9 +171,9 @@ int ethernet::read(int len){
 			tmpbuf[m]=num;
 			i++;
 			m++;
-			*(read_buff_ptr+read_produce)=num;
+			read_buff[read_produce]=num;
 			read_produce++;
-			read_produce=read_produce % MAX_COM_BUFFER;
+			read_produce=read_produce % COM_RECV_BUFFER_SIZE;
 		}
 	}
 	pdump(DEBUG_DEBUG,"read ethernet:",&tmpbuf[0],m);
@@ -202,14 +206,6 @@ int ethernet::get_com_state(){
 	pfunc(DEBUG_DEBUG,"get com state of ethernet\n");
 	return LINK_CONNECT;
 }
-int ethernet::set_set(void *){
-	pfunc(DEBUG_DEBUG,"set set of ethernet");
-	return 0;
-}
-int ethernet::get_set(void *){
-	pfunc(DEBUG_DEBUG,"get set of ethernet");
-	return 0;
-}
 
 ostream & operator<<(ostream &os,wireless_set &a){
 	return os<<"dst_ip:"<<a.ip_set.dst_ip[0]<<"."<<a.ip_set.dst_ip[1]<<"."<<a.ip_set.dst_ip[2]<<"."<<a.ip_set.dst_ip[3]<<endl\
@@ -219,7 +215,13 @@ ostream & operator<<(ostream &os,wireless_set &a){
 		<<",server:"<<a.ip_set.server<<endl\
 		<<",module_type:"<<a.module_type<<endl;
 }
+int	wireless::init(){
+	cout<<"init wireless"<<",port no:"<<port_no<<",com_type:"<<com_type<<endl;
+	cout<<"para: "<<endl<<set<<endl;
+	return 0;
+}
 int	wireless::init(void *para){
+	set=*(wireless_set*)para;
 	cout<<"init wireless"<<",port no:"<<port_no<<",com_type:"<<com_type<<endl;
 	cout<<"para: "<<endl<<set<<endl;
 	strcpy(file_name,"test3.dat");
@@ -264,9 +266,9 @@ int wireless::read(int len){
 			tmpbuf[m]=num;
 			i++;
 			m++;
-			*(read_buff_ptr+read_produce)=num;
+			read_buff[read_produce]=num;
 			read_produce++;
-			read_produce=read_produce % MAX_COM_BUFFER;
+			read_produce=read_produce % COM_RECV_BUFFER_SIZE;
 		}
 	}
 	pdump(DEBUG_DEBUG,"read wireless",&tmpbuf[0],m);
@@ -298,14 +300,6 @@ err:
 int wireless::get_com_state(){
 	pfunc(DEBUG_DEBUG,"get com state of wireless\n");
 	return LINK_CONNECT;
-}
-int wireless::set_set(void *){
-	pfunc(DEBUG_DEBUG,"set set of wireless\n");
-	return 0;
-}
-int wireless::get_set(void *){
-	pfunc(DEBUG_DEBUG,"get set of wireless\n");
-	return 0;
 }
 
 // vim:tw=72 

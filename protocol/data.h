@@ -363,17 +363,6 @@ typedef struct _buffer{
 	int len;
 	char data[300];
 }buffer;
-#define SCIA 0
-#define SCIB 1
-#define SCIC 2
-#define COM_SEND_BUFFER_SIZE 256
-#define COM_RECV_BUFFER_SIZE 512
-typedef struct combox{
-		unsigned int 	inbyte_cnt;//接收缓存填入数据计数
-		unsigned int 	outbyte_cnt;//接收缓存取出数据计数
-		unsigned char 	com_send_buffer[COM_SEND_BUFFER_SIZE];//发送缓存
-		unsigned char 	com_recv_buffer[COM_RECV_BUFFER_SIZE];//接收缓存
-} COMBOX;
 
 typedef struct YC_ADDR_POS {
 	unsigned int pos;
@@ -560,7 +549,6 @@ extern ratio_t YcRatio[MAX_LINE_NUM];
 extern TerminalMsg term_msg;
 extern unsigned int Para_buffer[2048];
 
-extern COMBOX ComBox[MAX_COM_PORT_NUM];
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -580,7 +568,6 @@ extern void DataBuffClear(void);
 extern int16 do_clear_soe_info(void );
 extern int16 do_clear_action_info(void );
 extern int16 do_set_default_para(void );
-extern void ComBoxInit(void);
 extern int    CheckTerminalState();
 extern void InitTerminalState();
 extern void show_ratio();

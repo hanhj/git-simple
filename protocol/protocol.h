@@ -626,7 +626,10 @@ class link_layer{
 		virtual int deal_frame(frame *)=0;
 		virtual void set_loc_ctl()=0;
 
-		int set_link_com(com_port*,int port);
+		void set_balance(int da){
+			balance = da;
+		}
+		int set_link_com(com_port*);
 		int set_app(app_layer*);
 		void reset_yk_data();
 		int send_frame(frame *);
@@ -724,9 +727,6 @@ class link_layer_101:public link_layer{
 			offset_pub_addr=offset_cause+cause_size;
 			offset_msg_id=offset_pub_addr+addr_size;
 			offset_data=offset_msg_id+msg_id_size;
-		}
-		void set_balance(int da){
-			balance = da;
 		}
 	public:
 		int on_fc0(frame *);
