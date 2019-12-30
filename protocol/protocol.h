@@ -30,29 +30,36 @@ class message{
 };
 #define VAR_FRAME 1
 #define FIX_FRAME 2
-#define FRAME_BUFF 300
+
+#define FRAME_BUFF 256 
+#define FIX_FRAME_BUFF 10 
 class frame{
 	public:
 		int len;
 		int type;
 		int id;//frame no
-		unsigned char data[FRAME_BUFF];
+		unsigned char *data;
 		frame(){
 			len=0;
-			id=0;
-			memset(&data,0,sizeof(data));
+			id=1;
 		}
 };
 class var_frame:public frame{
 	public:
+		unsigned char pdata[FRAME_BUFF];
 		var_frame(){
 			type=VAR_FRAME;	
+			data=&pdata[0];
+			memset(pdata,0,sizeof(pdata));
 		}
 };
 class fix_frame:public frame{
 	public:
+		unsigned char pdata[FIX_FRAME_BUFF];
 		fix_frame(){
 			type=FIX_FRAME;
+			data=&pdata[0];
+			memset(pdata,0,sizeof(pdata));
 		}
 };
 //data struct for 101
@@ -776,15 +783,14 @@ class link_layer_101:public link_layer{
 class link_layer_104:public link_layer{
 	public:
 		//fix frame is only for 101,so i define it in this.
-		frame r_s_frame;
-		frame r_u_frame;
-		frame r_i_frame;
-		frame s_s_frame;
-		frame s_u_frame;
-		frame s_i_frame;
-		frame r_tmp_frame;
-		//CircleQueue<var_frame> s_i_frames;
-		CircleQueue<frame> s_i_frames;
+		fix_frame r_s_frame;
+		fix_frame r_u_frame;
+		var_frame r_i_frame;
+		fix_frame s_s_frame;
+		fix_frame s_u_frame;
+		var_frame s_i_frame;
+		var_frame r_tmp_frame;
+		CircleQueue<var_frame> s_i_frames;
 		int start_rcv_s_flag;
 		int start_rcv_u_flag;
 		int start_rcv_i_flag;
@@ -814,7 +820,7 @@ class link_layer_104:public link_layer{
 	public:
 		link_layer_104(){
 			balance=BALANCE;
-			s_i_frames.init(100);
+			s_i_frames.init(3);
 			N=32767;
 			send_num=12;
 			rcv_num=8;

@@ -1747,15 +1747,17 @@ int link_layer_104::build_link_layer(frame *out,int asdu_len){
 	ret=i+asdu_len;
 	out->len=ret;
 	out->id=s_no;
-	s_i_frames.push(*out);
+	var_frame *o;
+	o=(var_frame *)out;
+	s_i_frames.push(*o);
 	s_no=(s_no+1)%N;
 	return ret;
 }
 int link_layer_104::clear_sq(){
 	int ret;
 	ret=0;
-	frame fm;
-	CircleQueue<frame>::iterator it(s_i_frames.MaxQueue);
+	var_frame fm;
+	CircleQueue<var_frame>::iterator it(s_i_frames.MaxQueue);
 	it=s_i_frames.begin();
 	while(it!=s_i_frames.end()){
 		fm=*it;
@@ -1768,9 +1770,9 @@ int link_layer_104::clear_sq(){
 	return ret;
 }
 void link_layer_104::resend(){
-	CircleQueue<frame >::iterator it;
+	CircleQueue<var_frame>::iterator it;
 	it=s_i_frames.begin();
-	frame fm;
+	var_frame fm;
 	while(it!=s_i_frames.end()){
 		fm=*it;
 		send_frame(&fm);
