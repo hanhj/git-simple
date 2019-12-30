@@ -1539,7 +1539,7 @@ int link_layer_101::get_frame(){
 					pfunc(DEBUG_ERROR,"get fix frame err2\n");
 					fail=1;
 				}
-			}else if(r_fix_pos>(addr_size+4)){
+			}else if(r_fix_pos>(addr_size+4)||r_fix_pos>FIX_FRAME_BUFF){
 				fail=1;
 				pfunc(DEBUG_ERROR,"get fix frame err3\n");
 			}
@@ -1586,7 +1586,7 @@ int link_layer_101::get_frame(){
 					pfunc(DEBUG_ERROR,"get var frame err2\n");
 					fail=1;
 				}
-			}else if(r_var_pos>exp_len){
+			}else if(r_var_pos>exp_len||r_var_pos>FRAME_BUFF){
 				fail=1;
 				pfunc(DEBUG_ERROR,"get var frame err3\n");
 			}

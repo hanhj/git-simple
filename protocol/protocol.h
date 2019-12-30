@@ -30,7 +30,6 @@ class message{
 };
 #define VAR_FRAME 1
 #define FIX_FRAME 2
-
 #define FRAME_BUFF 256 
 #define FIX_FRAME_BUFF 10 
 class frame{
@@ -41,7 +40,7 @@ class frame{
 		unsigned char *data;
 		frame(){
 			len=0;
-			id=1;
+			id=0;
 		}
 };
 class var_frame:public frame{
@@ -249,9 +248,86 @@ typedef struct _qoi{//召唤限定词
 #define PROCESS_WR_UNIT		0x4000
 #define PROCESS_SUMMON_ACC	0x8000//累计量
 #define PROCESS_UPDATE		0x10000
+
+//////////////////////////////////宏定义数据类型标识////////////////////////////////////////////////////
+/*
+#define M_SP_NA_1				            1//不带时标的单点信息
+#define M_SP_TA_1	                        2//带时标的单点信息
+#define M_DP_NA_1			                3//不带时标的双点信息
+#define M_DP_TA_1	                        4//带时标的双点信息
+#define M_ST_NA_1                           5//不带时标的步位置信息
+#define M_ST_TA_1	                        6//带时标的步位置信息
+#define M_BO_NA_1                           7//32比特串
+#define M_BO_TA_1	                        8//带时标的32比特串
+#define M_ME_NA_1				            9//测量值的归一化值
+#define M_ME_TA_1	                        10//带时标的测量值,规一化值
+#define M_ME_NB_1			                11//测量值的标度化值
+#define M_ME_TB_1	                        12//带时标的测量值，标度化值
+#define M_ME_NC_1                           13//测量值的短浮点数
+#define M_ME_TC_1	                        14//带时标的测量值，短浮点数
+#define M_IT_NA_1	                        15//累计量
+#define M_IT_TA_1	                        16//带时标的累计量
+#define M_EP_TA_1	                        17//带时标的继电保护设备事件
+#define M_EP_TB_1	                        18//带时标的继电保护设备成组启动事件
+#define M_EP_TC_1                           19//带时标的继电保护设备成组输出电路信息
+#define M_PS_NA_1	                        20//带变位检出的成组单点信息
+#define M_ME_ND_1	                        21//测量值，不带品质描述词的规一化值
+
+#define M_SP_TB_1                           30//带时标的单点信息
+#define M_DP_TB_1                           31//带时标的双点信息
+#define M_ST_TB_1                           32//带时标的步位置信息
+#define M_BO_TB_1                           33//带时标的32比特串
+
+#define M_ME_TD_1			                34//带CP56Time2a时标的测量值，带时标的归一化值
+#define M_ME_TE_1			                35//带CP56Time2a时标的测量值，带时标的标度化值
+#define M_ME_TF_1			                36//带CP56Time2a时标的测量值，短浮点数
+#define M_IT_TB_1	                        37//带CP56Time2a时标的累计量
+#define M_EP_TD_1	                        38//带CP56Time2a时标的继电保护设备事件
+#define M_EP_TE_1	                        39//带CP56Time2a时标的继电保护设备成组启动事件
+#define M_EP_TF_1	                        40//带CP56Time2a时标的继电保护装置成组输出电路信
+
+#define C_SC_NA_1					        45//单命令
+#define C_DC_NA_1					        46//双命令
+#define C_RC_NA_1                           47//步调节命令
+#define C_SE_NA_1	                        48//设定命令，归一化值
+#define C_SE_NB_1	                        49//设定命令，标度化值
+#define C_SE_NC_1                           50//设定命令，短浮点数
+#define C_BO_NA_1                           51//32比特串
+
+#define C_SC_TA_1                           58//带时标的单命令
+#define C_DC_TA_1                           59//带时标的双命令
+#define C_RC_TA_1                           60//带时标的步调节命令
+#define C_SE_TA_1                           61//带时标的设定值命令，归一化值
+#define C_SE_TB_1                           62//带时标的设定值命令，标度化值
+#define C_SE_TC_1                           63//带时标的设定值命令，短浮点数
+#define C_BO_TA_1                           64//带时标的32比特串
+//在监视方向的系统命令（站特定参数）
+#define M_EI_NA_1	                        70//初始化结束
+//在控制方向的系统命令（站特定参数）
+#define C_IC_NA_1			                100//总召唤
+#define C_CI_NA_1	                        101//累计量召唤命令
+#define C_RD_NA_1                           102//读命令
+#define C_CS_NA_1			                103//时钟同步
+#define C_TS_NA_1			                104//测试命令
+#define C_RP_NA_1		                    105//复位进程命令
+#define C_CD_NA_1                           106//延时获得
+//在控制方向的参数命令（站特定参数）
+#define P_ME_NA_1                           110//测量值参数，归一化
+#define P_ME_NB_1                           111//测量值参数，标度化
+#define P_ME_NC_1                           112//测量值参数，短浮点数
+#define P_AC_NA_1                           113//参数激活
+//文件传输（站特定参数）
+#define F_FR_NA_1						    120//文件准备就绪
+#define F_SR_NA_1					        121//节准备就绪
+#define F_SC_NA_1                           122//召唤目录，选择文件，召唤文件，召唤节
+#define F_LS_NA_1		                    123//最后的节，最后的段
+#define F_AF_NA_1                           124//认可文件，认可节
+#define F_SG_NA_1						    125//段
+#define F_DR_NA_1	                        126//目录
+*/
 //功能码
 #define COMMAND_SP			1
-#define COMMAND_DP			2
+#define COMMAND_DP			3
 #define COMMAND_GUIYI		9
 #define COMMAND_BIAODU		11
 #define COMMAND_FLOAT		13
