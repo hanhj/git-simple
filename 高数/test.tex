@@ -1,0 +1,150 @@
+\documentclass[fleqn]{article}
+\usepackage{ctex}
+\begin{document}
+\title{高数学习}
+\author{韩海舰}
+\maketitle
+\setlength{\mathindent}{10pt}
+\begin{flushleft}
+\section{第一章\quad 函数,极限,连续性}
+\subsection{第一周练习}
+1.已知f(x+1)的定义域为[0,a](a>0),则f(x)的定义域为（）。
+\begin{enumerate}
+\item $[1,a+1]$
+\item $[-1,a+1]$
+\item $[a,a+1]$
+\item $[a-1,a]$
+\end{enumerate}
+
+正确答案：A你错选为B
+
+2. \[\texttt{若}\lim_{n\to \infty}x_n=a\texttt{(a为常数）,则下列说法不正确的是。}\]
+\begin{enumerate}
+\item 数列$\{x_n\}$有界。
+\item \[\lim_{n\to \infty}x_{2n}=a\]
+\item 若$x_n>0$(n=1,2...n),则a>0
+\item 常数a唯一。
+\end{enumerate}
+正确答案：C你没选择任何选项
+
+极限的性质包括：唯一性，有界性，保号性。其中保号性是指如果极限>0,则$x_n$>0。
+\subsection{第二周练习}
+\par
+1.已知函数\[
+f(x)=\left\{\begin{array}{ll}
+x^2sin\frac{1}{x} ,& x<0 \\
+\frac{\sqrt{1+x^2}-1}{x}, & x>0
+\end{array}
+\right. 
+\]
+\[\texttt{则}\lim_{x\to 0}f(x)=(?)
+\]
+结果为0
+\par
+2.\[
+\texttt{若}\lim_{x\to 0}f(x)=0,\texttt{则（）}\]
+\begin{enumerate}
+\item \[\texttt{仅当}\lim_{x\to x_0}g(x)=0\texttt{时，才有}\lim_{x\to x_0}f(x)g(x)=0\texttt{成立。}\]
+\item \[\texttt{当}g(x)\texttt{为任意函数时,有}\lim_{x\to x_0}f(x)g(x)=0\texttt{成立}\]
+\item \[\texttt{仅当}g(x)\texttt{为常数时,才能使}\lim_{x\to x_0}f(x)g(x)=0\texttt{成立}\]
+\item \[\texttt{当}g(x)\texttt{有界时,能使}\lim_{x\to x_0}f(x)g(x)=0\texttt{成立}\]
+\end{enumerate}
+答案是4.\[\lim_{x\to 0}f(x)=0\]是无穷小，无穷小与有界函数之积是无穷小。
+
+3.\[
+\lim_{x\to 0}(1-x)^{\frac{1}{sinx}}=(?)\]
+\begin{enumerate}
+\item 1
+\item e
+\item $e^{-1}$
+\item $e^{-2}$
+\end{enumerate}
+
+正确答案：C你错选为B
+
+
+\subsection{第三周练习}
+等价无穷小：
+\[
+\begin{array}{ll}
+\ln(x+1)\sim x ,& 1-cos(x) \sim \frac{1}{2}x^2\\
+sin(x) \sim x ,& tan(x) \sim x\\
+e^x-1 \sim x, & a^x -1 \sim x\ln a
+\end{array}
+\]
+有用极限：
+\[
+\begin{array}{ll}
+\lim_{x\to 0}(1+x)^{\frac{1}{x}}=e
+\end{array}
+\]
+
+无穷小的关系：
+\[
+\alpha =lim{f(x)}=0,\beta =\lim{g(x)}=0,\texttt{均是无穷小}
+\]
+\[
+\begin{array}{|l|l|l|}
+\hline
+\texttt{高阶无穷小:}&\frac{\alpha}{\beta}=0&\alpha\texttt{是}\beta\texttt{的高阶无穷小}\\
+\hline
+\texttt{等价无穷小:}&\frac{\alpha}{\beta}=1&\alpha\texttt{是}\beta\texttt{的等阶无穷小}\\
+\hline
+\texttt{同价无穷小:}&\frac{\alpha}{\beta}=c\quad(c\neq 0)&\alpha\texttt{是}\beta\texttt{的同阶无穷小}\\
+\hline
+\texttt{k价无穷小:}&\frac{\alpha}{\beta^k}=c\quad(c\neq 0)&\alpha\texttt{是}\beta\texttt{的k阶无穷小}\\
+\hline
+\end{array}
+\]
+
+\section{导数与微分}
+\subsection{第四周练习}
+1.设函数f(u)可导，且$y=f(x^2)$当自变量x在x=1处取得增量$\Delta x=-0.1$时，相应的函数增量$\Delta y$的线性主部为0.1，则$f^{'}(1)=().$
+\begin{enumerate}
+\item 0.1
+\item 1
+\item -0.5
+\item -1
+\end{enumerate}
+正确答案：C你错选为D
+
+2.函数y=f(x)在$x_0$处连续、可导、可微的关系中不正确的是：
+\begin{enumerate}
+\item 可导是可微的充分必要条件
+\item 可微是连续的充分条件
+\item 连续是可导的充分必要条件
+\item 连续式可微的必要条件
+\end{enumerate}
+正确答案：C你错选为A
+\par
+连续：
+\begin{enumerate}
+\item f(x)在$x_0$处有定义
+\item f(x)在$x_0$处有极限
+\item \[\lim_{x\to x0}f(x)=f(x0)\]
+\end{enumerate}
+可导：
+\begin{enumerate}
+\item f(x)在$x_0$的邻域内有定义
+\item \[\lim_{\Delta x\to 0}\frac{\Delta y}{\Delta x}=\lim_{\Delta x\to 0}\frac{f(x0+\Delta x)-f(x_0)}{\Delta x}\]存在
+\item \[f_{+}^{'}(x_0)=f_{-}^{'}(x_0)\]
+\end{enumerate}
+可导$\Longrightarrow$连续，但连续未必可导。可导
+$\Longleftrightarrow$可微
+
+二阶导数：\[\frac{d^2y}{dx^2}=\frac{d\frac{dy}{dx}}{dx}\]
+
+\section{第三章微分中值定理与导数应用}
+\subsection{第六周练习}
+1.求\[\lim_{x\to 0}\left\lbrace\frac{sinx}{x}\right\rbrace^\frac{1}{1-cosx}=()\]
+\begin{enumerate}
+\item 1
+\item $e^{-\frac{1}{3}}$
+\item $e^{\frac{1}{6}}$
+\item $e^2$
+\end{enumerate}
+正确答案：B你错选为A
+
+\end{flushleft}
+\end{document}
+
