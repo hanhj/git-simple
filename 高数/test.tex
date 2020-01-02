@@ -1,5 +1,7 @@
 \documentclass[fleqn]{article}
-\usepackage{ctex}
+%\usepackage{ctex}
+\usepackage{xeCJK}
+\setCJKmainfont{AR PL UMing TW MBE}
 \begin{document}
 \title{高数学习}
 \author{韩海舰}
@@ -145,6 +147,64 @@ $\Longleftrightarrow$可微
 \end{enumerate}
 正确答案：B你错选为A
 
+\paragraph
+拐点：凹凸转折点。\\
+拐点的充分必要条件：f(x)在(a,b)内二阶可导，$f^{''}(x_0)=0,x_0\in{(a,b)}$，而且$f^{''}(x_0)$处两边符号不相等
+
+\paragraph
+曲率：反应曲线的弯曲程度。直线的曲率为0，圆的曲率为1/R.圆的半径越大，则曲率越小，否则曲率越大。
+\[K=\lim_{\Delta S\to 0}\frac{\alpha}{\Delta S} \]$\alpha$是弧的转角。
+曲率的计算公式：\[\frac{|y^{''}|}{(1+y^{' 2})^{\frac{3}{2}}}\]
+
+\begin{verbatim}
+matlab中的函数
+定义符号：syms x
+求导：diff(f)
+例如：f=sin(x);diff(f);
+积分：
+符号积分：
+int(fun,x)计算不定积分
+int(fun,x,a,b):计算定积分
+例如：
+f=sinx;int(f)
+int(f,-pi,pi);
+
+数值积分：
+trapz(x,y):梯形积分
+例如：x=-1:0.01:1
+y=tan(x);
+trapz(x,y);
+
+quad(fun,x,a,b)辛普森积分
+例如：
+y=@(x)tan(x)
+quad(y,-1,1)
+
+pretty(fx)人性化显示公式
+\end{verbatim}
+
+\section{第四章 一元函数积分学}
+\subsection{第九周练习}
+1.f(x)在[a,b]上连续是$\int_a^b{f(x)dx}$的（）
+\begin{enumerate}
+\item 充分必要条件
+\item 必要非充分条件
+\item 既非充分也非必要条件
+\item 充分而非必要条件
+\end{enumerate}
+正确答案：D你错选为C
+\paragraph
+2.求$\int \frac{\sqrt{x^2-9}}{x^2}dx$\\
+正确答案：$ln|x+\sqrt{x^2-9}|-\frac{1}{x}\sqrt{x^2-9}+C$
+\paragraph
+3. 求$\int_a^bf(mx+n)dx=$\\
+正确答案：$\frac{1}{m}\int_{ma+n}^{mb+n}f(x)ds$
+\paragraph
+4 求 $\int_0 ^{1/2} \frac{x^2}{\sqrt{1-x^2}}dx$\\
+正确答案：$\pi/12-\sqrt{3}/8$
+\paragraph
+5求$\int_{-2}^{2}(\exp{x^2}sinx^3-\sqrt{4-x^2})dx$\\
+正确答案：$-2\pi$
 \end{flushleft}
 \end{document}
 
