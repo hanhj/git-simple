@@ -1,7 +1,8 @@
 \documentclass[fleqn]{article}
 %\usepackage{ctex}
 \usepackage{xeCJK}
-\setCJKmainfont{AR PL UMing TW MBE}
+%\setCJKmainfont{AR PL UMing TW MBE}
+\setCJKmainfont{FangSong_GB2312}
 \begin{document}
 \title{高数学习}
 \author{韩海舰}
@@ -67,19 +68,23 @@ x^2sin\frac{1}{x} ,& x<0 \\
 
 \subsection{第三周练习}
 等价无穷小：
-\[
-\begin{array}{ll}
+\begin{equation}
+\begin{array}{|ll|}
+\hline
 \ln(x+1)\sim x ,& 1-cos(x) \sim \frac{1}{2}x^2\\
 sin(x) \sim x ,& tan(x) \sim x\\
-e^x-1 \sim x, & a^x -1 \sim x\ln a
+e^x-1 \sim x, & a^x -1 \sim x\ln a\\
+\hline
 \end{array}
-\]
+\end{equation}
 有用极限：
-\[
-\begin{array}{ll}
-\lim_{x\to 0}(1+x)^{\frac{1}{x}}=e
+\begin{equation}
+\begin{array}{|l|}
+\hline
+\lim_{x\to 0}(1+x)^{\frac{1}{x}}=e\\
+\hline
 \end{array}
-\]
+\end{equation}
 
 无穷小的关系：
 \[
@@ -154,8 +159,14 @@ $\Longleftrightarrow$可微
 \paragraph
 曲率：反应曲线的弯曲程度。直线的曲率为0，圆的曲率为1/R.圆的半径越大，则曲率越小，否则曲率越大。
 \[K=\lim_{\Delta S\to 0}\frac{\alpha}{\Delta S} \]$\alpha$是弧的转角。
-曲率的计算公式：\[\frac{|y^{''}|}{(1+y^{' 2})^{\frac{3}{2}}}\]
-
+曲率的计算公式：
+\begin{equation}
+\begin{array}{|l|}
+\hline
+\frac{|y^{''}|}{(1+y^{' 2})^{\frac{3}{2}}}\\
+\hline
+\end{array}
+\end{equation}
 \begin{verbatim}
 matlab中的函数
 定义符号：syms x
@@ -225,6 +236,37 @@ pretty(fx)人性化显示公式
 \paragraph
 4.求$\int_{-1}^{2}\frac{1}{x^2}dx$\\
 答案是发散。由于积分区间中存在瑕点。
+\section{第五章积分应用}
+1.计算心形$\rho=1+cos\theta$和圆$\rho=3cos\theta$所围公共部分面积。\\
+正确答案：$5\pi/4$
+\paragraph{}
+\begin{tabular}{|l|}
+\hline
+计算曲线面积\\
+直角坐标：$ds=y*dx$\\
+极坐标：$ds=\frac{\rho^2 d\theta}{2}$\\
+\\
+计算曲线长度：\\
+直角坐标：$ds=\sqrt{1+y^{'2}}dx$\\
+参数方程：$ds=\sqrt{dx^2(t)+dy^2(t)}$\\
+极坐标：$ds=\sqrt{\rho^2+\rho^{' 2}}d\theta$\\
+\hline
+\end{tabular}
+
+\paragraph{}
+\textbf{常用积分公式}
+\begin{equation}
+\begin{array}{|l|}
+\hline
+\int sin^2 x=\frac{x}{2}-\frac{sin2x}{4} \\
+\\
+\int cos^2 x=\frac{x}{2}+\frac{sin2x}{4}\\
+\\
+\int cos^m x sin^n x=\frac{1}{m+n}cos^{m-1} x sin^{n+1}x +\frac{m-1}{m+n}\int cos^{m-2}x sin^{n}x
+\\
+\hline
+\end{array}
+\end{equation}
 
 
 \end{flushleft}
