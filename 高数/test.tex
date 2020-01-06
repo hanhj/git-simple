@@ -2,6 +2,7 @@
 %\usepackage{ctex}
 \usepackage{xeCJK}
 \setCJKmainfont{AR PL UMing TW MBE}
+%\setCJKmainfont{FangSong_GB2312}
 \begin{document}
 \title{高数学习}
 \author{韩海舰}
@@ -27,7 +28,7 @@
 \item 若$x_n>0$(n=1,2...n),则a>0
 \item 常数a唯一。
 \end{enumerate}
-正确答案：C你没选择任何选项
+正确答案：C你没选择任何选项ddddwwwwwww
 
 极限的性质包括：唯一性，有界性，保号性。其中保号性是指如果极限>0,则$x_n$>0。
 \subsection{第二周练习}
@@ -67,19 +68,23 @@ x^2sin\frac{1}{x} ,& x<0 \\
 
 \subsection{第三周练习}
 等价无穷小：
-\[
-\begin{array}{ll}
+\begin{equation}
+\begin{array}{|ll|}
+\hline
 \ln(x+1)\sim x ,& 1-cos(x) \sim \frac{1}{2}x^2\\
 sin(x) \sim x ,& tan(x) \sim x\\
-e^x-1 \sim x, & a^x -1 \sim x\ln a
+e^x-1 \sim x, & a^x -1 \sim x\ln a\\
+\hline
 \end{array}
-\]
+\end{equation}
 有用极限：
-\[
-\begin{array}{ll}
-\lim_{x\to 0}(1+x)^{\frac{1}{x}}=e
+\begin{equation}
+\begin{array}{|l|}
+\hline
+\lim_{x\to 0}(1+x)^{\frac{1}{x}}=e\\
+\hline
 \end{array}
-\]
+\end{equation}
 
 无穷小的关系：
 \[
@@ -154,8 +159,14 @@ $\Longleftrightarrow$可微
 \paragraph
 曲率：反应曲线的弯曲程度。直线的曲率为0，圆的曲率为1/R.圆的半径越大，则曲率越小，否则曲率越大。
 \[K=\lim_{\Delta S\to 0}\frac{\alpha}{\Delta S} \]$\alpha$是弧的转角。
-曲率的计算公式：\[\frac{|y^{''}|}{(1+y^{' 2})^{\frac{3}{2}}}\]
-
+曲率的计算公式：
+\begin{equation}
+\begin{array}{|l|}
+\hline
+\frac{|y^{''}|}{(1+y^{' 2})^{\frac{3}{2}}}\\
+\hline
+\end{array}
+\end{equation}
 \begin{verbatim}
 matlab中的函数
 定义符号：syms x
@@ -225,16 +236,79 @@ pretty(fx)人性化显示公式
 \paragraph
 4.求$\int_{-1}^{2}\frac{1}{x^2}dx$\\
 答案是发散。由于积分区间中存在瑕点。
-\section{第四章定积分的应用}
+\section{第五章积分应用}
 \subsection{第十二周练习}
-1.已知一弹簧原长1米，把它压缩1厘米所用的力为0.05牛顿，把弹簧从80厘米压缩到60厘米所做的功（）\\
+1.计算心形$\rho=1+cos\theta$和圆$\rho=3cos\theta$所围公共部分面积。\\
+正确答案：$5\pi/4$
+2.已知一弹簧原长1米，把它压缩1厘米所用的力为0.05牛顿，把弹簧从80厘米压缩到60厘米所做的功（）\\
 正确答案：0.3（N.m)
-\paragraph
-弧长的积分：\\
-直角坐标：$ds=\sqrt{1+y^{' 2}}dx$\\
-参数方程：$ds=\sqrt{x^{' 2}(t)+y^{' 2}(t)}dt$\\
-极坐标：$ds=\sqrt{\rho^2+\rho^{' 2}}d\theta $
+\paragraph{}
+\begin{tabular}{|l|}
+\hline
+计算曲线面积\\
+直角坐标：$ds=y*dx$\\
+极坐标：$ds=\frac{\rho^2 d\theta}{2}$\\
+\\
+计算曲线长度：\\
+直角坐标：$ds=\sqrt{1+y^{'2}}dx$\\
+参数方程：$ds=\sqrt{dx^2(t)+dy^2(t)}$\\
+极坐标：$ds=\sqrt{\rho^2+\rho^{' 2}}d\theta$\\
+\hline
+\end{tabular}
 
+\paragraph{}
+\textbf{常用积分公式}
+\begin{equation}
+\begin{array}{|l|}
+\hline
+\int lnxdx=xlnx-x+C\\
+\int sin^2 xdx=\frac{x}{2}-\frac{sin2x}{4}+C \\
+\\
+\int cos^2 xdx=\frac{x}{2}+\frac{sin2x}{4}+C\\
+\\
+\int cos^m x sin^n xdx=\frac{1}{m+n}cos^{m-1} x sin^{n+1}x +\frac{m-1}{m+n}\int cos^{m-2}x sin^{n}x+C
+\\
+\hline
+\end{array}
+\end{equation}
+\section{第六章\quad 微分方程}
+\subsection{第十三周练习}
+1.微分方程$\frac{dy}{dx}=2x$的一条积分曲线与直线$y=2x+3$相切，则切点为：\\
+正确答案：(1,5)\\
+
+直线斜率为2，积分曲线切线斜率为y'=2x,$2x=2\Longrightarrow x=1 \Longrightarrow y=5$
+\paragraph
+2.微分方程$xy'+y=y(lnx+lny)$的通解为：\\
+正确答案：$y=\frac{1}{x}e^{Cx}$\\
+用换元法，u=xy
+\paragraph
+3.设y(x)满足微分方程$xy'+y-y^2lnx=0,y(1)=1,$则，y(e)=?\\
+正确答案：1/2\\
+用换元法，u=1/y,将方程转换成u，x的非齐次线性方程，然后用公式，最后代回。
+
+\paragraph{}
+\textbf{微分方程定义:}\\含有未知函数和未知函数导数的方程称为微分方程。\\
+注意不是所有含有未知函数导数的方程都是微分方程，比如u'v+uv'=(uv)'就是一个恒等式，它不是微分方程。\\
+\textbf{微分方程的分类:}\\
+导数的最高阶数称为微分方程的阶。\\
+含有一个未知变量的函数，称为常微分方程；\\
+含有2个以上未知变量的函数，称为偏微分方程。\\
+\textbf{微分方程的解:}\\
+微分方程的解是函数。将该函数带入原方程使得原方程恒成立，将此函数称为微分方程的解\\
+含有微分方程阶数的个数个独立常数的解称为微分方程的通解。\\
+不含常数的解称为微分方程的特解。\\
+含有初始条件的微分方程称为初始问题。
+\newline
+\newline
+\textbf{一阶常微分方程:}\\
+可分离变量方程：$\frac{dy}{dx}=f(x)g(y)(g(y)\neq 0)$或$f(x)dx=g(y)dy$\\
+齐次方程：$\frac{dy}{dx}=f(\frac{y}{x})$\\
+齐次线性方程：$\frac{dy}{dx}+p(x)y=0$\\
+\quad 解：$y=Ce^{- \int p(x)dx}$\\
+非齐次线性方程:$\frac{dy}{dx}+p(x)y=q(x)$\\
+\quad 解：公式$y=e^{- \int p(x)dx}\left(\int{q(x)e^{\int{p(x)dx}}+C}\right)$或常数变量法\\
+伯努力方程：$\frac{dy}{dx}+p(x)y=q(x)y^n,n\neq0,1$\\
+\quad 解：两边除以$y^n$,转换成非齐次线性方程，然后用公式法或常数变量法求解。
 
 \end{flushleft}
 \end{document}
