@@ -324,6 +324,15 @@ pretty(fx)人性化显示公式
 \end{tabular}
 
 \subsection{第十四周练习}
+\paragraph
+1.$y^{''}=e^{_x}$的通解为：\\
+正确答案：$e^{-x}+C_1 x+C_2 $
+\paragraph
+2.微分方程$xy^{''}+xy^{' 2}-y{'}=0$的通解\\
+正确答案：$y=ln(x^2+2C_1)+C_2$\\
+化简后方程变为：$y^{''}+y^{' 2}-y^{'}/x=0$ 。符合$y^{''}=f(x,y^{'})$格式，所以用$p=y^{'}$替换，替换后变成伯努立方程，两边同除$p^2$,然后用公式。
+
+\paragraph
 可降阶的微分方程：$y^{''}=f(x,y,y^{'})$，思路是将二阶降为一阶\\
 \begin{tabular}{|l|l|}
 	\hline
@@ -336,6 +345,11 @@ pretty(fx)人性化显示公式
 	$y^{''}=f(y,y^{'})$ & 令$y^{'} =p(y)$,$y^{''}=dp/dy*p$\\
 	\hline
 \end{tabular}
+\paragraph
+二阶线性常微分方程：\\
+\quad 二阶齐次线性常微分方程：$y^{''}+p(x)y^{'}+q(x)y=0$\\
+\quad 二阶非齐次线性常微分方程：$y^{''}+p(x)y^{'}+q(x)y=f(x)$
+
 \begin{verbatim}
 matlab中的微分方程：
 符号微分方程：
