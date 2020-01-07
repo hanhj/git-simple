@@ -3,6 +3,8 @@
 \usepackage{xeCJK}
 \setCJKmainfont{AR PL UMing TW MBE}
 %\setCJKmainfont{FangSong_GB2312}
+\usepackage[breaklinks,colorlinks,linkcolor=black,citecolor=black,urlcolor=black]{hyperref}
+\newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}  
 \begin{document}
 \title{高数学习}
 \author{韩海舰}
@@ -187,6 +189,10 @@ y=tan(x);
 trapz(x,y);
 
 quad(fun,x,a,b)辛普森积分
+fun可以是匿名函数@(x)，或内联函数inline()
+比如y=cosx,可以表示成：
+y=@(x)cos(x)
+y=inline('cos(x)')
 例如：
 y=@(x)tan(x)
 quad(y,-1,1)
@@ -301,15 +307,58 @@ pretty(fx)人性化显示公式
 \newline
 \newline
 \textbf{一阶常微分方程:}\\
-可分离变量方程：$\frac{dy}{dx}=f(x)g(y)(g(y)\neq 0)$或$f(x)dx=g(y)dy$\\
-齐次方程：$\frac{dy}{dx}=f(\frac{y}{x})$\\
-齐次线性方程：$\frac{dy}{dx}+p(x)y=0$\\
-\quad 解：$y=Ce^{- \int p(x)dx}$\\
-非齐次线性方程:$\frac{dy}{dx}+p(x)y=q(x)$\\
-\quad 解：公式$y=e^{- \int p(x)dx}\left(\int{q(x)e^{\int{p(x)dx}}+C}\right)$或常数变量法\\
-伯努力方程：$\frac{dy}{dx}+p(x)y=q(x)y^n,n\neq0,1$\\
-\quad 解：两边除以$y^n$,转换成非齐次线性方程，然后用公式法或常数变量法求解。
+\begin{tabular}{|l|l|l|}
+\hline
+方程名称&方程格式&方程解\\
+\hline
+可分离变量方程 & \tabincell{l}{$\frac{dy}{dx}=f(x)g(y)(g(y)\neq 0)$\\或$f(x)dx=g(y)dy$} &\\
+\hline
+齐次方程 & $\frac{dy}{dx}=f(\frac{y}{x})$ &\\
+\hline
+齐次线性方程 & \tabincell{l}{$\frac{dy}{dx}+p(x)y=0$\\或$y'+p(x)y=0$ }& $y=Ce^{- \int p(x)dx}$\\
+\hline
+非齐次线性方程 &\tabincell{l}{$\frac{dy}{dx}+p(x)y=q(x)$\\或$y'+p(x)y=q(x)$ }&\tabincell{l}{$y=e^{- \int p(x)dx}\left(\int{q(x)e^{\int{p(x)dx}}+C}\right)$\\或常数变量法}\\
+\hline
+伯努力方程 & $\frac{dy}{dx}+p(x)y=q(x)y^n,n\neq0,1$ & \tabincell{l}{两边除以$y^n$,转换成非齐次线性方程，\\然后用公式法或常数变量法求解。}\\
+\hline
+\end{tabular}
 
+\subsection{第十四周练习}
+可降阶的微分方程：$y^{''}=f(x,y,y^{'})$，思路是将二阶降为一阶\\
+\begin{tabular}{|l|l|}
+	\hline
+	方程形式 & 降阶方法\\
+	\hline
+	$y^{''}=f(x)$ & 逐级不定积分\\
+	\hline
+	$y^{''}=f(x,y^{'})$ & 令 $y^{'}=p(x)$\\
+	\hline
+	$y^{''}=f(y,y^{'})$ & 令$y^{'} =p(y)$,$y^{''}=dp/dy*p$\\
+	\hline
+\end{tabular}
+\begin{verbatim}
+matlab中的微分方程：
+符号微分方程：
+dsolve('eq1,eq2..','con1,con2','v')
+eq1,eq2..微分方程，
+con1，con2..初始条件，
+v	变量
+Dy	表示导数y'
+例子：
+求y'+3xy=4x的通解
+syms y x;
+dsolve('Dy+3*x*y=4*x','x')
+ezplot(y);
+ans =
+ 
+4/3+exp(-3/2*x^2)*C1
+ 
+ 
+>> pretty(ans)
+ 
+                                             2
+                            4/3 + exp(- 3/2 x ) C1
+\end{verbatim}
 \end{flushleft}
 \end{document}
 
