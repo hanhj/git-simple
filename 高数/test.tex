@@ -105,6 +105,21 @@ e^x-1 \sim x, & a^x -1 \sim x\ln a\\
 \hline
 \end{array}
 \]
+\paragraph
+\indent matlab中求极限\\
+\begin{verbatim}
+limit(f,x,a)
+f是表达式，可以直接用'xxx',也可用syms来定义。
+x表示自变量，a表示趋向。
+例如：
+limit('(exp(x)+exp(-x))/sin(x)',x,0)
+or
+syms x y;
+y=(exp(x)+exp(-x))/sin(x);
+limit(y,x,0)
+结果为2
+\end{verbatim}
+
 
 \section{导数与微分}
 \subsection{第四周练习}
@@ -244,8 +259,10 @@ pretty(fx)人性化显示公式
 答案是发散。由于积分区间中存在瑕点。
 \section{第五章积分应用}
 \subsection{第十二周练习}
+\paragraph
 1.计算心形$\rho=1+cos\theta$和圆$\rho=3cos\theta$所围公共部分面积。\\
 正确答案：$5\pi/4$
+\paragraph
 2.已知一弹簧原长1米，把它压缩1厘米所用的力为0.05牛顿，把弹簧从80厘米压缩到60厘米所做的功（）\\
 正确答案：0.3（N.m)
 \paragraph{}
@@ -484,6 +501,90 @@ ans =
                                              2
                             4/3 + exp(- 3/2 x ) C1
 \end{verbatim}
+\section{期末考试}
+\paragraph
+1.当$x\rightarrow 0 $时，下列哪一个无穷小时对于x的三阶无穷小（）
+\begin{enumerate}
+		\item $x^3+0.0001x^2$
+		\item $\sqrt{a+x^3}-\sqrt{a} \quad (a>0)$
+		\item $\sqrt[3]{x^2}-\sqrt{x}$
+		\item $\sqrt[3]{tanx}$
+\end{enumerate}
+正确答案B，错选A
+
+\paragraph
+2.$\int{xf''(x)dx=()}$
+\begin{enumerate}
+		\item $xf(x)-\int{f(x)dx}$
+		\item $xf''(x)-xf'(x)-f(x)+C$
+		\item $xf'(x)+f(x)+C$
+		\item $xf'(x)-f(x)+C$
+\end{enumerate}
+正确答案D，错选C
+
+\paragraph
+3.当$x\rightarrow 0$时，与$sin2x+5x^2$等价无穷小的量时()
+\begin{enumerate}
+		\item $5x^2$
+		\item $x$
+		\item $x^2$
+		\item $2x$
+\end{enumerate}
+正确答案D，错选A
+
+\paragraph
+4.$\int_{-1}^{1}\frac{2+x^3sin^2x}{\sqrt{4-x^2}}dx=$()
+\begin{enumerate}
+	\item $\pi/2$
+	\item $2/3\pi$
+	\item $\pi$
+	\item $2\pi$
+\end{enumerate}
+正确答案B
+
+\paragraph
+5.设$f(x)=\int_{2x}^{1}\frac{sint}{t}dt,$则$f'(x)=$()
+\begin{enumerate}
+	\item $-\frac{sin2x}{2x}$
+	\item $\frac{sin2x}{2x}$
+	\item $\frac{sin2x}{x}$
+	\item $-\frac{sin2x}{2x}$
+\end{enumerate}
+正确答案D
+
+\paragraph
+6.$\int_{0}^{1}\frac{x}{\sqrt{1-x^2}}dx=$()
+\begin{enumerate}
+	\item $-1$
+	\item $2$
+	\item $1$
+	\item $0$
+\end{enumerate}
+正确答案C,错选为A 
+
+\paragraph
+7.$\int_{-1}^{1}x^3\sqrt{1-x^2}dx=$()
+\begin{enumerate}
+	\item $0$
+	\item $\frac{1}{3}\pi$
+	\item $\frac{\pi}{4}$
+	\item $\frac{\pi}{2}$
+\end{enumerate}
+正确答案为A 
+
+\paragraph
+8.微分方程$y''+2y'+y=x$的通解是()
+\begin{enumerate}
+	\item $y=x+C_1e^{-x}+C_2xe^{-x}$
+	\item $y=x-2+C_1xe^{-x}+C_2e^x$
+	\item $y=x-2+C_1xe^{-x}+C_2e^{-x}$
+	\item $y=x-2+C_1e^{-x}+C_2e^x$
+\end{enumerate}
+正确答案为C,错选为A。\\
+首先确定齐次方程的根为-1，所以齐次方程通解为$(C_1+C_2x)e^{-x}$,\\
+其次，确定非齐次方程右边为$e^{\lambda x}P_m(x)$格式，$\lambda =0,m=1$,而$\lambda=0$不是特征方程的根\\
+所以非齐次方程的特解中k=0，特解为$y=ax+b$,带入方程得到$a=1,b=-2$
+
 \end{flushleft}
 \end{document}
 
