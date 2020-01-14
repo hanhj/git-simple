@@ -257,6 +257,7 @@ pretty(fx)人性化显示公式
 \paragraph
 4.求$\int_{-1}^{2}\frac{1}{x^2}dx$\\
 答案是发散。由于积分区间中存在瑕点。
+
 \section{第五章积分应用}
 \subsection{第十二周练习}
 \paragraph
@@ -574,7 +575,7 @@ $lim\frac{\sqrt{a+x^3}-\sqrt{a}}{x^3}=C$,所以选B。
 	\item $\frac{\pi}{2}$
 \end{enumerate}
 正确答案为A 
-
+{
 \paragraph
 8.微分方程$y''+2y'+y=x$的通解是()
 \begin{enumerate}
@@ -587,7 +588,66 @@ $lim\frac{\sqrt{a+x^3}-\sqrt{a}}{x^3}=C$,所以选B。
 首先确定齐次方程的根为-1，所以齐次方程通解为$(C_1+C_2x)e^{-x}$,\\
 其次，确定非齐次方程右边为$e^{\lambda x}P_m(x)$格式，$\lambda =0,m=1$,而$\lambda=0$不是特征方程的根\\
 所以非齐次方程的特解中k=0，特解为$y=ax+b$,带入方程得到$a=1,b=-2$
+\newpage
+\section{附录1不定积分的常用方法} 
+	\subsection{基本初等函数积分公式}
+		\subsubsection{幂函数}
+		\[
+			\int x^\mu dx=
+			\left \{
+				\begin{array}{ll}
+					\frac{x^{\mu+1}}{\mu + 1} + C & \mu \neq -1 \\
+								 ln|x| + C & \mu =-1
+				\end{array}
+			\right. 
+		\]
+		\subsubsection{指数函数}
+		$\int e^x dx=e^x+C$\\
+		$\int a^x dx=\frac{a^x}{lna}+C$
+		\subsubsection{对数函数}
+		$\int lnx dx=x*lnx-x+C$\\
+		$\int log_a x dx=x*log_a x -xlog_ae+C$
+		\subsubsection{三角函数}
+			\begin{tabular}{ll}
+				$\int sinxdx=cosx+C$ & $\int cosxdx=-sinx+C$\\
+				$\int tanxdx=-ln|cosx|+C$ & $\int cotxdx=ln|sinx|+C $\\
+				$\int secxdx=ln|secx+tanx|+C $ & $\int cscxdx=ln|cscx-cotx|+C$
+			\end{tabular}
+		\subsubsection{反三角函数}
+			\begin{tabular}{ll}
+				$\int arcsinx=x*arcsinxdx+\sqrt{1-x^2}+C$ & $\int arccosxdx=x*arccosx-\sqrt{1-x^2}+C$\\
+				$\int arctanxdx=x*arctanx-\frac{1}{2}ln(1+x^2)+C$ & $\int arccotxdx=x*arccotx+\frac{1}{2}ln(1+x^2)+C $\\
+				$\int arcsecxdx=x*arcsecx-ln(x+\sqrt{x^2-1})+C $ & $\int arccscxdx=x*arccscx+ln(x+\sqrt{x^2-1})+C$
+			\end{tabular}
+	\subsection{常用方法}
+		1.凑微分\\
+		$\int f(\varphi(x))\varphi^{'}(x)dx=\int f(\varphi(x))d(\varphi(x))$\\
+		将$\varphi^{'}(x)dx$凑到$d(\varphi(x))$中。\\
+		2.换元法\\
+		$\int f(x)dx=\int f(\varphi(t))\varphi^{'}(t)dt$\\
+		用$x=\varphi(t)$进行替换变量，进行积分\\
+		3.分部积分\\
+		$\int udv=uv-\int vdu$\\
+		换一种形式积分
+	\subsection{常用形式}
+		\subsubsection{含$ax+b$}
+		1)采用凑微分方法,将$ax+b$凑到微分中。\\
+		2)因式分解\\
+		\subsubsection{含$\sqrt{ax+b}$}
+		1)利用$t=\sqrt{ax+b}$来去除根号。\\
+		2)利用已经获得的结果，分部积分。\\
+		\subsubsection{含$a^2 \pm x^2$}	
+		\[
+		\begin{array}{|l|}
+			\hline
+			\int\frac{dx}{x^2+a^2}=\frac{1}{|a|}arctan(\frac{x}{|a|})+C \\
+			\int\frac{dx}{x^2-a^2}=\frac{1}{2a}ln(|\frac{x-a}{x+a}|)+C \\
+			\hline
+		\end{array}
+		\]
+		\subsubsection{含$ax^2+b}
 
+	}
 \end{flushleft}
 \end{document}
 
