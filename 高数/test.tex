@@ -618,7 +618,6 @@ $lim\frac{\sqrt{a+x^3}-\sqrt{a}}{x^3}=C$,所以选B。
 	\item $\frac{\pi}{2}$
 \end{enumerate}
 正确答案为A 
-{
 \paragraph
 8.微分方程$y''+2y'+y=x$的通解是()
 \begin{enumerate}
@@ -679,6 +678,15 @@ $lim\frac{\sqrt{a+x^3}-\sqrt{a}}{x^3}=C$,所以选B。
 		\subsubsection{含$\sqrt{ax+b}$}
 		1)利用$t=\sqrt{ax+b}$来去除根号。\\
 		2)利用已经获得的结果，分部积分。\\
+		参考例子:\\
+			$\int \sqrt{ax+b}dx$,凑微分。\\ 
+			$\int x\sqrt{ax+b}dx$,利用$t=\sqrt{ax+b}$来去除根号。或分部积分。\\ 
+			$\int x^2\sqrt{ax+b}dx$,利用$t=\sqrt{ax+b}$来去除根号。或分部积分。\\ 
+			$\int \frac{x}{\sqrt{ax+b}}dx$,利用$t=\sqrt{ax+b}$来去除根号。或先求出$\int \frac{dx}{\sqrt{ax+b}}$,再分部积分。\\ 
+			$\int \frac{x^2}{\sqrt{ax+b}}dx$,利用$t=\sqrt{ax+b}$来去除根号。或先求出$\int x/\frac{dx}{\sqrt{ax+b}}$,再分部积分。\\ 
+			$\int \frac{dx}{x*\sqrt{ax+b}}$,利用$t=\sqrt{ax+b}$来去除根号,然后利用$\int\frac{dx}{x^2+a^2}=\frac{1}{|a|}arctan(\frac{x}{|a|})+C $和$\int\frac{dx}{x^2-a^2}=\frac{1}{2a}ln(|\frac{x-a}{x+a}|)+C$来积分，。需要根据b>0,b<0选择积分型式。\\ 
+			$\int \frac{dx}{x^2*\sqrt{ax+b}}$,需要先分解因式，然后利用$\int \frac{dx}{x*\sqrt{ax+b}}$结果。\\
+
 		\subsubsection{含$a^2 \pm x^2$}	
 		\[
 		\begin{array}{|l|}
@@ -698,7 +706,13 @@ $lim\frac{\sqrt{a+x^3}-\sqrt{a}}{x^3}=C$,所以选B。
 			$\int \frac{dx}{x*(ax^2+b)}$，分解\\
 			$\int \frac{dx}{x^2*(ax^2+b)}$，分解\\
 			$\int \frac{dx}{x^3*(ax^2+b)}$，利用上一个分解的结果分解\\
-	}
+		\subsubsection{含$ax^2+bx+c,(a>0)$}
+		\subsubsection{含$\sqrt{x^2+a^2},(a>0)$}
+		\subsubsection{含$\sqrt{x^2-a^2},(a>0)$}
+		\subsubsection{含$\sqrt{a^2-x^2},(a>0)$}
+		\subsubsection{含$\sqrt{\pm ax^2+bx+c},(a>0)$}
+		\subsubsection{含$\sqrt{\pm\frac{x-a}{x-b}}$,或$\sqrt{(x-a)(b-x)}$}
+		\subsubsection{含三角函数}
 \end{flushleft}
 \end{document}
 
