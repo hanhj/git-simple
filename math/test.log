@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.1415926-2.2-0.9995.2 (TeX Live 2009/Debian) (format=xelatex 2019.4.16)  15 JAN 2020 19:05
+This is XeTeX, Version 3.1415926-2.2-0.9995.2 (TeX Live 2009/Debian) (format=xelatex 2019.4.16)  16 JAN 2020 17:35
 entering extended mode
  %&-line parsing enabled.
 **test.tex
@@ -357,254 +357,248 @@ File: eu1lmtt.fd 2007/01/14 v1.3 Font defs for Latin Modern
 ) [1
 
 ] [2] [3] [4]
-[5] [6]
+[5] [6] [7]
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
 (hyperref)                \hskip 10.0pt
-(hyperref)                replaced by space on input line 298.
+(hyperref)                replaced by space on input line 341.
 
-[7] [8]
-Overfull \hbox (59.74672pt too wide) in paragraph at lines 391--406
+[8] [9] [10]
+Overfull \hbox (59.74672pt too wide) in paragraph at lines 434--449
 [][]  
  []
 
 
-Overfull \hbox (53.6281pt too wide) in paragraph at lines 421--431
+Overfull \hbox (53.6281pt too wide) in paragraph at lines 464--474
 []  
  []
 
 
-Overfull \hbox (139.97539pt too wide) in paragraph at lines 433--481
+Overfull \hbox (139.97539pt too wide) in paragraph at lines 476--524
 []  
  []
 
-[9] [10] [11] [12] [13]
-Overfull \hbox (114.91644pt too wide) in paragraph at lines 617--622
+[11] [12] [13] [14] [15]
+Overfull \hbox (18.64832pt too wide) in paragraph at lines 636--654
 [][]  
  []
 
+[16]
+Overfull \hbox (114.91644pt too wide) in paragraph at lines 696--701
+[][]  
+ []
+
+[17]
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 633.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 633.
-
-[14]
-
-Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 636.
+(hyperref)                removing `math shift' on input line 735.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `\@ifnextchar' on input line 636.
+(hyperref)                removing `math shift' on input line 735.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 636.
+(hyperref)                removing `math shift' on input line 738.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 639.
+(hyperref)                removing `\@ifnextchar' on input line 738.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `superscript' on input line 639.
+(hyperref)                removing `math shift' on input line 738.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `\pm' on input line 639.
+(hyperref)                removing `math shift' on input line 750.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `superscript' on input line 639.
+(hyperref)                removing `superscript' on input line 750.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 639.
+(hyperref)                removing `\pm' on input line 750.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 648.
+(hyperref)                removing `superscript' on input line 750.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `superscript' on input line 648.
+(hyperref)                removing `math shift' on input line 750.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 648.
+(hyperref)                removing `math shift' on input line 759.
 
-LaTeX Font Info:    Try loading font information for OMS+lmr on input line 653.
+
+Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
+(hyperref)                removing `superscript' on input line 759.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
+(hyperref)                removing `math shift' on input line 759.
+
+LaTeX Font Info:    Try loading font information for OMS+lmr on input line 764.
 
 (/usr/share/texmf/tex/latex/lm/omslmr.fd
 File: omslmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    Try loading font information for OMS+lmsy on input line 653
+LaTeX Font Info:    Try loading font information for OMS+lmsy on input line 764
 .
 
 (/usr/share/texmf/tex/latex/lm/omslmsy.fd
 File: omslmsy.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    Font shape `OMS/lmr/m/n' in size <10> not available
-(Font)              Font shape `OMS/lmsy/m/n' tried instead on input line 653.
+(Font)              Font shape `OMS/lmsy/m/n' tried instead on input line 764.
+ [18]
+
+Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
+(hyperref)                removing `math shift' on input line 771.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 660.
+(hyperref)                removing `superscript' on input line 771.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `superscript' on input line 660.
+(hyperref)                removing `math shift' on input line 771.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 660.
+(hyperref)                removing `math shift' on input line 782.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 671.
+(hyperref)                removing `\@ifnextchar' on input line 782.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `\@ifnextchar' on input line 671.
+(hyperref)                removing `superscript' on input line 782.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `superscript' on input line 671.
+(hyperref)                removing `superscript' on input line 782.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `superscript' on input line 671.
+(hyperref)                removing `math shift' on input line 782.
+
+[19]
+
+Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
+(hyperref)                removing `math shift' on input line 823.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 671.
-
-[15] [16]
-
-Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 712.
+(hyperref)                removing `\@ifnextchar' on input line 823.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `\@ifnextchar' on input line 712.
+(hyperref)                removing `superscript' on input line 823.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `superscript' on input line 712.
+(hyperref)                removing `superscript' on input line 823.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `superscript' on input line 712.
+(hyperref)                removing `math shift' on input line 823.
+
+[20]
+
+Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
+(hyperref)                removing `math shift' on input line 832.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 712.
+(hyperref)                removing `\@ifnextchar' on input line 832.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 719.
+(hyperref)                removing `superscript' on input line 832.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `\@ifnextchar' on input line 719.
+(hyperref)                removing `superscript' on input line 832.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `superscript' on input line 719.
+(hyperref)                removing `math shift' on input line 832.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `superscript' on input line 719.
+(hyperref)                removing `math shift' on input line 841.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 719.
+(hyperref)                removing `\@ifnextchar' on input line 841.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 726.
+(hyperref)                removing `\pm' on input line 841.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `\@ifnextchar' on input line 726.
+(hyperref)                removing `superscript' on input line 841.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `\pm' on input line 726.
+(hyperref)                removing `math shift' on input line 841.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `superscript' on input line 726.
+(hyperref)                removing `math shift' on input line 852.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 726.
+(hyperref)                removing `\@ifnextchar' on input line 852.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 733.
+(hyperref)                removing `\pm' on input line 852.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `\@ifnextchar' on input line 733.
+(hyperref)                removing `\begingroup' on input line 852.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `\pm' on input line 733.
+(hyperref)                removing `\endgroup' on input line 852.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `\begingroup' on input line 733.
+(hyperref)                removing `\over' on input line 852.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `\endgroup' on input line 733.
+(hyperref)                removing `math shift' on input line 852.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `\over' on input line 733.
+(hyperref)                removing `math shift' on input line 852.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 733.
+(hyperref)                removing `\@ifnextchar' on input line 852.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 733.
+(hyperref)                removing `math shift' on input line 852.
 
-
-Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `\@ifnextchar' on input line 733.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 733.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 740.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `superscript' on input line 740.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 740.
-
-[17] [18] (./test.aux)
+[21] (./test.aux)
 LaTeX Font Info:    Some font shapes were not available, defaults substituted.
  ) 
 Here is how much of TeX's memory you used:
- 5951 strings out of 495713
- 102031 string characters out of 1188883
- 212110 words of memory out of 3000000
- 8996 multiletter control sequences out of 15000+50000
+ 5952 strings out of 495713
+ 102050 string characters out of 1188883
+ 212285 words of memory out of 3000000
+ 8997 multiletter control sequences out of 15000+50000
  6815 words of font info for 41 fonts, out of 3000000 for 9000
  28 hyphenation exceptions out of 8191
  38i,21n,40p,472b,490s stack positions out of 5000i,500n,10000p,200000b,50000s
 
-Output written on test.pdf (18 pages).
+Output written on test.pdf (21 pages).

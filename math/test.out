@@ -6,6 +6,7 @@
 \BOOKMARK [2][-]{subsection.2.1}{第四周练习}{section.2}
 \BOOKMARK [1][-]{section.3}{第三章微分中值定理与导数应用}{}
 \BOOKMARK [2][-]{subsection.3.1}{第六周练习}{section.3}
+\BOOKMARK [2][-]{subsection.3.2}{第七周练习}{section.3}
 \BOOKMARK [1][-]{section.4}{第四章 一元函数积分学}{}
 \BOOKMARK [2][-]{subsection.4.1}{第九周练习}{section.4}
 \BOOKMARK [2][-]{subsection.4.2}{第十一周练习}{section.4}
@@ -16,23 +17,25 @@
 \BOOKMARK [2][-]{subsection.6.2}{第十四周练习}{section.6}
 \BOOKMARK [2][-]{subsection.6.3}{第十五周练习}{section.6}
 \BOOKMARK [1][-]{section.7}{期末考试}{}
-\BOOKMARK [1][-]{section.8}{附录1不定积分的常用方法}{}
-\BOOKMARK [2][-]{subsection.8.1}{基本初等函数积分公式}{section.8}
-\BOOKMARK [3][-]{subsubsection.8.1.1}{幂函数}{subsection.8.1}
-\BOOKMARK [3][-]{subsubsection.8.1.2}{指数函数}{subsection.8.1}
-\BOOKMARK [3][-]{subsubsection.8.1.3}{对数函数}{subsection.8.1}
-\BOOKMARK [3][-]{subsubsection.8.1.4}{三角函数}{subsection.8.1}
-\BOOKMARK [3][-]{subsubsection.8.1.5}{反三角函数}{subsection.8.1}
-\BOOKMARK [2][-]{subsection.8.2}{常用方法}{section.8}
-\BOOKMARK [2][-]{subsection.8.3}{常用形式}{section.8}
-\BOOKMARK [3][-]{subsubsection.8.3.1}{含ax+b}{subsection.8.3}
-\BOOKMARK [3][-]{subsubsection.8.3.2}{含ax+b}{subsection.8.3}
-\BOOKMARK [3][-]{subsubsection.8.3.3}{含a2 x2}{subsection.8.3}
-\BOOKMARK [3][-]{subsubsection.8.3.4}{含ax2+b}{subsection.8.3}
-\BOOKMARK [3][-]{subsubsection.8.3.5}{含ax2+bx+c,\(a>0\)}{subsection.8.3}
-\BOOKMARK [3][-]{subsubsection.8.3.6}{含x2+a2,\(a>0\)}{subsection.8.3}
-\BOOKMARK [3][-]{subsubsection.8.3.7}{含x2-a2,\(a>0\)}{subsection.8.3}
-\BOOKMARK [3][-]{subsubsection.8.3.8}{含a2-x2,\(a>0\)}{subsection.8.3}
-\BOOKMARK [3][-]{subsubsection.8.3.9}{含ax2+bx+c,\(a>0\)}{subsection.8.3}
-\BOOKMARK [3][-]{subsubsection.8.3.10}{含x-ax+a或\(x-a\)\(x-b\)}{subsection.8.3}
-\BOOKMARK [3][-]{subsubsection.8.3.11}{含ax2+bx+c,\(a>0\)}{subsection.8.3}
+\BOOKMARK [1][-]{section.8}{附录1 常用公式}{}
+\BOOKMARK [1][-]{section.9}{附录2不定积分的常用方法}{}
+\BOOKMARK [2][-]{subsection.9.1}{基本初等函数积分公式}{section.9}
+\BOOKMARK [3][-]{subsubsection.9.1.1}{幂函数}{subsection.9.1}
+\BOOKMARK [3][-]{subsubsection.9.1.2}{指数函数}{subsection.9.1}
+\BOOKMARK [3][-]{subsubsection.9.1.3}{对数函数}{subsection.9.1}
+\BOOKMARK [3][-]{subsubsection.9.1.4}{三角函数}{subsection.9.1}
+\BOOKMARK [3][-]{subsubsection.9.1.5}{反三角函数}{subsection.9.1}
+\BOOKMARK [2][-]{subsection.9.2}{常用积分公式}{section.9}
+\BOOKMARK [2][-]{subsection.9.3}{常用方法}{section.9}
+\BOOKMARK [2][-]{subsection.9.4}{常用形式}{section.9}
+\BOOKMARK [3][-]{subsubsection.9.4.1}{含ax+b}{subsection.9.4}
+\BOOKMARK [3][-]{subsubsection.9.4.2}{含ax+b}{subsection.9.4}
+\BOOKMARK [3][-]{subsubsection.9.4.3}{含a2 x2}{subsection.9.4}
+\BOOKMARK [3][-]{subsubsection.9.4.4}{含ax2+b}{subsection.9.4}
+\BOOKMARK [3][-]{subsubsection.9.4.5}{含ax2+bx+c,\(a>0\)}{subsection.9.4}
+\BOOKMARK [3][-]{subsubsection.9.4.6}{含x2+a2,\(a>0\)}{subsection.9.4}
+\BOOKMARK [3][-]{subsubsection.9.4.7}{含x2-a2,\(a>0\)}{subsection.9.4}
+\BOOKMARK [3][-]{subsubsection.9.4.8}{含a2-x2,\(a>0\)}{subsection.9.4}
+\BOOKMARK [3][-]{subsubsection.9.4.9}{含ax2+bx+c,\(a>0\)}{subsection.9.4}
+\BOOKMARK [3][-]{subsubsection.9.4.10}{含x-ax+a或\(x-a\)\(x-b\)}{subsection.9.4}
+\BOOKMARK [3][-]{subsubsection.9.4.11}{含三角函数}{subsection.9.4}
