@@ -575,7 +575,7 @@ $lim\frac{\sqrt{a+x^3}-\sqrt{a}}{x^3}=C$,所以选B。
 	\item $\frac{\pi}{2}$
 \end{enumerate}
 正确答案为A 
-{
+
 \paragraph
 8.微分方程$y''+2y'+y=x$的通解是()
 \begin{enumerate}
@@ -649,13 +649,101 @@ $lim\frac{\sqrt{a+x^3}-\sqrt{a}}{x^3}=C$,所以选B。
 		1)凑微分\\
 		2)分解\\
 		参考例子:\\
-			$\int \frac{dx}{ax^2+b}$,利用$\int\frac{dx}{x^2+a^2}=\frac{1}{|a|}arctan(\frac{x}{|a|})+C $和$\int\frac{dx}{x^2-a^2}=\frac{1}{2a}ln(|\frac{x-a}{x+a}|)+C $\\
-			$\int \frac{xdx}{ax^2+b}$,凑微分\\
-			$\int \frac{x^2dx}{ax^2+b}$，分解\\
-			$\int \frac{dx}{x*(ax^2+b)}$，分解\\
-			$\int \frac{dx}{x^2*(ax^2+b)}$，分解\\
-			$\int \frac{dx}{x^3*(ax^2+b)}$，利用上一个分解的结果分解\\
-	}
+		\begin{itemize}
+			\item	$\int \frac{dx}{ax^2+b}$,利用$\int\frac{dx}{x^2+a^2}=\frac{1}{|a|}arctan(\frac{x}{|a|})+C $和$\int\frac{dx}{x^2-a^2}=\frac{1}{2a}ln(|\frac{x-a}{x+a}|)+C $\\
+			\item	$\int \frac{xdx}{ax^2+b}$,凑微分\\
+			\item	$\int \frac{x^2dx}{ax^2+b}$，分解\\
+			\item	$\int \frac{dx}{x*(ax^2+b)}$，分解\\
+			\item	$\int \frac{dx}{x^2*(ax^2+b)}$，分解\\
+			\item	$\int \frac{dx}{x^3*(ax^2+b)}$，利用上一个分解的结果分解\\
+		\end{itemize}
+		\subsubsection{含$ax^2+bx+c,(a>0)$}
+		1)凑微分\\
+		2)分解\\
+		参考例子:\\
+		\begin{itemize}
+			\item $\int \frac{dx}{ax^2+bx+c}$,\\
+			方法1：考虑将$ax^2+bx+c$分解成$(Ax+B)^2+C^2$形式，然后利用$\int\frac{dx}{x^2+a^2}=\frac{1}{|a|}arctan(\frac{x}{|a|})+C $和$\int\frac{dx}{x^2-a^2}=\frac{1}{2a}ln(|\frac{x-a}{x+a}|)+C $。因为$\sqrt{b^2-4ac}$结果不定，所以有两个结果\\
+			方法2：由于$\frac{1}{x-r1}*\frac{1}{x-r2}=\frac{1}{r1-r2}(\frac{1}{x-r1}-\frac{1}{x-r2})$,将$ax^2+bx+c$分解成:$\frac{1}{a}\frac{1}{r1-r2}(\frac{1}{x-r1}-\frac{1}{x-r2})$形式，r1，r2是该方程的根。然后凑微分即可积分。
+			\item $\int \frac{xdx}{ax^2+bx+c}$,\\
+				凑微分，将x凑到dx中。$\frac{x}{ax^2+bx+c}=\frac{ax+b-b}{ax^2+bx+c}$
+		\end{itemize}
+		\subsubsection{含$\sqrt{x^2+a^2},(a>0)$}
+		1)用$x=atan\alpha$利用$\sqrt{1+tan^2\alpha}=sec^2\alpha$换元来脱根号\\
+		2)分解\\
+		参考例子:\\
+		\begin{itemize}
+			\item $\int \frac{dx}{\sqrt{x^2+a^2}}=arcsinh\frac{x}{a}+C=ln(x+\sqrt{x^2+a^2})+C$.\\
+			用$x=atan\alpha$利用$\sqrt{1+tan^2\alpha}=sec^2\alpha$换元来脱根号\\
+			利用$\int secx=ln|secx+tanx|+C$公式。注意回带的时候，利用作图来求三角函数值比较方便。
+			\item $\int \frac{dx}{\sqrt{x^2+a^2}^3}$.\\
+			用$x=atan\alpha$利用$\sqrt{1+tan^2\alpha}=sec^2\alpha$换元来脱根号\\
+			注意回带的时候，利用作图来求三角函数值比较方便。
+			\item $\int \frac{xdx}{\sqrt{x^2+a^2}}$.\\
+			用$x=atan\alpha$利用$\sqrt{1+tan^2\alpha}=sec^2\alpha$换元来脱根号\\
+			注意回带的时候，利用作图来求三角函数值比较方便。
+			\item $\int \frac{xdx}{\sqrt{x^2+a^2}^3}$.\\
+			用$x=atan\alpha$利用$\sqrt{1+tan^2\alpha}=sec^2\alpha$换元来脱根号\\
+			注意回带的时候，利用作图来求三角函数值比较方便。
+			\item $\int \frac{x^2dx}{\sqrt{x^2+a^2}}$.\\
+			方法1：用$x=atan\alpha$利用$\sqrt{1+tan^2\alpha}=sec^2\alpha$换元来脱根号，注意用此方法需要计算$\int sec^3\alpha d\alpha$,在计算的时候会循环，从而求得。\\
+			方法2：将分子拆解成$x^2+a^2-a^2$,然后利用现成公式。需要计算$\int \sqrt{x^2+a^2}dx$。注意用此方法需要计算$\int sec^3\alpha d\alpha$,在计算的时候会循环，从而求得。\\
+			\item $\int \frac{x^2dx}{\sqrt{x^2+a^2}^3}$.\\
+			方法1：用$x=atan\alpha$利用$\sqrt{1+tan^2\alpha}=sec^2\alpha$换元来脱根号\\
+			\item $\int \sqrt{x^2+a^2}dx$.\\
+			用$x=atan\alpha$利用$\sqrt{1+tan^2\alpha}=sec^2\alpha$换元来脱根号\\
+			注意回带的时候，利用作图来求三角函数值比较方便。\\
+			\item $\int \sqrt{x^2+a^2}^3dx$\\
+			用$x=asinh\alpha$利用$\sqrt{1+sinh^2 \alpha}=cosh^2\alpha$换元来脱根号,得到$\int a^4cosh^4\alpha d\alpha$,然后积分\\
+			\item $\int x\sqrt{x^2+a^2}^3dx$\\
+			凑微分\\
+			\item $\int x^2\sqrt{x^2+a^2}^3dx$\\
+			分部积分?\\
+			x在分母\\
+			\item $\int \frac{dx}{x\sqrt{x^2+a^2}}$\\
+			用$x=atan\alpha$利用$\sqrt{1+tan^2\alpha}=sec^2\alpha$换元来脱根号\\
+			\item $\int \frac{dx}{x^2\sqrt{x^2+a^2}}$\\
+			用$x=atan\alpha$利用$\sqrt{1+tan^2\alpha}=sec^2\alpha$换元来脱根号,化简得到$\int cot\alpha*csc\alpha d\alpha=csc\alpha$积分形式\\
+		\item $\int \frac{\sqrt{x^2+a^2}}{x}dx$\\
+			用$x=atan\alpha$利用$\sqrt{1+tan^2\alpha}=sec^2\alpha$换元来脱根号,化简后，分解得到$a\int (\frac{sin\alpha}{1-sin^2\alpha}+\frac{1}{sin\alpha})d\alpha$积分形式\\
+		\item $\int \frac{\sqrt{x^2+a^2}}{x^2}dx$\\
+			用$x=atan\alpha$利用$\sqrt{1+tan^2\alpha}=sec^2\alpha$换元来脱根号,化简后，分解得到$\int (\frac{1}{cos\alpha}+\frac{cos\alpha}{1-cos^2\alpha})d\alpha$积分形式\\
+		\end{itemize}
+		\subsubsection{含$\sqrt{x^2-a^2},(a>0)$}
+		1)凑微分\\
+		2)分解\\
+		参考例子:\\
+		\begin{itemize}
+				\item 
+		\end{itemize}
+		\subsubsection{含$\sqrt{a^2-x^2},(a>0)$}
+		1)凑微分\\
+		2)分解\\
+		参考例子:\\
+		\begin{itemize}
+				\item 
+		\end{itemize}
+	\subsubsection{含$\sqrt{\pm ax^2+bx+c},(a>0)$}
+		1)凑微分\\
+		2)分解\\
+		参考例子:\\
+		\begin{itemize}
+				\item 
+		\end{itemize}
+		\subsubsection{含$\sqrt{\pm \frac{x-a}{x+a}}$或$\sqrt{(x-a)(x-b)}$}
+		1)凑微分\\
+		2)分解\\
+		参考例子:\\
+		\begin{itemize}
+				\item 
+		\end{itemize}
+		\subsubsection{含$ax^2+bx+c,(a>0)$}
+		1)凑微分\\
+		2)分解\\
+		参考例子:\\
+		\begin{itemize}
+				\item 
+		\end{itemize}
 \end{flushleft}
 \end{document}
 
