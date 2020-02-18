@@ -1,7 +1,7 @@
 \documentclass[fleqn]{article}
-%\usepackage{ctex}
-\usepackage{xeCJK}
-\setCJKmainfont{AR PL UMing TW MBE}
+\usepackage{ctex}
+%\usepackage{xeCJK}
+%\setCJKmainfont{AR PL UMing TW MBE}
 %\setCJKmainfont{FangSong_GB2312}
 \usepackage[breaklinks,colorlinks,linkcolor=black,citecolor=black,urlcolor=black]{hyperref}
 \newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}  
@@ -11,6 +11,7 @@
 \maketitle
 \setlength{\mathindent}{10pt}
 \begin{flushleft}
+高等数学上（mooc课程学习笔记，深圳大学）
 \section{第一章\quad 函数,极限,连续性}
 \subsection{第一周练习}
 1.已知f(x+1)的定义域为[0,a](a>0),则f(x)的定义域为（）。
@@ -631,6 +632,259 @@ $lim\frac{\sqrt{a+x^3}-\sqrt{a}}{x^3}=C$,所以选B。
 其次，确定非齐次方程右边为$e^{\lambda x}P_m(x)$格式，$\lambda =0,m=1$,而$\lambda=0$不是特征方程的根\\
 所以非齐次方程的特解中k=0，特解为$y=ax+b$,带入方程得到$a=1,b=-2$
 \newpage
+高等数学下（mooc课程学习笔记，深圳大学）
+\section{向量代数与空间解析几何}
+\subsection{第一周}
+\paragraph
+1.已知向量$\overrightarrow{p}$与z轴垂直，且$\overrightarrow{a}\cdot\overrightarrow{p}=9,\overrightarrow{b}\cdot\overrightarrow{p}=-4$,其中$\overrightarrow{a}=(3,-1,5),\overrightarrow{b}=(1,2,-3)$,则$\overrightarrow{p}$=().
+\begin{enumerate}
+\item (2,0,-3)\\
+\item(2,3,0)\\
+\item(0,-3,0)\\
+\item(2,-3,0)
+\end{enumerate}
+正确答案D，错选B
+
+
+2.已知$\overrightarrow{a},\overrightarrow{b},\overrightarrow{c}$都是单位向量，且$\overrightarrow{a}+\overrightarrow{b}+\overrightarrow{c}=0,$则$\overrightarrow{a}\overrightarrow{b}+\overrightarrow{b}\overrightarrow{c}+\overrightarrow{c}\overrightarrow{a}$=()
+\begin{enumerate}
+\item (-1/2)\\
+\item(1/2)\\
+\item(-3/2)\\
+\item(3/2)
+\end{enumerate}
+正确答案C，错选D
+
+\includegraphics[scale=0.3]{13.jpg}
+\subsection{第二周}
+\paragraph{ }
+1.设点(1,2,3),(-1,0,-6)是某直线上的点，则直线的对称式方程为（）
+\begin{enumerate}
+\item $\frac{x+1}{2}=\frac{y}{2}=\frac{z+6}{9}$\\
+\item $\frac{x-1}{2}=\frac{y-2}{2}=\frac{z-3}{3}$\\
+\item $\frac{x-2}{2}=\frac{y-2}{2}=\frac{z-9}{9}$\\
+\item $\frac{x+1}{1}=\frac{y}{2}=\frac{z+6}{3}$
+\end{enumerate}
+正确答案A，错选C\\
+解：方向向量$\overrightarrow{AB}=(-2,-2,-9)$,取B点，则点向式方程为A
+
+\paragraph{ }
+2.设直线的一般式方程为$\left\{
+\begin{array}{ll}
+x-y+2z-1=0\\
+2x+y-z-2=0
+\end{array}
+\right. 
+$，则直线的对称式方程为（）
+\begin{enumerate}
+\item $\frac{x-1}{1}=\frac{y}{-5}=\frac{z}{-3}$\\
+\item $\frac{x-1}{1}=\frac{y}{5}=\frac{z+1}{3}$\\
+\item $\frac{x-1}{1}=\frac{y}{5}=\frac{z}{3}$\\
+\item $\frac{x-1}{1}=\frac{y}{-5}=\frac{z+1}{-3}$
+\end{enumerate}
+正确答案A，错选D\\
+解：方向向量为$\overrightarrow{s}=\overrightarrow{n1}\times\overrightarrow{n2}$,再取点(1,0,0)，得点向式方程A。
+
+\paragraph{ }
+3.平面$\alpha$分两点A（1,2,3)和B（2,-1,4）间的线段，并垂直。求平面方程为（）
+\begin{enumerate}
+\item $2x-6y+2z-7=0$\\
+\item $x-3y+z+2=0$\\
+\item $2x-6y+2z+7=0$\\
+\item $x-3y+z-12=0$\\
+\end{enumerate}
+正确答案A，未有任何选项\\
+解：设平面与线段AB的交点为p(x,y,z),根据题意$\overrightarrow{AB}//\overrightarrow{Ap}//\overrightarrow{pB},|\overrightarrow{Ap}|=|\overrightarrow{pB}|$,平面的法线是$\overrightarrow{AB}=(1,-3,1)$,关键是求得p点。
+根据以上判断可得直线的参数方程$\left\{\begin{array}{ll}
+x=t+1\\
+y=-3t+2\\
+z=t+3
+\end{array}
+\right.
+$,再根据
+$|\overrightarrow{Ap}|=|\overrightarrow{pB}|$,可得t=1/2,则可求得
+$\left\{ \begin{array}{l}
+x=3/2\\
+y=1/2\\
+z=7/2
+\end{array} \right.$,根据点法式方程$A(x-x0)+B(y-y0)+C(z-z0)=0$得到方程为A。
+\subsection{第三周}
+曲面方程：\\
+旋转曲面方程：xoy面$f(x,y)$曲线，绕x轴的曲面方程：$f(x,\sqrt[2]{y^2+z^2})$\\
+柱面方程：xoy面,$C:f(x,y)=0$称为准线，平行于z轴的直线l称为母线，由C和l构成的曲面为柱面，方程为$f(x,y)=0$\\
+三元二次方程构成的曲面：\\
+\begin{tabular}{|l|l|l|l|}
+\hline
+曲面名称	&
+	椭球面	&
+	\begin{tabular}{ll}
+	抛物面	& \\
+		\tabincell{l}{双曲抛物面\\(马鞍面)}	&
+		椭球面
+	\end{tabular}	&
+	\begin{tabular}{ll}
+	双曲面	& \\
+		单叶 & 
+		双叶
+	\end{tabular}	\\
+	\hline
+方程	&
+	\tabincell{l}{$\frac{x^2}{a^2}+\frac{y^2}{b^2}+\frac{z^2}{c^2}=1$\\	
+		(a,b,c>0)}	&
+	\begin{tabular}{ll}
+		\tabincell{l}{$\frac{x^2}{2p}+\frac{y^2}{2q}=z$\\p,q异号}&
+		\tabincell{l}{$\frac{x^2}{2p}+\frac{y^2}{2q}=z$\\p,q同号}
+	\end{tabular}	&
+	\begin{tabular}{ll}
+		\tabincell{l}{$\frac{x^2}{a^2}+\frac{y^2}{b^2}-\frac{z^2}{c^2}=1$\\2个二次项为正}&
+		\tabincell{l}{$-\frac{x^2}{a^2}-\frac{y^2}{b^2}+\frac{z^2}{c^2}=1$\\2个二次项为负}
+	\end{tabular}	\\
+\hline
+曲面图形	&
+	\includegraphics[scale=0.1]{2.png}	&
+	\begin{tabular}{ll}
+	\includegraphics[scale=0.1]{1.png}	&
+	\includegraphics[scale=0.1]{3.png}
+	\end{tabular}	&
+	\begin{tabular}{ll}
+	\includegraphics[scale=0.1]{4.png} & 
+	\includegraphics[scale=0.1]{5.png}
+\end{tabular}\\
+\hline
+\end{tabular}\\
+
+\begin{tabular}{|l|l|}
+\hline
+曲面名称	&
+椭圆锥面	\\
+\hline
+方程	&
+	$\frac{x^2}{a^2}+\frac{y^2}{b^2}=z^2$\\
+\hline
+曲面图形	&
+	\includegraphics[scale=0.1]{6.png}\\
+\hline
+\end{tabular}
+
+投影方程：\\
+1)消去z变量\\
+2)z=0
+\paragraph{ }
+1.双曲抛物面（马鞍面）$x^2-y^2=2z$与xoy平面的交线是（）。
+\begin{enumerate}
+\item 相交于原点的两条直线.
+\item 双曲线
+\item 抛物线
+\item 椭圆
+\end{enumerate}
+正确答案A，错选B\\
+解:xoy面的方程为z=0，与马鞍面方程联立得到$x=\pm y$,所以答案为A
+\paragraph{ }
+2.方程$\left \{ \begin{array}{l}
+x^2-4y^2+z^2=25\\
+x=-3
+\end{array} \right.$表示（）
+\begin{enumerate}
+\item x=-3平面上的抛物线
+\item 双曲柱面
+\item 单叶双曲面
+\item x=-3平面上的双曲线
+\end{enumerate}
+正确答案D，错选为A\\
+解：将x=-3带入方程得到的是一个平行于zoy面的平面上的双曲线。如果没有x=-3的条件是双曲柱面，但是这里有x=-3的条件所以只能是一个曲线。
+\section{多元函数微分}
+\subsection{第四周}
+\paragraph
+1.$\frac{\partial{f(x,y)}}{\partial{x}}$和$\frac{\partial{f(x,y)}}{\partial{y}}$在点$p(x_0,y_0)$是连续的，是函数f(x,y)在点(x0,y0)可微的（）
+\begin{enumerate}
+	\item 必要条件
+	\item 无关条件
+	\item 充分条件
+	\item 充分必要条件
+\end{enumerate}
+正确答案C，错选为A
+\paragraph
+2.设$z=arctan\frac{x+y}{x-y}$,则$\frac{\partial z}{\partial x},\frac{\partial z}{\partial y}$=()
+\begin{enumerate}
+	\item $\frac{y}{x^2+y^2},\frac{x}{x^2+y^2}$
+	\item $-\frac{y}{x^2+y^2},-\frac{x}{x^2+y^2}$
+	\item $\frac{y}{x^2+y^2},-\frac{x}{x^2+y^2}$
+	\item $-\frac{y}{x^2+y^2},\frac{x}{x^2+y^2}$
+\end{enumerate}
+正确答案为D，错选为B。
+\subsection{第五周}
+例1 ：设函数$f(x,y,z)=xy^2z^3$,若$y=y(z,x)$为方程$x^2+y^2+z^2-3xyz=0$确定的隐函数，则$f_x(1,1,1)=?$
+
+解：\includegraphics[scale=0.3]{7.jpg}
+\subsection{第六周}
+
+1. 下列向量中，与曲线
+		\[
+			\left \{
+				\begin{array}{ll}
+					x^2+y^2+z^2-2y=4 \\ 
+					x+y+z=0
+				\end{array}
+			\right. 
+		\]
+	在点(1,1,-2)处的切向量平行的是（）
+\begin{enumerate}
+	\item (2,-3,1)
+	\item (2,-3,-1)
+	\item (2,3,1)
+	\item (-2,-3,1)
+\end{enumerate}
+正确答案为A，未有任何选项。
+
+\includegraphics[scale=0.5]{8.jpg}
+
+2. 曲面$z=arcsin\sqrt{1-x^2-y^2}$在点$(0,1/2,\pi/3)$处的切平面的法向量是（）
+\begin{enumerate}
+	\item ($2\sqrt{3}/3,2\sqrt{3}/3,1$)
+	\item ($0,,2\sqrt{3},3$)
+	\item ($0,2\sqrt{3}/3,-1$)
+	\item ($2\sqrt{3}/3,2\sqrt{3}/3,-1$)
+\end{enumerate}
+正确答案为B，错选为C 
+
+\includegraphics[scale=0.5]{9.jpg}
+
+3. 曲面$z=2x^2+y^2$,该曲面与平面$x+y+z=0$平行的切平面方程为（）
+\begin{enumerate}
+	\item ($x+y+z+3/8=0$)
+	\item ($x+y+z+1/8=0$)
+	\item ($x+y+z-5/8=0$)
+	\item ($x+y+z-9/8=0$)
+\end{enumerate}
+正确答案为A，错选为D
+
+\includegraphics[scale=0.5]{10.jpg}
+
+4. 平面$x+y-z+a=0$是曲面$z=x^2+y^2$的切平面，则a为（）
+\begin{enumerate}
+	\item 2
+	\item 1/2
+	\item 1
+	\item 0
+\end{enumerate}
+正确答案为B，错选为D
+
+\includegraphics[scale=0.5]{11.jpg}
+
+5. 函数$z=f(x,y)=\sqrt{x^2+y^2}$在点$(0,0)$处函数值增加最快的方向是（）
+\begin{enumerate}
+	\item (1,1)
+	\item (1,-1),(-1,1)
+	\item (1,1),(-1,-1)
+	\item (-1,-1)
+\end{enumerate}
+正确答案为C，错选为A
+
+\includegraphics[scale=0.5]{12.jpg}
+
+\section{多元函数积分}
+\section{级数}
+\newpage
 \section{附录1 常用公式}
 双曲函数\\
 \begin{tabular}{|l|l|l|}
@@ -667,10 +921,6 @@ $ch^2(x)+sh^2(x)=ch(2x)$\\
 }\\
 \hline
 \end{tabular}
-\section{向量代数与空间解析几何}
-\section{多元函数微分}
-\section{多元函数积分}
-\section{级数}
 \newpage
 \section{附录2不定积分的常用方法} 
 	\subsection{基本初等函数积分公式}
