@@ -5,7 +5,7 @@
 	> Created Time: 2019年02月19日 星期二 22时09分40秒
 	> Relize 101 and 104 protocol
 ************************************************************************/
-#include "protocol.h"
+#include "gdw101_104.h"
 #include "configurable.h"
 #include "para.h"
 #include "profun.h"

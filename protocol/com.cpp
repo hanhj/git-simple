@@ -7,9 +7,9 @@
 #include<iostream>
 using namespace std;
 #include "com.h"
-#include "protocol.h"
+#include "gdw101_104.h"
 #include "system.h"
-#include "utilities.h"
+#include "utility.h"
 /****************************
  * physical layer
 ****************************/

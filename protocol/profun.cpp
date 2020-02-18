@@ -6,7 +6,7 @@
 */
 #include<iostream>
 using namespace std;
-#include "protocol.h"
+#include "gdw101_104.h"
 #include "configurable.h"
 #include "para.h"
 #include "profun.h"

@@ -6,9 +6,9 @@
 */
 #include<iostream>
 #include "configurable.h"
-#include "protocol.h"
+#include "gdw101_104.h"
 #include "data.h"
-#include "utilities.h"
+#include "utility.h"
 using namespace std;
 extern int g_reset;
 void test_event();
