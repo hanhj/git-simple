@@ -108,22 +108,6 @@ e^x-1 \sim x, & a^x -1 \sim x\ln a\\
 \hline
 \end{array}
 \]
-\paragraph
-\indent matlab中求极限\\
-\begin{verbatim}
-limit(f,x,a)
-f是表达式，可以直接用'xxx',也可用syms来定义。
-x表示自变量，a表示趋向。
-例如：
-limit('(exp(x)+exp(-x))/sin(x)',x,0)
-or
-syms x y;
-y=(exp(x)+exp(-x))/sin(x);
-limit(y,x,0)
-结果为2
-\end{verbatim}
-
-
 \section{导数与微分}
 \subsection{第四周练习}
 1.设函数f(u)可导，且$y=f(x^2)$当自变量x在x=1处取得增量$\Delta x=-0.1$时，相应的函数增量$\Delta y$的线性主部为0.1，则$f^{'}(1)=().$
@@ -228,36 +212,6 @@ $lim_x\to \infty f(x)=?$判断水平渐近线，$lim_x\to x0 f(x)=?$判断铅直
 \hline
 \end{array}
 \end{equation}
-\begin{verbatim}
-matlab中的函数
-定义符号：syms x
-求导：diff(f)
-例如：f=sin(x);diff(f);
-积分：
-符号积分：
-int(fun,x)计算不定积分
-int(fun,x,a,b):计算定积分
-例如：
-f=sinx;int(f)
-int(f,-pi,pi);
-
-数值积分：
-trapz(x,y):梯形积分
-例如：x=-1:0.01:1
-y=tan(x);
-trapz(x,y);
-
-quad(fun,x,a,b)辛普森积分
-fun可以是匿名函数@(x)，或内联函数inline()
-比如y=cosx,可以表示成：
-y=@(x)cos(x)
-y=inline('cos(x)')
-例如：
-y=@(x)tan(x)
-quad(y,-1,1)
-
-pretty(fx)人性化显示公式
-\end{verbatim}
 
 \section{第四章 一元函数积分学}
 \subsection{第九周练习}
@@ -522,30 +476,6 @@ $\lambda+i\omega$是特征方程的根 & k=1 \\
 \end{tabular}\\
 \hline
 \end{tabular}
-\newpage
-\begin{verbatim}
-matlab中的微分方程：
-符号微分方程：
-dsolve('eq1,eq2..','con1,con2','v')
-eq1,eq2..微分方程，
-con1，con2..初始条件，
-v	变量
-Dy	表示导数y'
-例子：
-求y'+3xy=4x的通解
-syms y x;
-dsolve('Dy+3*x*y=4*x','x')
-ezplot(y);
-ans =
- 
-4/3+exp(-3/2*x^2)*C1
- 
- 
->> pretty(ans)
- 
-                                             2
-                            4/3 + exp(- 3/2 x ) C1
-\end{verbatim}
 \section{期末考试}
 \paragraph
 1.当$x\rightarrow 0 $时，下列哪一个无穷小时对于x的三阶无穷小（）
@@ -1114,5 +1044,77 @@ $ch^2(x)+sh^2(x)=ch(2x)$\\
 		\end{itemize}
 		\subsubsection{含三角函数}
 \end{flushleft}
+\section{matlab在高数中应用}
+
+定义符号：syms x
+
+pretty(fx)人性化显示公式
+\subsection{极限}
+\begin{verbatim}
+limit(f,x,a)
+f是表达式，可以直接用'xxx',也可用syms来定义。
+x表示自变量，a表示趋向。
+例如：limit('(exp(x)+exp(-x))/sin(x)',x,0) or
+syms x y;
+y=(exp(x)+exp(-x))/sin(x);
+limit(y,x,0)
+结果为2
+\end{verbatim}
+\subsection{求导}
+\begin{verbatim}
+求导：diff(f)
+例如：f=sin(x);diff(f);
+\end{verbatim}
+\subsection{积分}
+\begin{verbatim}
+符号积分：int 
+    int(fun,x)计算不定积分
+    int(fun,x,a,b):计算定积分
+例如：
+syms f x
+f=sinx;int(f)
+int(f,-pi,pi);
+利用int可以计算重积分。
+int(int(fun,x,a,b),y,c,d)
+数值积分：
+    梯形积分：trapz(x,y)
+    例如：
+    x=-1:0.01:1
+    y=tan(x);
+    trapz(x,y);
+    辛普森积分：quad(fun,x,a,b)
+    fun可以是匿名函数@(x)，或内联函数inline()
+    比如y=cosx,可以表示成：y=@(x)cos(x),y=inline('cos(x)')
+    例如：
+    y=@(x)tan(x)
+    quad(y,-1,1)
+\end{verbatim}
+\subsection{幂函数方程}
+\begin{verbatim}
+解幂函数方程：solve
+    solve('eq')
+    solve('eq',var)
+    solve('eq1','eq2',...)
+    solve('eq1','eq2'...'eqn','var1','var2'...'varn')
+\end{verbatim}
+\subsection{微分方程}
+\begin{verbatim}
+解符号微分方程：dsolve
+dsolve('eq1,eq2..','con1,con2','v')
+  eq1,eq2..微分方程，
+  con1，con2..初始条件，
+  v	变量
+  Dy	表示导数y'
+例子：求y'+3xy=4x的通解
+syms y x;
+dsolve('Dy+3*x*y=4*x','x')
+ezplot(y);
+ans =
+	4/3+exp(-3/2*x^2)*C1
+>> pretty(ans)
+            2
+   4/3 + exp(- 3/2 x ) C1
+\end{verbatim}
+
 \end{document}
 
