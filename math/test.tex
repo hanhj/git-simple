@@ -1,7 +1,8 @@
 \documentclass[fleqn]{article}
-\usepackage{ctex}
-%\usepackage{xeCJK}
-%\setCJKmainfont{AR PL UMing TW MBE}
+%\usepackage{ctex}
+\usepackage{mylatex}
+\usepackage{xeCJK}
+\setCJKmainfont{AR PL UMing TW MBE}
 %\setCJKmainfont{FangSong_GB2312}
 \usepackage[breaklinks,colorlinks,linkcolor=black,citecolor=black,urlcolor=black]{hyperref}
 \newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}  
@@ -813,7 +814,71 @@ x=-3
 \includegraphics[scale=0.5]{12.jpg}
 
 \section{多元函数积分}
+\subsection{第八周}
+1. 由$xy=a^2,xy=2a^2,y=x(x>0,y>0)$所围成的平面区域面积为（）
+\begin{enumerate}
+	\item $a^2ln2$
+	\item $\frac{1}{8}a^2ln2$
+	\item $\frac{1}{2}a^2ln2$
+	\item $\frac{1}{4}a^2ln2$
+\end{enumerate}
+正确答案C，没有任何选项
+
+\paragraph
+2. 两个圆柱体$x^2+y^2<=R^2,x^2+z^2<=R^2(R>0)$公共部分体积为（）
+\begin{enumerate}
+	\item $\int_{-R}^{R}dx\int_{\sqrt{R^2-x^2}}^{\sqrt{R^2-x^2}}\sqrt{R^2-x^2}dy$
+	\item $4\int_{-R}^{R}dx\int_{-\sqrt{R^2-x^2}}^{\sqrt{R^2-x^2}}\sqrt{R^2-x^2}dy$
+	\item $2\int_{0}^{R}dx\int_{0}^{\sqrt{R^2-x^2}}\sqrt{R^2-x^2}dy$
+	\item $8\int_{0}^{R}dx\int_{0}^{\sqrt{R^2-x^2}}\sqrt{R^2-x^2}dy$
+\end{enumerate}
+正确答案D，错选为B
+
+\includegraphics[scale=0.5]{14.png}
+
+
+\includegraphics[scale=0.5]{15.jpg}
+\subsection{第九周}
+1.二重积分$\iint xyd\sigma=$(),其中D是由圆$x^2+y^2=2y,$直线$y=x,$以及直线$x=0$所围成的区域。
+\begin{enumerate}
+	\item $\frac{7}{12}$
+	\item $\frac{3}{4}$
+	\item $\frac{1}{3}$
+	\item $\frac{3}{2}$
+\end{enumerate}
+正确答案A，错选为C
+
+\includegraphics[scale=0.5]{17.jpg}
+\paragraph
+2.二重积分$\iint_D arctan\frac{y}{x}d\sigma $(),其中D是由\{$(x,y)|1<=x^2+y^2<=4,x>=0,y>=0 $ \}所围成的区域。
+\begin{enumerate}
+	\item $\frac{3\pi^2}{16}$
+	\item $\frac{3\pi^2}{2}$
+	\item $\frac{3\pi^2}{4}$
+	\item $\frac{3\pi^2}{32}$
+\end{enumerate}
+正确答案A，错选为C
+
+\includegraphics[scale=0.5]{18.jpg}
+\paragraph
+3.二重积分$\iint_D 2x-x^2-y^2 d\sigma$(),其中D是由\{$(x,y)|(x-1)^2+y^2<=1$\}所围成的区域。
+\begin{enumerate}
+	\item $\frac{\pi}{3}$
+	\item $\frac{\pi}{2}$
+	\item $\frac{\pi}{1}$
+	\item $\frac{2\pi}{3}$
+\end{enumerate}
+正确答案B
+
+\includegraphics[scale=0.5]{16.jpg}
 \section{级数}
+%$\iint$
+\makebox[0.5\textwidth][l]{
+	$\int\int$
+}
+		
+
+eeend 
 \newpage
 \section{附录1 常用公式}
 双曲函数\\
@@ -852,7 +917,7 @@ $ch^2(x)+sh^2(x)=ch(2x)$\\
 \hline
 \end{tabular}
 \newpage
-\section{附录2不定积分的常用方法} 
+\section{附录2  不定积分的常用方法} 
 	\subsection{基本初等函数积分公式}
 		\subsubsection{幂函数}
 		\[
@@ -1044,7 +1109,7 @@ $ch^2(x)+sh^2(x)=ch(2x)$\\
 		\end{itemize}
 		\subsubsection{含三角函数}
 \end{flushleft}
-\section{matlab在高数中应用}
+\section{附录3 matlab在高数中应用}
 
 定义符号：syms x
 
