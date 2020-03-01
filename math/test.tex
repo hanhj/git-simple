@@ -802,7 +802,7 @@ x=-3
 
 \includegraphics[scale=0.5]{11.jpg}
 
-5. 函数$z=f(x,y)=\sqrt{x^2+y^2}$在点$(0,0)$处函数值增加最快的方向是（）
+5. 函数$f(x,y)=xy$在点$(0,0)$处函数值增加最快的方向是（）
 \begin{enumerate}
 	\item (1,1)
 	\item (1,-1),(-1,1)
@@ -871,6 +871,289 @@ x=-3
 正确答案B
 
 \includegraphics[scale=0.5]{16.jpg}
+\subsection{第十周}
+\paragraph
+1.计算三重积分$\iiint_\Omega zdV=$(),其中$\Omega$是由$x^2+y^2+z^2=4,x^2+y^2=3z$所围成的区域。
+\begin{enumerate}
+	\item $\frac{\pi}{2}$
+	\item $\frac{3\pi}{4}$
+	\item $\frac{\pi}{4}$
+	\item $\frac{13\pi}{4}$
+\end{enumerate}
+正确答案D 未有选择
+
+\includegraphics[scale=0.5]{19.jpg}
+\paragraph
+2.计算三重积分$\iiint_{\Omega} f(ax+by+cz)dxdydz=$(),
+其中$\Omega={(x,y,z)|x^2+y^2<= 1}$
+所围成的区域,$h=\sqrt{a^2+b^2+c^2}$,f(x)在区间$[-h,h]$上连续。
+\begin{enumerate}
+	\item $\int_{_1}^{1}(1+t^2)f(ht)dt$
+	\item $\int_{_1}^{1}(1-t^2)f(ht)dt$
+	\item $\pi\int_{_1}^{1}(1-t^2)f(ht)dt$
+	\item $\pi\int_{_1}^{1}(1+t^2)f(ht)dt$
+\end{enumerate}
+正确答案C 错选为A
+
+\paragraph
+3.下列累次积分中不表示三重积分$\iiint_\Omega f(x,y,z)dV=$的是(),其中$\Omega=x^2+y^2<=z,0<= z <=1$所围成的区域。
+\begin{enumerate}
+	\item $\int_{0}^{1} dz\int_{0}^{2\pi} d\theta\int_{0}^{1}f(\rho cos(\theta),\rho sin(\theta),z)\rho d \rho$
+	\item $\int_{-1}^{1} dz\int_{-\sqrt{1-x^2}}^{\sqrt{1-x^2}}dy\int_{x^2+y^2}^{1}f(x,y,z)dz$
+	\item $\int_{0}^{1} dz\int_{0}^{2\pi} d\theta\int_{0}^{\sqrt{z}}f(\rho cos(\theta),\rho sin(\theta),z)\rho d \rho$
+	\item $\int_{0}^{2\pi} d\theta\int_{0}^{1}\rho d \rho\int_{\rho^2}^{1}f(\rho cos(\theta),\rho sin(\theta),z) dz$
+\end{enumerate}
+正确答案A 错选为D
+
+\includegraphics[scale=0.5]{20.jpg}
+
+\subsection{第十一周}
+\paragraph
+1.已知L为以O(0,0),A(1,0),B(0,1)为顶点的三角形的边界，则曲线$\int_L(x+y)ds=$()。
+\begin{enumerate}
+	\item $\frac{\sqrt{2}+1}{1}$
+	\item $\frac{\sqrt{2}-1}{1}$
+	\item $\frac{1}{1}$
+	\item $\frac{\sqrt{2}}{1}$
+\end{enumerate}
+正确答案A 错选为D
+\paragraph
+2.已知曲线L为$x^2+y^2+z^2=R^2(R>0),x+y+z=0$，则曲线$\int_L(x^2)ds=$()。
+\begin{enumerate}
+	\item $\frac{4}{3}\pi R^3$
+	\item $\frac{1}{3}\pi R^3$
+	\item $\frac{1}{1}\pi R^3$
+	\item $\frac{2}{3}\pi R^3$
+\end{enumerate}
+正确答案D 没有选项
+
+
+使用mathmatics计算的结果是
+\begin{verbatim}
+Solve[{x^2 + y^2 + z^2 == R^2, x + y + z == 0}, {y, z}]
+{{y -> 1/2 (-x - Sqrt[2 R^2 - 3 x^2]), 
+  z -> 1/2 (-x + Sqrt[2 R^2 - 3 x^2])}, 
+ {y -> 1/2 (-x + Sqrt[2 R^2 - 3 x^2]), 
+  z -> 1/2 (-x - Sqrt[2 R^2 - 3 x^2])}}
+dyx = D[y, x];
+dzx = D[z, x];
+ds = x^2*Sqrt[1 + dyx^2 + dzx^2];
+Integrate[ds, {x, -R, R}]
+(2 R^3)/3
+\end{verbatim}
+\paragraph
+3.已知曲面$\Sigma$是单位球面，则$\iint_\Sigma (z^2)dS=$()。
+\begin{enumerate}
+	\item $\frac{-4}{3}\pi$
+	\item $\frac{4}{3}\pi$
+	\item $\frac{1}{1}\pi$
+	\item $\frac{4}{1}\pi$
+\end{enumerate}
+正确答案B 错选为C
+
+\includegraphics[scale=0.5]{21.jpg}
+
+\subsection{第十二周}
+\paragraph
+1.球体$x^2+y^2+z^2<=2az(a>0)$的任意一点的密度在数量上等于此点到坐标原点的距离的平方，则此球体的重心坐标是（）。
+\begin{enumerate}
+	\item $(0,0,3/4a)$
+	\item $(0,0,5/4a)$
+	\item $(0,0,7/4a)$
+	\item $(0,0,4/3a)$
+\end{enumerate}
+正确答案B 错选为D
+
+解答与答案不一样
+\includegraphics[scale=0.6]{22.jpg}
+
+\paragraph
+3.设D=\{$(x,y)|4<=x^2+y^2<=9$\}是一个平面圆环，每点的面密度是$\mu(x,y)=1+x^2+y^2$,则D在第一象限的重心为（）。
+\begin{enumerate}
+	\item $(5824/(1125\pi),5824/(1125\pi))$
+	\item $(16/(3\pi),16/(3\pi))$
+	\item $(8/(3\pi),8/(3\pi))$
+	\item $(4/(3\pi),4/(3\pi))$
+\end{enumerate}
+正确答案A ,选对了
+
+\includegraphics[scale=0.8]{23.jpg}
+\paragraph
+4.半径为2的球体，其密度与点到球心的距离成正比，已知球面上个点的密度为2，则球体的质量为（）。
+\begin{enumerate}
+	\item $24\pi$
+	\item $8\pi$
+	\item $32\pi$
+	\item $16\pi$
+\end{enumerate}
+正确答案D ,错选为C
+
+\includegraphics[scale=0.8]{24.jpg}
+\paragraph
+5.设平面薄片D有直线x+y=1与两坐标轴所围成的闭区域，其密度函数为$\mu(x,y)=xy$,则该平面薄片的质量为（）。
+\begin{enumerate}
+	\item $1/8$
+	\item $1/12$
+	\item $1/24$
+	\item $1/4$
+\end{enumerate}
+正确答案C 
+
+\includegraphics[scale=0.8]{25.jpg}
+\paragraph
+6.已知L为由$y=1-|1-x|,x\in[0,2]$（曲线正向为x增长的方向），则$\int_L (x^2+y^2)dx+(x^2-y^2)dy=$().
+\begin{enumerate}
+	\item $2$
+	\item $2/3$
+	\item $4/3$
+	\item $8/3$
+\end{enumerate}
+正确答案C 
+
+\includegraphics[scale=0.8]{26.jpg}
+9.已知L为由$x^2+y^2+z^2=1,z=y$（由z轴正向看去为逆时针方向），则$\oint_L (xyz)dz=$().
+\begin{enumerate}
+	\item $\frac{\pi}{8\sqrt{2}}$
+	\item $\frac{\pi}{6\sqrt{2}}$
+	\item $\frac{\pi}{4\sqrt{2}}$
+	\item $\frac{\pi}{2\sqrt{2}}$
+\end{enumerate}
+
+正确答案A ,
+
+\includegraphics[scale=0.8]{27.jpg}
+\subsection{第十三周}
+\paragraph
+1.设L是原点O沿抛物线$y=x^2$到A（1,1），再由A点沿直线y=x，到原点的封闭曲线，则$\oint arctan\frac{y}{x}dy-dx=$().
+\begin{enumerate}
+	\item $\frac{\pi}{4}+1$
+	\item $\frac{\pi}{4}-1$
+	\item $\frac{\pi}{2}+1$
+	\item $\frac{\pi}{2}-1$
+\end{enumerate}
+
+用格林公式反而复杂，直接用曲线积分，分成两段。
+
+$\oint arctan\frac{y}{x}dy-dx=\oint_L arctan\frac{y}{x}dy-\oint_Ldx$,后者积分为0.前者分成两段积分。
+
+正确答案B ,
+\paragraph
+4.对于格林公式$\oint_L Pdx+Qdy=\iint_D(\frac{\partial Q}{\partial x}-\frac{\partial P}{\partial y})dxdy$,下列说法正确的是（）。
+\begin{enumerate}
+		\item L取顺时针方向，函数P，Q在闭区域上存在一阶连续偏导数。
+		\item L取D正向边界，函数P，Q在闭区域上存在一阶连续偏导数。
+		\item L取逆时针方向，函数P，Q在闭区域上存在一阶偏导数。
+		\item L取逆时针方向，函数P，Q在闭区域上存在一阶连续偏导数。
+\end{enumerate}
+正确答案B，错选为C
+\subsection{第十四周}
+\paragraph
+1.设有曲面$\Sigma:x+y+z=1(x>=0,y>=0,z>=0),$其法向量与z轴正向成钝角，则曲面积分$\iint_\Sigma(x+2)dydz+ydzdx+dxdy$=()
+\begin{enumerate}
+	\item $\frac{-11}{6}$
+	\item $\frac{11}{6}$
+	\item $\frac{4\sqrt{3}}{3}$
+	\item $\frac{-4\sqrt{3}}{3}$
+\end{enumerate}
+正确答案A
+\paragraph
+2.曲面$\Sigma:x+y+z=1$为下侧，则曲面积分$\iint_\Sigma zdxdy$=()
+\begin{enumerate}
+	\item $\frac{\sqrt{3}}{2}$
+	\item $\frac{-1}{6}$
+	\item $\frac{1}{6}$
+	\item $\frac{- \sqrt{3}}{2}$
+\end{enumerate}
+
+正确答案B
+
+\paragraph
+3.曲面$\Sigma:
+			\left \{
+				\begin{array}{l}
+					y=\sqrt{1+x^2} \\
+					x=0
+				\end{array}
+			\right. 
+		(1<=z<=2)$绕z轴旋转而成的旋转面，法向量与z轴正向夹角成锐角，则$\iint_\Sigma sinxdxdy+xz^2dydz$=()
+\begin{enumerate}
+	\item $\frac{128\pi}{15}$
+	\item $\frac{-128\pi}{45}$
+	\item $\frac{-128\pi}{15}$
+	\item $\frac{128\pi}{45}$
+\end{enumerate}
+
+正确答案C 未有任何选项
+\paragraph
+4.设有曲面$\Sigma:x^2+y^2=R^2$,在y>=0,z>=0两卦限内被平面z=0和z=h所截下的部分外侧，则曲面积分$\iint_\Sigma yzdxy+xyydyz+xzdzx$=()
+\begin{enumerate}
+	\item $\frac{2hR^2}{3}$
+	\item $\frac{2hR^3}{3}$
+	\item $\frac{3hR^2}{4}$
+	\item $\frac{3hR^3}{4}$
+\end{enumerate}
+正确答案B
+\paragraph
+5.设有曲面$\Sigma:x^2+y^2=9$,的外侧，曲面积分$\iint_\Sigma zdxy$=()
+\begin{enumerate}
+	\item $\frac{48\pi}{1}$
+	\item $\frac{36\pi}{1}$
+	\item $\frac{12\pi}{1}$
+	\item $\frac{24\pi}{1}$
+\end{enumerate}
+正确答案B
+\paragraph
+6.设有曲面$\Sigma:z=\sqrt{x^2+y^2}(0<=z<=1)$,的上侧，曲面积分$\iint_\Sigma xzdydz+yzdzdx=z^2dxdy$=()
+\begin{enumerate}
+	\item $\frac{-\pi}{1}$
+	\item $\frac{\pi}{1}$
+	\item $0$
+	\item $\frac{\pi}{2}$
+\end{enumerate}
+正确答案A 错选为D
+
+\paragraph
+7.设曲面$\Sigma:z=x^2+y^2(0<=z<=a^2)$,的下侧，曲面积分$\iint_\Sigma (z-y^2+x^2)dxdy+(y-x^2+z^2)dydz+(x-z^2+y^2)dzdx$=()
+\begin{enumerate}
+	\item $\pi a^4$
+	\item $\frac{1}{2}\pi a^4$
+	\item $\frac{-3}{2}\pi a^4$
+	\item $-\pi a^4$
+\end{enumerate}
+正确答案D 错选为B
+
+\paragraph
+8.设曲面$\Sigma:x^2+y^2=1$,的外侧，曲面积分$\oiint_\Sigma x^3dydz+y^3dzdx+z^3dxdy$=()
+\begin{enumerate}
+	\item $\frac{6}{5}\pi$
+	\item $\frac{-6}{5}\pi$
+	\item $\frac{-12}{5}\pi$
+	\item $\frac{12}{5}\pi$
+\end{enumerate}
+正确答案D 
+
+
+\paragraph
+9.设曲面$\Sigma:x^2+y^2=1$,与z=1，z=3所围成的空间闭区域的外侧，曲面积分$\iint_\Sigma (x-y)dxdy+x(y-z)dydz$=()
+\begin{enumerate}
+	\item $4\pi$
+	\item $-4\pi$
+	\item $\pi$
+	\item $-\pi$
+\end{enumerate}
+正确答案B 没有任何选项
+\paragraph
+10.设曲面$\Sigma:x^2+y^2=1$,与z=0，z=3所围成的空间闭区域的外侧，曲面积分$\iint_\Sigma (x-y)dxdy+x(y-z)dydz$=()
+\begin{enumerate}
+	\item $3\pi$
+	\item $\frac{-9}{2}\pi$
+	\item $\frac{9}{2}\pi$
+	\item $0$
+\end{enumerate}
+正确答案D 错选为B
+
+
+
 \section{级数}
 %$\iint$
 \makebox[0.5\textwidth][l]{
@@ -1180,6 +1463,22 @@ ans =
             2
    4/3 + exp(- 3/2 x ) C1
 \end{verbatim}
+\section{附录4 mathematics在高数中的应用}
 
+\subsection{通用}
+
+内置函数首字母大写，以区分用户定义函数。比如Integrate。\\
+变量用[]括起，比如Sqrt[x]\\
+定义函数时，变量名用\_.比如$fun[x\_,y\_]$\\
+
+\subsection{积分}
+$\int_a^b f(x)dx$
+\begin{verbatim}
+	Integrate[f(x),{x,a,b}]
+\end{verbatim}
+$\int_a^b dx\int_{y_1(x)}^{y_2(x)}f(x,y)dy$
+\begin{verbatim}
+	Integrate[f(x,y),{x,a,b},{y,y_1(x),y_2(x)]
+\end{verbatim}
 \end{document}
 
