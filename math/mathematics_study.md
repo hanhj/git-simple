@@ -65,6 +65,57 @@
 
 ### 2 数学和算法
 
+#### 2.7微积分
+
+- **D 求导**
+
+	- D[f,x]  
+		给出f对x的偏导数
+			
+			In[1]:= D[x^n, x]
+			Out[1]= n x^(-1 + n)
+	
+	- D[f,{x,n}]  
+		给出f对x的n阶偏导数
+		
+			In[1]:= D[Sin[x]^10, {x, 4}]
+			Out[1]= 5040 Cos[x]^4 Sin[x]^6 - 4680 Cos[x]^2 Sin[x]^8 +  280 Sin[x]^10
+		
+- **Dt求全导数**
+
+	- Dt[f]		
+		全微分
+		
+			In[1]:= Dt[x y]
+			Out[1]= y Dt[x] + x Dt[y]
+	
+	- Dt[f,x]  
+		对f求x的全导数
+			
+			In[1]:= Dt[a x + b, x]
+			Out[1]= a + x Dt[a, x] + Dt[b, x]
+	
+- **Integrate积分**
+
+	- Integrate[f,x] 不定积分
+
+			In[22]:= Integrate[x, x]
+			Out[22]= x^2/2
+	- Integrate[f,{x,xmin,xmax}] 定积分
+	
+			In[20]:= Integrate[x, {x, 0, 2}]
+			Out[20]= 2	
+	
+	- Integrate[f,{x,xmin,xmax},{y,ymin,ymax}...] 多重积分
+			
+			z[x_, y_] = x^2 + y^2;
+			dzx = D[z[x, y], x];
+			dzy = D[z[x, y], y];
+			ds = z[x, y]*Sqrt[1 + dzx^2 + dzy^2] /. {x -> r*Cos[t], y -> r*Sin[t]};
+			Integrate[ds*r, {t, 0, 2 Pi}, {r, 0, 1/2}]
+	
+	
+
 ### 3 可视化和图形
 	
 #### 3.1 数据可视化
