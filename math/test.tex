@@ -1,6 +1,7 @@
 \documentclass[fleqn]{article}
 %\usepackage{ctex}
 \usepackage{mylatex}
+\usepackage{graphicx}
 \usepackage{xeCJK}
 \setCJKmainfont{AR PL UMing TW MBE}
 %\setCJKmainfont{FangSong_GB2312}
@@ -1466,5 +1467,20 @@ ans =
 \section{附录4 mathematics在高数中的应用}
 
 \href{mathematics_study.html}{点击 mathematics学习}
+
+\subsection{通用}
+内置函数首字母大写，以区分用户定义函数。比如Integrate。\\
+变量用[]括起，比如Sqrt[x]\\
+定义函数时，变量名用\_.比如$fun[x\_,y\_]$\\
+
+\subsection{积分}
+$\int_a^b f(x)dx$
+\begin{verbatim}
+	Integrate[f(x),{x,a,b}]
+\end{verbatim}
+$\int_a^b dx\int_{y_1(x)}^{y_2(x)}f(x,y)dy$
+\begin{verbatim}
+	Integrate[f(x,y),{x,a,b},{y,y_1(x),y_2(x)]
+\end{verbatim}
 \end{document}
 
