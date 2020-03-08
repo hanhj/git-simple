@@ -2,6 +2,7 @@
 *.log
 *.aux
 *.bak
+*.html
 matn/[原始文件]
 protocol/it 
 protocol/update.bin
