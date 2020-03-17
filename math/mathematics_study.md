@@ -16,8 +16,8 @@
 	-	Range[xmax]  
 		产生1,2.。xmax个数
 
-	- Range[xmin,imax]   
-		产生xmin到imax之间的数，间隔为1。
+	- Range[xmin,xmax]   
+		产生xmin到xmax之间的数，间隔为1。
 
 	- Range[xmin,xmax,di]  
 		产生xmin到xmax之间的数，间隔为di
@@ -47,7 +47,7 @@
 		
 	- Table[expr,{x,xmin,xmax},{y,ymin,ymax}。。。]  
 		自变量为x，是一个嵌套列表。如果是只有x，y就是二维表  
-		xmax-xmin行，ymax-ymin列，例如：
+		xmax-xmin+1行，ymax-ymin+1列，例如：
 		
 			In[34]:= Table[x + y, {x, 2, 4}, {y, 1, 2}]  
 			Out[34]= {{3, 4}, {4, 5}, {5, 6}}
@@ -113,6 +113,15 @@
 			dzy = D[z[x, y], y];
 			ds = z[x, y]*Sqrt[1 + dzx^2 + dzy^2] /. {x -> r*Cos[t], y -> r*Sin[t]};
 			Integrate[ds*r, {t, 0, 2 Pi}, {r, 0, 1/2}]
+
+- **Solve解方程** 
+
+	- Solve[expr,var]
+	
+			In[1]:= Solve[x^2 + a x + 1 == 0, x]
+			Out[1]= {{x -> 1/2 (-a - Sqrt[-4 + a^2])}, {x -> 1/2 (-a + Sqrt[-4 + a^2])}}
+
+
 	
 	
 
