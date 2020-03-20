@@ -1,0 +1,133 @@
+<Workspace
+	CID = "1"
+	NextCID = "2"
+	IconCategory = "jiemian">
+	<OpenFiles
+		CID = "1"
+		LastActive = "12">
+		<File
+			FileID = "9D32A6C6-E28A-45D0-8E9C5E1378F7C4F5"
+			RootPath = "$Container"
+			RelativePathname = "FrameWin.gui"
+			ViewSettings = ""/>
+		<File
+			FileID = "7EE6F1DC-A284-46C5-9A7299820771DB8F"
+			RootPath = "$Container"
+			RelativePathname = "show.gui"
+			ViewSettings = ""/>
+		<File
+			FileID = "7D938346-209A-4BDE-B8FCF15A0813A9C1"
+			RootPath = "$Container"
+			RelativePathname = "set.gui"
+			ViewSettings = ""/>
+		<File
+			FileID = "B4DE0D73-5084-454F-888E32E885D2336D"
+			RootPath = "$Container"
+			RelativePathname = "jiaozheng.gui"
+			ViewSettings = ""/>
+		<File
+			FileID = "CAF55668-EBF9-4CCB-8495086B5C91DDC7"
+			RootPath = "$Container"
+			RelativePathname = "prepare.gui"
+			ViewSettings = ""/>
+		<File
+			FileID = "846B384C-9A19-4A59-8177184FF9B0D362"
+			RootPath = "$Container"
+			RelativePathname = "longin_operator.gui"
+			ViewSettings = ""/>
+		<File
+			FileID = "78527B2D-F1F3-4E59-94D4A5AF3023D267"
+			RootPath = "$Container"
+			RelativePathname = "add_user.gui"
+			ViewSettings = ""/>
+		<File
+			FileID = "8DD99B0B-7C4F-44E2-8370EE09F1120A4C"
+			RootPath = "$Container"
+			RelativePathname = "download.gui"
+			ViewSettings = ""/>
+		<File
+			FileID = "79C62603-9238-43BC-B69003CE47C49285"
+			RootPath = "$Container"
+			RelativePathname = "report.gui"
+			ViewSettings = ""/>
+		<File
+			FileID = "4FE7BE25-BFA5-4B50-AF5C07668DE22089"
+			RootPath = "$Container"
+			RelativePathname = "annote.gui"
+			ViewSettings = ""/>
+		<File
+			FileID = "8647EFA7-FD46-4908-9B200028E9E33A93"
+			RootPath = "$Container"
+			RelativePathname = "bkgnd.gui"
+			ViewSettings = ""/>
+		<File
+			FileID = "0E12A869-7F68-4D07-96BCEB49E814425D"
+			RootPath = "$Container"
+			RelativePathname = "longin_doctor.gui"
+			ViewSettings = ""/>
+		<File
+			FileID = "F28F7E5A-73AD-48B9-90ABFB263A82725A"
+			RootPath = "$Container"
+			RelativePathname = "check.gui"
+			ViewSettings = ""/>
+		<File
+			FileID = "6398E15F-EEAB-487B-9F482BF547A0187B"
+			RootPath = "$Container"
+			RelativePathname = "save_rec.gui"
+			ViewSettings = ""/>
+		<File
+			RootPath = "$Container"
+			RelativePathname = "test.gui"
+			ViewSettings = ""/>
+		<File
+			FileID = "6F1718B7-EE96-4EB0-9EF34C11B9805FA8"
+			RootPath = "$Container"
+			RelativePathname = "user.gui"
+			ViewSettings = ""/>
+		<File
+			FileID = "3AD3C8A6-0A8B-45C0-AECFC54FE417AD12"
+			RootPath = "$Container"
+			RelativePathname = "longin.gui"
+			ViewSettings = ""/>
+		<File
+			FileID = "0750CEA3-62AF-4579-96F2C72FF6BC5A93"
+			RootPath = "$Container"
+			RelativePathname = "communication.gui"
+			ViewSettings = ""/>
+		<File
+			FileID = "BA57E3ED-C741-42CD-BABF299F45C8FBCF"
+			RootPath = "$Container"
+			RelativePathname = "import.gui"
+			ViewSettings = ""/>
+		<File
+			FileID = "AF32E81C-F310-45F0-8A8C884C5A650837"
+			RootPath = "$Container"
+			RelativePathname = "fiber_set.gui"
+			ViewSettings = ""/>
+		<File
+			FileID = "1976FDFA-5196-4A54-8C36112A4EF765F2"
+			RootPath = "$Container"
+			RelativePathname = "del_user.gui"
+			ViewSettings = ""/>
+		<File
+			FileID = "26732E64-051F-4C10-8EF1B5C486BE6797"
+			RootPath = "$Container"
+			RelativePathname = "export.gui"
+			ViewSettings = ""/>
+		<File
+			FileID = "97993295-E1C1-413D-9F03F9640B9FA881"
+			RootPath = "$Container"
+			RelativePathname = "upload.gui"
+			ViewSettings = ""/>
+		<File
+			FileID = "927B972E-D5F5-4731-8DE914BC8F66D07A"
+			RootPath = "$Container"
+			RelativePathname = "export2.gui"
+			ViewSettings = ""/>
+		<File
+			FileID = "859866C3-4C62-4BD5-A4680FB512EC492D"
+			RootPath = "$Container"
+			RelativePathname = "search.gui"
+			ViewSettings = ""/>
+	</OpenFiles>
+</Workspace>

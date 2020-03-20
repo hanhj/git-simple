@@ -1,0 +1,153 @@
+<Catalogue
+	CID = "1"
+	NextCID = "2">
+	<Files
+		CID = "1">
+		<FileInfo
+			ID = "000587C8-CB2A-4290-9DE51BC0EE7F2B12"
+			RelativePath = "pic.png"
+			OriginalRoot = "$Project"
+			OriginalPath = "pic.png"/>
+		<FileInfo
+			ID = "0750CEA3-62AF-4579-96F2C72FF6BC5A93"
+			RelativePath = "communication.gui"
+			OriginalRoot = "$Project"
+			OriginalPath = "communication.gui"/>
+		<FileInfo
+			ID = "0E12A869-7F68-4D07-96BCEB49E814425D"
+			RelativePath = "longin_doctor.gui"
+			OriginalRoot = "$Project"
+			OriginalPath = "longin_doctor.gui"/>
+		<FileInfo
+			ID = "1976FDFA-5196-4A54-8C36112A4EF765F2"
+			RelativePath = "del_user.gui"
+			OriginalRoot = "$Project"
+			OriginalPath = "del_user.gui"/>
+		<FileInfo
+			ID = "26732E64-051F-4C10-8EF1B5C486BE6797"
+			RelativePath = "export.gui"
+			OriginalRoot = "$Project"
+			OriginalPath = "import.gui"/>
+		<FileInfo
+			ID = "29735045-1971-4FC1-85C04D6BFEF71587"
+			RelativePath = "left.bmp"
+			OriginalRoot = "$Project"
+			OriginalPath = "left.bmp"/>
+		<FileInfo
+			ID = "3AD3C8A6-0A8B-45C0-AECFC54FE417AD12"
+			RelativePath = "longin.gui"
+			OriginalRoot = "$Project"
+			OriginalPath = "longin.gui"/>
+		<FileInfo
+			ID = "4FE7BE25-BFA5-4B50-AF5C07668DE22089"
+			RelativePath = "annote.gui"
+			OriginalRoot = "$Project"
+			OriginalPath = "annote.gui"/>
+		<FileInfo
+			ID = "6398E15F-EEAB-487B-9F482BF547A0187B"
+			RelativePath = "save_rec.gui"
+			OriginalRoot = "$Project"
+			OriginalPath = "save_rec.gui"/>
+		<FileInfo
+			ID = "6F1718B7-EE96-4EB0-9EF34C11B9805FA8"
+			RelativePath = "user.gui"
+			OriginalRoot = "$Project"
+			OriginalPath = "user.gui"/>
+		<FileInfo
+			ID = "70D818A9-A198-4A4D-ACD8F8BB90D87AC1"
+			RelativePath = "jiemian.autosave"
+			OriginalRoot = "$Project"
+			OriginalPath = "jiemian.autosave"/>
+		<FileInfo
+			ID = "78527B2D-F1F3-4E59-94D4A5AF3023D267"
+			RelativePath = "add_user.gui"
+			OriginalRoot = "$Project"
+			OriginalPath = "add_user.gui"/>
+		<FileInfo
+			ID = "78BF1444-CD84-4109-A0663A5DC260E2AD"
+			RelativePath = "left.PNG"
+			OriginalRoot = "$Project"
+			OriginalPath = "left.PNG"/>
+		<FileInfo
+			ID = "79C62603-9238-43BC-B69003CE47C49285"
+			RelativePath = "report.gui"
+			OriginalRoot = "$Project"
+			OriginalPath = "report.gui"/>
+		<FileInfo
+			ID = "7D938346-209A-4BDE-B8FCF15A0813A9C1"
+			RelativePath = "set.gui"
+			OriginalRoot = "$Project"
+			OriginalPath = "set.gui"/>
+		<FileInfo
+			ID = "7EE6F1DC-A284-46C5-9A7299820771DB8F"
+			RelativePath = "show.gui"
+			OriginalRoot = "$Project"
+			OriginalPath = "show.gui"/>
+		<FileInfo
+			ID = "846B384C-9A19-4A59-8177184FF9B0D362"
+			RelativePath = "longin_operator.gui"
+			OriginalRoot = "$Project"
+			OriginalPath = "longin_operator.gui"/>
+		<FileInfo
+			ID = "859866C3-4C62-4BD5-A4680FB512EC492D"
+			RelativePath = "search.gui"
+			OriginalRoot = "$Project"
+			OriginalPath = "search.gui"/>
+		<FileInfo
+			ID = "8647EFA7-FD46-4908-9B200028E9E33A93"
+			RelativePath = "bkgnd.gui"
+			OriginalRoot = "$Project"
+			OriginalPath = "bkgnd.gui"/>
+		<FileInfo
+			ID = "8DD99B0B-7C4F-44E2-8370EE09F1120A4C"
+			RelativePath = "download.gui"
+			OriginalRoot = "$Project"
+			OriginalPath = "download.gui"/>
+		<FileInfo
+			ID = "927B972E-D5F5-4731-8DE914BC8F66D07A"
+			RelativePath = "export2.gui"
+			OriginalRoot = "$Project"
+			OriginalPath = "export2.gui"/>
+		<FileInfo
+			ID = "97993295-E1C1-413D-9F03F9640B9FA881"
+			RelativePath = "upload.gui"
+			OriginalRoot = "$Project"
+			OriginalPath = "upload.gui"/>
+		<FileInfo
+			ID = "9D32A6C6-E28A-45D0-8E9C5E1378F7C4F5"
+			RelativePath = "FrameWin.gui"
+			OriginalRoot = "$Project"
+			OriginalPath = "FrameWin.gui"
+			IsDeleted = "1"/>
+		<FileInfo
+			ID = "A9069F3C-3E7A-4A2D-9A3F4C1C37F7F78D"
+			RelativePath = "report.png"
+			OriginalRoot = "$Project"
+			OriginalPath = "report.png"/>
+		<FileInfo
+			ID = "AF32E81C-F310-45F0-8A8C884C5A650837"
+			RelativePath = "fiber_set.gui"
+			OriginalRoot = "$Project"
+			OriginalPath = "fiber_set.gui"/>
+		<FileInfo
+			ID = "B4DE0D73-5084-454F-888E32E885D2336D"
+			RelativePath = "jiaozheng.gui"
+			OriginalRoot = "$Project"
+			OriginalPath = "jiaozheng.gui"/>
+		<FileInfo
+			ID = "BA57E3ED-C741-42CD-BABF299F45C8FBCF"
+			RelativePath = "import.gui"
+			OriginalRoot = "$Project"
+			OriginalPath = "export.gui"/>
+		<FileInfo
+			ID = "CAF55668-EBF9-4CCB-8495086B5C91DDC7"
+			RelativePath = "prepare.gui"
+			OriginalRoot = "$Project"
+			OriginalPath = "prepare.gui"/>
+		<FileInfo
+			ID = "F28F7E5A-73AD-48B9-90ABFB263A82725A"
+			RelativePath = "check.gui"
+			OriginalRoot = "$Project"
+			OriginalPath = "check.gui"/>
+	</Files>
+</Catalogue>
