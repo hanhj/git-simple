@@ -64,6 +64,32 @@
 			Out[1]= {a, a^2, y, z}
 
 ### 2 数学和算法
+### 2.5 级数,极限
+
+- **Sum求和**
+
+	- Sum[expr,{n,nmin,nmax}]  
+	求expr当n从nmin到nmax的和  
+	求1+2+3
+
+			In[26]:= Sum[i, {i, 1, 3}]
+			Out[26]= 6
+	求a+aq+aq^2+...等比数列极限
+
+			In[19]:= Sum[a*q^(n - 1), {n, 1, Infinity}]
+			Out[19]= -(a/(-1 + q))
+
+- **Product连乘**	
+	- Product[expr,{n,nmin,nmax}]
+
+			In[24]:= Product[x^i/i, {i, 1, 5}]
+			Out[24]= x^15/120	
+
+- **Limit求极限**
+	- Limit[expr,var->n]
+	
+			In[3]:= Limit[x^2, x -> 1]
+			Out[3]= 1
 
 #### 2.7微积分
 

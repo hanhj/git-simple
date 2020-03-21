@@ -1,6 +1,6 @@
-target=test.pdf mathematics_study.html
+target=test.pdf mathematics_study.html matlab_study.html
 all:$(target)
-mathematics_study.html:mathematics_study.md
+%.html:%.md
 	pandoc -f markdown $< -o $@ -c dox.css
 test.pdf:test.tex
 	xelatex $<
