@@ -19,16 +19,18 @@ body>*:first-child {
 body>*:last-child {
   margin-bottom: 0 !important;
 }
-H1 {
-	font-family:仿宋_GB2312;
+H5 {
     text-align: center;
+	font-size: 36px;
+}
+H1 {
+	font-weight:bold
 }
 H2 {
-	font-family: Helvetica, arial, freesans, clean, sans-serif;
 	font-weight: bold;
 }
 H3 {
-	font-family: Helvetica, arial, freesans, clean, sans-serif;
+	font-weight: bold;
 }
 A.qindex {}
 A.qindexRef {}
@@ -132,12 +134,12 @@ table th {
 }
 
 .odd{
-/*	  background-color: #f8f8f8;*/
+	  background-color: #f8f8f8;
 	
 }
 
 .even{
-/*	  background-color: #d6c5bc;*/
+	  background-color: #d6c5bc;
 }
 
 /* CODE

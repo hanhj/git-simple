@@ -1,4 +1,4 @@
-target=需求规格书.html require.html
+target=需求规格书.html require.html cankao.html
 all:$(target)
 %.html:%.md
 	pandoc -f markdown $< -o $@ -c dox.css
