@@ -1,0 +1,31 @@
+#draw a python
+#import turtle
+#turtle.setup(650,350,200.200)
+#turtle.penup()
+#turtle.fd(-250)
+#turtle.pendown()
+#turtle.pensize(25)
+#turtle.pencolor("tomato")
+#turtle.seth(-40)
+#for i in range(4):
+#    turtle.circle(40,80)
+#    turtle.circle(-40,80)
+#turtle.circle(40,80/2)
+#turtle.fd(40)
+#turtle.fd(40*2/3)
+#turtle.done()
+from turtle import *
+setup(650,350,200.200)
+penup()
+fd(-250)
+pendown()
+pensize(25)
+pencolor("tomato")
+seth(-40)
+for i in range(4):
+    circle(40,80)
+    circle(-40,80)
+circle(40,80/2)
+fd(40)
+fd(40*2/3)
+done()

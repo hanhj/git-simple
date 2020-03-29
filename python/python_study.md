@@ -1,5 +1,10 @@
 #####Python程序设计
+
 # 1 Python语法
+python的帮助:进入python后help(),进入help提示,此时输入想要的模块名.  
+输入modules可以列出所有模块名.  
+或者:import xx模块,然后help(xx)
+
 ## 1.1 python安装:
 https://python123.io/download下载windows,linux,macos版本  
 pip是python软件包管理器   
@@ -61,6 +66,15 @@ pip install -i https://pypi.mirrors.ustc.edu.cn/simple xxx
 	|continue|from|or|yield||
 	|def|if|pass|del||
 
+在1.2的例子程序中,我们用到了eval函数,print函数,input函数  
+
+	eval(str)
+		eval函数用来执行一个字符串,参变量是一个字符串,eval将执行该字符串
+	input(prompt)
+		input函数用来从控制台输入一个字串,参变量是一个字符串,用来提示
+	print(str)
+		print函数用来向控制台输出一个字串,可以用来格式化输出.
+		{:.3f}是一个槽,用来对应后面的变量,表示将其格式化的形式.
 
 # 2 Python数据类型
 Python有三种数据类型:  
@@ -74,8 +88,69 @@ Python有三种数据类型:
 	
 
 # 3 Python程序控制
+## 3.1 Python语言在计算机发展历史中的位置:
+- 计算机发展的历程可以分成  
+
+|年代|时代特点|诞生的语言|
+|---------|-----------------------|-----------------------|
+|40年代-80年代|计算机结构时代,应对的是解决计算能力的问题|c语言,关注计算机本身问题|
+|80年代-2008|视窗和网络时代,解决的是人机交互,机器之间交互的问题|java,解决跨平台,计算机之间的交互问题;c++,理解主客体关系,面向对象,适合大型程序;VB适合桌面程序,解决人机交互问题.Python理解问题本身求解,适合多种问题|
+|2008-2017年|复杂信息时代,解决的是数据问题.标志性事件是08年安卓系统诞生,标志由PC时代向移动时代转变,云计算,网络安全,大数据.|Python得到发展.css,html,js前端页面.R/matlab/Go语言-适合特定领域|
+|2016年-|人工智能时代,解决人类自身问题,计算机替代人类从事基础性工作||
+
+- Python语言的特点:
+	- 语法简洁.
+	- 开源,使用第三方库,生态高产.
+	- c规c,python规python.c更适合底层问题,接口问题.
 
 # 4 Python函数
+## 4.1 turtle
+一个蟒蛇绘制程序 
+
+	#draw a python
+	import turtle
+	turtle.setup(650,350,200.200)
+	turtle.penup()
+	turtle.fd(-250)
+	turtle.pendown()
+	turtle.pensize(25)
+	turtle.pencolor("purple")
+	turtle.seth(-40)
+	for i in range(4):
+	    turtle.circle(40,80)
+	    turtle.circle(-40,80)
+	turtle.circle(40,80/2)
+	turtle.fd(40)
+	turtle.fd(40*2/3)
+	turtle.done()
+
+	import turtle 
+		引入turtle
+	setup(width,height,startx,starty) 
+		设置窗口
+	seth(angle)	
+		改变海龟方向,angle角度单位°
+	fd(len)	
+		行进len
+	penup()	pu()
+		抬起画笔
+	pencolor("str"),pencolor(r,g,b)
+		设置颜色
+
+
+import 引入库的三种形式:  
+
+	import 库名
+	库名.函数(参数)
+
+	from 库名 import *
+	函数(参数)
+
+	import 库名 as 别名
+	别名.函数(参数)
+
+	
+	
 
 中国大学mooc,北京理工大学  
 https://www.icourse163.org/learn/BIT-268001?tid=1450323450#/learn/announce
