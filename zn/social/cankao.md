@@ -123,6 +123,9 @@ https://www.sohu.com/a/299991636_464387
 东莞市宇朔泰合健康科技有限公司
 https://detail.1688.com/pic/583840380609.html?spm=a261y.7663282.1998411378.1.396b5b21sIFwCG
 
+血压硬件,监测平台
+http://www.kang.cn/industry-solutions/zf-industry-solutions/
+
 智能检测 无创血糖检测仪 无痛无创伤 5000,odm
 https://detail.1688.com/offer/577800326813.html?spm=a261b.2187593.1998088710.89.5c64619dBb6Wh9
 
