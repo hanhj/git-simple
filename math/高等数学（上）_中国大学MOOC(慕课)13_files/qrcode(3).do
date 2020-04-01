@@ -1,1 +1,0 @@
-resultShow['https://www.icourse163.org/learn/SZU-1002834007/wapLearnVideoDetail/?utm_source=(weixin)&utm_medium=(webshare)&utm_campaign=share&id=1211814100&cid=1214738328']({"height":125,"width":125,"success":true,"url":"http://edu-image.nosdn.127.net/_PhotoUploadUtils_99f9b97c-c5bc-4b7b-b582-3f6e48d9806e.png"})
