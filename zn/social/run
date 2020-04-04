@@ -1,0 +1,2 @@
+pandoc feasibility.md -o feasibility.html -c dox.css
+pandoc feasibility.md -o feasibility.docx -c dox.css
