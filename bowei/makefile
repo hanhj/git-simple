@@ -1,6 +1,7 @@
-target=note.docx
+target=note.docx note.html
 all:$(target)
 note.docx:note.md
+note.html:note.md
 
 %.docx:%.md	
 	pandoc -f markdown  $< -o $@ -c dox.css
@@ -16,4 +17,4 @@ latex_study.pdf:latex_study.tex
 	latex $<
 .PHONY:clean
 clean:
-	rm -f *.out *.fls *.idx *.ind *.dvi *.ps *.log *.toc *.aux *.ilg *.lof *.lot *.html 
+	rm -f $(target) *.out *.fls *.idx *.ind *.dvi *.ps *.log *.toc *.aux *.ilg *.lof *.lot *.html 
