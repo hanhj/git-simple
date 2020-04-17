@@ -6,7 +6,8 @@
 	cd ~   
 	mkdir opt
 3. 拷贝开发包  
-	cp ti-sdk-omapl138-lcdk-01.00.00.bz2 ~/opt
+	cp ti-sdk-omapl138-lcdk-01.00.00.bz2 ~/opt  
+	cp ... ~/opt 
 4. 解压开发包   
 	cd opt   
 	tar -jxvf ti-sdk-omapl138-lcdk-01.00.00.bz2   
@@ -47,36 +48,43 @@
 	- 安装arm部分程序  
 		- 安装libxml2  
 			cd ~/opt  
-			cp libxml2_2.7.8.dfsg.orig.tar.gz ~/opt/ti-sdk-omapl138-lcdk-01.00.00/board-support   
-			cd ~/opt/ti-sdk-omapl138-lcdk-01.00.00/board-support/  
-			tar jxvf libxml2_2.7.8.dfsg.orig.tar.gz   
-			ln libxml2_2.7.8 libxml -s    
+			tar zxvf libxml2_2.7.8.dfsg.orig.tar.gz -C ~/opt/ti-sdk-omapl138-lcdk-01.00.00/board-support   
+			ln ~/opt/ti-sdk-omapl138-lcdk-01.00.00/board-support/libxml2-2.7.8/ ~/opt/ti-sdk-omapl138-lcdk-01.00.00/board-support/libxml2 -s    
+		- 安装u-boot
+			tar jxvf ~/opt/u-boot_omapl138.tar.gz2 -C ~/opt/ti-sdk-omapl138-lcdk-01.00.00/board-support/ 
+		- 安装Linux内核
+			unzip ~/opt/linux-2.6.zip -d ~/opt/ti-sdk-omapl138-lcdk-01.00.00/board-support
+		- 安装rootfs
+			tar zxvf ~/opt/filesystem.tar.gz -C ~/opt/ti-sdk-omapl138-lcdk-01.00.00/board-support/   
+			cd ~/opt/ti-sdk-omapl138-lcdk-01.00.00/board-support/rootfs/ 
+			sudo tar zxvf rootfs_omapl138.tar.gz  
+
+	安装完以上文件后,opt目录应当如下:  
+	![](14.png)
 7. 编译应用程序
 	将应用程序拷贝到合适位置,其目录结构为:  
 	![](11.png)  
 	进入arm目录,编辑makefile文件,将其中的xxx替换成用户的目录  
-	![](9.png)  
+	![](9.png)   
 	执行make命令   
 	![](12.png)  
+	结果文件为arm    
 	进入dsp目录,编辑product.mak文件,将其中的xxx替换成用户的目录  
 	![](9.png)  
 	执行make命令   
-	![](13.png)
-	
+	![](13.png)  
+	结果文件为dsp.xe674
 8. 编译系统程序
 	- linux系统  
-		cp ~/dtu/board/board_src/linux-2.6/ ~/opt/ti-sdk-omapl138-lcdk-01.00.00/board-support/ -r  
 		cd ~/opt/ti-sdk-omapl138-lcdk-01.00.00/board-support/linux-2.6/   
 		./build_sh   
 		结果文件为uImage_omapl138
 	- u-boot  
-		cp ~/dtu/board/board_src/u-boot_omapl138/ ~/opt/ti-sdk-omapl138-lcdk-01.00.00/board-support/ -r   
 		cd ~/opt/ti-sdk-omapl138-lcdk-01.00.00/board-support/u-boot_omapl138/   
 		./build.sh   
 		结果文件为:u-boot-head.bin
 	- rootfs  
-		cp ~/dtu/board/board_src/filesystem/ ~/opt/ti-sdk-omapl138-lcdk-01.00.00/board-support/filesystem -r  
-		cd ~/opt/ti-sdk-omapl138-lcdk-01.00.00/board-support/filesystem/   
+		cd ~/opt/ti-sdk-omapl138-lcdk-01.00.00/board-support/rootfs/   
 		./rootfs.sh  
 		结果文件为rootfs_omapl138 
 
