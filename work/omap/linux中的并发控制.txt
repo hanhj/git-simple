@@ -719,6 +719,33 @@ Linux中的同步问题
 				dma_free_coherent
 				free_dma
 				
+如何添加一个驱动到linux中
+	1. 将程序拷贝到合适的位置  
+		比如将添加一个Wiznet的W5300驱动
+		/dirvers/net/ethernet/wiznet 
+	2. 在wiznet目录下增加Kconfig和Makefile  
+		Kconfig :  
+			config NET_VENDOR_WIZNET	;定义一个配置项	  
+				depends on HAS_IOMEM		;指定依赖关系  
+				default y					;指定值,其他形式还包括bool,tristate(y,n,m)  
+				--help--  
+					xxx用缩进表示帮助  
+			if NET_VENDOR_WIZNET
+
+			config WIZNET_W5100			;  
+				tristate "wiznet w5100 support"  
+				depends on HAS_IOMEM  
+
+			endif 
+		定义的配置项用于Makefile  
+		Makefile:  
+			obj-$(WIZNET_W5100)+=w5100.o  
+	3. 在上一级目录中要修改Kconfig和Makefile文件,  
+		Kconfig:  
+			source wiznet/Kconfig   
+		Makefie:  
+			obj-$(CONFIG_NET_VENDOR_WIZNET)+=wiznet/  
+
 platform设备驱动
 	说明:
 		platform是Linux中总线的一种,与i2c,pci,isa一样.但是它并非实际存在,而是虚拟出来的,用于将soc中的外围器件挂接在这个总线中.
