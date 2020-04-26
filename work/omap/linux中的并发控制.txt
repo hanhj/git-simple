@@ -1,44 +1,44 @@
-Linuxä¸­çš„åŒæ­¥é—®é¢˜
-æ“ä½œç³»ç»Ÿä¸­å­˜åœ¨ç«æ€é—®é¢˜,å°±æ˜¯åŒæ—¶è®¿é—®å…±äº«èµ„æº(åŒ…æ‹¬ç¨‹åº,æ•°æ®),å¼•èµ·ç«æ€çš„åŸå› æœ‰:smp,æŠ¢å å¼å†…æ ¸,ä¸­æ–­(ç¡¬ä¸­æ–­,è½¯ä¸­æ–­ç­‰).
-æŠ¢å å¼å†…æ ¸ç«æ€é—®é¢˜çš„å›¾ç¤º
-	Aè¿›ç¨‹				Bè¿›ç¨‹				Cè¿›ç¨‹
+LinuxÖĞµÄÍ¬²½ÎÊÌâ
+²Ù×÷ÏµÍ³ÖĞ´æÔÚ¾ºÌ¬ÎÊÌâ,¾ÍÊÇÍ¬Ê±·ÃÎÊ¹²Ïí×ÊÔ´(°üÀ¨³ÌĞò,Êı¾İ),ÒıÆğ¾ºÌ¬µÄÔ­ÒòÓĞ:smp,ÇÀÕ¼Ê½ÄÚºË,ÖĞ¶Ï(Ó²ÖĞ¶Ï,ÈíÖĞ¶ÏµÈ).
+ÇÀÕ¼Ê½ÄÚºË¾ºÌ¬ÎÊÌâµÄÍ¼Ê¾
+	A½ø³Ì				B½ø³Ì				C½ø³Ì
 	------------------------------------------------------------------------
-	å†™				
+	Ğ´				
 	------------------------------------------------------------------------
-						å†™
+						Ğ´
 	------------------------------------------------------------------------					
-	è®¡æ•°				
+	¼ÆÊı				
 	------------------------------------------------------------------------
-											è¯»è®¡æ•°(è¿™æ—¶,å°±ä¼šæœ‰é—®é¢˜)
+											¶Á¼ÆÊı(ÕâÊ±,¾Í»áÓĞÎÊÌâ)
 	------------------------------------------------------------------------										
-						è®¡æ•°
+						¼ÆÊı
 	------------------------------------------------------------------------					
 
-ä¿æŠ¤å…±äº«èµ„æºçš„æ–¹æ³•æœ‰:ä¸­æ–­å±è”½,åŸå­æ“ä½œ,è‡ªæ—‹é”,ä¿¡å·é‡.
+±£»¤¹²Ïí×ÊÔ´µÄ·½·¨ÓĞ:ÖĞ¶ÏÆÁ±Î,Ô­×Ó²Ù×÷,×ÔĞıËø,ĞÅºÅÁ¿.
 
-ä¸­æ–­å±è”½
-	å˜é‡
-	å‡½æ•°
+ÖĞ¶ÏÆÁ±Î
+	±äÁ¿
+	º¯Êı
 		local_irq_enable
 		local_irq_disable
-	ç”¨æ³•
+	ÓÃ·¨
 		local_irq_disable
 		....
 		local_irq_enable
 	
-	æ‰©å±•:
+	À©Õ¹:
 		local_irq_save(flags)
 		local_irq_restore(flags)
 		
 		local_bh_enable
 		local_bh_disable
 
-åŸå­æ“ä½œ
-	è¯´æ˜:åŸå­æ“ä½œ,ä¸ä¼šè¢«æ‰“æ–­
-	å˜é‡:
+Ô­×Ó²Ù×÷
+	ËµÃ÷:Ô­×Ó²Ù×÷,²»»á±»´ò¶Ï
+	±äÁ¿:
 		atomic_t 
-		ATOMIT_INIT(i)  åˆå§‹åŒ–å€¼
-	å‡½æ•°
+		ATOMIT_INIT(i)  ³õÊ¼»¯Öµ
+	º¯Êı
 		atomic_inc(atomic_t*)
 		atomic_dec(atomic_t*)
 		
@@ -49,42 +49,42 @@ Linuxä¸­çš„åŒæ­¥é—®é¢˜
 		
 		atomic_inc_and_test(atomic_t*)
 		atomic_dec_and_test(atomic_t*)
-		atomic_sub_and_test(int,atomic_t*) æ³¨æ„,æ²¡æœ‰åŠ 
+		atomic_sub_and_test(int,atomic_t*) ×¢Òâ,Ã»ÓĞ¼Ó
 		
 		atomic_inc_return(atomic_t*)
 		atomic_dec_return(atomic_t*)
 		atomic_add_return(int,atomic_t*)
 		atomic_sub_return(int,atomic_t*)
 		
-		bitæ“ä½œ
+		bit²Ù×÷
 		set_bit(nr,void*)
 		clear_bit(nr,void*)
 		change_bit(nr,void*)
 		
 		test_bit(nr,void*)
 		
-		test_and_set(nr,void*) å…ˆæµ‹è¯•,å†æ“ä½œ
+		test_and_set(nr,void*) ÏÈ²âÊÔ,ÔÙ²Ù×÷
 		test_and_clear(nr,void*)
 		test_and_change(nr,void*)
 
-è‡ªæ—‹é”
-	è¯´æ˜:
-		è‡ªæ—‹é”ä¼šåœ¨åŸåœ°æ‰“è½¬,æ‰€ä»¥ä¸´ç•ŒåŒºå°½å¯èƒ½çŸ­,ä¸èƒ½é˜»å¡.
-	å˜é‡:
+×ÔĞıËø
+	ËµÃ÷:
+		×ÔĞıËø»áÔÚÔ­µØ´ò×ª,ËùÒÔÁÙ½çÇø¾¡¿ÉÄÜ¶Ì,²»ÄÜ×èÈû.
+	±äÁ¿:
 		spinlock_t lock
 		
-	å‡½æ•°
+	º¯Êı
 		spin_lock_init(spinlock_t*)
 		
 		spin_lock(spinlock_t*)
 		spin_unlock(spinlock_t*)
-	ç”¨æ³•
+	ÓÃ·¨
 		spinlock_t lock
 		spin_lock_init(&lock)
 		spin_lock(&lock)
 		...
 		spin_unlock(&lock)
-	æ‰©å±•
+	À©Õ¹
 		spin_trylock(&lock)
 		
 		spin_lock_irq(&lock)
@@ -96,32 +96,32 @@ Linuxä¸­çš„åŒæ­¥é—®é¢˜
 		spin_lock_bh(&lock)
 		spin_unlock_bh(&lock)
 		
-		è¯»å†™è‡ªæ—‹é”
-			è¯´æ˜ï¼šè¯»å†™é”æ˜¯æ¯”è‡ªæ—‹é”ç²’åº¦æ›´å°çš„é”ï¼Œè‡ªæ—‹é”å¯¹äºè¯»å†™ä¸åŠ åŒºåˆ†ï¼Œè€Œå®é™…ä¸Šå¯¹äºè¯»æ“ä½œæ˜¯å¯ä»¥å¹¶å‘çš„ï¼Œè¯»å†™é”å°±æ˜¯è§£å†³è¿™ä¸ªé—®é¢˜ã€‚å½“ç„¶ï¼Œè¯»å’Œå†™ä¹Ÿæ˜¯ä¸èƒ½åŒæ—¶è¿›è¡Œçš„ã€‚
-			å˜é‡:
-				rwlock_t lock=RW_LOCK_UNLOCKED;é™æ€åˆå§‹åŒ–
+		¶ÁĞ´×ÔĞıËø
+			ËµÃ÷£º¶ÁĞ´ËøÊÇ±È×ÔĞıËøÁ£¶È¸üĞ¡µÄËø£¬×ÔĞıËø¶ÔÓÚ¶ÁĞ´²»¼ÓÇø·Ö£¬¶øÊµ¼ÊÉÏ¶ÔÓÚ¶Á²Ù×÷ÊÇ¿ÉÒÔ²¢·¢µÄ£¬¶ÁĞ´Ëø¾ÍÊÇ½â¾öÕâ¸öÎÊÌâ¡£µ±È»£¬¶ÁºÍĞ´Ò²ÊÇ²»ÄÜÍ¬Ê±½øĞĞµÄ¡£
+			±äÁ¿:
+				rwlock_t lock=RW_LOCK_UNLOCKED;¾²Ì¬³õÊ¼»¯
 			
-			å‡½æ•°
-				rwlock_init(rwlock_t*)åŠ¨æ€åˆå§‹åŒ–
+			º¯Êı
+				rwlock_init(rwlock_t*)¶¯Ì¬³õÊ¼»¯
 					
 				read_lock(rwlock_t*)
 				read_unlock(rwlock_t*)
 				write_lock(rwlock_t*)
 				write_unlock(rwlock_t*)
-			ç”¨æ³•
+			ÓÃ·¨
 				rwlock_t lock;
 				rwlock_init(&lock)
-				è¯»è‡ªæ—‹é”
+				¶Á×ÔĞıËø
 				read_lock(&lock)
 				...
 				read_unlock(&lock)
 				
-				å†™è‡ªæ—‹é”
+				Ğ´×ÔĞıËø
 				write_lock(&lock)
 				...
 				write_unlock(&lock)
 			
-			æ‰©å±•
+			À©Õ¹
 				read_lock_irq(&lock)
 				read_unlock_irq(&lock)
 				
@@ -139,29 +139,29 @@ Linuxä¸­çš„åŒæ­¥é—®é¢˜
 				
 				write_lock_bh(&lock)
 				write_unlock_bh(&lock)
-		é¡ºåºé”
-			è¯´æ˜ï¼šé¡ºåºé”æ˜¯è¯»å†™é”çš„ä¼˜åŒ–ï¼Œè¯»å•å…ƒä¸ä¼šè¢«å†™å•å…ƒé˜»å¡ï¼Œå†™å•å…ƒä¹Ÿä¸ä¼šè¢«è¯»å•å…ƒé˜»å¡ã€‚ä½†æ˜¯å†™å•å…ƒä¹‹é—´ä»ç„¶æ˜¯äº’æ–¥çš„ã€‚é¡ºåºé”æœ‰ä¸€ä¸ªé™åˆ¶å°±æ˜¯ä¸èƒ½åœ¨å…¶ä¸­ä½¿ç”¨æŒ‡é’ˆï¼Œå› ä¸ºåœ¨ä¿æŠ¤çš„å†™å•å…ƒä¸­å¯èƒ½ä¼šä½¿æŒ‡é’ˆå¤±æ•ˆï¼Œè€Œè¯»å•å…ƒæ­¤æ—¶ä½¿ç”¨æŒ‡é’ˆå°±ä¼šå¤±æ•ˆã€‚
-			å˜é‡:
+		Ë³ĞòËø
+			ËµÃ÷£ºË³ĞòËøÊÇ¶ÁĞ´ËøµÄÓÅ»¯£¬¶Áµ¥Ôª²»»á±»Ğ´µ¥Ôª×èÈû£¬Ğ´µ¥ÔªÒ²²»»á±»¶Áµ¥Ôª×èÈû¡£µ«ÊÇĞ´µ¥ÔªÖ®¼äÈÔÈ»ÊÇ»¥³âµÄ¡£Ë³ĞòËøÓĞÒ»¸öÏŞÖÆ¾ÍÊÇ²»ÄÜÔÚÆäÖĞÊ¹ÓÃÖ¸Õë£¬ÒòÎªÔÚ±£»¤µÄĞ´µ¥ÔªÖĞ¿ÉÄÜ»áÊ¹Ö¸ÕëÊ§Ğ§£¬¶ø¶Áµ¥Ôª´ËÊ±Ê¹ÓÃÖ¸Õë¾Í»áÊ§Ğ§¡£
+			±äÁ¿:
 				seqlock_t lock;
-			å‡½æ•°:
+			º¯Êı:
 				write_seqlock(&lock)
 				write_sequnlock(&lock)
 				write_seqtrylock(&lock)
 				
 				read_seqbegin(&lock)
 				read_seqretry(&lock,iv)
-			ç”¨æ³•:
-				å†™æ“ä½œ
+			ÓÃ·¨:
+				Ğ´²Ù×÷
 				write_seqlock
 				...
 				write_sequnlock
 				
-				è¯»æ“ä½œ
+				¶Á²Ù×÷
 				do{
 					seqnum=read_seqbegin(&lock);
 					....
 				}while(read_seqretry(&lock,sequm))
-			æ‰©å±•:
+			À©Õ¹:
 				write_seqlock_irq(&lock)
 				write_sequnlock_irq(&lock)
 				
@@ -174,19 +174,19 @@ Linuxä¸­çš„åŒæ­¥é—®é¢˜
 				read_seqbegin_irqsave(&lock,falgs)
 				read_seqretry_irqrestore(&lock,iv,flags)
 		RCU
-			è¯´æ˜:rcuæ˜¯read copy updateçš„æ„æ€,å¯ä»¥çœ‹åšæ˜¯è¯»å†™é”çš„é«˜çº§ç‰ˆæœ¬,å¯ä»¥å¯¹ä¿æŠ¤å•å…ƒåŒæ—¶è¿›è¡Œè¯»å†™.
-			å˜é‡:rcu_head head
-			å‡½æ•°:
+			ËµÃ÷:rcuÊÇread copy updateµÄÒâË¼,¿ÉÒÔ¿´×öÊÇ¶ÁĞ´ËøµÄ¸ß¼¶°æ±¾,¿ÉÒÔ¶Ô±£»¤µ¥ÔªÍ¬Ê±½øĞĞ¶ÁĞ´.
+			±äÁ¿:rcu_head head
+			º¯Êı:
 				read_lock_rcu()
 				read_unlock_rcu()
 				call_rcu(struct rcu_head*,void(*fun)(struct rcu_head*))
 				
-			ç”¨æ³•:
+			ÓÃ·¨:
 				read_lock_rcu
 				...
 				read_unlock_rcu
 				
-			æ‰©å±•
+			À©Õ¹
 				list_add_rcu
 				list_add_tail_rcu
 				list_del_rcu
@@ -200,12 +200,12 @@ Linuxä¸­çš„åŒæ­¥é—®é¢˜
 				hlist_for_each_rcu
 				hlost_for_each_entry_rcu
 			
-ä¿¡å·é‡
-	è¯´æ˜:
-		ä¿¡å·é‡ä¸è‡ªæ—‹é”ä¸åŒ,ä¿¡å·é‡ä¼šè¿›å…¥ä¼‘çœ çŠ¶æ€,è€Œè‡ªæ—‹é”ä¼šåœ¨åŸåœ°æ‰“è½¬.			
-	å˜é‡:
+ĞÅºÅÁ¿
+	ËµÃ÷:
+		ĞÅºÅÁ¿Óë×ÔĞıËø²»Í¬,ĞÅºÅÁ¿»á½øÈëĞİÃß×´Ì¬,¶ø×ÔĞıËø»áÔÚÔ­µØ´ò×ª.			
+	±äÁ¿:
 		semaphore sem;
-	å‡½æ•°:
+	º¯Êı:
 		sema_init(struct semaphore *,int val)
 		
 		DECLARE_MUTEX(name)
@@ -215,21 +215,21 @@ Linuxä¸­çš„åŒæ­¥é—®é¢˜
 		
 		down(&sem)
 		up(&sem)
-	ç”¨æ³•:
+	ÓÃ·¨:
 		down
 		....
 		up
 			
-	æ‰©å±•:
-		down_interruptible(&sem) è¿›å…¥æµ…ç¡çœ çŠ¶æ€,å¯è¢«æ‰“æ–­.å½“è°ƒç”¨æ­¤å‡½æ•°æ—¶éœ€è¦æ£€æŸ¥å…¶è¿”å›å€¼å¦‚æœè¿”å›é0,åº”å½“è¿”å›-ERESTARTSYS
-		down_trylock å°è¯•è·å¾—ä¿¡å·é‡,å¦‚æœè·å¾—åˆ™ç«‹å³è¿”å›0,å¦åˆ™è¿”å›éé›¶å€¼,æ­¤å‡½æ•°ä¸ä¼šå¼•èµ·ç¡çœ .
+	À©Õ¹:
+		down_interruptible(&sem) ½øÈëÇ³Ë¯Ãß×´Ì¬,¿É±»´ò¶Ï.µ±µ÷ÓÃ´Ëº¯ÊıÊ±ĞèÒª¼ì²éÆä·µ»ØÖµÈç¹û·µ»Ø·Ç0,Ó¦µ±·µ»Ø-ERESTARTSYS
+		down_trylock ³¢ÊÔ»ñµÃĞÅºÅÁ¿,Èç¹û»ñµÃÔòÁ¢¼´·µ»Ø0,·ñÔò·µ»Ø·ÇÁãÖµ,´Ëº¯Êı²»»áÒıÆğË¯Ãß.
 		
-		è¯»å†™ä¿¡å·é‡
-			è¯´æ˜:
-				è¯»å†™ä¿¡å·é‡ä¸ä¿¡å·é‡çš„å…³ç³»ä¸è¯»å†™é”ä¸è‡ªæ—‹é”çš„å…³ç³»æ˜¯ä¸€æ ·çš„.
-			å˜é‡:
+		¶ÁĞ´ĞÅºÅÁ¿
+			ËµÃ÷:
+				¶ÁĞ´ĞÅºÅÁ¿ÓëĞÅºÅÁ¿µÄ¹ØÏµÓë¶ÁĞ´ËøÓë×ÔĞıËøµÄ¹ØÏµÊÇÒ»ÑùµÄ.
+			±äÁ¿:
 				rw_semaphore sem
-			å‡½æ•°:
+			º¯Êı:
 				init_rwsem(&sem)
 				
 				down_read
@@ -239,27 +239,27 @@ Linuxä¸­çš„åŒæ­¥é—®é¢˜
 				down_write
 				up_write
 				down_write_trylock
-		å®Œæˆé‡
-			è¯´æ˜:
-				å®Œæˆé‡æ˜¯ä¸ºäº†åŒæ­¥ä¸¤ä¸ªè¿›ç¨‹.
-			å˜é‡:
+		Íê³ÉÁ¿
+			ËµÃ÷:
+				Íê³ÉÁ¿ÊÇÎªÁËÍ¬²½Á½¸ö½ø³Ì.
+			±äÁ¿:
 				completion comp;
-			å‡½æ•°:
+			º¯Êı:
 				init_completion(&comp);
 				DECLARE_COMPLETION(name)
 				
 				wait_for_completion
 				complete
 				complete_all
-			ç”¨æ³•:
-				è¿›ç¨‹A						è¿›ç¨‹B
+			ÓÃ·¨:
+				½ø³ÌA						½ø³ÌB
 				wait_for_completion			complete
-äº’æ–¥ä½“
-	è¯´æ˜:
-		äº’æ–¥ä½“ä¸ä¿¡å·é‡æ˜¯ä¸€æ ·çš„.
-	å˜é‡:
+»¥³âÌå
+	ËµÃ÷:
+		»¥³âÌåÓëĞÅºÅÁ¿ÊÇÒ»ÑùµÄ.
+	±äÁ¿:
 		mutex mux;
-	å‡½æ•°:
+	º¯Êı:
 		mutex_init(&mux)
 		
 		mutex_lock
@@ -267,21 +267,21 @@ Linuxä¸­çš„åŒæ­¥é—®é¢˜
 		
 		mutex_trylock
 		mutex_lock_interruptible	
-	ç”¨æ³•:
+	ÓÃ·¨:
 		mutex_lock
 		...
 		mutex_unlock
 				
 	
-é˜»å¡å’Œéé˜»å¡IO
-	è¯´æ˜:
-		é˜»å¡IO,å½“èµ„æºä¸å¯ç”¨æ—¶,è¿›ç¨‹å°±é˜»å¡ä½.éé˜»å¡IO,å½“èµ„æºä¸å¯ç”¨æ—¶,è¿›ç¨‹ä¸è¢«é˜»å¡.
-		ç³»ç»Ÿé€šè¿‡ç­‰å¾…é˜Ÿåˆ—å®ç°é˜»å¡IO,ç­‰å¾…é˜Ÿåˆ—çš„è°ƒåº¦ä¸ç³»ç»Ÿè°ƒåº¦æœ‰å…³.
-		éé˜»å¡IO,éœ€è¦ç”¨æˆ·ä¸æ–­æŸ¥è¯¢çŠ¶æ€.ç”¨æˆ·ä¾§é€šè¿‡select,FD_SETç­‰å®æ¥å®ç°,é©±åŠ¨ä¾§éœ€è¦å®ç°pollå‡½æ•°.
-	å˜é‡
+×èÈûºÍ·Ç×èÈûIO
+	ËµÃ÷:
+		×èÈûIO,µ±×ÊÔ´²»¿ÉÓÃÊ±,½ø³Ì¾Í×èÈû×¡.·Ç×èÈûIO,µ±×ÊÔ´²»¿ÉÓÃÊ±,½ø³Ì²»±»×èÈû.
+		ÏµÍ³Í¨¹ıµÈ´ı¶ÓÁĞÊµÏÖ×èÈûIO,µÈ´ı¶ÓÁĞµÄµ÷¶ÈÓëÏµÍ³µ÷¶ÈÓĞ¹Ø.
+		·Ç×èÈûIO,ĞèÒªÓÃ»§²»¶Ï²éÑ¯×´Ì¬.ÓÃ»§²àÍ¨¹ıselect,FD_SETµÈºêÀ´ÊµÏÖ,Çı¶¯²àĞèÒªÊµÏÖpollº¯Êı.
+	±äÁ¿
 		wait_queue_head_t head
 		wait_queue_t	wait
-	å‡½æ•°
+	º¯Êı
 		DECLARE_WAIT_QUEUE_HEAD(name)
 		DECLARE_WAITQUEUE(name,tsk)
 		init_waitqueue_head(&head)
@@ -297,43 +297,43 @@ Linuxä¸­çš„åŒæ­¥é—®é¢˜
 		wait_event_interruptible_timeout
 		
 		wake_up_interruptible
-	ç”¨æ³•:
-		é˜»å¡IO
-			1ã€	xx_device{
+	ÓÃ·¨:
+		×èÈûIO
+			1¡¢	xx_device{
 					cdev cdev;
 					...
-					wait_queue_head_t queue;//åœ¨è®¾å¤‡å®šä¹‰ä¸­æ¡ä»¶ç­‰å¾…é˜Ÿåˆ—å¤´.
+					wait_queue_head_t queue;//ÔÚÉè±¸¶¨ÒåÖĞÌõ¼şµÈ´ı¶ÓÁĞÍ·.
 				}
-			2ã€å¤„ç†é˜»å¡çš„åœ°æ–¹
+			2¡¢´¦Àí×èÈûµÄµØ·½
 				DECLEAR_WAITQUEUE(wait,current);
 				add_wait_queue(dev->queue,&wait)	
 				...
 				
-				if(!available){//èµ„æºä¸å¯ç”¨
-					__set_current_state(TASK_INTERRUPTIBLE);//è®¾ç½®æµ…ç¡çœ çŠ¶æ€
+				if(!available){//×ÊÔ´²»¿ÉÓÃ
+					__set_current_state(TASK_INTERRUPTIBLE);//ÉèÖÃÇ³Ë¯Ãß×´Ì¬
 	
-					if(filep->flags & O_NOBLOCK){//éé˜»å¡æ–¹å¼æ‰“å¼€
+					if(filep->flags & O_NOBLOCK){//·Ç×èÈû·½Ê½´ò¿ª
 						ret= -EAGAIN;
 						goto out;
 					}
 					schedule();
-					if(signal_pending(current)){//è¢«å…¶ä»–ä¿¡å·å”¤é†’
+					if(signal_pending(current)){//±»ÆäËûĞÅºÅ»½ĞÑ
 						ret=-ERESTARTSYS;
 						goto out;
 					}
 					
 				}
-				å¤„ç†æ­£å¸¸äº‹åŠ¡...
+				´¦ÀíÕı³£ÊÂÎñ...
 				
-				out:remove_wait_queue(dev->queue,&wait);//ç§»é™¤ç­‰å¾…é˜Ÿåˆ—
-				__set_current_state(TASK_RUNNING);//è®¾ç½®è¿›ç¨‹çŠ¶æ€
+				out:remove_wait_queue(dev->queue,&wait);//ÒÆ³ıµÈ´ı¶ÓÁĞ
+				__set_current_state(TASK_RUNNING);//ÉèÖÃ½ø³Ì×´Ì¬
 				return ret;
 				
-				åˆ«çš„å‡½æ•°
-				å½“å…è®¸è®¿é—®èµ„æºæ—¶
+				±ğµÄº¯Êı
+				µ±ÔÊĞí·ÃÎÊ×ÊÔ´Ê±
 				wake_up_interruptible(&dev->queue);
-		éé˜»å¡IO
-			1ã€ç”¨æˆ·ä¾§
+		·Ç×èÈûIO
+			1¡¢ÓÃ»§²à
 				fd_set rd,wt;
 				FD_ZERO(&rd);FD_ZERO(&wt)
 				FD_SET(fd,&rd);FD_SET(fd,&wt);
@@ -343,15 +343,15 @@ Linuxä¸­çš„åŒæ­¥é—®é¢˜
 					do read work
 				if(FD_ISSET(fd,&wr))
 					do write work
-			2ã€é©±åŠ¨ä¾§
+			2¡¢Çı¶¯²à
 				xx_poll(struct file *filep,poll_table *wait)
 				{
 					dev=filep->private_data;
 					poll_wait(dev->rd_queue,wait);
 					poll_wait(dev->wr_queue,wait);
-					if(å¯è¯»)
+					if(¿É¶Á)
 						mask |=POLLIN|POLLRDNORMAL;
-					if(å¯å†™)
+					if(¿ÉĞ´)
 						mask |=POLLOUT|POLLWRNORMAL;
 					return mask;
 				}
@@ -360,73 +360,73 @@ Linuxä¸­çš„åŒæ­¥é—®é¢˜
 					.poll=xx_poll;
 				}
 
-å¼‚æ­¥é€šçŸ¥
-	è¯´æ˜:
-		ç”¨æˆ·ä¾§é€šè¿‡è®¾ç½®å›è°ƒå‡½æ•°,å½“èµ„æºå¯ç”¨æ—¶,é€šè¿‡å›è°ƒå‡½æ•°çš„å½¢å¼,å¼‚æ­¥é€šçŸ¥ç”¨æˆ·ä¾§.ç›¸å½“äºç³»ç»Ÿå¯¹ç”¨æˆ·ä¾§çš„ä¸­æ–­.
-	å˜é‡:
+Òì²½Í¨Öª
+	ËµÃ÷:
+		ÓÃ»§²àÍ¨¹ıÉèÖÃ»Øµ÷º¯Êı,µ±×ÊÔ´¿ÉÓÃÊ±,Í¨¹ı»Øµ÷º¯ÊıµÄĞÎÊ½,Òì²½Í¨ÖªÓÃ»§²à.Ïàµ±ÓÚÏµÍ³¶ÔÓÃ»§²àµÄÖĞ¶Ï.
+	±äÁ¿:
 		fasync_struct
 		typedef void(*sighandler_t)(int);
-	å‡½æ•°:
-		ç”¨æˆ·ä¾§
-			signal(undigned long no,sighandler_t handler);//æ³¨å†Œå›è°ƒå‡½æ•°
+	º¯Êı:
+		ÓÃ»§²à
+			signal(undigned long no,sighandler_t handler);//×¢²á»Øµ÷º¯Êı
 			fcntl(fd,cmd,data)
-		é©±åŠ¨ä¾§
+		Çı¶¯²à
 			fasync_helper
 			kill_fasync
-	ç”¨æ³•:
-		ç”¨æˆ·ä¾§
+	ÓÃ·¨:
+		ÓÃ»§²à
 			xx_handler(int)
 			{
 				...
 			}
 			
 			signal(fd,handler)
-			fcntl(fd,F_SETOWN,getpid());//è®¾ç½®own,è®©é©±åŠ¨ä¾§çŸ¥é“å‘å“ªé‡Œå‘é€æ¶ˆæ¯
+			fcntl(fd,F_SETOWN,getpid());//ÉèÖÃown,ÈÃÇı¶¯²àÖªµÀÏòÄÄÀï·¢ËÍÏûÏ¢
 			flag=fcntl(fd,F_GETFL);
-			fcntl(fd,F_SETFL,flag|FASYNC);è®¾ç½®é©±åŠ¨ä¾§fasyncæ ‡å¿—
-		é©±åŠ¨ä¾§
-			è®¾å¤‡ç»“æ„ä½“ä¸­å®šä¹‰fasync_struct
+			fcntl(fd,F_SETFL,flag|FASYNC);ÉèÖÃÇı¶¯²àfasync±êÖ¾
+		Çı¶¯²à
+			Éè±¸½á¹¹ÌåÖĞ¶¨Òåfasync_struct
 			xx_dev{
 				cdev cdev;
 				...
 				struct fasync_struct *fasync_queue;
 			}
-			å®ç°xx_fasyncå‡½æ•°
+			ÊµÏÖxx_fasyncº¯Êı
 				xx_fasync(int fd,struct file *filep,int mode)
 				{
-					fasync_helper(fd,filep,mode,&dev->fasync_queue);//è°ƒç”¨fasync_helperå‡½æ•°
+					fasync_helper(fd,filep,mode,&dev->fasync_queue);//µ÷ÓÃfasync_helperº¯Êı
 				}
-			åœ¨èµ„æºå¯ç”¨æ—¶è°ƒç”¨kill_fasyncå‡½æ•°
+			ÔÚ×ÊÔ´¿ÉÓÃÊ±µ÷ÓÃkill_fasyncº¯Êı
 				if(available)
 					kill_fasync(&dev->fasync_queue,sig,POLL_XX);
-			åœ¨releaseä¸­,æ³¨é”€å‡½æ•°
+			ÔÚreleaseÖĞ,×¢Ïúº¯Êı
 				xx_fasync(-1,filep,0);
 			
-ä¸­æ–­
-	è¯´æ˜:
-		ä¸­æ–­ç”¨äºæ‰“æ–­å½“å‰ç¨‹åº.åœ¨linuxä¸­ä¸ºå–å¾—æ•ˆç‡çš„å¹³è¡¡,é‡‡ç”¨ä¸‹åŠéƒ¨å¤„ç†æ–¹å¼,å¤„ç†ä¸­æ–­.ä¸‹åŠéƒ¨å¤„ç†æ–¹å¼æœ‰tasklet,work,softirq.
-		ä¸­æ–­ç¨‹åºä¸­ä¸ŠåŠéƒ¨å¤„ç†éœ€è¦ç´§æ€¥å¤„ç†éƒ¨åˆ†,ä¸‹åŠéƒ¨å¤„ç†ä¸éœ€è¦ç´§æ€¥å¤„ç†éƒ¨åˆ†.ä¸Šä¸‹éƒ¨å¤„ç†æ ¹æ®æƒ…å†µæ¥é€‰æ‹©,ä¸ä¸€å®šä¸€å®šè¦.
-		taskletå’Œsoftirqå·¥ä½œäºåŸå­ä¸Šä¸‹æ–‡,å·¥ä½œé˜Ÿåˆ—å·¥ä½œäºè¿›ç¨‹ä¸Šä¸‹æ–‡,æ‰€ä»¥å·¥ä½œé˜Ÿåˆ—å¯ä»¥é˜»å¡,è€Œtaskletå’Œsoftirqä¸èƒ½æœ‰é˜»å¡.
-	å˜é‡:
+ÖĞ¶Ï
+	ËµÃ÷:
+		ÖĞ¶ÏÓÃÓÚ´ò¶Ïµ±Ç°³ÌĞò.ÔÚlinuxÖĞÎªÈ¡µÃĞ§ÂÊµÄÆ½ºâ,²ÉÓÃÏÂ°ë²¿´¦Àí·½Ê½,´¦ÀíÖĞ¶Ï.ÏÂ°ë²¿´¦Àí·½Ê½ÓĞtasklet,work,softirq.
+		ÖĞ¶Ï³ÌĞòÖĞÉÏ°ë²¿´¦ÀíĞèÒª½ô¼±´¦Àí²¿·Ö,ÏÂ°ë²¿´¦Àí²»ĞèÒª½ô¼±´¦Àí²¿·Ö.ÉÏÏÂ²¿´¦Àí¸ù¾İÇé¿öÀ´Ñ¡Ôñ,²»Ò»¶¨Ò»¶¨Òª.
+		taskletºÍsoftirq¹¤×÷ÓÚÔ­×ÓÉÏÏÂÎÄ,¹¤×÷¶ÓÁĞ¹¤×÷ÓÚ½ø³ÌÉÏÏÂÎÄ,ËùÒÔ¹¤×÷¶ÓÁĞ¿ÉÒÔ×èÈû,¶øtaskletºÍsoftirq²»ÄÜÓĞ×èÈû.
+	±äÁ¿:
 		tasklet_t tsklet
 		work_struct wk
 
-		DECLARE_TASKLET(tsklet,tsklet_fun,data)//è”ç³»ç»“æ„ä¸ä¸‹åŠéƒ¨å¤„ç†å‡½æ•°
+		DECLARE_TASKLET(tsklet,tsklet_fun,data)//ÁªÏµ½á¹¹ÓëÏÂ°ë²¿´¦Àíº¯Êı
 		
 
-	å‡½æ•°:
+	º¯Êı:
 		register_irq(unsigned int irq,irq_handler_t handler,unsigned long irqflags,const char * name,void *dev_id)
 		free_irq(unsigned int irq,void * dev_id);
 		
-		disable_irq(int irq);//éœ€è¦ç­‰å¾…ä¸­æ–­å¤„ç†å®Œ
+		disable_irq(int irq);//ĞèÒªµÈ´ıÖĞ¶Ï´¦ÀíÍê
 		enable_irq(int irq);
-		disable_irq_nosync(int irq);//ä¸éœ€è¦ç­‰å¾…ä¸­æ–­å¤„ç†å®Œ
+		disable_irq_nosync(int irq);//²»ĞèÒªµÈ´ıÖĞ¶Ï´¦ÀíÍê
 		
 		tasklet_schedule(xx_tsk);
 		schedule_work(xx_wk);
 		
-		INIT_WORK(wk,xx_work_fun,data);//è”ç³»å·¥ä½œé˜Ÿåˆ—ä¸­çš„ç»“æ„ä¸å¤„ç†å‡½æ•°
-	ç”¨æ³•
+		INIT_WORK(wk,xx_work_fun,data);//ÁªÏµ¹¤×÷¶ÓÁĞÖĞµÄ½á¹¹Óë´¦Àíº¯Êı
+	ÓÃ·¨
 		xx_init()
 		{
 			request_irq(irq,xx_irqhandler,flags,"xx_irq",NULL);
@@ -447,27 +447,27 @@ Linuxä¸­çš„åŒæ­¥é—®é¢˜
 			free_irq(irq,NULL);
 		}
 			
-		å¦‚æœæƒ³ç”¨taskletä¸‹åŠéƒ¨
+		Èç¹ûÏëÓÃtaskletÏÂ°ë²¿
 		void xx_tasklet_fun(unsigned int)
 		{
 			
 		}
 		DECLARE_TASKLET(xx_tsk,xx_tasklet_fun,NULL)
-	æ‰©å±•:
-		local_irq_eanble,local_irq_disable//å…è®¸,ç¦æ­¢æœ¬åœ°cpuä¸­æ–­
+	À©Õ¹:
+		local_irq_eanble,local_irq_disable//ÔÊĞí,½ûÖ¹±¾µØcpuÖĞ¶Ï
 		
-		å…±äº«ä¸­æ–­:
-			è¯´æ˜:
-				å¤šä¸ªè®¾å¤‡,å…±äº«ä¸€ä¸ªç¡¬ä»¶ä¸­æ–­çº¿çš„æƒ…å†µ.å…±äº«ä¸­æ–­éœ€è¦å°†flagsè®¾ç½®æˆIRQF_SHARED,ç³»ç»Ÿä¼šéå†æ‰€æœ‰å…±äº«ä¸­æ–­çš„å¤„ç†å‡½æ•°,ç›´åˆ°è¿”å›IRQ_HANDLED.åœ¨ä¸ŠåŠéƒ¨,åº”å½“è¯»å–ä¸­æ–­çŠ¶æ€,å¦‚æœä¸æ˜¯å±äºæœ¬èº«çš„ä¸­æ–­åº”å½“ç«‹å³è¿”å›IRQ_NONE;
+		¹²ÏíÖĞ¶Ï:
+			ËµÃ÷:
+				¶à¸öÉè±¸,¹²ÏíÒ»¸öÓ²¼şÖĞ¶ÏÏßµÄÇé¿ö.¹²ÏíÖĞ¶ÏĞèÒª½«flagsÉèÖÃ³ÉIRQF_SHARED,ÏµÍ³»á±éÀúËùÓĞ¹²ÏíÖĞ¶ÏµÄ´¦Àíº¯Êı,Ö±µ½·µ»ØIRQ_HANDLED.ÔÚÉÏ°ë²¿,Ó¦µ±¶ÁÈ¡ÖĞ¶Ï×´Ì¬,Èç¹û²»ÊÇÊôÓÚ±¾ÉíµÄÖĞ¶ÏÓ¦µ±Á¢¼´·µ»ØIRQ_NONE;
 			
-		æ—¶é—´å®šæ—¶å™¨:
-			è¯´æ˜:
-				æ—¶é—´å®šæ—¶å™¨æœ€ç»ˆä¾èµ–ç¡¬ä»¶å®šæ—¶å™¨æ¥å·¥ä½œ,å½“æ—¶é’Ÿä¸­æ–­å‘ç”Ÿæ—¶,ç³»ç»Ÿä¼šæ£€æµ‹å„ä¸ªæ—¶é—´å®šæ—¶å™¨,åˆ°æœŸçš„æ—¶é—´å®šæ—¶å™¨å‡½æ•°ä½œä¸ºè½¯ä¸­æ–­åœ¨åº•åŠéƒ¨æ‰§è¡Œ.
-			å˜é‡:
+		Ê±¼ä¶¨Ê±Æ÷:
+			ËµÃ÷:
+				Ê±¼ä¶¨Ê±Æ÷×îÖÕÒÀÀµÓ²¼ş¶¨Ê±Æ÷À´¹¤×÷,µ±Ê±ÖÓÖĞ¶Ï·¢ÉúÊ±,ÏµÍ³»á¼ì²â¸÷¸öÊ±¼ä¶¨Ê±Æ÷,µ½ÆÚµÄÊ±¼ä¶¨Ê±Æ÷º¯Êı×÷ÎªÈíÖĞ¶ÏÔÚµ×°ë²¿Ö´ĞĞ.
+			±äÁ¿:
 				timer_list timer
-				HZ æ¯ç§’é’Ÿä¸­æ–­æ¬¡æ•°,ä¸€èˆ¬100
-				jiffies å½“å‰ä¸­æ–­æ¬¡æ•°.ä¸€ç§’é’Ÿæœ‰hzä¸ªjiffies.
-			å‡½æ•°:	
+				HZ Ã¿ÃëÖÓÖĞ¶Ï´ÎÊı,Ò»°ã100
+				jiffies µ±Ç°ÖĞ¶Ï´ÎÊı.Ò»ÃëÖÓÓĞhz¸öjiffies.
+			º¯Êı:	
 				init_timer(&timer)
 				add_timer(&timer)
 				del_timer(&timer)
@@ -475,9 +475,9 @@ Linuxä¸­çš„åŒæ­¥é—®é¢˜
 				
 				DEFINE_TIEMER(name,fun,expires)
 				TIMER_INITIALIZER(name,fun,dara)
-				msecs_to_jiffies å°†æ¯«ç§’è½¬æ¢æˆjiffies
+				msecs_to_jiffies ½«ºÁÃë×ª»»³Éjiffies
 				
-			ç”¨æ³•:
+			ÓÃ·¨:
 				sturct xx_dev={
 					struct cdev cdev;
 					...
@@ -490,7 +490,7 @@ Linuxä¸­çš„åŒæ­¥é—®é¢˜
 					init_timer(&dev.xx_timer);
 					dev.xx_timer.function=do_timer;
 					dev.xx_timer.data=..
-					dev.xx_timer.expires=jiffies+æ—¶é—´é—´éš”;
+					dev.xx_timer.expires=jiffies+Ê±¼ä¼ä¸ô;
 				}
 				xx_exit()
 				{
@@ -499,20 +499,20 @@ Linuxä¸­çš„åŒæ­¥é—®é¢˜
 				
 				do_timer(unsigned long arg)
 				{
-					mod_timer(&dev.xx_timer,æ–°æ—¶é—´)
-					æˆ–è€…
-					dev.xx_timer.expires=æ–°æ—¶é—´
+					mod_timer(&dev.xx_timer,ĞÂÊ±¼ä)
+					»òÕß
+					dev.xx_timer.expires=ĞÂÊ±¼ä
 					add_timer(&dev.xx_timer);
 				}
 				
-				æ‰©å±•:delay_work
-					è¯´æ˜:
-						å¯¹äºå‘¨æœŸæ€§ä»»åŠ¡,è¿˜å¯ä»¥ç”¨delay_workæ¥å®Œæˆ.
-					å˜é‡:	
+				À©Õ¹:delay_work
+					ËµÃ÷:
+						¶ÔÓÚÖÜÆÚĞÔÈÎÎñ,»¹¿ÉÒÔÓÃdelay_workÀ´Íê³É.
+					±äÁ¿:	
 						struct delay_work work;
-					å‡½æ•°:
+					º¯Êı:
 						schedule_delay_work(struct delay_work *,unsigned long dealy)
-					ç”¨æ³•:
+					ÓÃ·¨:
 						struct delay_work work;
 						
 						xx_fun1()
@@ -524,62 +524,62 @@ Linuxä¸­çš„åŒæ­¥é—®é¢˜
 							schedule_delay_work(&work,delay);
 						}
 				
-		å»¶è¿Ÿ:
-			è¯´æ˜:
-				å»¶è¿Ÿæœ‰å¿™å»¶è¿Ÿ,ä¼‘çœ å»¶è¿Ÿ.å¿™å»¶è¿Ÿå ç”¨cpuæ—¶é—´,ä¼‘çœ å»¶è¿Ÿä¸å ç”¨cpuæ—¶é—´.
-			å‡½æ•°:
+		ÑÓ³Ù:
+			ËµÃ÷:
+				ÑÓ³ÙÓĞÃ¦ÑÓ³Ù,ĞİÃßÑÓ³Ù.Ã¦ÑÓ³ÙÕ¼ÓÃcpuÊ±¼ä,ĞİÃßÑÓ³Ù²»Õ¼ÓÃcpuÊ±¼ä.
+			º¯Êı:
 				ndelay
 				udelay
 				mdelay
 				
-				msleep ä¸å¯è¢«æ‰“æ–­
-				msleep_interruptiable å¯è¢«æ‰“æ–­
+				msleep ²»¿É±»´ò¶Ï
+				msleep_interruptiable ¿É±»´ò¶Ï
 				ssleep
 				
-				timer_before(a,b) aåœ¨bä¹‹å‰
-				timer_after(a,b) aåœ¨bä¹‹å
+				timer_before(a,b) aÔÚbÖ®Ç°
+				timer_after(a,b) aÔÚbÖ®ºó
 				
-å†…å­˜ä¸IOè®¿é—®
-	è¯´æ˜:ä»æ“ä½œç³»ç»Ÿè§’åº¦å†…å­˜å¯åˆ†ä¸ºå†…å­˜ç©ºé—´å’ŒIOç©ºé—´,å¯¹äºx86ç³»ç»Ÿå­˜åœ¨IOç©ºé—´,ä½†æ˜¯å¯¹äºarmç³»ç»Ÿåªæœ‰å†…å­˜ç©ºé—´.
-		å†…å­˜ç©ºé—´,åœ¨linuxç³»ç»Ÿä¸­åˆåˆ†ä¸ºç”¨æˆ·å†…å­˜å’Œå†…æ ¸å†…å­˜.ç”¨æˆ·å†…å­˜åœ¨0~3GèŒƒå›´,å†…æ ¸å†…å­˜åœ¨3G~4GèŒƒå›´.ç”¨æˆ·ç¨‹åºè¿è¡Œåœ¨ç”¨æˆ·å†…å­˜ä¸­,å„ä¸ªç”¨æˆ·å…·æœ‰è‡ªå·±çš„ç©ºé—´,äº’ç›¸ä¸å¹²æ‰°.å†…æ ¸è¿è¡Œåœ¨å†…æ ¸å†…å­˜ä¸­,å…·æœ‰å›ºå®šåˆ†é….
-		å†…æ ¸å†…å­˜ä»é«˜å‘ä½åˆ†ä¸ºå‡ ä¸ªéƒ¨åˆ†:ä¿ç•™åŒº,ä¸“ç”¨é¡µé¢åˆ†é…åŒº,é«˜ç«¯å†…å­˜æ˜ å°„åŒº,vmallocåˆ†é…åŒº,ç‰©ç†å†…å­˜æ˜ å°„åŒº.vmallocåˆ†é…åŒºä¸å‰ååŒºä¹‹é—´æœ‰ä¸€å®šçš„é—´éš”.ç‰©ç†æ˜ å°„åŒºæ˜ å°„ç‰©ç†0~896Mçš„å†…å­˜ï¼Œé«˜äºæ­¤åœ°å€çš„ç‰©ç†å†…å­˜æ˜ å°„åˆ°é«˜ç«¯å†…å­˜æ˜ å°„åŒºã€‚
-		åœ°å€å¯åˆ†ä¸ºç‰©ç†åœ°å€,æ€»çº¿åœ°å€,è™šæ‹Ÿåœ°å€.
-		é«˜æ€§èƒ½cpuä¸€èˆ¬å…·æœ‰mmuå†…å­˜ç®¡ç†å•å…ƒ,å…¶ä¸­åŒ…æ‹¬tlbå’Œttwã€‚tlbæ˜¯è½¬æ¢æ—è·¯ç¼“å­˜ï¼Œttwæ˜¯è½¬æ¢è¡¨æ¼«æ¸¸ã€‚å½“å¤„ç†å™¨ç»™å‡ºåœ°å€åï¼Œå…·æœ‰mmuçš„cpué¦–å…ˆä¼šæŸ¥æ‰¾tlbï¼Œå¦‚æœæ²¡æœ‰æ‰¾åˆ°ä¼šåœ¨ttwä¸­æŸ¥æ‰¾ï¼ŒæŸ¥æ‰¾åˆ°åå°†åœ°å€æ”¾å…¥tlbä¸­ã€‚
-	å˜é‡ï¼š
-		kmem_cache_t slabç¼“å­˜ç»“æ„,ç”¨äºslabç¼“å­˜.
-		struct vma_area_struct vmaç»“æ„,ç”¨äºå†…å­˜ç©ºé—´æ˜ å°„
-			æˆå‘˜:{
+ÄÚ´æÓëIO·ÃÎÊ
+	ËµÃ÷:´Ó²Ù×÷ÏµÍ³½Ç¶ÈÄÚ´æ¿É·ÖÎªÄÚ´æ¿Õ¼äºÍIO¿Õ¼ä,¶ÔÓÚx86ÏµÍ³´æÔÚIO¿Õ¼ä,µ«ÊÇ¶ÔÓÚarmÏµÍ³Ö»ÓĞÄÚ´æ¿Õ¼ä.
+		ÄÚ´æ¿Õ¼ä,ÔÚlinuxÏµÍ³ÖĞÓÖ·ÖÎªÓÃ»§ÄÚ´æºÍÄÚºËÄÚ´æ.ÓÃ»§ÄÚ´æÔÚ0~3G·¶Î§,ÄÚºËÄÚ´æÔÚ3G~4G·¶Î§.ÓÃ»§³ÌĞòÔËĞĞÔÚÓÃ»§ÄÚ´æÖĞ,¸÷¸öÓÃ»§¾ßÓĞ×Ô¼ºµÄ¿Õ¼ä,»¥Ïà²»¸ÉÈÅ.ÄÚºËÔËĞĞÔÚÄÚºËÄÚ´æÖĞ,¾ßÓĞ¹Ì¶¨·ÖÅä.
+		ÄÚºËÄÚ´æ´Ó¸ßÏòµÍ·ÖÎª¼¸¸ö²¿·Ö:±£ÁôÇø,×¨ÓÃÒ³Ãæ·ÖÅäÇø,¸ß¶ËÄÚ´æÓ³ÉäÇø,vmalloc·ÖÅäÇø,ÎïÀíÄÚ´æÓ³ÉäÇø.vmalloc·ÖÅäÇøÓëÇ°ºóÇøÖ®¼äÓĞÒ»¶¨µÄ¼ä¸ô.ÎïÀíÓ³ÉäÇøÓ³ÉäÎïÀí0~896MµÄÄÚ´æ£¬¸ßÓÚ´ËµØÖ·µÄÎïÀíÄÚ´æÓ³Éäµ½¸ß¶ËÄÚ´æÓ³ÉäÇø¡£
+		µØÖ·¿É·ÖÎªÎïÀíµØÖ·,×ÜÏßµØÖ·,ĞéÄâµØÖ·.
+		¸ßĞÔÄÜcpuÒ»°ã¾ßÓĞmmuÄÚ´æ¹ÜÀíµ¥Ôª,ÆäÖĞ°üÀ¨tlbºÍttw¡£tlbÊÇ×ª»»ÅÔÂ·»º´æ£¬ttwÊÇ×ª»»±íÂşÓÎ¡£µ±´¦ÀíÆ÷¸ø³öµØÖ·ºó£¬¾ßÓĞmmuµÄcpuÊ×ÏÈ»á²éÕÒtlb£¬Èç¹ûÃ»ÓĞÕÒµ½»áÔÚttwÖĞ²éÕÒ£¬²éÕÒµ½ºó½«µØÖ··ÅÈëtlbÖĞ¡£
+	±äÁ¿£º
+		kmem_cache_t slab»º´æ½á¹¹,ÓÃÓÚslab»º´æ.
+		struct vma_area_struct vma½á¹¹,ÓÃÓÚÄÚ´æ¿Õ¼äÓ³Éä
+			³ÉÔ±:{
 				struct mm_struct *vm_mm;
-				unsigned long vm_strat;//è™šæ‹Ÿç©ºé—´èµ·å§‹åœ°å€
+				unsigned long vm_strat;//ĞéÄâ¿Õ¼äÆğÊ¼µØÖ·
 				unsigned long vm_end;
 				
 				pgprot_t vm_page_prot;
 				unsigned long vm_flags;
 				
-				vm_operations_struct *vm_ops;//æ“ä½œå‡½æ•°
+				vm_operations_struct *vm_ops;//²Ù×÷º¯Êı
 				...
 				}
 					
-		struct map_spec ç”¨äºé™æ€ç©ºé—´æ˜ å°„.
-	å‡½æ•°:
-		kmalloc (size_t size,int flags) flagsä¸€èˆ¬æœ‰GFP_KERNEL,GFP_ATOMIC,GFP_DMAç­‰.ä½¿ç”¨GFP_KERNELæ ‡å¿—ä¼šå¯¼è‡´é˜»å¡,è€Œä½¿ç”¨GFP_ATOMIC
-		ä¸ä¼šå¯¼è‡´é˜»å¡.
+		struct map_spec ÓÃÓÚ¾²Ì¬¿Õ¼äÓ³Éä.
+	º¯Êı:
+		kmalloc (size_t size,int flags) flagsÒ»°ãÓĞGFP_KERNEL,GFP_ATOMIC,GFP_DMAµÈ.Ê¹ÓÃGFP_KERNEL±êÖ¾»áµ¼ÖÂ×èÈû,¶øÊ¹ÓÃGFP_ATOMIC
+		²»»áµ¼ÖÂ×èÈû.
 		kfree
 		__get_free_pages(unsigned int flags,unsigned int order)
 		vmalloc (unsigned long size)
 		vfree
 		
-		//slabç›¸å…³å‡½æ•°,slabæ˜¯ä¸ºäº†æé«˜å†…å­˜çš„ä½¿ç”¨æ•ˆç‡,ä¸ºé¢‘ç¹åˆ†é…å°å†…å­˜ä½¿ç”¨è€Œæå‡ºçš„è§£å†³æ–¹æ¡ˆ.kmallocå°±æ˜¯ç”¨slabå®ç°çš„.
+		//slabÏà¹Øº¯Êı,slabÊÇÎªÁËÌá¸ßÄÚ´æµÄÊ¹ÓÃĞ§ÂÊ,ÎªÆµ·±·ÖÅäĞ¡ÄÚ´æÊ¹ÓÃ¶øÌá³öµÄ½â¾ö·½°¸.kmalloc¾ÍÊÇÓÃslabÊµÏÖµÄ.
 		kmem_cache_create
 		kmem_cache_alloc
 		kmem_cache_free
 		kmem_cache_destory
-		//å†…å­˜æ± ç›¸å…³å‡½æ•°
+		//ÄÚ´æ³ØÏà¹Øº¯Êı
 		mem_pool_create
 		mem_pool_alloc
 		mem_pool_free
 		mem_pool_destory
-		//ä½ç«¯å†…å­˜çš„ç‰©ç†åœ°å€ä¸è™šæ‹Ÿåœ°å€çš„è½¬æ¢
+		//µÍ¶ËÄÚ´æµÄÎïÀíµØÖ·ÓëĞéÄâµØÖ·µÄ×ª»»
 		virt_to_phys
 		phys_to_virt
 		virt_to_page
@@ -587,7 +587,7 @@ Linuxä¸­çš„åŒæ­¥é—®é¢˜
 		virt_to_bus
 		bus_to_virt
 		
-		//IOç©ºé—´è®¿é—®å‡½æ•°
+		//IO¿Õ¼ä·ÃÎÊº¯Êı
 		inb
 		outb
 		inw
@@ -600,8 +600,8 @@ Linuxä¸­çš„åŒæ­¥é—®é¢˜
 		outsw
 		insl
 		outsl
-		//IOå†…å­˜ç©ºé—´è®¿é—®å‡½æ•°
-		ioremap(unsigned long offset,unsigned long size) å°†ç‰©ç†åœ°å€æ˜ å°„åˆ°è™šæ‹Ÿåœ°å€
+		//IOÄÚ´æ¿Õ¼ä·ÃÎÊº¯Êı
+		ioremap(unsigned long offset,unsigned long size) ½«ÎïÀíµØÖ·Ó³Éäµ½ĞéÄâµØÖ·
 		iounremap
 		
 		ioport_map
@@ -619,25 +619,25 @@ Linuxä¸­çš„åŒæ­¥é—®é¢˜
 		
 		request_mem_region
 		release_mem_region
-		//ç”¨äºå†…æ ¸ç©ºé—´åˆ°ç”¨æˆ·ç©ºé—´å†…å­˜æ˜ å°„å‡½æ•°
-		remap_pfn_range(struct vma_area_struct *,unsigned long start,unsigned long pfn,unsigned long size,pgprot_t prot)//åˆ›å»ºé¡µè¡¨
+		//ÓÃÓÚÄÚºË¿Õ¼äµ½ÓÃ»§¿Õ¼äÄÚ´æÓ³Éäº¯Êı
+		remap_pfn_range(struct vma_area_struct *,unsigned long start,unsigned long pfn,unsigned long size,pgprot_t prot)//´´½¨Ò³±í
 		remap_page_range(unsigned long start,unsigned long page,unsigned long pagesize,pgprot_t prot)//
 		mem_map_reserve(unsigned long page)
-		pgprot_nocached(pgprot_t prot)//å°†pageè®¾ç½®ä¸ºno cache,ä¸€èˆ¬ioç©ºé—´éƒ½è¦è®¾ç½®ä¸ºno cache
-		ç”¨æˆ·ä¾§:
+		pgprot_nocached(pgprot_t prot)//½«pageÉèÖÃÎªno cache,Ò»°ãio¿Õ¼ä¶¼ÒªÉèÖÃÎªno cache
+		ÓÃ»§²à:
 		mmap(void* addr,size_t len,int prot,int flags,int fd,off_t offset)
 			prot:PROT_READ,PROT_WRITE,PROT_EXEC...
 			flags:MAP_SHARE,MAP_PRIVATE,MAP_ANONYMOUS...		
 		munmap(void *addr,int len)
-	ç”¨æ³•:
-		ioç©ºé—´
+	ÓÃ·¨:
+		io¿Õ¼ä
 		request_region
 		inb
 		outb
 		...
 		release_region
 		
-		ioå†…å­˜
+		ioÄÚ´æ
 		request_region
 		ioport_map
 		ioread8
@@ -654,18 +654,18 @@ Linuxä¸­çš„åŒæ­¥é—®é¢˜
 		iounmap
 		release_mem_region
 		
-		å†…æ ¸ç©ºé—´æ˜ å°„
-			è¯´æ˜:
-				å¯ä»¥å°†å†…å­˜ä¸­çš„ä¿ç•™é¡µæ˜ å°„åˆ°ç”¨æˆ·ç©ºé—´,ä¿ç•™é¡µæ˜¯IOç©ºé—´,æˆ–è€…é€šè¿‡ç¨‹åºè®¾ç½®.
-			ç”¨æ³•:
-				ç”¨æˆ·ç«¯:
-					è°ƒç”¨mmapå‡½æ•°
+		ÄÚºË¿Õ¼äÓ³Éä
+			ËµÃ÷:
+				¿ÉÒÔ½«ÄÚ´æÖĞµÄ±£ÁôÒ³Ó³Éäµ½ÓÃ»§¿Õ¼ä,±£ÁôÒ³ÊÇIO¿Õ¼ä,»òÕßÍ¨¹ı³ÌĞòÉèÖÃ.
+			ÓÃ·¨:
+				ÓÃ»§¶Ë:
+					µ÷ÓÃmmapº¯Êı
 					mmap(NULL,len,PROT_READ,MAP_PRIVATE,fd,0);
 					...
 					munmap();
 					
-				å†…æ ¸:
-					å®ç°fileoperationsä¸­mmapå‡½æ•°
+				ÄÚºË:
+					ÊµÏÖfileoperationsÖĞmmapº¯Êı
 					xx_mmap(struct file *file,struct vm_area_struct *vm)
 					{
 						remap_pfn_range(vm,vm->vm_start,vm->vm_pgoff,vm->vm_end-vm->vm_start,vm->vm_page_prot);
@@ -676,12 +676,12 @@ Linuxä¸­çš„åŒæ­¥é—®é¢˜
 						.close=xx_close;
 					}
 		
-					å®ç°kmallocåˆ†é…å†…å­˜çš„æ˜ å°„
+					ÊµÏÖkmalloc·ÖÅäÄÚ´æµÄÓ³Éä
 					xx_init
 					{
 						share_mem=kmalloc();
 						for(page=virt_to_page(share_mem);page<virt_to_page(share_mem+BUFFER_SIZE);page++)
-							mem_map_reserve(page);å°†memè®¾ç½®ä¸ºä¿ç•™é¡µ
+							mem_map_reserve(page);½«memÉèÖÃÎª±£ÁôÒ³
 					}
 					xx_mmap(struct file*file,struct vm_area_struct *vm)
 					{
@@ -700,17 +700,17 @@ Linuxä¸­çš„åŒæ­¥é—®é¢˜
 						kfree();
 					}
 					
-		DMAæ“ä½œ
-			è¯´æ˜:
-				dmaæ“ä½œ,å¯èƒ½å¯¼è‡´cacheä¸ä¸€è‡´çš„æƒ…å†µ,æ‰€ä»¥åº”å½“ä½¿ç”¨dma_alloc_coherentæ–¹æ³•ç”³è¯·dmaå†…å­˜.dmaçš„ä½¿ç”¨ç±»ä¼¼äºä¸­æ–­.
-			å˜é‡:
+		DMA²Ù×÷
+			ËµÃ÷:
+				dma²Ù×÷,¿ÉÄÜµ¼ÖÂcache²»Ò»ÖÂµÄÇé¿ö,ËùÒÔÓ¦µ±Ê¹ÓÃdma_alloc_coherent·½·¨ÉêÇëdmaÄÚ´æ.dmaµÄÊ¹ÓÃÀàËÆÓÚÖĞ¶Ï.
+			±äÁ¿:
 				struct scatterlist
-			å‡½æ•°:
+			º¯Êı:
 				void *dma_alloc_coherent(struct device*dev,size_t size,dma_addr_t *handler,gfp_t gfp)
 				dma_free_coherent(struct device*dev,size_t size,void *cpu_addr,gfp_t gfp)
 				request_dma(unsigned int dmanr,const char*device_id);
 				free_dma(unsigned int dmanr);
-			ç”¨æ³•:
+			ÓÃ·¨:
 				request_dma()
 				dma_alloc_coherent
 				
@@ -719,17 +719,18 @@ Linuxä¸­çš„åŒæ­¥é—®é¢˜
 				dma_free_coherent
 				free_dma
 				
-å¦‚ä½•æ·»åŠ ä¸€ä¸ªé©±åŠ¨åˆ°linuxä¸­
-	1. å°†ç¨‹åºæ‹·è´åˆ°åˆé€‚çš„ä½ç½®  
-		æ¯”å¦‚å°†æ·»åŠ ä¸€ä¸ªWiznetçš„W5300é©±åŠ¨
+
+ÈçºÎÌí¼ÓÒ»¸öÇı¶¯µ½linuxÖĞ
+	1. ½«³ÌĞò¿½±´µ½ºÏÊÊµÄÎ»ÖÃ  
+		±ÈÈç½«Ìí¼ÓÒ»¸öWiznetµÄW5300Çı¶¯
 		/dirvers/net/ethernet/wiznet 
-	2. åœ¨wiznetç›®å½•ä¸‹å¢åŠ Kconfigå’ŒMakefile  
+	2. ÔÚwiznetÄ¿Â¼ÏÂÔö¼ÓKconfigºÍMakefile  
 		Kconfig :  
-			config NET_VENDOR_WIZNET	;å®šä¹‰ä¸€ä¸ªé…ç½®é¡¹	  
-				depends on HAS_IOMEM		;æŒ‡å®šä¾èµ–å…³ç³»  
-				default y					;æŒ‡å®šå€¼,å…¶ä»–å½¢å¼è¿˜åŒ…æ‹¬bool,tristate(y,n,m)  
+			config NET_VENDOR_WIZNET	;¶¨ÒåÒ»¸öÅäÖÃÏî	  
+				depends on HAS_IOMEM		;Ö¸¶¨ÒÀÀµ¹ØÏµ  
+				default y					;Ö¸¶¨Öµ,ÆäËûĞÎÊ½»¹°üÀ¨bool,tristate(y,n,m)  
 				--help--  
-					xxxç”¨ç¼©è¿›è¡¨ç¤ºå¸®åŠ©  
+					xxxÓÃËõ½ø±íÊ¾°ïÖú  
 			if NET_VENDOR_WIZNET
 
 			config WIZNET_W5100			;  
@@ -737,29 +738,29 @@ Linuxä¸­çš„åŒæ­¥é—®é¢˜
 				depends on HAS_IOMEM  
 
 			endif 
-		å®šä¹‰çš„é…ç½®é¡¹ç”¨äºMakefile  
+		¶¨ÒåµÄÅäÖÃÏîÓÃÓÚMakefile  
 		Makefile:  
 			obj-$(WIZNET_W5100)+=w5100.o  
-	3. åœ¨ä¸Šä¸€çº§ç›®å½•ä¸­è¦ä¿®æ”¹Kconfigå’ŒMakefileæ–‡ä»¶,  
+	3. ÔÚÉÏÒ»¼¶Ä¿Â¼ÖĞÒªĞŞ¸ÄKconfigºÍMakefileÎÄ¼ş,  
 		Kconfig:  
 			source wiznet/Kconfig   
 		Makefie:  
 			obj-$(CONFIG_NET_VENDOR_WIZNET)+=wiznet/  
 
-platformè®¾å¤‡é©±åŠ¨
-	è¯´æ˜:
-		platformæ˜¯Linuxä¸­æ€»çº¿çš„ä¸€ç§,ä¸i2c,pci,isaä¸€æ ·.ä½†æ˜¯å®ƒå¹¶éå®é™…å­˜åœ¨,è€Œæ˜¯è™šæ‹Ÿå‡ºæ¥çš„,ç”¨äºå°†socä¸­çš„å¤–å›´å™¨ä»¶æŒ‚æ¥åœ¨è¿™ä¸ªæ€»çº¿ä¸­.
-	linuxä¸­çš„é©±åŠ¨åŒ…æ‹¬æ€»çº¿,è®¾å¤‡,è®¾å¤‡é©±åŠ¨ä¸‰ä¸ªå®ä½“,æ€»çº¿å°†è®¾å¤‡å’Œé©±åŠ¨ç»‘å®š.platformæ€»çº¿çš„é©±åŠ¨æ˜¯platform_driver,è®¾å¤‡æ˜¯platform_device.
-	æ€»çº¿çš„matchå‡½æ•°å°±æ˜¯å°†é©±åŠ¨ä¸è®¾å¤‡çš„åå­—åŠ ä»¥æ¯”è¾ƒ,ç›¸ç­‰è®¤ä¸ºåŒ¹é…ä¸Šäº†.
-	å˜é‡:
+platformÉè±¸Çı¶¯
+	ËµÃ÷:
+		platformÊÇLinuxÖĞ×ÜÏßµÄÒ»ÖÖ,Óëi2c,pci,isaÒ»Ñù.µ«ÊÇËü²¢·ÇÊµ¼Ê´æÔÚ,¶øÊÇĞéÄâ³öÀ´µÄ,ÓÃÓÚ½«socÖĞµÄÍâÎ§Æ÷¼ş¹Ò½ÓÔÚÕâ¸ö×ÜÏßÖĞ.
+	linuxÖĞµÄÇı¶¯°üÀ¨×ÜÏß,Éè±¸,Éè±¸Çı¶¯Èı¸öÊµÌå,×ÜÏß½«Éè±¸ºÍÇı¶¯°ó¶¨.platform×ÜÏßµÄÇı¶¯ÊÇplatform_driver,Éè±¸ÊÇplatform_device.
+	×ÜÏßµÄmatchº¯Êı¾ÍÊÇ½«Çı¶¯ÓëÉè±¸µÄÃû×Ö¼ÓÒÔ±È½Ï,ÏàµÈÈÏÎªÆ¥ÅäÉÏÁË.
+	±äÁ¿:
 		device_private{
 			..
 			void * driver_data;
 		}
 		device {
-			device_private *p;//è®¾å¤‡çš„ç§æœ‰æ•°æ®
-			void* platform_data;//å¹³å°è®¾å¤‡æ•°æ®
-			ã€‚ã€‚ã€‚
+			device_private *p;//Éè±¸µÄË½ÓĞÊı¾İ
+			void* platform_data;//Æ½Ì¨Éè±¸Êı¾İ
+			¡£¡£¡£
 		}
 		platform_device {
 			char *name;
@@ -768,10 +769,10 @@ platformè®¾å¤‡é©±åŠ¨
 			u32 num_resourecs;
 			struct resource *resource;
 		}
-		å¦‚æœèµ„æºæ–‡ä»¶ä¸­çš„æè¿°ä¸å¤Ÿ,å¯ä»¥åœ¨devä¸­çš„platform_dataä¸­è‡ªå®šä¹‰æ•°æ®
+		Èç¹û×ÊÔ´ÎÄ¼şÖĞµÄÃèÊö²»¹»,¿ÉÒÔÔÚdevÖĞµÄplatform_dataÖĞ×Ô¶¨ÒåÊı¾İ
 		
 		device_driver{
-			char * name;//æè¿°é©±åŠ¨åç§°
+			char * name;//ÃèÊöÇı¶¯Ãû³Æ
 			struct module *owner;
 			...
 		} 
@@ -799,14 +800,14 @@ platformè®¾å¤‡é©±åŠ¨
 		}
 		flags:IORESOURCE_IO,IORESORECE_MEM,IORESOURCE_DMA...
 		
-	å‡½æ•°:
+	º¯Êı:
 		platform_driver_register(platform_driver*)
 		platform_driver_unregister(platform_driver*)
 		platform_get_resource(platform_device *dev,flags,num)
 		
 		platform_set_drvdata(platform_device*pdev,void *);
 		platform_get_drvdata(platform_device *pdev);
-	ç”¨æ³•
+	ÓÃ·¨
 		xx_probe(struct platform_device *dev)
 		{
 			register_chrdev_region
@@ -845,15 +846,15 @@ platformè®¾å¤‡é©±åŠ¨
 			platform_driver_unregister(&xx_driver);
 		}
 		
-åˆ†å±‚è®¾è®¡çš„é©±åŠ¨ç¨‹åº		
-	è¯´æ˜:
-		é€šè¿‡å€Ÿç”¨é¢å‘å¯¹è±¡çš„æ€æƒ³linuxä¸­çš„é©±åŠ¨ç¨‹åºå‘ˆç°ä¸¤ä¸ªç‰¹ç‚¹,åˆ†å±‚ä¸åˆ†ç¦».å°±æ˜¯å°†é‡å¤çš„ä»£ç æŠ½è±¡å‡ºæ¥,ç”¨æˆ·ä»…éœ€å…³å¿ƒä¸ä¸€æ ·çš„éƒ¨åˆ†.é€šè¿‡æŠ½è±¡,å°†ä¸€äº›è®¾å¤‡çš„å…±åŒéƒ¨åˆ†æŠ½å–å‡ºæ¥,å†…æ ¸å®ç°
-		é€šç”¨éƒ¨åˆ†,ç”¨æˆ·å®ç°å…·ä½“ä¸ä¸€æ ·éƒ¨åˆ†.è¾“å…¥é©±åŠ¨,rtcé©±åŠ¨,i2cé©±åŠ¨ç­‰éƒ½æ˜¯è¿™æ ·å®ç°çš„.
-	gpioè¾“å…¥é©±åŠ¨:
-		è¯´æ˜:
-			gpioé©±åŠ¨æ˜¯æŒ‡ç”¨gpioæ¥å®ç°çš„æŒ‰é”®è¾“å…¥é©±åŠ¨.å†…æ ¸drivers/input/keyboard/gpio_keys.cä¸­å®ç°é€šç”¨çš„æŒ‰é”®é©±åŠ¨.ä»è¿™ä¸ªä¾‹å­å¯ä»¥çœ‹å‡º,é€šè¿‡æŠ½è±¡,å°†æ•°æ®ä¸ç¨‹åºåˆ†ç¦».ç”¨æˆ·åªéœ€å…³å¿ƒæŒ‰é”®çš„å®šä¹‰å³å¯.
-		å˜é‡:
-			struct gpio_keys_button{//ç”¨äºæè¿°gpioæŒ‰é”®çš„èµ„æº
+·Ö²ãÉè¼ÆµÄÇı¶¯³ÌĞò		
+	ËµÃ÷:
+		Í¨¹ı½èÓÃÃæÏò¶ÔÏóµÄË¼ÏëlinuxÖĞµÄÇı¶¯³ÌĞò³ÊÏÖÁ½¸öÌØµã,·Ö²ãÓë·ÖÀë.¾ÍÊÇ½«ÖØ¸´µÄ´úÂë³éÏó³öÀ´,ÓÃ»§½öĞè¹ØĞÄ²»Ò»ÑùµÄ²¿·Ö.Í¨¹ı³éÏó,½«Ò»Ğ©Éè±¸µÄ¹²Í¬²¿·Ö³éÈ¡³öÀ´,ÄÚºËÊµÏÖ
+		Í¨ÓÃ²¿·Ö,ÓÃ»§ÊµÏÖ¾ßÌå²»Ò»Ñù²¿·Ö.ÊäÈëÇı¶¯,rtcÇı¶¯,i2cÇı¶¯µÈ¶¼ÊÇÕâÑùÊµÏÖµÄ.
+	gpioÊäÈëÇı¶¯:
+		ËµÃ÷:
+			gpioÇı¶¯ÊÇÖ¸ÓÃgpioÀ´ÊµÏÖµÄ°´¼üÊäÈëÇı¶¯.ÄÚºËdrivers/input/keyboard/gpio_keys.cÖĞÊµÏÖÍ¨ÓÃµÄ°´¼üÇı¶¯.´ÓÕâ¸öÀı×Ó¿ÉÒÔ¿´³ö,Í¨¹ı³éÏó,½«Êı¾İÓë³ÌĞò·ÖÀë.ÓÃ»§Ö»Ğè¹ØĞÄ°´¼üµÄ¶¨Òå¼´¿É.
+		±äÁ¿:
+			struct gpio_keys_button{//ÓÃÓÚÃèÊögpio°´¼üµÄ×ÊÔ´
 				code
 				gpio
 				type
@@ -863,11 +864,11 @@ platformè®¾å¤‡é©±åŠ¨
 				...
 			}
 			struct gpio_keys_platform_data{
-				buttons	//ä¸Šé¢æè¿°çš„èµ„æº
-				nbuttons//æ•°é‡
+				buttons	//ÉÏÃæÃèÊöµÄ×ÊÔ´
+				nbuttons//ÊıÁ¿
 			}
 		
-		å‡½æ•°:
+		º¯Êı:
 			input_dev* input_allocate_device(void)
 			input_free_device(input_dev*)
 			
@@ -880,8 +881,8 @@ platformè®¾å¤‡é©±åŠ¨
 			input_report_abs(input_dev*,unsigned int code,unsigned int type,int value)
 			input_sync(input_dev*)
 			
-		ç”¨æ³•:
-			å®šä¹‰gpio_keys_buttonç»“æ„æˆå‘˜
+		ÓÃ·¨:
+			¶¨Òågpio_keys_button½á¹¹³ÉÔ±
 			xx_buttons[]={
 				{
 					.gpio=
@@ -899,29 +900,29 @@ platformè®¾å¤‡é©±åŠ¨
 				},
 			...				
 			}	
-			//å®šä¹‰platform_data
+			//¶¨Òåplatform_data
 			xx_key_platform_data={
 				.buttons=&xx_buttons;
 				.nbuttons=ARRAY_SIZE(xx_buttons)
 			}
-			//å°†platform_dataèµ‹äºˆdev
+			//½«platform_data¸³Óèdev
 			xx_device={
-				.name="xx",//åå­—è¦ä¸ºgpio-keysæˆ–è€…gpio-keys-polled
+				.name="xx",//Ãû×ÖÒªÎªgpio-keys»òÕßgpio-keys-polled
 				.id=1;
 				.dev={
 					.platform_data=&xx_key_platforn_data;	
 				}
 			}
-			//åœ¨åˆé€‚çš„åœ°æ–¹è°ƒç”¨platform_device,ç³»ç»Ÿè‡ªåŠ¨å›åŒ¹é…ç›¸åº”çš„é©±åŠ¨
+			//ÔÚºÏÊÊµÄµØ·½µ÷ÓÃplatform_device,ÏµÍ³×Ô¶¯»ØÆ¥ÅäÏàÓ¦µÄÇı¶¯
 			xx_fun()
 			{
 				platform_device_register(&xx_device);
 			}
 			
-	rtcæ—¶é’ŸèŠ¯ç‰‡é©±åŠ¨:
-		è¯´æ˜:rtcæ—¶é’Ÿé©±åŠ¨å°†å¤§éƒ¨åˆ†é€šç”¨éƒ¨åˆ†åœ¨rtc-dev.cæ–‡ä»¶ä¸­å®ç°.é€šç”¨éƒ¨åˆ†å®ç°äº†file_operations,å¹¶å¯¼å‡ºäº†rtc_class_opsç»“æ„,rtc_device_register
-		rtc_device_unregisterå‡½æ•°,åº•å±‚éƒ¨åˆ†åªè¦å®ç°rtc_class_opså³å¯.
-		å˜é‡:
+	rtcÊ±ÖÓĞ¾Æ¬Çı¶¯:
+		ËµÃ÷:rtcÊ±ÖÓÇı¶¯½«´ó²¿·ÖÍ¨ÓÃ²¿·ÖÔÚrtc-dev.cÎÄ¼şÖĞÊµÏÖ.Í¨ÓÃ²¿·ÖÊµÏÖÁËfile_operations,²¢µ¼³öÁËrtc_class_ops½á¹¹,rtc_device_register
+		rtc_device_unregisterº¯Êı,µ×²ã²¿·ÖÖ»ÒªÊµÏÖrtc_class_ops¼´¿É.
+		±äÁ¿:
 			rtc_class_ops{
 				open
 				release
@@ -934,11 +935,11 @@ platformè®¾å¤‡é©±åŠ¨
 				irq_set_state
 				proc
 			}
-		å‡½æ•°:
+		º¯Êı:
 			rtc_device_register(char *name,device *dev,rtc_class_ops *class,MODULE)
 			rtc_decice_ungister
-		ç”¨æ³•:
-			å®ç° rtc_class_opsä¸­çš„å‡½æ•°
+		ÓÃ·¨:
+			ÊµÏÖ rtc_class_opsÖĞµÄº¯Êı
 			xx_read_time{
 			
 			}
@@ -969,24 +970,24 @@ platformè®¾å¤‡é©±åŠ¨
 			
 			xx_init(void){
 				i2c_add_driver(&xx_driver);
-				æˆ–è€…spi_register_driver
-				æˆ–è€…å…¶ä»–ç±»ä¼¼çš„é©±åŠ¨å‡½æ•°
+				»òÕßspi_register_driver
+				»òÕßÆäËûÀàËÆµÄÇı¶¯º¯Êı
 			}
 			xx_exit(void){
 				i2c_del_driver(&xx_driver);
-				æˆ–è€…spi_unregister_driver
-				æˆ–è€…å…¶ä»–ç±»ä¼¼çš„é©±åŠ¨å‡½æ•°
+				»òÕßspi_unregister_driver
+				»òÕßÆäËûÀàËÆµÄÇı¶¯º¯Êı
 			}
 			
-		SPIé©±åŠ¨:
-		è¯´æ˜:
-			spi,i2c,usbç­‰æ€»çº¿,åœ¨cpuä¸Šå‡æœ‰ç›¸åº”çš„æ§åˆ¶å™¨,ä¸ä¹‹å¯¹åº”çš„æ•°æ®ç»“æ„æ˜¯spi_master,i2c_adapterç­‰.ä¸»æœºæ§åˆ¶å™¨å’Œå¤–è®¾åˆ†ç¦»,å¤–è®¾ç”¨äº
-		é©±åŠ¨ä¸åŒçš„èŠ¯ç‰‡,é€šè¿‡è¿™æ ·è®¾è®¡é¿å…äº†å¤–è®¾é©±åŠ¨ä¸æ§åˆ¶å™¨å…³è”.
-			spié©±åŠ¨åŒ…æ‹¬spiæ ¸å¿ƒ(/drivers/spi/spi.c),ä¸»è¦åŒ…æ‹¬ä¸»æœºæ§åˆ¶å™¨,å¤–è®¾çš„æ³¨å†Œ,æ³¨é”€
-			driverå’Œdeviceçš„å…³ç³»:driverç”¨äºå°†å¤–è®¾æŒ‚è½½åˆ°æ€»çº¿ä¸Š,deviceæè¿°è®¾å¤‡çš„ç‰¹æ€§,ä¸platform_deviceä½¿ç”¨board_infoæ¥æè¿°deviceç±»ä¼¼,
-		spiä½¿ç”¨spi_board_infoæ¥æè¿°spi_device.é€šè¿‡spi_driverå°†spiå¤–è®¾æŒ‚è½½åˆ°spiæ€»çº¿,åœ¨driverçš„probeå‡½æ•°ä¸­,æ³¨å†Œspiæ‰€å±æœ¬èº«è®¾å¤‡é©±åŠ¨.
-		å˜é‡:
-			spi_master{//ç”¨äºæè¿°spiä¸»æœºæ§åˆ¶å™¨
+		SPIÇı¶¯:
+		ËµÃ÷:
+			spi,i2c,usbµÈ×ÜÏß,ÔÚcpuÉÏ¾ùÓĞÏàÓ¦µÄ¿ØÖÆÆ÷,ÓëÖ®¶ÔÓ¦µÄÊı¾İ½á¹¹ÊÇspi_master,i2c_adapterµÈ.Ö÷»ú¿ØÖÆÆ÷ºÍÍâÉè·ÖÀë,ÍâÉèÓÃÓÚ
+		Çı¶¯²»Í¬µÄĞ¾Æ¬,Í¨¹ıÕâÑùÉè¼Æ±ÜÃâÁËÍâÉèÇı¶¯Óë¿ØÖÆÆ÷¹ØÁª.
+			spiÇı¶¯°üÀ¨spiºËĞÄ(/drivers/spi/spi.c),Ö÷Òª°üÀ¨Ö÷»ú¿ØÖÆÆ÷,ÍâÉèµÄ×¢²á,×¢Ïú
+			driverºÍdeviceµÄ¹ØÏµ:driverÓÃÓÚ½«ÍâÉè¹ÒÔØµ½×ÜÏßÉÏ,deviceÃèÊöÉè±¸µÄÌØĞÔ,Óëplatform_deviceÊ¹ÓÃboard_infoÀ´ÃèÊödeviceÀàËÆ,
+		spiÊ¹ÓÃspi_board_infoÀ´ÃèÊöspi_device.Í¨¹ıspi_driver½«spiÍâÉè¹ÒÔØµ½spi×ÜÏß,ÔÚdriverµÄprobeº¯ÊıÖĞ,×¢²áspiËùÊô±¾ÉíÉè±¸Çı¶¯.
+		±äÁ¿:
+			spi_master{//ÓÃÓÚÃèÊöspiÖ÷»ú¿ØÖÆÆ÷
 				struct device dev;
 				bus_num
 				num_chipselect
@@ -994,7 +995,7 @@ platformè®¾å¤‡é©±åŠ¨
 				(*transfer)(spi_device* dev,spi_message *msg);
 				(*cleanup)(spi_device *dev);
 			}
-			spi_driver{//ç”¨äºæè¿°å¤–è®¾,æŒ‚è½½å¤–è®¾é©±åŠ¨
+			spi_driver{//ÓÃÓÚÃèÊöÍâÉè,¹ÒÔØÍâÉèÇı¶¯
 				probe
 				remove
 				shutdown
@@ -1002,7 +1003,7 @@ platformè®¾å¤‡é©±åŠ¨
 				resume
 				device_driver driver;
 			}
-			spi_device{//ç”¨äºæè¿°å¤–è®¾
+			spi_device{//ÓÃÓÚÃèÊöÍâÉè
 				struct device dev;
 				struct spi_master *master;
 				max_speed_hz;
@@ -1014,7 +1015,7 @@ platformè®¾å¤‡é©±åŠ¨
 				*controller_data;
 				modalias[SPI_NAME_SIZE];				
 			}
-			spi_transfer{//ç”¨äºæè¿°ä¼ è¾“æ•°æ®
+			spi_transfer{//ÓÃÓÚÃèÊö´«ÊäÊı¾İ
 				*tx_buf;
 				*rx_buf;
 				len
@@ -1028,7 +1029,7 @@ platformè®¾å¤‡é©±åŠ¨
 				list_head transfer_list;
 			}
 			
-			spi_message{//ç”¨äºç»„ç»‡spi_transfer
+			spi_message{//ÓÃÓÚ×éÖ¯spi_transfer
 				list_head transfers;
 				spi_device *spi;
 				is_dma_mapped;
@@ -1041,32 +1042,32 @@ platformè®¾å¤‡é©±åŠ¨
 				list_head queue;
 				void *state;
 			}
-			struct spi_board_info{//æè¿°spiå¤–è®¾æ•°æ®ç»“æ„
-				modaliasï¼›å¤–è®¾é©±åŠ¨çš„åç§°
-				bus_num;//ç”¨åˆ°çš„spiä¸»æœºæ§åˆ¶å™¨å·
-				chip_select;//ç‰‡é€‰ä¿¡å·
-				max_speed_hz;//spiä¼ è¾“é€Ÿç‡
-				plat_form_data;//å¹³å°æ•°æ®,ç”¨åœ¨spi_device.dev.platform_data;
-				controller_data;//ç”¨åœ¨spi_device.controller_dataä¸­
+			struct spi_board_info{//ÃèÊöspiÍâÉèÊı¾İ½á¹¹
+				modalias£»ÍâÉèÇı¶¯µÄÃû³Æ
+				bus_num;//ÓÃµ½µÄspiÖ÷»ú¿ØÖÆÆ÷ºÅ
+				chip_select;//Æ¬Ñ¡ĞÅºÅ
+				max_speed_hz;//spi´«ÊäËÙÂÊ
+				plat_form_data;//Æ½Ì¨Êı¾İ,ÓÃÔÚspi_device.dev.platform_data;
+				controller_data;//ÓÃÔÚspi_device.controller_dataÖĞ
 			}
-		å‡½æ•°:
-			spiæ ¸å¿ƒå‡½æ•°:
-			spiå¤–è®¾å‡½æ•°
+		º¯Êı:
+			spiºËĞÄº¯Êı:
+			spiÍâÉèº¯Êı
 			(struct spi_device *) 
 				spi_alloc_device(struct spi_master* master);
 			int spi_add_device(struct spi_device *dev);
-			int spi_new_device(struct spi_device *dev,struct spi_board_info* info);//è°ƒç”¨alloc_deviceå’Œadd_device
+			int spi_new_device(struct spi_device *dev,struct spi_board_info* info);//µ÷ÓÃalloc_deviceºÍadd_device
 			void spi_unregister_device(struct spi_device *dev);
-			int spi_register_board_info(struct spi_board_info* info,int nr);//å°†å¤–è®¾ä¸masterè”ç³»çš„å‡½æ•°ï¼Œä¼šè°ƒç”¨spi_new_device
+			int spi_register_board_info(struct spi_board_info* info,int nr);//½«ÍâÉèÓëmasterÁªÏµµÄº¯Êı£¬»áµ÷ÓÃspi_new_device
 
 			int spi_register_driver(struct spi_driver *driver);
 			int spi_unregister_driver(struct spi_driver *driver);
-			spiæ§åˆ¶å™¨å‡½æ•°
+			spi¿ØÖÆÆ÷º¯Êı
 			struct spi_master * 
 				spi_alloc_master(stuct device *dev,int size);
 			int spi_register_master(struct spi_master *master);
 			int spi_unregister_master(struct spi_master *master);
-				spi_master_get_dev_data(struct spi_master*master)//é€šå¸¸é€šè¿‡æ­¤å‡½æ•°è·å¾—ç”¨æˆ·å®šä¹‰çš„æ§åˆ¶å™¨çš„spièµ„æº,
+				spi_master_get_dev_data(struct spi_master*master)//Í¨³£Í¨¹ı´Ëº¯Êı»ñµÃÓÃ»§¶¨ÒåµÄ¿ØÖÆÆ÷µÄspi×ÊÔ´,
 																xx_spi{
 																	int irq;
 																	struct clk *clk;
@@ -1076,27 +1077,27 @@ platformè®¾å¤‡é©±åŠ¨
 																}
 				spi_master_set_dev_data(struct spi_master *master,void *data);
 			
-			//spiä¼ è¾“å‡½æ•°
-			spi_message_init åˆå§‹åŒ–spi message
+			//spi´«Êäº¯Êı
+			spi_message_init ³õÊ¼»¯spi message
 			spi_message_add_tail(struct spi_transfer *t,struct spi_message *msg)
 			spi_sync(spi_device *spi,spi_message *msg)
 			spi_write(spi_device *spi,char *buf,size_t len);
 			spi_read(spi_device*spi,char *buf,size_t len);
 			
 		
-		ç”¨æ³•:
-			spié€‚é…å™¨é©±åŠ¨å®ç°:
-				é€‚é…å™¨é©±åŠ¨æ–‡ä»¶
+		ÓÃ·¨:
+			spiÊÊÅäÆ÷Çı¶¯ÊµÏÖ:
+				ÊÊÅäÆ÷Çı¶¯ÎÄ¼ş
 				xx_transfer(struct spi_device* dev,struct spi_message *msg){
 				
 				}
 				xx_setup(struct *spi_device *dev){
 				}
 				int xx_probe(struct platform_device *dev){
-					è¯»å–é€‚é…å™¨èµ„æº,é…ç½®èµ„æº
+					¶ÁÈ¡ÊÊÅäÆ÷×ÊÔ´,ÅäÖÃ×ÊÔ´
 					spi_alloc_master();
 					...
-					å¡«å……spi_masterä¸­çš„setup,transferç­‰å‡½æ•°
+					Ìî³äspi_masterÖĞµÄsetup,transferµÈº¯Êı
 					spi_register_master();
 				}
 				struct platform_driver xx_spi_driver={
@@ -1114,9 +1115,9 @@ platformè®¾å¤‡é©±åŠ¨
 				xx_exit(){
 					platform_driver_unregister(&xx_spi_driver);
 				}
-				æˆ–è€…
-					module_platform_driver(&xx_spi_driver);//ä¸éœ€è¦init,exitå‡½æ•°
-				é€‚é…å™¨èµ„æºæè¿°
+				»òÕß
+					module_platform_driver(&xx_spi_driver);//²»ĞèÒªinit,exitº¯Êı
+				ÊÊÅäÆ÷×ÊÔ´ÃèÊö
 				struct resources={
 					[0]={
 						.start
@@ -1135,21 +1136,21 @@ platformè®¾å¤‡é©±åŠ¨
 						}	
 					}
 				}
-				åœ¨åˆé€‚çš„åœ°æ–¹è°ƒç”¨
+				ÔÚºÏÊÊµÄµØ·½µ÷ÓÃ
 				platform_device_register(&xx_spi_device);
 				
 				
-			spiå¤–è®¾é©±åŠ¨å®ç°
-				xxå¤–è®¾é©±åŠ¨æ–‡ä»¶
-					å®šä¹‰å¤–è®¾è‡ªèº«çš„é©±åŠ¨
+			spiÍâÉèÇı¶¯ÊµÏÖ
+				xxÍâÉèÇı¶¯ÎÄ¼ş
+					¶¨ÒåÍâÉè×ÔÉíµÄÇı¶¯
 					xx_fun();
 					
-					å®šä¹‰å¤–è®¾driverå‡½æ•°
+					¶¨ÒåÍâÉèdriverº¯Êı
 					xx_probe(struct platform_device *pdev){
-						æ³¨å†Œå¤–è®¾åŠŸèƒ½å‡½æ•°
+						×¢²áÍâÉè¹¦ÄÜº¯Êı
 					}
 				
-					å®šä¹‰driver
+					¶¨Òådriver
 					xx_driver={
 						.probe=xx_probe;
 						.remove=xx_remove;
@@ -1165,10 +1166,10 @@ platformè®¾å¤‡é©±åŠ¨
 					xx_exit(void){
 						spi_unregister_driver(&xx_driver);
 					}
-				å¤–è®¾çš„èµ„æºæè¿°ï¼Œé€šå¸¸åœ¨æ¿å­çš„åˆå§‹åŒ–æ–‡ä»¶ä¸­
-					æè¿°spiå¤–è®¾,å¡«å……spi_board_info
+				ÍâÉèµÄ×ÊÔ´ÃèÊö£¬Í¨³£ÔÚ°å×ÓµÄ³õÊ¼»¯ÎÄ¼şÖĞ
+					ÃèÊöspiÍâÉè,Ìî³äspi_board_info
 					struct spi_board_info xx_spi_device={
-						.modalias="xx_driver";//å¯¹åº”çš„å¤–è®¾é©±åŠ¨åç§°
+						.modalias="xx_driver";//¶ÔÓ¦µÄÍâÉèÇı¶¯Ãû³Æ
 						.bus_num
 						.max_speed_hz
 						.chip_select
@@ -1176,13 +1177,13 @@ platformè®¾å¤‡é©±åŠ¨
 						.mode;
 						...
 					}
-					åœ¨åˆé€‚çš„åœ°æ–¹è°ƒç”¨spi_register_board_infoï¼ˆ&xx_spi_device,ARRAY_SIZE(xx_spi_device)ï¼‰;	
-				å¯ä»¥çœ‹å‡ºspié©±åŠ¨ä¸ä¸Šé¢è®²çš„rtcé©±åŠ¨å¾ˆåƒ,é™¤äº†æœ€åé©±åŠ¨æ³¨å†Œå‡½æ•°ä¸ä¸€æ ·å¤–,ä»¥ä¸Šrtcéƒ¨åˆ†å‡å¯ä»¥å¥—ç”¨.
+					ÔÚºÏÊÊµÄµØ·½µ÷ÓÃspi_register_board_info£¨&xx_spi_device,ARRAY_SIZE(xx_spi_device)£©;	
+				¿ÉÒÔ¿´³öspiÇı¶¯ÓëÉÏÃæ½²µÄrtcÇı¶¯ºÜÏñ,³ıÁË×îºóÇı¶¯×¢²áº¯Êı²»Ò»ÑùÍâ,ÒÔÉÏrtc²¿·Ö¾ù¿ÉÒÔÌ×ÓÃ.
 				
-		æ—¶é’Ÿæºç›¸å…³å‡½æ•°:
-			å‡½æ•°:
-			clk* clk_get(struct device *dev,const char *id)//è·å¾—æ—¶é’Ÿ
-				 clk_put(struct clk *clk)//é‡Šæ”¾æ—¶é’Ÿ
+		Ê±ÖÓÔ´Ïà¹Øº¯Êı:
+			º¯Êı:
+			clk* clk_get(struct device *dev,const char *id)//»ñµÃÊ±ÖÓ
+				 clk_put(struct clk *clk)//ÊÍ·ÅÊ±ÖÓ
 				 clk_enable(struct clk *clk);
 				 clk_disable(struct clk *clk);
 				 clk_get_rate(struct clk *clk);
@@ -1192,13 +1193,13 @@ platformè®¾å¤‡é©±åŠ¨
 			clk* clk_get_parent(struct clk*clk);
 				 clk_set_parent(struct clk*clk,struct clk *parent);
 				 
-				 contain_of(void *ptr,ç»“æ„ç±»å‹,ç»“æ„æˆå‘˜å)//é€šè¿‡æ­¤å®æ¥è·å–åŒ…å«æŸä¸ªæˆå‘˜çš„ç»“æ„ä½“æŒ‡é’ˆ
+				 contain_of(void *ptr,½á¹¹ÀàĞÍ,½á¹¹³ÉÔ±Ãû)//Í¨¹ı´ËºêÀ´»ñÈ¡°üº¬Ä³¸ö³ÉÔ±µÄ½á¹¹ÌåÖ¸Õë
 		
-		miscæ··æ‚è®¾å¤‡:
-			è¯´æ˜:
-				æ··æ‚è®¾å¤‡åŒ…æ‹¬nvram,çœ‹é—¨ç‹—,ds1286æ—¶é’Ÿ,lcdç­‰.æ··æ‚è®¾å¤‡æœ¬è´¨è¿˜æ˜¯å­—ç¬¦è®¾å¤‡,å…¶åŠŸèƒ½å®ç°äºfile_operations.
-				æ··æ‚è®¾å¤‡ä¸»è®¾å¤‡å·ä¸º10.
-			å˜é‡:
+		misc»ìÔÓÉè±¸:
+			ËµÃ÷:
+				»ìÔÓÉè±¸°üÀ¨nvram,¿´ÃÅ¹·,ds1286Ê±ÖÓ,lcdµÈ.»ìÔÓÉè±¸±¾ÖÊ»¹ÊÇ×Ö·ûÉè±¸,Æä¹¦ÄÜÊµÏÖÓÚfile_operations.
+				»ìÔÓÉè±¸Ö÷Éè±¸ºÅÎª10.
+			±äÁ¿:
 				struct miscdevice{
 					int minor;
 					char *name
@@ -1207,15 +1208,15 @@ platformè®¾å¤‡é©±åŠ¨
 					struct device *parent;
 					struct device *this_device;
 				}
-			å‡½æ•°:
+			º¯Êı:
 				misc_register(struct miscdevice *dev);
 				misc_unregister(struct miscdevice *dev);
 		
-		sysfsè®¾å¤‡:
-			è¯´æ˜:
-				sysfsè®¾å¤‡æ²¡æœ‰åœ¨devç›®å½•ä¸‹æœ‰èŠ‚ç‚¹,ä½†æ˜¯å¯ä»¥åœ¨ç”¨æˆ·ä¾§ç›´æ¥è®¿é—®.é€šè¿‡sysfs_create_fileåˆ›å»ºçš„æ–‡ä»¶,æ¯ä¸ªdeviceçš„attributeå¯¹åº”ä¸€ä¸ªæ–‡ä»¶
-				æ–‡ä»¶é€šè¿‡showå’Œstoreæ–¹æ³•æ¥å­˜å–.
-			å˜é‡:
+		sysfsÉè±¸:
+			ËµÃ÷:
+				sysfsÉè±¸Ã»ÓĞÔÚdevÄ¿Â¼ÏÂÓĞ½Úµã,µ«ÊÇ¿ÉÒÔÔÚÓÃ»§²àÖ±½Ó·ÃÎÊ.Í¨¹ısysfs_create_file´´½¨µÄÎÄ¼ş,Ã¿¸ödeviceµÄattribute¶ÔÓ¦Ò»¸öÎÄ¼ş
+				ÎÄ¼şÍ¨¹ıshowºÍstore·½·¨À´´æÈ¡.
+			±äÁ¿:
 				sysdev_driver{
 					list_head entry;
 					(*add)(struct sys_device*);
@@ -1239,35 +1240,35 @@ platformè®¾å¤‡é©±åŠ¨
 					read
 				}
 				
-			å‡½æ•°:
+			º¯Êı:
 				sysdev_driver_register(struct sysdev_class*,struct sysdev_driver*);
 				sysdev_driver_unregister(struct sysdev_class *,struct sysdev_driver*);
 				
 				sysdev_create_file(struct sys_device *dev,struct sysdev_attribute*);
 				sysdev_remove_file(struct sys_device *dev,struct sysdev_attribute*);
-				ç›¸å…³å‡½æ•°:
+				Ïà¹Øº¯Êı:
 					sysfs_create_file(struct kobject*obj,struct attribute *);
 					sysfs_remove_file(struct kobject*obj,struct attribute *);
 					device_create_file(struct device*dev,struct device_arrtibute*);
 					device_remove_file(struct device*dev,struct device_arrtibute*);
 					sysfs_create_bin_file(struct kobject,struct bin_attribure *);
 					
-ç»ˆç«¯è®¾å¤‡é©±åŠ¨
-	è¯´æ˜:
-		linuxä¸­çš„ç»ˆç«¯è®¾å¤‡æœ‰ä»¥ä¸‹å‡ ç±»:ä¸²å£ç»ˆç«¯:ttySn,ä¼ªç»ˆç«¯pty,æ§åˆ¶ç»ˆç«¯ttyn,console.ä¼ªç»ˆç«¯åœ¨linuxä¸­ç”¨pts(pseudo terminal slave)å’Œptmx(pseudo terminal master)å®ç°.
-		æ§åˆ¶ç»ˆç«¯ç”¨äºç™»å½•linux,è¿›è¡Œæ“ä½œ.åœ¨ç³»ç»Ÿå¯åŠ¨æ—¶,å¯ä»¥åœ¨åˆå§‹åŒ–çš„æ—¶å€™é€šè¿‡console=device,optionsæ¥é…ç½®æ§åˆ¶ç»ˆç«¯,å¯ä»¥åŒæ—¶é…ç½®å¤šä¸ªæ§åˆ¶ç»ˆç«¯,å½“æ‰“å¼€consoleæ—¶,è¿”å›çš„æ˜¯æœ€åä¸€ä¸ªconsole.
-		tty0æ˜¯å½“å‰ä½¿ç”¨çš„æ§åˆ¶ç»ˆç«¯åˆ«å.
-		ttyé©±åŠ¨åŒ…æ‹¬ttyæ ¸å¿ƒ(tty_io.c),çº¿è·¯é…ç½®,ttyå…·ä½“é©±åŠ¨æ„æˆ.
-		uarté©±åŠ¨æ˜¯åœ¨tty_ioä¹‹ä¸Šé€šè¿‡serial_coreå†å°è£…,å°†ttyé©±åŠ¨è½¬æ¢æˆuarté©±åŠ¨.
-	å˜é‡:
+ÖÕ¶ËÉè±¸Çı¶¯
+	ËµÃ÷:
+		linuxÖĞµÄÖÕ¶ËÉè±¸ÓĞÒÔÏÂ¼¸Àà:´®¿ÚÖÕ¶Ë:ttySn,Î±ÖÕ¶Ëpty,¿ØÖÆÖÕ¶Ëttyn,console.Î±ÖÕ¶ËÔÚlinuxÖĞÓÃpts(pseudo terminal slave)ºÍptmx(pseudo terminal master)ÊµÏÖ.
+		¿ØÖÆÖÕ¶ËÓÃÓÚµÇÂ¼linux,½øĞĞ²Ù×÷.ÔÚÏµÍ³Æô¶¯Ê±,¿ÉÒÔÔÚ³õÊ¼»¯µÄÊ±ºòÍ¨¹ıconsole=device,optionsÀ´ÅäÖÃ¿ØÖÆÖÕ¶Ë,¿ÉÒÔÍ¬Ê±ÅäÖÃ¶à¸ö¿ØÖÆÖÕ¶Ë,µ±´ò¿ªconsoleÊ±,·µ»ØµÄÊÇ×îºóÒ»¸öconsole.
+		tty0ÊÇµ±Ç°Ê¹ÓÃµÄ¿ØÖÆÖÕ¶Ë±ğÃû.
+		ttyÇı¶¯°üÀ¨ttyºËĞÄ(tty_io.c),ÏßÂ·ÅäÖÃ,tty¾ßÌåÇı¶¯¹¹³É.
+		uartÇı¶¯ÊÇÔÚtty_ioÖ®ÉÏÍ¨¹ıserial_coreÔÙ·â×°,½«ttyÇı¶¯×ª»»³ÉuartÇı¶¯.
+	±äÁ¿:
 		struct ktermios{
-			c_cflag;//æ§åˆ¶æ¨¡å¼
-			c_iflag;//è¾“å…¥æ¨¡å¼
-			c_oflag;//è¾“å‡ºæ¨¡å¼
-			c_lflag;//çº¿è·¯æ¨¡å¼
-			c_cc;//æ§åˆ¶å­—ç¬¦
-			c_ispeed;//è¾“å…¥é€Ÿç‡
-			c_ospeed;//è¾“å‡ºé€Ÿç‡
+			c_cflag;//¿ØÖÆÄ£Ê½
+			c_iflag;//ÊäÈëÄ£Ê½
+			c_oflag;//Êä³öÄ£Ê½
+			c_lflag;//ÏßÂ·Ä£Ê½
+			c_cc;//¿ØÖÆ×Ö·û
+			c_ispeed;//ÊäÈëËÙÂÊ
+			c_ospeed;//Êä³öËÙÂÊ
 		}
 		struct tty_operations{
 			struct tty_struct *(*lookup)(struct tty_driver*driver,struct inode *inode,int idx);
@@ -1281,8 +1282,8 @@ platformè®¾å¤‡é©±åŠ¨
 			int (*ioctl)(struct tty_struct *tty,struct file *filep,unsigned int cmd,unsigned int arg);
 			
 			...
-			void (*set_temios)(struct tty_struct *tty,kermios*old);//è®¾ç½®termios
-			int (*tiocmget)(struct tty_struct *tty,struct file *filep);//è®¾ç½®modemå‡½æ•°
+			void (*set_temios)(struct tty_struct *tty,kermios*old);//ÉèÖÃtermios
+			int (*tiocmget)(struct tty_struct *tty,struct file *filep);//ÉèÖÃmodemº¯Êı
 			int (*tiocmset)(struct tty_struct *tty,struct file *filep,unsigned int set ,unsigned int clear);
 			
 			
@@ -1310,8 +1311,8 @@ platformè®¾å¤‡é©±åŠ¨
 			struct kref kref;
 			struct cdev cdev;
 			struct module *owner;
-			const char * driver_name;//ç”¨äº/proc/tty,sysfsä¸­
-			const char *name;//è®¾å¤‡èŠ‚ç‚¹
+			const char * driver_name;//ÓÃÓÚ/proc/tty,sysfsÖĞ
+			const char *name;//Éè±¸½Úµã
 			...
 			int major;
 			int minor_start;
@@ -1321,7 +1322,7 @@ platformè®¾å¤‡é©±åŠ¨
 			int subtype;
 			ktermios init_termios;
 			int flags;
-			tty_driver *other;//ä»…å¯¹ptyé©±åŠ¨æœ‰ç”¨
+			tty_driver *other;//½ö¶ÔptyÇı¶¯ÓĞÓÃ
 			
 			ktermios **termios;
 			tty_struct **ttys;
@@ -1348,7 +1349,7 @@ platformè®¾å¤‡é©±åŠ¨
 			struct kref		kref;		/* Ref counter */
 		};
 		
-		struct uart_ops{//æ­¤ç»“æ„æä¾›å¤–è®¾å…·ä½“æ¥å£å‡½æ•°
+		struct uart_ops{//´Ë½á¹¹Ìá¹©ÍâÉè¾ßÌå½Ó¿Úº¯Êı
 			unsigned int (*tx_empty)(struct uart_port *);
 			(*start_tx)
 			(*stop_tx)
@@ -1356,7 +1357,7 @@ platformè®¾å¤‡é©±åŠ¨
 			(*stop_rz)
 			...
 		}		
-		struct uart_port{//æ­¤ç»“æ„ç”¨äºæè¿°å¤–è®¾èµ„æº
+		struct uart_port{//´Ë½á¹¹ÓÃÓÚÃèÊöÍâÉè×ÊÔ´
 			spinlock_t lock;
 			unsigned int iobase;
 			unsigned char __iomem *membase;
@@ -1370,10 +1371,10 @@ platformè®¾å¤‡é©±åŠ¨
 			...
 		}
 
-		struct uart_driver{//æ­¤ç»“æ„ç”¨äºåœ¨ç”¨æˆ·ç©ºé—´å‘ˆç°æ¥å£
+		struct uart_driver{//´Ë½á¹¹ÓÃÓÚÔÚÓÃ»§¿Õ¼ä³ÊÏÖ½Ó¿Ú
 			struct module *owner;
-			const char *dev_name;//è®¾å¤‡èŠ‚ç‚¹åttyxx
-			const char *driver_name;//é©±åŠ¨å
+			const char *dev_name;//Éè±¸½ÚµãÃûttyxx
+			const char *driver_name;//Çı¶¯Ãû
 			int nr;
 			struct console *cons;
 			
@@ -1396,7 +1397,7 @@ platformè®¾å¤‡é©±åŠ¨
 			void *data;
 			...
 		}
-	å‡½æ•°:
+	º¯Êı:
 		struct tty_driver* alloc_tty_driver(int lines);
 		int tty_register_driver(struct tty_driver*driver);
 		void tty_unregister_driver(struct tty_driver*driver);
@@ -1404,21 +1405,21 @@ platformè®¾å¤‡é©±åŠ¨
 		void tty_unregister_device(struct tty_driver*driver,int index);
 		void tty_set_operations(struct tty_driver*driver,struct tty_operations *ops);
 		
-		ç”¨æˆ·ç©ºé—´å‡½æ•°
-		åŒ…æ‹¬termios.hæ–‡ä»¶
+		ÓÃ»§¿Õ¼äº¯Êı
+		°üÀ¨termios.hÎÄ¼ş
 		int tcgetattr(int fd,struct termios*termios);
 		int tcsetattr(int fd,int operatios,struct termios*termios);
 		int cfsetospeed(struct termios *termios,speed_t speed);
-		int cfsetispeed(struct termios * termios,speed_t speed);//speed æ˜¯B0 B50 ç­‰
+		int cfsetispeed(struct termios * termios,speed_t speed);//speed ÊÇB0 B50 µÈ
 		speed_t cfgetospeed(struct termios*termios);
 		speed_t cfgetispeed(struct termios *termios);
 		
-		int tcdrain(int fd);//ç­‰å¾…æ‰€æœ‰è¾“å‡ºè¢«å‘é€
-		int tcflush(int fd,int queue_selector);//flushè¾“å…¥/è¾“å‡º
-		int tcflow(int fd,int actios);//å¯¹è¾“å…¥/è¾“å‡ºè¿›è¡Œæµæ§åˆ¶
-		int tcsendbreak(int fd,int duration);//å‘é€breakå­—ç¬¦
+		int tcdrain(int fd);//µÈ´ıËùÓĞÊä³ö±»·¢ËÍ
+		int tcflush(int fd,int queue_selector);//flushÊäÈë/Êä³ö
+		int tcflow(int fd,int actios);//¶ÔÊäÈë/Êä³ö½øĞĞÁ÷¿ØÖÆ
+		int tcsendbreak(int fd,int duration);//·¢ËÍbreak×Ö·û
 		
-		uarté©±åŠ¨å‡½æ•°
+		uartÇı¶¯º¯Êı
 		
 		int uart_register_driver(struct uart_driver*);
 		void uart_unregister_driver(struct uart_driver*);
@@ -1427,15 +1428,15 @@ platformè®¾å¤‡é©±åŠ¨
 		
 		void register_console(struct console *con);
 		int unregister_console(struct console *con);
-		console_initcall(fn);//å°†cosoleåˆå§‹åŒ–å‡½æ•°æ”¾åˆ°ç³»ç»Ÿçš„.con_initcall.initèŠ‚ä¸­
-			æ‰©å±•:
-				initcallèŠ‚åˆ†ä¸º:initcall0.init,initcall.init ...initcall7.init,å¯¹åº”çš„å®æœ‰pure_initcall(fn),core_initcall(fn)
+		console_initcall(fn);//½«cosole³õÊ¼»¯º¯Êı·Åµ½ÏµÍ³µÄ.con_initcall.init½ÚÖĞ
+			À©Õ¹:
+				initcall½Ú·ÖÎª:initcall0.init,initcall.init ...initcall7.init,¶ÔÓ¦µÄºêÓĞpure_initcall(fn),core_initcall(fn)
 				postcore_initcall(fn),arch_initcall(fn),subsys_initcall(fn),fs_initcall(fn),device_initcall(fn),late_initcall(fn).
-				åŒæ—¶å¯¹äº1~7èŠ‚å¯¹åº”æœ‰syncç‰ˆæœ¬pure_initcall_sync(fn)...
+				Í¬Ê±¶ÔÓÚ1~7½Ú¶ÔÓ¦ÓĞsync°æ±¾pure_initcall_sync(fn)...
 		
-	ç”¨æ³•:
-		ä¸€:è®¾å¤‡çš„èµ„æº
-		1 åœ¨è®¾å¤‡çš„èµ„æºæ–‡ä»¶ä¸­å®šä¹‰uartçš„platform_device
+	ÓÃ·¨:
+		Ò»:Éè±¸µÄ×ÊÔ´
+		1 ÔÚÉè±¸µÄ×ÊÔ´ÎÄ¼şÖĞ¶¨ÒåuartµÄplatform_device
 			struct resources xx_resources[]={
 				[0]={
 					.start=
@@ -1450,11 +1451,11 @@ platformè®¾å¤‡é©±åŠ¨
 				.num_resources=ARRAY_SIZE(xx_resources);
 				.resources=&xx_resources;
 			}
-		2.åœ¨æ¿å­çš„åˆå§‹åŒ–éƒ¨åˆ†è°ƒç”¨platform_device_register
+		2.ÔÚ°å×ÓµÄ³õÊ¼»¯²¿·Öµ÷ÓÃplatform_device_register
 			platform_device_register(&xx_uart_device);
-		äºŒ:é©±åŠ¨éƒ¨åˆ†
+		¶ş:Çı¶¯²¿·Ö
 		
-			å®šä¹‰uart_ops,uart_driverä»¥åŠå®ç°å…¶ä¸­å‡½æ•°
+			¶¨Òåuart_ops,uart_driverÒÔ¼°ÊµÏÖÆäÖĞº¯Êı
 				xx_tx_empty(){
 					...
 				}
@@ -1472,16 +1473,16 @@ platformè®¾å¤‡é©±åŠ¨
 					.driver_name="xxuart";
 					...
 				}		
-			å®šä¹‰platform_driver
+			¶¨Òåplatform_driver
 				int xx_probe(struct platform_device *pdev){
 					...
-					å¡«å……åˆé€‚çš„uart_portç»“æ„
-					uart_add_one_port(&xx_uart_driver,&xx_uart_port);//æ­¤éƒ¨åˆ†å®Œæˆå…·ä½“è®¾å¤‡çš„åŠŸèƒ½æ·»åŠ ,ä¸åŒè®¾å¤‡è°ƒç”¨ä¸åŒå‡½æ•°
+					Ìî³äºÏÊÊµÄuart_port½á¹¹
+					uart_add_one_port(&xx_uart_driver,&xx_uart_port);//´Ë²¿·ÖÍê³É¾ßÌåÉè±¸µÄ¹¦ÄÜÌí¼Ó,²»Í¬Éè±¸µ÷ÓÃ²»Í¬º¯Êı
 					platform_set_drvdata(pdev,xx_data);
 				}
 				int xx_remove(struct platform_device *pdev){
 					...
-					è¿›è¡Œå¿…è¦çš„æ¸…é™¤æ“ä½œ
+					½øĞĞ±ØÒªµÄÇå³ı²Ù×÷
 					uart_remove_one_port(&xx_uart_driver,&xx_uart_port);
 				}
 				struct platform_driver xx_platform_uart_driver={
@@ -1499,10 +1500,10 @@ platformè®¾å¤‡é©±åŠ¨
 				}
 			
 
-			//consoleå®ç°
+			//consoleÊµÏÖ
 				xx_setup(){//console setup
-					æ ¹æ®å¡«å……çš„portä¿¡æ¯
-					è°ƒç”¨uart_set_options(uart_port,console,baund,parity,bits,flow);
+					¸ù¾İÌî³äµÄportĞÅÏ¢
+					µ÷ÓÃuart_set_options(uart_port,console,baund,parity,bits,flow);
 				}
 				xx_write(){//console write
 				
@@ -1513,26 +1514,26 @@ platformè®¾å¤‡é©±åŠ¨
 					
 				}
 				xx_console_init(){
-					å¡«å……uart_portç»“æ„
+					Ìî³äuart_port½á¹¹
 					register_console(&xx_console);
 				}
 
-I2Cè®¾å¤‡é©±åŠ¨
-	è¯´æ˜:I2cé©±åŠ¨åŒ…æ‹¬i2cæ ¸å¿ƒ,è®¾å¤‡é©±åŠ¨,æ€»çº¿é©±åŠ¨.i2cæ ¸å¿ƒæä¾›æ€»çº¿ä¸è®¾å¤‡çš„æ³¨å†Œ,æ³¨é”€ä»¥åŠé€šä¿¡æ–¹æ³•çš„ä¸Šå±‚(i2c-core.c).æ€»çº¿é©±åŠ¨æä¾›i2cé€‚é…å™¨ä»¥åŠalgorithmæ–¹æ³•(i2c-dev.c),æ˜¯å¯¹åº”i2cé€‚é…å™¨çš„å­—ç¬¦è®¾å¤‡é©±åŠ¨,éšç€å¤–è®¾çš„æ‰“å¼€è€Œæ‰“å¼€,ä¸»è®¾å¤‡å·89.
-	è®¾å¤‡é©±åŠ¨æä¾›å…·ä½“è®¾å¤‡çš„é©±åŠ¨,å®Œæˆè®¾å¤‡åŠŸèƒ½.
-	å˜é‡:
-		struct i2c_algorithm{//ä¼ è¾“æ–¹æ³•
+I2CÉè±¸Çı¶¯
+	ËµÃ÷:I2cÇı¶¯°üÀ¨i2cºËĞÄ,Éè±¸Çı¶¯,×ÜÏßÇı¶¯.i2cºËĞÄÌá¹©×ÜÏßÓëÉè±¸µÄ×¢²á,×¢ÏúÒÔ¼°Í¨ĞÅ·½·¨µÄÉÏ²ã(i2c-core.c).×ÜÏßÇı¶¯Ìá¹©i2cÊÊÅäÆ÷ÒÔ¼°algorithm·½·¨(i2c-dev.c),ÊÇ¶ÔÓ¦i2cÊÊÅäÆ÷µÄ×Ö·ûÉè±¸Çı¶¯,Ëæ×ÅÍâÉèµÄ´ò¿ª¶ø´ò¿ª,Ö÷Éè±¸ºÅ89.
+	Éè±¸Çı¶¯Ìá¹©¾ßÌåÉè±¸µÄÇı¶¯,Íê³ÉÉè±¸¹¦ÄÜ.
+	±äÁ¿:
+		struct i2c_algorithm{//´«Êä·½·¨
 			int (*master_xfer)(struct i2c_adapter*adap,struct i2c_msg *msg,int num);
 			int (*smbus_xfer)(struct i2c_adapter*adap,u16 addr,unsigned int flags,char read_write,u8 command,int size,union i2c_smbus_data *data);
 			u32 (*functionality)(struct i2c_adapter*);
 		}
 
-		struct i2c_adapter{//æè¿°socä¸Šçš„i2cé€‚é…å™¨
+		struct i2c_adapter{//ÃèÊösocÉÏµÄi2cÊÊÅäÆ÷
 			struct module owner;
 			struct i2c_algorithm *algo;//
 			int (*client_register)(struct i2c_client *client);
 			int (*clinet_unregister)(struct i2c_client *client);
-			struct device dev;//é€‚é…å™¨è®¾å¤‡
+			struct device dev;//ÊÊÅäÆ÷Éè±¸
 			struct class_device class_dev;
 			struct list_head client;
 			struct list_head list;
@@ -1540,19 +1541,19 @@ I2Cè®¾å¤‡é©±åŠ¨
 			struct completion dev_released;
 			....
 		}
-		struct i2c_driver{//i2c æ€»çº¿
+		struct i2c_driver{//i2c ×ÜÏß
 			int id;
 			int class;
-			int (*attach_adapter)(struct i2c_adapter *);//å³å°†è¢«åˆ é™¤
-			int (*detach_adapter)(struct i2c_adapter*);//å³å°†è¢«åˆ é™¤
-			int (*detach_client)(struct i2c_client *);//å³å°†è¢«åˆ é™¤
+			int (*attach_adapter)(struct i2c_adapter *);//¼´½«±»É¾³ı
+			int (*detach_adapter)(struct i2c_adapter*);//¼´½«±»É¾³ı
+			int (*detach_client)(struct i2c_client *);//¼´½«±»É¾³ı
 			
 			int (*probe)(struct i2c_client *,const struct i2c_device_id);
 			int (*remove)(struct i2c_client *);
 			...
 			struct list_head client;
 		}
-		struct i2c_client{//æè¿°å¤–è®¾
+		struct i2c_client{//ÃèÊöÍâÉè
 			unsigned int flags;
 			unsigned short addr;
 			char name;
@@ -1579,42 +1580,42 @@ I2Cè®¾å¤‡é©±åŠ¨
 			int irq;
 		}
 		
-	å‡½æ•°:
-		i2cæ ¸å¿ƒçš„å‡½æ•°
-			//é€‚é…å™¨å‡½æ•°
+	º¯Êı:
+		i2cºËĞÄµÄº¯Êı
+			//ÊÊÅäÆ÷º¯Êı
 			i2c_add_adapter(struct i2c_adapter *);
 			i2c_del_adapter(struct i2c_adapter*);
-			//å¤–è®¾é©±åŠ¨å‡½æ•°
-			i2c_register_driver(sruct module *module ,struct i2c_driver*);//å¤–è®¾å‡½æ•°,æ³¨å†Œdriveråˆ°i2cæ€»çº¿ä¸­,è”ç³»driverä¸adapter
-			i2c_add_driver(struct i2c_driver *);å°†driveråŠ å…¥åˆ°i2cæ€»çº¿ä¸­
+			//ÍâÉèÇı¶¯º¯Êı
+			i2c_register_driver(sruct module *module ,struct i2c_driver*);//ÍâÉèº¯Êı,×¢²ádriverµ½i2c×ÜÏßÖĞ,ÁªÏµdriverÓëadapter
+			i2c_add_driver(struct i2c_driver *);½«driver¼ÓÈëµ½i2c×ÜÏßÖĞ
 			i2c_del_driver(struct i2c_driver*);
 			
 			i2c_register_board_info(int busnum, struct i2c_board_info const *info,unsigned n)
 			
 			i2c_attach_adapter(struct i2c_client*);
 			i2c_detach_adapter(struct i2c_client*);					
-			//ä¼ è¾“å‡½æ•°
-			i2c_transfer(struct i2c_adapter*adapter,i2c_msg *msg,int num);//è°ƒç”¨i2c_adapterä¸­çš„master_xferå‡½æ•°
-			i2c_master_send(struct i2c_adapter *adapter,char *buf,int count);//è°ƒç”¨i2c_transferå‡½æ•°
-			i2c_master_recv(struct i2c_adapter *adapter,char buf,int count);//è°ƒç”¨i2c_transferå‡½æ•°
-		ç”¨æ³•:
-			é€‚é…å™¨é©±åŠ¨:
-				é©±åŠ¨æ–‡ä»¶
+			//´«Êäº¯Êı
+			i2c_transfer(struct i2c_adapter*adapter,i2c_msg *msg,int num);//µ÷ÓÃi2c_adapterÖĞµÄmaster_xferº¯Êı
+			i2c_master_send(struct i2c_adapter *adapter,char *buf,int count);//µ÷ÓÃi2c_transferº¯Êı
+			i2c_master_recv(struct i2c_adapter *adapter,char buf,int count);//µ÷ÓÃi2c_transferº¯Êı
+		ÓÃ·¨:
+			ÊÊÅäÆ÷Çı¶¯:
+				Çı¶¯ÎÄ¼ş
 					xx_xfer(){
-						å®šä¹‰xferä¼ è¾“å‡½æ•°
+						¶¨Òåxfer´«Êäº¯Êı
 					}
 					xx_smbus_xfer(){
-						å®šä¹‰smbusä¼ è¾“å‡½æ•°
+						¶¨Òåsmbus´«Êäº¯Êı
 					}
-					struct i2c_algorithm xx_algo={//å®šä¹‰ä¼ è¾“æ–¹æ³•
+					struct i2c_algorithm xx_algo={//¶¨Òå´«Êä·½·¨
 						.master_xfer=xx_xfer;
 						.smbus_xfer=xx_smbus_xfer;
 					}
 					xx_probe(){
 						i2c_adapter *adapter;
 						...
-						hw_init();//æ—¶é’Ÿ,å†…å­˜ç­‰èµ„æº
-						i2c_add_adapter(adapter);æˆ–è€…i2c_add_numbered_adapter  äºŒè€…åŒºåˆ«åœ¨äºå‰è€…ä½¿ç”¨åŠ¨æ€bus_numåè€…ä½¿ç”¨é™æ€bus_num
+						hw_init();//Ê±ÖÓ,ÄÚ´æµÈ×ÊÔ´
+						i2c_add_adapter(adapter);»òÕßi2c_add_numbered_adapter  ¶şÕßÇø±ğÔÚÓÚÇ°ÕßÊ¹ÓÃ¶¯Ì¬bus_numºóÕßÊ¹ÓÃ¾²Ì¬bus_num
 					}
 					xx_remove(){
 						i2c_adapter *adapter;
@@ -1636,8 +1637,8 @@ I2Cè®¾å¤‡é©±åŠ¨
 					xx_exit(){
 						platform_driver_unregister(&xx_i2c_driver);
 					}
-					æˆ–è€…module_platform_driverï¼ˆ&xx_i2c_driver);
-				èµ„æºæ–‡ä»¶
+					»òÕßmodule_platform_driver£¨&xx_i2c_driver);
+				×ÊÔ´ÎÄ¼ş
 					struct resource xx_resources[]={
 						[0]={
 							.start=
@@ -1652,20 +1653,20 @@ I2Cè®¾å¤‡é©±åŠ¨
 						.resource=&xx_resources;
 						.num_resources=ARRAY_SIZE(xx_resources);
 					}
-					åœ¨åˆé€‚çš„åœ°æ–¹è°ƒç”¨
+					ÔÚºÏÊÊµÄµØ·½µ÷ÓÃ
 					platform_decice_register(&xx_device);
-			å¤–è®¾é©±åŠ¨
-				å¤–è®¾é©±åŠ¨æ–‡ä»¶
+			ÍâÉèÇı¶¯
+				ÍâÉèÇı¶¯ÎÄ¼ş
 					xx_fun(){
-						å¤–è®¾åŠŸèƒ½å‡½æ•°	
+						ÍâÉè¹¦ÄÜº¯Êı	
 					}
 					xx_probe(struct i2c_client *client){
-						åˆå§‹åŒ–å¤–è®¾.
+						³õÊ¼»¯ÍâÉè.
 						...
 						i2c_set_client_data(&xx_device);
 					}
 					xx_remove(struct i2c_client *client){
-						é‡Šæ”¾èµ„æº
+						ÊÍ·Å×ÊÔ´
 					}
 					struct i2c_driver xx_driver={
 						.driver={
@@ -1682,19 +1683,19 @@ I2Cè®¾å¤‡é©±åŠ¨
 						i2c_del_driver(&xx_driver);
 					}
 				
-				èµ„æºæ–‡ä»¶é…ç½®:
+				×ÊÔ´ÎÄ¼şÅäÖÃ:
 					struct i2c_board_info xx_i2c_devices[]={
 						{
 							I2C_BOARD_INFO("xx_driver",irq);
 						}
 						...
 					} 
-					åˆé€‚çš„åœ°æ–¹è°ƒç”¨
+					ºÏÊÊµÄµØ·½µ÷ÓÃ
 					i2c_register_board_info(busnum,&xx_i2c_devices,num);
-ç½‘ç»œè®¾å¤‡é©±åŠ¨
-	è¯´æ˜:ç½‘ç»œè®¾å¤‡é©±åŠ¨åˆ†3å±‚,åŒ…æ‹¬åè®®æ¥å£,ç½‘ç»œè®¾å¤‡æ¥å£,è®¾å¤‡é©±åŠ¨æ¥å£.
-	å˜é‡:
-		åè®®æ¥å£:
+ÍøÂçÉè±¸Çı¶¯
+	ËµÃ÷:ÍøÂçÉè±¸Çı¶¯·Ö3²ã,°üÀ¨Ğ­Òé½Ó¿Ú,ÍøÂçÉè±¸½Ó¿Ú,Éè±¸Çı¶¯½Ó¿Ú.
+	±äÁ¿:
+		Ğ­Òé½Ó¿Ú:
 		struct sk_buff{
 			undigned  int len;
 			data_len
@@ -1712,7 +1713,7 @@ I2Cè®¾å¤‡é©±åŠ¨
 			unsigned char *data;
 		}
 		
-		ç½‘ç»œè®¾å¤‡æ¥å£:
+		ÍøÂçÉè±¸½Ó¿Ú:
 		struct net_device_ops{
 			int (*ndo_open)(struct net_device* ndev);
 			int (*ndo_stop)(struct net_device *ndev);
@@ -1722,7 +1723,7 @@ I2Cè®¾å¤‡é©±åŠ¨
 			int (*ndo_do_ioctl)(struct net_device *ndev,struct ifreq*ifr,int cmd);
 			int (*ndo_set_config)(struct net_device *ndev,struct ifmap*map);
 			int (*ndo_set_mac_address)(struct net_device *ndev,void *addr);
-			void (*ndo_poll_controller)(struct net_device *ndev);//è½®è¯¢æ–¹å¼æ¥å—æ•°æ®		
+			void (*ndo_poll_controller)(struct net_device *ndev);//ÂÖÑ¯·½Ê½½ÓÊÜÊı¾İ		
 			...	
 		}
 		struct ethtool_ops{
@@ -1741,8 +1742,8 @@ I2Cè®¾å¤‡é©±åŠ¨
 			int (*init)(struct net_device*);
 			
 			unsigned long mem_start;
-			unsigned long mem_end;//è®¾å¤‡å…±äº«å†…å­˜åœ°å€
-			unsigned long base_addr;//è®¾å¤‡ioåŸºåœ°å€
+			unsigned long mem_end;//Éè±¸¹²ÏíÄÚ´æµØÖ·
+			unsigned long base_addr;//Éè±¸io»ùµØÖ·
 			unsigned char irq;
 			unsigned char if_port;
 			unsigned char dma;
@@ -1761,30 +1762,30 @@ I2Cè®¾å¤‡é©±åŠ¨
 
 			...		
 		}
-		å‡½æ•°:
-			åè®®å±‚å‡½æ•°:
+		º¯Êı:
+			Ğ­Òé²ãº¯Êı:
 			struct sk_buff* alloc_skb(unsigned int len,gfp_t priority);
 			struct sk_buff* dev_alloc_skb(unsigned int len);//priority=GFP_ATOMIC
 			kfree_skb(struct sk_buff*skb);
-			dev_kfree_skb(struct sk_buff*skb);//ç”¨äºéä¸­æ–­ä¸Šä¸‹æ–‡,
-				æ‰©å±•:
-					dev_kfree_irq//ç”¨äºä¸­æ–­ä¸­
-					dev_kfree_any//å¯ç”¨äºä¸­æ–­æˆ–éä¸­æ–­ä¸Šä¸‹æ–‡
-			è®¾å¤‡å±‚å‡½æ•°:
+			dev_kfree_skb(struct sk_buff*skb);//ÓÃÓÚ·ÇÖĞ¶ÏÉÏÏÂÎÄ,
+				À©Õ¹:
+					dev_kfree_irq//ÓÃÓÚÖĞ¶ÏÖĞ
+					dev_kfree_any//¿ÉÓÃÓÚÖĞ¶Ï»ò·ÇÖĞ¶ÏÉÏÏÂÎÄ
+			Éè±¸²ãº¯Êı:
 			int register_netdev(struct net_device*ndev);
 			void unregister_netdev(struct net_device *ndev);
 			alloc_netdev(sizeof_priv,name,setup)
 			alloc_etherdev(sizeof_priv)
 			free_netdev(struct net_device *ndev);
 			
-			netdev_priv(struct net_device *ndev);//è·å¾—net_device çš„ç§æœ‰æ•°æ®æŒ‡é’ˆ
+			netdev_priv(struct net_device *ndev);//»ñµÃnet_device µÄË½ÓĞÊı¾İÖ¸Õë
 			
 			netif_start_queue(struct net_device *);
-			netif_stop_queue(struct net_device*);//å½“ä¼ è¾“ç¼“å†²åŒºæ»¡çš„æ—¶å€™,é˜»æ­¢ç»§ç»­ä¼ è¾“
+			netif_stop_queue(struct net_device*);//µ±´«Êä»º³åÇøÂúµÄÊ±ºò,×èÖ¹¼ÌĞø´«Êä
 			netif_wakeup_queue(struct net_device *);
 			
-			netif_rx(struct sk_buff*);//æäº¤ç¼“å†²åŒºåˆ°ä¸Šå±‚
-			netif_receive_skb(struct sk_buff*);//é‡‡ç”¨pollæ–¹å¼çš„æäº¤ä¸Šå±‚ç¼“å†²åŒº
+			netif_rx(struct sk_buff*);//Ìá½»»º³åÇøµ½ÉÏ²ã
+			netif_receive_skb(struct sk_buff*);//²ÉÓÃpoll·½Ê½µÄÌá½»ÉÏ²ã»º³åÇø
 
 			napi_schedule(struct napi_struct *);
 			napi_enable(struct napi_struct*);
@@ -1792,9 +1793,9 @@ I2Cè®¾å¤‡é©±åŠ¨
 			
 			netif_carrier_on(struct net_device *);
 			netif_carrier_off(struct net_device *);
-	ç”¨æ³•:
-		ä¸€.ç¼–å†™é©±åŠ¨ç¨‹åº
-		1.ç¼–å†™å‡½æ•°å¡«å……net_device_ops,ethtool_opsç»“æ„
+	ÓÃ·¨:
+		Ò».±àĞ´Çı¶¯³ÌĞò
+		1.±àĞ´º¯ÊıÌî³änet_device_ops,ethtool_ops½á¹¹
 			xx_open(struct net_device *ndev){
 				...
 			}
@@ -1815,35 +1816,35 @@ I2Cè®¾å¤‡é©±åŠ¨
 				.set_settings=xx_set_settings;
 				...
 			}
-			static int xx_poll(struct napi_struct *napi,int weight){//pollå¤„ç†å‡½æ•°
+			static int xx_poll(struct napi_struct *napi,int weight){//poll´¦Àíº¯Êı
 				
-				å¤„ç†æ•°æ®
-				dev_alloc_skb //åˆ†é…skb
+				´¦ÀíÊı¾İ
+				dev_alloc_skb //·ÖÅäskb
 				...
 				skb_reserve(skb,2)
 				skb->dev=dev;
-				skb->protocol=eth_type_trans(skb,dev);//åè®®
-				netif_receive_skb(skb);//å°†æ•°æ®ä¸Šä¼ 
-				æ›´æ”¹ç»Ÿè®¡æ•°æ®			
+				skb->protocol=eth_type_trans(skb,dev);//Ğ­Òé
+				netif_receive_skb(skb);//½«Êı¾İÉÏ´«
+				¸ü¸ÄÍ³¼ÆÊı¾İ			
 			}
 			
 			static irqreturn_t xx_interrupt(int irq,void* data){
 				struct net_device *ndev=data;
 				struct priv * xx_priv=net_priv(ndev);
-				å¦‚æœé‡‡ç”¨napiåˆ™
+				Èç¹û²ÉÓÃnapiÔò
 					napi_schedule(&xx_priv->napi);
-				å¦åˆ™
-					å¤„ç†æ•°æ®
-					dev_alloc_skb //åˆ†é…skb
+				·ñÔò
+					´¦ÀíÊı¾İ
+					dev_alloc_skb //·ÖÅäskb
 					...
 					skb_reserve(skb,2)
 					skb->dev=dev;
-					skb->protocol=eth_type_trans(skb,dev);//åè®®
-					netif_rx(skb);//å°†æ•°æ®ä¸Šä¼ 
-					æ›´æ”¹ç»Ÿè®¡æ•°æ®			
+					skb->protocol=eth_type_trans(skb,dev);//Ğ­Òé
+					netif_rx(skb);//½«Êı¾İÉÏ´«
+					¸ü¸ÄÍ³¼ÆÊı¾İ			
 					
 			}
-		2.ç¼–å†™probe,remove,suspendç­‰å‡½æ•°
+		2.±àĞ´probe,remove,suspendµÈº¯Êı
 			`
 			xx_probe(struct platform_device* pdev){
 				struct net_device *ndev;
@@ -1851,32 +1852,32 @@ I2Cè®¾å¤‡é©±åŠ¨
 				struct resources *res;
 				
 				
-				ndev=alloc_etherdev(sizeof(*xx_priv));//åˆ†é…net_device
-				SET_NETDEV_DEV(ndev,&pdev->dev);//è®¾ç½®net deviceçš„device
-				platform_set_drvdata(pdev,ndev);//è®¾ç½®platform_deviceçš„é©±åŠ¨æ•°æ®
+				ndev=alloc_etherdev(sizeof(*xx_priv));//·ÖÅänet_device
+				SET_NETDEV_DEV(ndev,&pdev->dev);//ÉèÖÃnet deviceµÄdevice
+				platform_set_drvdata(pdev,ndev);//ÉèÖÃplatform_deviceµÄÇı¶¯Êı¾İ
 				
-				priv=net_priv(dev);//è·å–ç§æœ‰æ•°æ®
+				priv=net_priv(dev);//»ñÈ¡Ë½ÓĞÊı¾İ
 				priv->pdev=pdev;
 				priv->dev=ndev;
 				
-				clk=clk_get(&pdev->dev,"");//æ—¶é’Ÿå¤„ç†
+				clk=clk_get(&pdev->dev,"");//Ê±ÖÓ´¦Àí
 				clk_enable(clk);
 				clk_hz=clk_get_rate(clk);
 				
-				res=platform_get_resource(pdev,IORESOURCE_MEM,0);//è·å–å†…å­˜èµ„æº
-				request_mem_region(res->start,size,ndev->name);//ç”³è¯·èµ„æºè®¿é—®
-				mem_base=ioremap(res->start,res->end-res->start+1);//æ˜ å°„èµ„æº
+				res=platform_get_resource(pdev,IORESOURCE_MEM,0);//»ñÈ¡ÄÚ´æ×ÊÔ´
+				request_mem_region(res->start,size,ndev->name);//ÉêÇë×ÊÔ´·ÃÎÊ
+				mem_base=ioremap(res->start,res->end-res->start+1);//Ó³Éä×ÊÔ´
 
-				irq=platform_get_resource(pdev,IORESOURCE_IRQ,0);//è·å–ä¸­æ–­èµ„æº
-				request_irq(irq,xx_interrupt,flags,ndev->name,ndev);//ç”³è¯·ä¸­æ–­
+				irq=platform_get_resource(pdev,IORESOURCE_IRQ,0);//»ñÈ¡ÖĞ¶Ï×ÊÔ´
+				request_irq(irq,xx_interrupt,flags,ndev->name,ndev);//ÉêÇëÖĞ¶Ï
 				
 				ndev->netdev_ops=&xx_ndo_ops;
 				SET_ETHTOOL_OPS(ndev,&xx_ethtool_ops);
-				netif_napi_add(ndev,&priv->napi,xx_poll,POLL_WEIGHT);//æ·»åŠ pollå¤„ç†å‡½æ•°
+				netif_napi_add(ndev,&priv->napi,xx_poll,POLL_WEIGHT);//Ìí¼Ópoll´¦Àíº¯Êı
 				
-				register_netdev(ndev);//æ³¨å†Œnet device
+				register_netdev(ndev);//×¢²ánet device
 			
-				err://é”™è¯¯å¤„ç†
+				err://´íÎó´¦Àí
 
 			}
 			static int __devexit xx_remove(struct platform_device*dev){
@@ -1884,29 +1885,29 @@ I2Cè®¾å¤‡é©±åŠ¨
 				
 				ndev=platform_get_drvdata(dev);
 				if(ndev){
-					iounremap();//é‡Šæ”¾æ˜ å°„åœ°å€
-					free_irq();//é‡Šæ”¾ä¸­æ–­
-					unregister_netdev(ndev);//æ³¨é”€ç½‘ç»œè®¾å¤‡
-					clk_disable();//å…³é—­æ—¶é’Ÿ
-					clk_put();//é‡Šæ”¾æ—¶é’Ÿ
-					free_netdev(ndev);//é‡Šæ”¾ç½‘ç»œè®¾å¤‡
-					set_platform_drvdata(dev,NULL);//é‡Šæ”¾devçš„é©±åŠ¨æ•°æ®
+					iounremap();//ÊÍ·ÅÓ³ÉäµØÖ·
+					free_irq();//ÊÍ·ÅÖĞ¶Ï
+					unregister_netdev(ndev);//×¢ÏúÍøÂçÉè±¸
+					clk_disable();//¹Ø±ÕÊ±ÖÓ
+					clk_put();//ÊÍ·ÅÊ±ÖÓ
+					free_netdev(ndev);//ÊÍ·ÅÍøÂçÉè±¸
+					set_platform_drvdata(dev,NULL);//ÊÍ·ÅdevµÄÇı¶¯Êı¾İ
 				}
 				return 0;
 			}
 			
-			//å¦‚æœéœ€è¦poweræ§åˆ¶å‡½æ•°,å®šä¹‰ä»¥ä¸‹ç»“æ„
+			//Èç¹ûĞèÒªpower¿ØÖÆº¯Êı,¶¨ÒåÒÔÏÂ½á¹¹
 			xx_suspend(struct platform_device *pdev){
 				...
 			}
 			xx_resume(struct platform_device *pdev){
 				...
 			}
-			struct dev_pm_ops xx_pm_ops={//å®šä¹‰power manageç»“æ„
+			struct dev_pm_ops xx_pm_ops={//¶¨Òåpower manage½á¹¹
 				.suspend=xx_suspend;
 				.resume=xx_resume;
 			}
-		3 æ³¨å†Œ
+		3 ×¢²á
 			struct platform_driver xx_driver={
 				.driver={
 					.name="xx";
@@ -1924,8 +1925,8 @@ I2Cè®¾å¤‡é©±åŠ¨
 			}
 			module_init(xx_init);
 			module_exit(xx_exit);
-		äºŒ.è®¾å¤‡æ³¨å†Œ
-			1.æè¿°èµ„æº
+		¶ş.Éè±¸×¢²á
+			1.ÃèÊö×ÊÔ´
 				struct resource xx_resources[]={
 					[0]={
 						.start=
@@ -1941,35 +1942,35 @@ I2Cè®¾å¤‡é©±åŠ¨
 				struct platform_device xx_device={
 					.name="xx";
 					.dev={
-						.platform_data=&xx_data;//ç§æœ‰å¹³å°æ•°æ®
+						.platform_data=&xx_data;//Ë½ÓĞÆ½Ì¨Êı¾İ
 					}
 					.resources=&xx_resources;
 					.num_resources=ARRAY_SIZE(xx_resources);
 				}
-			åˆé€‚çš„åœ°æ–¹è°ƒç”¨
+			ºÏÊÊµÄµØ·½µ÷ÓÃ
 			platform_device_register(&xx_device);
 			
-Flashè®¾å¤‡é©±åŠ¨:
-	è¯´æ˜:flashé©±åŠ¨åœ¨linuxä¸­é‡‡ç”¨äº†mtdæ¥å£(memory teconolgy device).mtdå°†flashè®¾å¤‡æŠ½è±¡å‡ºæ¥,éš”ç¦»äº†æ–‡ä»¶ç³»ç»Ÿå’Œflashé©±åŠ¨.mtdåŒ…æ‹¬ä¸‰ä¸ªå±‚æ¬¡,åº•å±‚æ˜¯flashé©±åŠ¨(noræˆ–nand),
-		å…¶ä¸Šæ˜¯mtdåŸå§‹è®¾å¤‡,å†ä¸Šæ˜¯mtdè®¾å¤‡èŠ‚ç‚¹(å­—ç¬¦è®¾å¤‡æˆ–å—è®¾å¤‡).mtdè®¾å¤‡èŠ‚ç‚¹æ˜¯mtdX,å­—ç¬¦è®¾å¤‡ä¸»è®¾å¤‡å·31,å—è®¾å¤‡ä¸»è®¾å¤‡å·æ˜¯90.		
- 		åœ¨è®¾å¤‡èŠ‚ç‚¹ä¸Šå±‚,æ–‡ä»¶ç³»ç»Ÿåœ¨linuxä¸Šæœ‰fat,cramfs,jffs/jffs2/jffs3,yaffs/yaffs2,ubifsç­‰.fatæ–‡ä»¶ç³»ç»Ÿéœ€è¦æœ‰ftl(filesystem transfer layer é’ˆå¯¹nor),nftl(é’ˆå¯¹nand)æ¥è½¬æ¢.jffs,yaffsç­‰
- 		ç›´æ¥ä¸mtdå±‚æ¥å£.
- 		cramfså®æ—¶çš„è§£å‹ç¼©æ–‡ä»¶åˆ°å†…å­˜ä¸­,é€‚ç”¨äºå°çš„æ–‡ä»¶ç³»ç»Ÿ,æœ€å¤§16M.
- 		jffsæ”¯æŒæ–‡ä»¶å‹ç¼©,yaffsä¸æ”¯æŒ,yaffsæ›´åå‘æ”¯æŒå¤§çš„æ–‡ä»¶ç³»ç»Ÿ.yaffsä½¿ç”¨oobç»„ç»‡æ–‡ä»¶ç»“æ„,jffså°†èŠ‚ç‚¹ä¿¡æ¯ä¿å­˜åœ¨nandçš„æ•°æ®åŒº,ç”±äºæ­¤jffs moutæ—¶é—´è¾ƒyaffsæ—¶é—´é•¿.
+FlashÉè±¸Çı¶¯:
+	ËµÃ÷:flashÇı¶¯ÔÚlinuxÖĞ²ÉÓÃÁËmtd½Ó¿Ú(memory teconolgy device).mtd½«flashÉè±¸³éÏó³öÀ´,¸ôÀëÁËÎÄ¼şÏµÍ³ºÍflashÇı¶¯.mtd°üÀ¨Èı¸ö²ã´Î,µ×²ãÊÇflashÇı¶¯(nor»ònand),
+		ÆäÉÏÊÇmtdÔ­Ê¼Éè±¸,ÔÙÉÏÊÇmtdÉè±¸½Úµã(×Ö·ûÉè±¸»ò¿éÉè±¸).mtdÉè±¸½ÚµãÊÇmtdX,×Ö·ûÉè±¸Ö÷Éè±¸ºÅ31,¿éÉè±¸Ö÷Éè±¸ºÅÊÇ90.		
+ 		ÔÚÉè±¸½ÚµãÉÏ²ã,ÎÄ¼şÏµÍ³ÔÚlinuxÉÏÓĞfat,cramfs,jffs/jffs2/jffs3,yaffs/yaffs2,ubifsµÈ.fatÎÄ¼şÏµÍ³ĞèÒªÓĞftl(filesystem transfer layer Õë¶Ônor),nftl(Õë¶Ônand)À´×ª»».jffs,yaffsµÈ
+ 		Ö±½ÓÓëmtd²ã½Ó¿Ú.
+ 		cramfsÊµÊ±µÄ½âÑ¹ËõÎÄ¼şµ½ÄÚ´æÖĞ,ÊÊÓÃÓÚĞ¡µÄÎÄ¼şÏµÍ³,×î´ó16M.
+ 		jffsÖ§³ÖÎÄ¼şÑ¹Ëõ,yaffs²»Ö§³Ö,yaffs¸üÆ«ÏòÖ§³Ö´óµÄÎÄ¼şÏµÍ³.yaffsÊ¹ÓÃoob×éÖ¯ÎÄ¼ş½á¹¹,jffs½«½ÚµãĞÅÏ¢±£´æÔÚnandµÄÊı¾İÇø,ÓÉÓÚ´Ëjffs moutÊ±¼ä½ÏyaffsÊ±¼ä³¤.
  		
-		linuxé€šè¿‡physmap.cå®ç°äº†norçš„åº•å±‚é©±åŠ¨(é©±åŠ¨åç§°:"physmap-flash"),ç”¨æˆ·åªè¦å®šä¹‰èµ„æºæ–‡ä»¶å³å¯.
-		norçš„åº•å±‚é©±åŠ¨å¯ä»¥ä½¿ç”¨é€šç”¨é©±åŠ¨(physmapçš„platformé©±åŠ¨),ä¹Ÿå¯è‡ªå·±æŒ‰ç…§æ¨¡æ¿ç¼–å†™,å°†èµ„æºä¸é©±åŠ¨åœ¨ä¸€ä¸ªæ–‡ä»¶ä¸­å®ç°.
-		nandçš„åº•å±‚é©±åŠ¨å¯ä»¥æŒ‰ç…§platformé©±åŠ¨,ä¹Ÿå¯æŒ‰ç…§è‡ªå·±æ¨¡æ¿ç¼–å†™,å°†èµ„æºä¸é©±åŠ¨åœ¨ä¸€ä¸ªæ–‡ä»¶ä¸­å®ç°.
-		nandå’Œnorçš„åŒºåˆ«:nandä¸€èˆ¬å®¹é‡è¾ƒå¤§,æœ€å¤§å¯åˆ°8g,è€Œnoråªèƒ½è¾¾åˆ°Mçº§.nandåœ°å€å’Œæ•°æ®é‡‡ç”¨å¤ç”¨æ¥å£,noré‡‡ç”¨sdramç›¸åŒæ¥å£.norå¯é æ€§è¾ƒé«˜.å…¸å‹çš„nandèŠ¯ç‰‡å¦‚ä¸‰æ˜Ÿçš„k9xxxxx,norèŠ¯ç‰‡å¦‚sstxxx.
-		nandæ¯å—å¤§å°8k,æ¯é¡µ512å­—èŠ‚,æ¯é¡µè¿˜æœ‰16å­—èŠ‚çš„oob(out of band)ç”¨äºeccæ ¡æ­£.norçš„å—ä¸º64k.norçš„å†™é€Ÿåº¦æ…¢äºnand.nandå’Œnoréƒ½éœ€è¦å…ˆæ“¦é™¤ç„¶åæ‰èƒ½å†™å…¥.
-	å˜é‡:
-		struct mtd_info{//mtd_infoç”¨äºæè¿°mtdåŸå§‹è®¾å¤‡
+		linuxÍ¨¹ıphysmap.cÊµÏÖÁËnorµÄµ×²ãÇı¶¯(Çı¶¯Ãû³Æ:"physmap-flash"),ÓÃ»§Ö»Òª¶¨Òå×ÊÔ´ÎÄ¼ş¼´¿É.
+		norµÄµ×²ãÇı¶¯¿ÉÒÔÊ¹ÓÃÍ¨ÓÃÇı¶¯(physmapµÄplatformÇı¶¯),Ò²¿É×Ô¼º°´ÕÕÄ£°å±àĞ´,½«×ÊÔ´ÓëÇı¶¯ÔÚÒ»¸öÎÄ¼şÖĞÊµÏÖ.
+		nandµÄµ×²ãÇı¶¯¿ÉÒÔ°´ÕÕplatformÇı¶¯,Ò²¿É°´ÕÕ×Ô¼ºÄ£°å±àĞ´,½«×ÊÔ´ÓëÇı¶¯ÔÚÒ»¸öÎÄ¼şÖĞÊµÏÖ.
+		nandºÍnorµÄÇø±ğ:nandÒ»°ãÈİÁ¿½Ï´ó,×î´ó¿Éµ½8g,¶ønorÖ»ÄÜ´ïµ½M¼¶.nandµØÖ·ºÍÊı¾İ²ÉÓÃ¸´ÓÃ½Ó¿Ú,nor²ÉÓÃsdramÏàÍ¬½Ó¿Ú.nor¿É¿¿ĞÔ½Ï¸ß.µäĞÍµÄnandĞ¾Æ¬ÈçÈıĞÇµÄk9xxxxx,norĞ¾Æ¬Èçsstxxx.
+		nandÃ¿¿é´óĞ¡8k,Ã¿Ò³512×Ö½Ú,Ã¿Ò³»¹ÓĞ16×Ö½ÚµÄoob(out of band)ÓÃÓÚeccĞ£Õı.norµÄ¿éÎª64k.norµÄĞ´ËÙ¶ÈÂıÓÚnand.nandºÍnor¶¼ĞèÒªÏÈ²Á³ıÈ»ºó²ÅÄÜĞ´Èë.
+	±äÁ¿:
+		struct mtd_info{//mtd_infoÓÃÓÚÃèÊömtdÔ­Ê¼Éè±¸
 			u_char type;//MTD_RAM MTD_ROM MTD_NORFLASH MTD_NANDFLASH
-			u_int_32 flags;//å†™æ ‡å¿— MTD_WRITEABLE MTD_BIT_WRITEABLE MTD_NO_ERASE MTD_POWERUP_LOCK
-			u_int_32 erasesize;//ä¸»è¦æ“¦é™¤å—å¤§å°
-			u_int_32 writesize;//æœ€å°å†™å•å…ƒå¤§å°
-			u_int_32 oobsize;//oobå­—èŠ‚æ•°
-			u_int_32 oobabil;//å¯ç”¨çš„oobå¤§å°
+			u_int_32 flags;//Ğ´±êÖ¾ MTD_WRITEABLE MTD_BIT_WRITEABLE MTD_NO_ERASE MTD_POWERUP_LOCK
+			u_int_32 erasesize;//Ö÷Òª²Á³ı¿é´óĞ¡
+			u_int_32 writesize;//×îĞ¡Ğ´µ¥Ôª´óĞ¡
+			u_int_32 oobsize;//oob×Ö½ÚÊı
+			u_int_32 oobabil;//¿ÉÓÃµÄoob´óĞ¡
 			
 			char *name;
 			int index;
@@ -1978,34 +1979,34 @@ Flashè®¾å¤‡é©±åŠ¨:
 			u_int_32 band_size;
 			
 			int (*erase)(...)
-			int (*point)(...)//é’ˆå¯¹xip(eXecute-In-Place)
+			int (*point)(...)//Õë¶Ôxip(eXecute-In-Place)
 			int (*unpoint)(...)
 			
-			int (*read)(...);//è¯»å†™flash
+			int (*read)(...);//¶ÁĞ´flash
 			int (*write)(...);
 			
 			void (*sync)(...);
 			
-			//pmå‡½æ•°
+			//pmº¯Êı
 			int (*suspend)(..)
 			int (resume)(...);
 			
-			//åå—ç®¡ç†
+			//»µ¿é¹ÜÀí
 			int (*block_isbad)(...);
 			int (*block_markbad)(...);
 			
-			void *priv;//ç§æœ‰æ•°æ®
+			void *priv;//Ë½ÓĞÊı¾İ
 			struct module *owner;
 		}
-		struct mtd_part{//ç”¨äºæè¿°åˆ†åŒº
-			struct mtd_info mtd;//åˆ†åŒºæè¿°
-			struct mtd_info *master;//ä¸»åˆ†åŒºæè¿°
-			u_int_32 offset;//åˆ†åŒºåç§»åœ°å€
-			int index;//åˆ†åŒºå·
+		struct mtd_part{//ÓÃÓÚÃèÊö·ÖÇø
+			struct mtd_info mtd;//·ÖÇøÃèÊö
+			struct mtd_info *master;//Ö÷·ÖÇøÃèÊö
+			u_int_32 offset;//·ÖÇøÆ«ÒÆµØÖ·
+			int index;//·ÖÇøºÅ
 			struct list_head list;
 			int registered;
 		}
-		struct mtd_partition{//ç”¨äºæè¿°åˆ†åŒº,ç”¨äºadd_mtd_partitionså‡½æ•°çš„å‚æ•°
+		struct mtd_partition{//ÓÃÓÚÃèÊö·ÖÇø,ÓÃÓÚadd_mtd_partitionsº¯ÊıµÄ²ÎÊı
 			char *name;
 			u_int_32 size;
 			u_int_32 offset;
@@ -2014,18 +2015,18 @@ Flashè®¾å¤‡é©±åŠ¨:
 			struct mtd_info **mtdp;
 		}
 		
-		nor Flashå˜é‡
-			struct map_info{//ç”¨æ¥æè¿°nor flash
+		nor Flash±äÁ¿
+			struct map_info{//ÓÃÀ´ÃèÊönor flash
 				char *name;
 				unsigned long size;
 				unsigned long phys;
-				void __iomem *virt;//è™šæ‹Ÿåœ°å€
+				void __iomem *virt;//ĞéÄâµØÖ·
 				...
 			}
-		nand flash å˜é‡
-			struct nand_chip{//ç”¨äºæè¿°nandèŠ¯ç‰‡
-				void __iomem *IO_ADDR_R;//è¯»åœ°å€è™šæ‹Ÿåœ°å€
-				void __iomem *IO_ADDR_W;//å†™åœ°å€è™šæ‹Ÿåœ°å€
+		nand flash ±äÁ¿
+			struct nand_chip{//ÓÃÓÚÃèÊönandĞ¾Æ¬
+				void __iomem *IO_ADDR_R;//¶ÁµØÖ·ĞéÄâµØÖ·
+				void __iomem *IO_ADDR_W;//Ğ´µØÖ·ĞéÄâµØÖ·
 				uint8_t (*read_byte)(struct mtd_info *mtd);
 				u16 (*read_word)(struct mtd_info *mtd);
 				void (*write_buf)(struct mtd_info *mtd,const uint8_t *buf,int len);
@@ -2036,30 +2037,30 @@ Flashè®¾å¤‡é©±åŠ¨:
 				struct nand_ecclayout *ecclayout;
 				struct mtd_oob_ops ops;
 				...
-				void *priv;//ç§æœ‰æ•°æ®
+				void *priv;//Ë½ÓĞÊı¾İ
 			}	
 		
-	å‡½æ•°ï¼š
-	 	mtd å‡½æ•°ï¼š
-	 		add_mtd_deviceï¼ˆstruct mtd_info* mtd);//æ·»åŠ åˆ é™¤mtdè®¾å¤‡
+	º¯Êı£º
+	 	mtd º¯Êı£º
+	 		add_mtd_device£¨struct mtd_info* mtd);//Ìí¼ÓÉ¾³ımtdÉè±¸
 	 		del_mtd_device(struct mtd_info*mtd);
-	 		add_mtd_partitionsï¼ˆsttuct mtd_info *masterï¼Œstruct mtd_partition *part);//æ·»åŠ åˆ é™¤mtdåˆ†åŒº
+	 		add_mtd_partitions£¨sttuct mtd_info *master£¬struct mtd_partition *part);//Ìí¼ÓÉ¾³ımtd·ÖÇø
 			del_mtd_partitios(struct mtd_info *master);
-	 		mtdç”¨æˆ·ç©ºé—´é€šè¿‡ioctlæ¥äº¤æµ,ä¸»è¦å‘½ä»¤æœ‰MEMGETINFO,MEMERASE,MEMREADOOB,MEMWRITEOOB,MEMGETBADBLOCK
+	 		mtdÓÃ»§¿Õ¼äÍ¨¹ıioctlÀ´½»Á÷,Ö÷ÒªÃüÁîÓĞMEMGETINFO,MEMERASE,MEMREADOOB,MEMWRITEOOB,MEMGETBADBLOCK
 	 		
-	 	åº•å±‚é©±åŠ¨å‡½æ•°
-	 		struct mtd_info *do_map_probe(const char *name,struct map_info* map);//name å¯ä»¥ä¸º "cfi_probe","jedec_probe","map_rom" ,ç”¨äºnor flash
-	 		int nand_scan(struct mtd_info *mtd,int maxchips);//ç”¨äºæ¢æµ‹nand flash æ˜¯å¦å­˜åœ¨.
-	 ç”¨æ³•:
-	 	éplatformå½¢å¼çš„noråº•å±‚é©±åŠ¨
-	 		//å®šä¹‰map_info
+	 	µ×²ãÇı¶¯º¯Êı
+	 		struct mtd_info *do_map_probe(const char *name,struct map_info* map);//name ¿ÉÒÔÎª "cfi_probe","jedec_probe","map_rom" ,ÓÃÓÚnor flash
+	 		int nand_scan(struct mtd_info *mtd,int maxchips);//ÓÃÓÚÌ½²ânand flash ÊÇ·ñ´æÔÚ.
+	 ÓÃ·¨:
+	 	·ÇplatformĞÎÊ½µÄnorµ×²ãÇı¶¯
+	 		//¶¨Òåmap_info
 	 		struct map_info xx_map={
 	 			.name="xx";
 	 			.size=xx_size;
 	 			.phys=xx_phys;
 	 			.bankwidth=xx_bank;
 	 		}
-	 		//å®šä¹‰åˆ†åŒº
+	 		//¶¨Òå·ÖÇø
 	 		struct mtd_partition xx_partitions[]={
 	 			[0]={
 	 				.name="xx_part1";
@@ -2075,22 +2076,22 @@ Flashè®¾å¤‡é©±åŠ¨:
 	 			}
 	 		...	
 	 		}
-	 		//å®šä¹‰åˆå§‹åŒ–å‡½æ•°
+	 		//¶¨Òå³õÊ¼»¯º¯Êı
 	 		struct mtd_info *mymtd;
 	 		static int __init xx_init(void){
-	 			xx_map.virt=ioremap_nocache(xx_map.phys,xx_map.size);//å°†ç‰©ç†åœ°å€è½¬åŒ–
+	 			xx_map.virt=ioremap_nocache(xx_map.phys,xx_map.size);//½«ÎïÀíµØÖ·×ª»¯
 	 			if(!xx_map.virt){
 	 				printk("error ioremap xx_map.phys");
 	 				goto error;
 	 			}
-	 			simple_map_init(&xx_map);//èµ‹å€¼map_infoä¸­çš„read,write,copy_from,copy_toå‡½æ•°æŒ‡é’ˆ
-	 			mymtd=do_map_probe("cfi_probe",&xx_map);//æ¢æµ‹nor flash
+	 			simple_map_init(&xx_map);//¸³Öµmap_infoÖĞµÄread,write,copy_from,copy_toº¯ÊıÖ¸Õë
+	 			mymtd=do_map_probe("cfi_probe",&xx_map);//Ì½²ânor flash
 	 			if(!mymtd){
 	 				printk("errot do map probe\n");
 	 				rc=-EXNIO;//no such device or address
 	 				goto error;
 	 			}
-	 			add_mtd_partitions(mymtd,xx_partitions,ARRAY_SIZE(xx_partitions);//åŠ å…¥åˆ†åŒº
+	 			add_mtd_partitions(mymtd,xx_partitions,ARRAY_SIZE(xx_partitions);//¼ÓÈë·ÖÇø
 	 			return 0;
 	 		error:
 	 			iounremap(xx_map.virt);
@@ -2109,8 +2110,8 @@ Flashè®¾å¤‡é©±åŠ¨:
 	 		}
 	 		module_init(xx_init);
 	 		module_exit(xx_exit);
-	 	platformå½¢å¼çš„nor flashé©±åŠ¨:åªç”¨å®šä¹‰èµ„æºæ–‡ä»¶,é©±åŠ¨é‡‡ç”¨physmap-flashé©±åŠ¨
-	 		//å®šä¹‰åˆ†åŒº
+	 	platformĞÎÊ½µÄnor flashÇı¶¯:Ö»ÓÃ¶¨Òå×ÊÔ´ÎÄ¼ş,Çı¶¯²ÉÓÃphysmap-flashÇı¶¯
+	 		//¶¨Òå·ÖÇø
 	 		struct mtd_partition xx_partitions[]={
 	 			[0]={
 	 				.name="xx_part1";
@@ -2126,19 +2127,19 @@ Flashè®¾å¤‡é©±åŠ¨:
 	 			}
 	 		...	
 	 		}
-	 		//å®šä¹‰èµ„æº
+	 		//¶¨Òå×ÊÔ´
 	 		static resource xx_resources={
 	 			.start=xx_nor_flash_start;
 	 			.end=xx_nor_flash_end;
 	 			.flags=IORESORCE_MEM;
 	 		}
-	 		//å®šä¹‰physmapçš„æ•°æ®
+	 		//¶¨ÒåphysmapµÄÊı¾İ
 	 		static physmap_flash_data xx_nor_flash_data={
 	 			.width=xx_width;
 	 			.parts=&xx_partitions;
 	 			.nr_parts=ARRAY_SIZE(xx_partitions);
 	 		}
-	 		//å®šä¹‰platform_data
+	 		//¶¨Òåplatform_data
 	 		struct platform_device xx_flash_device={
 	 			.name="physmap-flash";
 	 			.id=0;
@@ -2148,11 +2149,11 @@ Flashè®¾å¤‡é©±åŠ¨:
 	 			.resources=&xx_resources;
 	 			.num_resources=ARRAY_SIZE(xx_resources);
 	 		}
-	 		åˆé€‚çš„åœ°æ–¹è°ƒç”¨:
+	 		ºÏÊÊµÄµØ·½µ÷ÓÃ:
 	 			platform_add_device(&xx_flash_device);
 	 			
-	 	éplatformå½¢å¼çš„nandé©±åŠ¨
-	 		//å®šä¹‰åˆ†åŒº
+	 	·ÇplatformĞÎÊ½µÄnandÇı¶¯
+	 		//¶¨Òå·ÖÇø
 	 		struct mtd_partition xx_partitions[]={
 	 			[0]={
 					.name="part1";
@@ -2162,36 +2163,36 @@ Flashè®¾å¤‡é©±åŠ¨:
 	 			},
 	 			[1]={
 	 				.name="part2";
-	 				.size=MTDPART_SIZ_FULL;//å®šä¹‰ä¸ºå‰©ä¸‹çš„åŒºåŸŸ
+	 				.size=MTDPART_SIZ_FULL;//¶¨ÒåÎªÊ£ÏÂµÄÇøÓò
 	 				.offset=xx_offset2;
 	 				.flags=xx_flags2;
 	 			}
 	 			
 	 		...
 	 		}
-	 		//å®šä¹‰åˆå§‹åŒ–å‡½æ•°
+	 		//¶¨Òå³õÊ¼»¯º¯Êı
 	 		struct mtd_info *mymtd;
 	 		void __iomem *base_addr;
 			static int __init xx_init(void){
 				struct nand_chip *this;
 				int rc;
-				base_addr=ioremap(xx_phys);//è·å–nandçš„è™šæ‹Ÿåœ°å€
+				base_addr=ioremap(xx_phys);//»ñÈ¡nandµÄĞéÄâµØÖ·
 				if(!base_addr){
 					printk("error on remap");
 					rc=-EIO;// io error
 					goto out;
 				}
 				
-				mymtd=kzalloc(sizeof(struct mtd_info)+sizeof(struct nand_chip),GFP_KERNEL);//åˆ†é…å†…å­˜
+				mymtd=kzalloc(sizeof(struct mtd_info)+sizeof(struct nand_chip),GFP_KERNEL);//·ÖÅäÄÚ´æ
 				if(!mymtd){
 					printk("error on kzmalloc\n");
 					rc=-ENOMEM;//out of memory
 					goto to out_mem;
 				}
 				
-				this=(struct nand_chip *)(&mymtd[1]);//è·å–mymtdçš„ç§æœ‰æ•°æ®æŒ‡é’ˆ
-				mymtd->priv=this;//å°†mtdä¸­çš„ç§æœ‰æ•°æ®æŒ‡é’ˆæŒ‡å‘nand chip
-				//å¯¹nand chipç»“æ„ä¸­èµ‹å€¼,å¦‚æœnand chip ä¸­çš„å‡½æ•°æœªè¢«èµ‹å€¼ï¼Œåˆ™ä½¿ç”¨nand_baseã€‚cä¸­çš„é»˜è®¤å‡½æ•°ã€‚åŒ…æ‹¬é»˜è®¤çš„ecc layout
+				this=(struct nand_chip *)(&mymtd[1]);//»ñÈ¡mymtdµÄË½ÓĞÊı¾İÖ¸Õë
+				mymtd->priv=this;//½«mtdÖĞµÄË½ÓĞÊı¾İÖ¸ÕëÖ¸Ïònand chip
+				//¶Ônand chip½á¹¹ÖĞ¸³Öµ,Èç¹ûnand chip ÖĞµÄº¯ÊıÎ´±»¸³Öµ£¬ÔòÊ¹ÓÃnand_base¡£cÖĞµÄÄ¬ÈÏº¯Êı¡£°üÀ¨Ä¬ÈÏµÄecc layout
 				this->IO_ADDR_R=base_addr;
 				this->IO_ADDR_W=base_addr;
 				this->cmd_ctl=xx_hw_ctl;
@@ -2217,17 +2218,17 @@ Flashè®¾å¤‡é©±åŠ¨:
 				kfree(mymtd);
 			}
 			
-		platformå½¢å¼çš„nandé©±åŠ¨
-			é©±åŠ¨éƒ¨åˆ†:
-			probeå‡½æ•°ä¸»è¦å·¥ä½œ
-				åˆ†é…å†…å­˜åŒ…æ‹¬mtd_info,nand_chip
-				æ ¹æ®æ¿æ–‡ä»¶ä¿¡æ¯,è·å¾—nandçš„åœ°å€ç­‰å‚æ•°
-				èµ‹å€¼nand_chipç»“æ„å‚æ•°
-				è°ƒç”¨nand_scanæ‰«ææ˜¯å¦å­˜åœ¨
-				è°ƒç”¨add_mtd_partitionsåŠ å…¥æ¿æ–‡ä»¶å®šä¹‰çš„åˆ†åŒº
+		platformĞÎÊ½µÄnandÇı¶¯
+			Çı¶¯²¿·Ö:
+			probeº¯ÊıÖ÷Òª¹¤×÷
+				·ÖÅäÄÚ´æ°üÀ¨mtd_info,nand_chip
+				¸ù¾İ°åÎÄ¼şĞÅÏ¢,»ñµÃnandµÄµØÖ·µÈ²ÎÊı
+				¸³Öµnand_chip½á¹¹²ÎÊı
+				µ÷ÓÃnand_scanÉ¨ÃèÊÇ·ñ´æÔÚ
+				µ÷ÓÃadd_mtd_partitions¼ÓÈë°åÎÄ¼ş¶¨ÒåµÄ·ÖÇø
 				
-				ä¸‹é¢æ˜¯ä¸»è¦éƒ¨åˆ†ä»£ç :
-				//å®šä¹‰ä¸€ä¸ªè®¾å¤‡çš„nandç»“æ„
+				ÏÂÃæÊÇÖ÷Òª²¿·Ö´úÂë:
+				//¶¨ÒåÒ»¸öÉè±¸µÄnand½á¹¹
 				struct xx_nand_info{
 					struct mtd_info mtd;
 					struct nand_chip chip;
@@ -2237,7 +2238,7 @@ Flashè®¾å¤‡é©±åŠ¨:
 					...
 					
 				};
-				//å®šä¹‰platform dataæ•°æ®ç»“æ„
+				//¶¨Òåplatform dataÊı¾İ½á¹¹
 				struct xx_nand_data{
 					struct mtd_partition parts;
 					int	nrparts;
@@ -2264,7 +2265,7 @@ Flashè®¾å¤‡é©±åŠ¨:
 					
 					mtd->owner=THIS_MODULE;
 					mtd->name=dev_name(&pdev->dev);
-					mtd->priv=chip;//èµ‹å€¼mtd çš„ç§æœ‰æ•°æ®ä¸ºnand chip
+					mtd->priv=chip;//¸³Öµmtd µÄË½ÓĞÊı¾İÎªnand chip
 					mtd->dev.parent=&pdev->dev;
 
 					chip->IO_ADDR_W=info->base;
@@ -2272,7 +2273,7 @@ Flashè®¾å¤‡é©±åŠ¨:
 					chip->cmd_ctl=xx_hw_ctl;
 					chip->dev_ready=xx_ready;
 					...
-					ret=nand_scan(mtd,1);//æˆ–è€…nand_scan_tail(mtd) è¯¥å‡½æ•°æ˜¯nand_scançš„ç¬¬äºŒç§å‹å¼,å¯ä»¥å¡«å……æœªè¢«åˆå§‹åŒ–çš„å‚æ•°
+					ret=nand_scan(mtd,1);//»òÕßnand_scan_tail(mtd) ¸Ãº¯ÊıÊÇnand_scanµÄµÚ¶şÖÖĞÍÊ½,¿ÉÒÔÌî³äÎ´±»³õÊ¼»¯µÄ²ÎÊı
 					if(ret<0){
 						rc=-ENODEV;
 						goto out_scan;
@@ -2285,7 +2286,7 @@ Flashè®¾å¤‡é©±åŠ¨:
 					out:
 						retrurn rc;
 				}
-	 		èµ„æºéƒ¨åˆ†:
+	 		×ÊÔ´²¿·Ö:
 	 			struct resources xx_resources={
 	 				.start=
 	 				.end=
@@ -2294,9 +2295,9 @@ Flashè®¾å¤‡é©±åŠ¨:
 	 			struct mtd_partition xx_parts={
 	 				[0]={
 	 					.name="";
-	 					.size=//å¯èƒ½çš„å‚æ•°SZ_1,2,..512,1K,2K..512K,1M,2M..512M,1G,2G
-	 					.offset=;//å¯èƒ½çš„å‚æ•°MTDPART_OFS_APPEND
-	 					.flags=;//å¯èƒ½çš„å‚æ•°MTD_CAP_ROM,MTD_CAP_NORFLASH,MTD_CAP_NANDFLASH,MTD_CAP_RAM
+	 					.size=//¿ÉÄÜµÄ²ÎÊıSZ_1,2,..512,1K,2K..512K,1M,2M..512M,1G,2G
+	 					.offset=;//¿ÉÄÜµÄ²ÎÊıMTDPART_OFS_APPEND
+	 					.flags=;//¿ÉÄÜµÄ²ÎÊıMTD_CAP_ROM,MTD_CAP_NORFLASH,MTD_CAP_NANDFLASH,MTD_CAP_RAM
 	 				}
 	 				[1]={
 	 					.name="";
@@ -2310,32 +2311,32 @@ Flashè®¾å¤‡é©±åŠ¨:
 	 				.nrparts=ARRAY_SIZE(xx_parts);
 	 			}
 	 			struct platform_device xx_platform_dev={
-	 				.name="xx";//socè®¾å¤‡çš„é©±åŠ¨åç§°
+	 				.name="xx";//socÉè±¸µÄÇı¶¯Ãû³Æ
 	 				.reources=&xx_resources;
 	 				.num_resources=ARRAY_SIZE(xx_resources);
 	 				.dev={
 	 					.platform_data=&xx_nand_data;
 	 				}
 	 			}
-	 			åˆé€‚çš„åœ°æ–¹è°ƒç”¨
+	 			ºÏÊÊµÄµØ·½µ÷ÓÃ
 	 				platform_add_devices(&xx_platform_dev);
-	 	åº”ç”¨å±‚:
-	 		æ–‡ä»¶ç³»ç»Ÿåˆ¶ä½œ
+	 	Ó¦ÓÃ²ã:
+	 		ÎÄ¼şÏµÍ³ÖÆ×÷
 	 		cramfs:
-	 			mkcramfs  æ–‡ä»¶ç³»ç»Ÿæ ¹ç›®å½• è¾“å‡ºæ–‡ä»¶   //åˆ¶ä½œæ–‡ä»¶ç³»ç»Ÿ
-	 			mount -t cramfs /dev/mtdblockx æŒ‚è½½çš„ç›®å½• //å°†mtdè®¾å¤‡åˆ†åŒºæŒ‚è½½åˆ°ç›®å½•ä¸Š
-	 			mount -o loop xx.img æŒ‚è½½çš„ç›®å½• //å°†æ˜ åƒæ–‡ä»¶æŒ‚è½½åˆ°ç›®å½•ä¸Š,åªè¯»æ¨¡å¼
+	 			mkcramfs  ÎÄ¼şÏµÍ³¸ùÄ¿Â¼ Êä³öÎÄ¼ş   //ÖÆ×÷ÎÄ¼şÏµÍ³
+	 			mount -t cramfs /dev/mtdblockx ¹ÒÔØµÄÄ¿Â¼ //½«mtdÉè±¸·ÖÇø¹ÒÔØµ½Ä¿Â¼ÉÏ
+	 			mount -o loop xx.img ¹ÒÔØµÄÄ¿Â¼ //½«Ó³ÏñÎÄ¼ş¹ÒÔØµ½Ä¿Â¼ÉÏ,Ö»¶ÁÄ£Ê½
 	 		jffs:
-	 			mkfs.jffs -d æ–‡ä»¶ç³»ç»Ÿæ ¹ç›®å½• -o è¾“å‡ºæ–‡ä»¶
-	 			mount -t jffs /dev/mtdblockx æŒ‚è½½çš„ç›®å½•
+	 			mkfs.jffs -d ÎÄ¼şÏµÍ³¸ùÄ¿Â¼ -o Êä³öÎÄ¼ş
+	 			mount -t jffs /dev/mtdblockx ¹ÒÔØµÄÄ¿Â¼
 	 		yaffs:
 	 			mkyaffsimage dir imagename
 	 			mkyaffs2image dir imagename
-	 			mount -t yaffs /dev/mtdblockx æŒ‚è½½çš„ç›®å½•
+	 			mount -t yaffs /dev/mtdblockx ¹ÒÔØµÄÄ¿Â¼
 	 		ubifs:
-	 			mkfs.ubifs -d æ–‡ä»¶ç³»ç»Ÿæ ¹ç›®å½• -o è¾“å‡ºæ–‡ä»¶ -m æœ€å°å•å…ƒ -c æœ€å¤§é€»è¾‘æ“¦é™¤å—å¤§å° -e é€»è¾‘æ“¦é™¤å—å¤§å° //åˆ¶ä½œæ–‡ä»¶ç³»ç»Ÿæ˜ åƒæ–‡ä»¶
-	 			ubinize -o è¾“å‡ºæ˜ åƒæ–‡ä»¶ -p ç‰©ç†æ“¦é™¤å—å¤§å°(xxKiB xxMiB) -m æœ€å°é¡µå•å…ƒ -s æœ€å°å­é¡µå•å…ƒ xx.conf //åˆ¶ä½œubiæ–‡ä»¶ç³»ç»Ÿæ˜ åƒ,ubiå¯ä»¥åŒ…å«å¤šä¸ªæ˜ åƒ.åœ¨é…ç½®æ–‡ä»¶ä¸­é…ç½®
-		 			é…ç½®æ–‡ä»¶
+	 			mkfs.ubifs -d ÎÄ¼şÏµÍ³¸ùÄ¿Â¼ -o Êä³öÎÄ¼ş -m ×îĞ¡µ¥Ôª -c ×î´óÂß¼­²Á³ı¿é´óĞ¡ -e Âß¼­²Á³ı¿é´óĞ¡ //ÖÆ×÷ÎÄ¼şÏµÍ³Ó³ÏñÎÄ¼ş
+	 			ubinize -o Êä³öÓ³ÏñÎÄ¼ş -p ÎïÀí²Á³ı¿é´óĞ¡(xxKiB xxMiB) -m ×îĞ¡Ò³µ¥Ôª -s ×îĞ¡×ÓÒ³µ¥Ôª xx.conf //ÖÆ×÷ubiÎÄ¼şÏµÍ³Ó³Ïñ,ubi¿ÉÒÔ°üº¬¶à¸öÓ³Ïñ.ÔÚÅäÖÃÎÄ¼şÖĞÅäÖÃ
+		 			ÅäÖÃÎÄ¼ş
 		 				[xx_volume]
 		 				mode=ubi
 		 				image=xx_image
@@ -2345,21 +2346,21 @@ Flashè®¾å¤‡é©±åŠ¨:
 		 				vol_name
 		 				vol_flags=autoresize
 		 				vol_alignment=1
-	 			ubiformat /dev/mtd1 -s  å­é¡µå¤§å° -f æ˜ åƒæ–‡ä»¶ //çƒ§å½•æ˜ åƒ
-	 			ubiattach /dev/ubi_ctrl -m 1 //å°†mtd1 è”ç³»åˆ°ubi
-	 				é»˜è®¤çš„ubiæ§åˆ¶æ˜¯/dev/ubi_ctrl 
-	 					ubiattach -p mtdè·¯å¾„ ä¾‹å¦‚ ubiattach -p /dev/mtd1 å°†mtd1è”ç³»åˆ°ubi
-	 					ubiattach -m 0 	å°†mtd0 è”ç³»åˆ°ubi
-	 					ubiattach -m 0 -d 3 å°†mtd0 è”ç³»åˆ°ubiå¹¶ä¸”åˆ›å»ºubiè®¾å¤‡3 ubi3
-	 			mount -t ubifs ubi0:rootfs æŒ‚è½½ç›®å½•  //æŒ‚è½½æ–‡ä»¶ç³»ç»Ÿ
+	 			ubiformat /dev/mtd1 -s  ×ÓÒ³´óĞ¡ -f Ó³ÏñÎÄ¼ş //ÉÕÂ¼Ó³Ïñ
+	 			ubiattach /dev/ubi_ctrl -m 1 //½«mtd1 ÁªÏµµ½ubi
+	 				Ä¬ÈÏµÄubi¿ØÖÆÊÇ/dev/ubi_ctrl 
+	 					ubiattach -p mtdÂ·¾¶ ÀıÈç ubiattach -p /dev/mtd1 ½«mtd1ÁªÏµµ½ubi
+	 					ubiattach -m 0 	½«mtd0 ÁªÏµµ½ubi
+	 					ubiattach -m 0 -d 3 ½«mtd0 ÁªÏµµ½ubi²¢ÇÒ´´½¨ubiÉè±¸3 ubi3
+	 			mount -t ubifs ubi0:rootfs ¹ÒÔØÄ¿Â¼  //¹ÒÔØÎÄ¼şÏµÍ³
 	 			
-usbé©±åŠ¨
-	è¯´æ˜:usbé©±åŠ¨åŒ…æ‹¬ä¸»æœºä¾§é©±åŠ¨å’Œè®¾å¤‡ä¾§é©±åŠ¨.ä¸»æœºä¾§é©±åŠ¨åŒ…æ‹¬ä¸»æœºusbæ§åˆ¶å™¨é©±åŠ¨å’Œè®¾å¤‡é©±åŠ¨.usbæ§åˆ¶å™¨é©±åŠ¨ç”¨æ¥é©±åŠ¨socä¸Šçš„ohci,ehciå’Œotg(on-the-go)æ¥å£.ohciç”¨äºéx86ç³»ç»Ÿ,ehciç”¨äºx86.,otgç”¨äºusb2.0æ¥å£.
-	usbæ§åˆ¶å™¨åŒ…æ‹¬è®¾å¤‡,é…ç½®,æ¥å£,ç«¯å£å››ä¸ªå±‚æ¬¡.æ¯ä¸ªusbè®¾å¤‡å¯ä»¥æœ‰å¤šä¸ªé…ç½®,ä½†æ˜¯åŒæ—¶åªèƒ½æœ‰ä¸€ä¸ªé…ç½®èµ·ä½œç”¨.æ¯ä¸ªæ¥å£ä»£è¡¨è®¾å¤‡çš„æŸé¡¹åŠŸèƒ½,æ¯ä¸ªé…ç½®å¯èƒ½æœ‰å¤šä¸ªæ¥å£,æ¥å£å¯åŒæ—¶èµ·æ•ˆ.æ¥å£ä¸­åŒ…æ‹¬å¤šä¸ªç«¯ç‚¹,ç«¯ç‚¹0ä¸€èˆ¬
-	ä½œä¸ºæ§åˆ¶æ¥å£,1,2ä½œä¸ºæ•°æ®æ¥å£.
-	è®¾å¤‡é©±åŠ¨ç±»ä¼¼äºi2c driver,ç”¨äºå°†è®¾å¤‡æŒ‚è½½åˆ°usbæ€»çº¿ä¸Š.è®¾å¤‡ä¸ä¸»æœºæ§åˆ¶å™¨ä¹‹é—´é€šè¿‡urb(usb request block)è¿›è¡Œäº¤æµ.
-	å˜é‡:
-		ä¸»æœºä¾§:
+usbÇı¶¯
+	ËµÃ÷:usbÇı¶¯°üÀ¨Ö÷»ú²àÇı¶¯ºÍÉè±¸²àÇı¶¯.Ö÷»ú²àÇı¶¯°üÀ¨Ö÷»úusb¿ØÖÆÆ÷Çı¶¯ºÍÉè±¸Çı¶¯.usb¿ØÖÆÆ÷Çı¶¯ÓÃÀ´Çı¶¯socÉÏµÄohci,ehciºÍotg(on-the-go)½Ó¿Ú.ohciÓÃÓÚ·Çx86ÏµÍ³,ehciÓÃÓÚx86.,otgÓÃÓÚusb2.0½Ó¿Ú.
+	usb¿ØÖÆÆ÷°üÀ¨Éè±¸,ÅäÖÃ,½Ó¿Ú,¶Ë¿ÚËÄ¸ö²ã´Î.Ã¿¸öusbÉè±¸¿ÉÒÔÓĞ¶à¸öÅäÖÃ,µ«ÊÇÍ¬Ê±Ö»ÄÜÓĞÒ»¸öÅäÖÃÆğ×÷ÓÃ.Ã¿¸ö½Ó¿Ú´ú±íÉè±¸µÄÄ³Ïî¹¦ÄÜ,Ã¿¸öÅäÖÃ¿ÉÄÜÓĞ¶à¸ö½Ó¿Ú,½Ó¿Ú¿ÉÍ¬Ê±ÆğĞ§.½Ó¿ÚÖĞ°üÀ¨¶à¸ö¶Ëµã,¶Ëµã0Ò»°ã
+	×÷Îª¿ØÖÆ½Ó¿Ú,1,2×÷ÎªÊı¾İ½Ó¿Ú.
+	Éè±¸Çı¶¯ÀàËÆÓÚi2c driver,ÓÃÓÚ½«Éè±¸¹ÒÔØµ½usb×ÜÏßÉÏ.Éè±¸ÓëÖ÷»ú¿ØÖÆÆ÷Ö®¼äÍ¨¹ıurb(usb request block)½øĞĞ½»Á÷.
+	±äÁ¿:
+		Ö÷»ú²à:
 			struct usb_endpoint_descripter{
 				__u8 bLength;
 				__u8 bDescriperType;
@@ -2384,7 +2385,7 @@ usbé©±åŠ¨
 			}
 			strut usb_host_config{
 				struct usb_config_descripor desc;
-				struct usb_interface *interface[MAXINTERFACES];//å®šä¹‰ä¸º32
+				struct usb_interface *interface[MAXINTERFACES];//¶¨ÒåÎª32
 				struct usb_interface_cache *inf_cache[MAXINTERFACES];
 				...
 			}
@@ -2407,8 +2408,8 @@ usbé©±åŠ¨
 				
 			}
 	
-			usb_host_endpoint->usb_interface->usb_host_config->usb_device//usbç»“æ„å…³ç³»
-			struct usb_driver{//usbå¤–è®¾é©±åŠ¨ç»“æ„
+			usb_host_endpoint->usb_interface->usb_host_config->usb_device//usb½á¹¹¹ØÏµ
+			struct usb_driver{//usbÍâÉèÇı¶¯½á¹¹
 				const char *name;
 				int (*probe)(struct usb_interface *intf,const struct usb_device_id *id);
 				void (*disconnect)(struct usb_interface *intf);
@@ -2426,43 +2427,43 @@ usbé©±åŠ¨
 
 			}
 			
-			struct hc_driver{//usb ä¸»æœºæ§åˆ¶å™¨çš„é©±åŠ¨å‡½æ•°
-				const char *description;//æè¿°ohci,ehci
+			struct hc_driver{//usb Ö÷»ú¿ØÖÆÆ÷µÄÇı¶¯º¯Êı
+				const char *description;//ÃèÊöohci,ehci
 				const char *product_desc;
 				irqreturn_t (*irq)(struct usb_hcd*);
 				
 				int(*reset)(struct usb_hcd *hcd);
 				int(*start)(struct usb_hcd *hcd);
 				
-				int (*urb_enqueue)(struct usb_hcd *hcd,struct urb *urb ,gfp_t mem_flags);//è¢«usb_submit_urbè°ƒç”¨
+				int (*urb_enqueue)(struct usb_hcd *hcd,struct urb *urb ,gfp_t mem_flags);//±»usb_submit_urbµ÷ÓÃ
 				int (*urb_dequeue)(struct usb_hcd *hcd ,struct urb *urb,int status);
 				 
 				...
 				
 			}
-			struct usb_hcd{//usb_hcdç”¨æ¥æè¿°ä¸»æœºæ§åˆ¶å™¨usb host controller driver
+			struct usb_hcd{//usb_hcdÓÃÀ´ÃèÊöÖ÷»ú¿ØÖÆÆ÷usb host controller driver
 				struct usb_bus self;
 				struct kref kref;
 				const char *product_desc;
 				
-				const struct hc_driver *driver;//ä¸»è¦é©±åŠ¨å‡½æ•°
+				const struct hc_driver *driver;//Ö÷ÒªÇı¶¯º¯Êı
 				
 				int irq;
 				void __iomem *regs;
 				u64 rsrc_start;
 				u64 rsrc_len;
-				unsigned power_budget;//ç”µæºå®¹é‡ å•ä½ma,0è¡¨ç¤ºæ²¡æœ‰é™åˆ¶.
+				unsigned power_budget;//µçÔ´ÈİÁ¿ µ¥Î»ma,0±íÊ¾Ã»ÓĞÏŞÖÆ.
 				...
-				unsigned long hcd_priv[0] __attributr__((aligned(sizeof(s64)));//ç§æœ‰æ•°æ®
+				unsigned long hcd_priv[0] __attributr__((aligned(sizeof(s64)));//Ë½ÓĞÊı¾İ
 			}
-			struct ohci_hcd{//ç”¨æ¥æè¿°ohciæ¥å£,å±äºusb_hcdç‰¹ä¾‹,å­˜åœ¨äºusb_hcdçš„ç§æœ‰æ•°æ®ä¸­.
+			struct ohci_hcd{//ÓÃÀ´ÃèÊöohci½Ó¿Ú,ÊôÓÚusb_hcdÌØÀı,´æÔÚÓÚusb_hcdµÄË½ÓĞÊı¾İÖĞ.
 				spinlock_t lock;
-				struct ohci_regs __iomem *regs;//ä¸ä¸»æœºé€šè®¯çš„ioå†…å­˜,ç”¨readl,writelè¯»å†™
-				struct ohci_hcca *hcca;//ä¸ä¸»æœºé€šè®¯çš„å†…å­˜,256å­—èŠ‚
+				struct ohci_regs __iomem *regs;//ÓëÖ÷»úÍ¨Ñ¶µÄioÄÚ´æ,ÓÃreadl,writel¶ÁĞ´
+				struct ohci_hcca *hcca;//ÓëÖ÷»úÍ¨Ñ¶µÄÄÚ´æ,256×Ö½Ú
 				...
 			}
-		å‡½æ•°:
-			ohciç›¸å…³å‡½æ•°:
+		º¯Êı:
+			ohciÏà¹Øº¯Êı:
 				struct ohci_hcd * hcd_to_ohci(strut usb_hcd *hcd);
 				struct usb_hcd * ohci_to_hcd(struct ohci_hcd *ohci);
 				
@@ -2472,27 +2473,27 @@ usbé©±åŠ¨
 				void ohci_usb_reset(struct ohci_hcd *ohci);
 				
 				void usb_remove_hcd(struct usb_hcd *);
-				void usb_put_hcd(struct usb_hcd*);//put å‡½æ•°é‡Šæ”¾èµ„æº,get è·å¾—èµ„æº
-				int  usb_create_hcd(struct hc_driver*driver,struct device *,const char *devname);//devname:bus nameå¯ä»¥ç”¨dev_name(struct device *dev)æ¥è·å¾—
+				void usb_put_hcd(struct usb_hcd*);//put º¯ÊıÊÍ·Å×ÊÔ´,get »ñµÃ×ÊÔ´
+				int  usb_create_hcd(struct hc_driver*driver,struct device *,const char *devname);//devname:bus name¿ÉÒÔÓÃdev_name(struct device *dev)À´»ñµÃ
 				int  usb_add_hcd(struct usb_hcd *hcd);
-			usbè®¾å¤‡ç›¸å…³å‡½æ•°:
-				struct usb_interface * usb_find_interface(struct usb_driver *,int minor);//æ ¹æ®usb_driverè·å¾—usb_interface
-				void *usb_get_infdata(struct usb_interface *);//æ ¹æ®usb_interface è·å¾—usb_interfaceä¸­çš„devçš„ç§æœ‰æ•°æ®,ä¸€èˆ¬æ˜¯è‡ªå®šä¹‰çš„usbè®¾å¤‡æ•°æ®
-				usb_rsvbulkpipe(struct usb_device *dev,__u8 endpoint);//åˆ›å»ºusb device çš„pipe,endpointæ˜¯endpointåœ°å€.
+			usbÉè±¸Ïà¹Øº¯Êı:
+				struct usb_interface * usb_find_interface(struct usb_driver *,int minor);//¸ù¾İusb_driver»ñµÃusb_interface
+				void *usb_get_infdata(struct usb_interface *);//¸ù¾İusb_interface »ñµÃusb_interfaceÖĞµÄdevµÄË½ÓĞÊı¾İ,Ò»°ãÊÇ×Ô¶¨ÒåµÄusbÉè±¸Êı¾İ
+				usb_rsvbulkpipe(struct usb_device *dev,__u8 endpoint);//´´½¨usb device µÄpipe,endpointÊÇendpointµØÖ·.
 				usb_sndbulkpipe(struct usb_device *dev,__u8 endpoint);
-				usb_fill_control_urb(struct urb *urb,struct usb_device *udev,unsigned int pipe,unsigned char *setup_packet,void *transfer_buffer,int buffer_length,usb_complete_t complete_fn,void *context);//å¡«å……control urb
-				usb_fill_bulk_urb(struct urb *urb,struct usb_device *udev,unsigned int pipe,void *transfer_buffer,int buffer_length,usb_complete_t complete_fn,void *context);//å¡«å……bulk urb
-				usb_fill_int_urb(struct urb*urb,struct usb_device *dev,unsigned int pipe,void* transfer_buffer,int buffer_length,usb_complete_fn *complete_fn,void*context,int interval);//å¡«å……int urb
-				struct urb * usb_alloc_urb(int iso_packet,int flags)ï¼›//åˆ†é…urbç©ºé—´,ä¼šè°ƒç”¨usb_init_urb.å¯¹äºæ¯ä¸ªendpointè¦åˆ†é…bulk_inå’Œbulk_out urb.bulk_inå¯ä»¥åœ¨probeæ—¶åˆ†é….bulk_outåœ¨writeæ—¶åˆ†é….
+				usb_fill_control_urb(struct urb *urb,struct usb_device *udev,unsigned int pipe,unsigned char *setup_packet,void *transfer_buffer,int buffer_length,usb_complete_t complete_fn,void *context);//Ìî³äcontrol urb
+				usb_fill_bulk_urb(struct urb *urb,struct usb_device *udev,unsigned int pipe,void *transfer_buffer,int buffer_length,usb_complete_t complete_fn,void *context);//Ìî³äbulk urb
+				usb_fill_int_urb(struct urb*urb,struct usb_device *dev,unsigned int pipe,void* transfer_buffer,int buffer_length,usb_complete_fn *complete_fn,void*context,int interval);//Ìî³äint urb
+				struct urb * usb_alloc_urb(int iso_packet,int flags)£»//·ÖÅäurb¿Õ¼ä,»áµ÷ÓÃusb_init_urb.¶ÔÓÚÃ¿¸öendpointÒª·ÖÅäbulk_inºÍbulk_out urb.bulk_in¿ÉÒÔÔÚprobeÊ±·ÖÅä.bulk_outÔÚwriteÊ±·ÖÅä.
 
-				usb_submit_urb(struct urb *urb,int flags);//æäº¤urb
+				usb_submit_urb(struct urb *urb,int flags);//Ìá½»urb
 				
-				usb_register_dev(struct usb_interface *interface,struct usb_class_driver*);//æ³¨å†Œå­—ç¬¦å‹usbè®¾å¤‡.å°†è®¾å¤‡é“¾æ¥åˆ°usbæ€»çº¿ä¸Š.
-				usb_register(struct usb_driver *);//æ³¨å†Œusbè®¾å¤‡
-		ç”¨æ³•:
-			ohcié©±åŠ¨:
-				ä¸»è¦å·¥ä½œæ˜¯ç¼–å†™hc_driverå‡½æ•°,å…¶ä¸­çš„ä¸»è¦å‡½æ•°é‡‡ç”¨ohci-hcd.cä¸­çš„é€šç”¨å‡½æ•°,åªæœ‰å°‘æ•°å‡½æ•°éœ€è¦ç¼–å†™å¦‚reset,start,stop,shutdownç­‰
-			å‡½æ•°.
+				usb_register_dev(struct usb_interface *interface,struct usb_class_driver*);//×¢²á×Ö·ûĞÍusbÉè±¸.½«Éè±¸Á´½Óµ½usb×ÜÏßÉÏ.
+				usb_register(struct usb_driver *);//×¢²áusbÉè±¸
+		ÓÃ·¨:
+			ohciÇı¶¯:
+				Ö÷Òª¹¤×÷ÊÇ±àĞ´hc_driverº¯Êı,ÆäÖĞµÄÖ÷Òªº¯Êı²ÉÓÃohci-hcd.cÖĞµÄÍ¨ÓÃº¯Êı,Ö»ÓĞÉÙÊıº¯ÊıĞèÒª±àĞ´Èçreset,start,stop,shutdownµÈ
+			º¯Êı.
 				xx_reset(struct usb_hcd*hcd){
 						...
 						ohci=hcd_to_ohci(hcd);
@@ -2512,54 +2513,54 @@ usbé©±åŠ¨
 					res=platform_get_resources(pdev,IORESOURCES_IRQ,0);
 					irq=res->start;
 					
-					res=platform_get_resources(pdev,IORESOURCES_MEM,0)//è·å–èµ„æº
+					res=platform_get_resources(pdev,IORESOURCES_MEM,0)//»ñÈ¡×ÊÔ´
 					
-					hcd=usb_create_hcd(&xx_hc_driver,&pdev->dev,dev_name(&pdev->dev));//åˆ›å»ºhcd
+					hcd=usb_create_hcd(&xx_hc_driver,&pdev->dev,dev_name(&pdev->dev));//´´½¨hcd
 					hcd->rsrc_start=res->start;
 					hcd->rsrc_len=res->end-res->start+1;
 					request_mem_region(hcd->rsrc_start,hcd->rsrc_len,driver->description);
-					hcd->regs=ioremap(hcd->rsrc_srtart,hcd->rsrc_len);//æ˜ å°„å†…å­˜
-					ohci_hcd_init(hcd_to_ochi(hcd));//ohciåˆå§‹åŒ–
-					usb_add_hcd(hcd,irq,IRQF_SHARED);///æ·»åŠ hcdè®¾å¤‡
+					hcd->regs=ioremap(hcd->rsrc_srtart,hcd->rsrc_len);//Ó³ÉäÄÚ´æ
+					ohci_hcd_init(hcd_to_ochi(hcd));//ohci³õÊ¼»¯
+					usb_add_hcd(hcd,irq,IRQF_SHARED);///Ìí¼ÓhcdÉè±¸
 				}
 				static int xx_remove(struct platform_device *pdev){
-					hcd=platform_get_drvdata(pdev);//?æ²¡æœ‰set
+					hcd=platform_get_drvdata(pdev);//?Ã»ÓĞset
 					usb_remove_hcd(hcd);
 					usb_put_hcd(hcd);
 					iounmap(hcd->regs);
 					release_mem_region(hcd->rsrc_start,hcd->rsrc_len);
 					platform_set_drvdata(pdev,NULL);
 				}
-			ä¸»æœºä¾§usbå¤–è®¾é©±åŠ¨:
-			    ä¸»è¦æ­¥éª¤:
-			        1.å®šä¹‰ç§æœ‰çš„usb deviceç»“æ„,å…¶ä¸­åŒ…æ‹¬usb_device
-			        2.å®šä¹‰probeå‡½æ•°,
-			            2.1åˆå§‹åŒ–å¿…è¦çš„lock,semphore,completionç­‰.
-			            2.2æ ¹æ®interfaceå¡«å……bulk_urb
-			            2.3è®¾ç½®interfaceçš„ç§æœ‰æ•°æ®ä¸ºç§æœ‰usb_device
-			            2.4æ³¨å†Œusb_device
-			        3.å®šä¹‰disconnectç­‰å…¶ä»–å‡½æ•°
-			        4.æ³¨å†Œusbè®¾å¤‡
-			    æ¼”ç¤ºä»£ç å¦‚ä¸‹:  
+			Ö÷»ú²àusbÍâÉèÇı¶¯:
+			    Ö÷Òª²½Öè:
+			        1.¶¨ÒåË½ÓĞµÄusb device½á¹¹,ÆäÖĞ°üÀ¨usb_device
+			        2.¶¨Òåprobeº¯Êı,
+			            2.1³õÊ¼»¯±ØÒªµÄlock,semphore,completionµÈ.
+			            2.2¸ù¾İinterfaceÌî³äbulk_urb
+			            2.3ÉèÖÃinterfaceµÄË½ÓĞÊı¾İÎªË½ÓĞusb_device
+			            2.4×¢²áusb_device
+			        3.¶¨ÒådisconnectµÈÆäËûº¯Êı
+			        4.×¢²áusbÉè±¸
+			    ÑİÊ¾´úÂëÈçÏÂ:  
 			    struct xx_usb_dev{
 			        struct usb_device *udev;//usb device
 			        struct usb_interface * interface;
-			        struct urb *bulk_in_urb;//è¾“å…¥urb
+			        struct urb *bulk_in_urb;//ÊäÈëurb
 			        struct kref kref;
 			        ...
 			    };
-			    struct usb_driver xx_driver;//é¢„å®šä¹‰usb driver
+			    struct usb_driver xx_driver;//Ô¤¶¨Òåusb driver
 			    
 			    static int xx_open(struct inode *inode,file *file){
 			    	struct xx_usb_dev *xx_dev;
 			    	struct usb_interface *intf;
 			    	int subminor ;
 			    	
-			    	subminor=iminor(inode);//è·å¾—å­è®¾å¤‡å·
-			    	intf=usb_find_interface(&xx_driver,subminor);//ä»usb driver è·å¾—interface
-			    	xx_dev=usb_get_infdata(intf);//ä»interfaceçš„ç§æœ‰æ•°æ®è·å¾—ç§ç”¨çš„usb device
-			    	kref_getï¼ˆ&xx_dev->kref);//å¢åŠ å¼•ç”¨
-			    	file->private_data=xx_dev;//è®¾ç½®fileçš„ç§ç”¨æ•°æ®ä¾›å…¶ä»–å‡½æ•°ä½¿ç”¨
+			    	subminor=iminor(inode);//»ñµÃ×ÓÉè±¸ºÅ
+			    	intf=usb_find_interface(&xx_driver,subminor);//´Óusb driver »ñµÃinterface
+			    	xx_dev=usb_get_infdata(intf);//´ÓinterfaceµÄË½ÓĞÊı¾İ»ñµÃË½ÓÃµÄusb device
+			    	kref_get£¨&xx_dev->kref);//Ôö¼ÓÒıÓÃ
+			    	file->private_data=xx_dev;//ÉèÖÃfileµÄË½ÓÃÊı¾İ¹©ÆäËûº¯ÊıÊ¹ÓÃ
 			    	
 			    }
 			    static int xx_release(struct inode *inode,struct file *file){
@@ -2572,7 +2573,7 @@ usbé©±åŠ¨
 			    	xx_dev=file->private_data;
 			    	...
 			    }
-			    static int xx_writeï¼ˆstruct file *fileï¼Œchar *bufferï¼Œsize_t count ,loff_t *ppos){
+			    static int xx_write£¨struct file *file£¬char *buffer£¬size_t count ,loff_t *ppos){
 			    	struct xx_usb_dev *xx_dev;
 			    	xx_dev=file->private_data;
 			    	struct urb *urb;
@@ -2581,7 +2582,7 @@ usbé©±åŠ¨
 			    	usb_fill_bulk_urb(...);
 			    	usb_submit_urb(urb,GFP_KERNEL);
 			    	...
-			    	//ä¹Ÿå¯ä»¥ä¸ç”¨ä¸Šè¿°æ–¹æ³•ï¼Œé‡‡ç”¨ç®€å•çš„usb_control_msg,usb_bulk_msgä¹Ÿå¯ä»¥
+			    	//Ò²¿ÉÒÔ²»ÓÃÉÏÊö·½·¨£¬²ÉÓÃ¼òµ¥µÄusb_control_msg,usb_bulk_msgÒ²¿ÉÒÔ
 			    }
 			    
 			    static const struct file_operations xx_fops={
@@ -2599,18 +2600,18 @@ usbé©±åŠ¨
 			    };
 			    
 				static int xx_probe(struct usb_interface *intf,struct usb_device_id *id){
-					struct xx_usb_dev *xx_dev;//å®šä¹‰ç§æœ‰çš„usb device
+					struct xx_usb_dev *xx_dev;//¶¨ÒåË½ÓĞµÄusb device
 					struct usb_host_interface* iface_desc;
 					struct usb_endpoint_descriptor *endpoint;
-					//åˆå§‹åŒ–å¿…è¦çš„lock,semphore,completionç­‰.
-					xx_dev=kzalloc(sizeof(*xx_dev),GFP_KERNEL);//åˆ†é…è®¾å¤‡å†…å­˜
+					//³õÊ¼»¯±ØÒªµÄlock,semphore,completionµÈ.
+					xx_dev=kzalloc(sizeof(*xx_dev),GFP_KERNEL);//·ÖÅäÉè±¸ÄÚ´æ
 					kref_init(xx_dev->kref);
 					sema_init(&xx_dev->sem);
 					mutex_init(&xx_dev->mutex);
 					spin_lock_init(&xx_dev->lock);
 					init_completion(&xx_dev->completion);
-					//æ ¹æ®interfaceå¡«å……bulk_in_urb
-					xx_dev->udev=usb_get_dev(interface_to_usbdev(intf));//usb_get_devæ˜¯å¢åŠ deviceçš„å¼•ç”¨,interface_to_usbdevæ˜¯ä¸€ä¸ªcontainer_ofå®
+					//¸ù¾İinterfaceÌî³äbulk_in_urb
+					xx_dev->udev=usb_get_dev(interface_to_usbdev(intf));//usb_get_devÊÇÔö¼ÓdeviceµÄÒıÓÃ,interface_to_usbdevÊÇÒ»¸öcontainer_ofºê
 					xx_dev->interface=interface;
 					iface_desc=interface->cur_altsetting;
 					for(i=0;i<iface_desc->desc.bNumEndpoints;++i){
@@ -2626,17 +2627,17 @@ usbé©±åŠ¨
 					    	xx_dev->bulk_out_endpointAddr=endpoint->bEndpointAddress;
 					    }
 					}
-					//è®¾ç½®interfaceçš„ç§æœ‰æ•°æ®ä¸ºç§æœ‰usb_device
-					usb_set_infata(interface,xx_dev);//è®¾ç½®interfaceç§æœ‰æ•°æ®
-					//æ³¨å†Œusb_device
-					usb_register_dev(interface,&xx_class);//æ³¨å†Œå­—ç¬¦å‹usbè®¾å¤‡ï¼Œè¿™ä¸ªè®¾å¤‡æ ¹æ®xx classä¸­çš„minor baseæ¥ç¡®å®šå­è®¾å¤‡å·ï¼Œåœ¨åé¢çš„æ‰“å¼€è®¾å¤‡æ—¶è¦ç”¨åˆ°ã€‚
+					//ÉèÖÃinterfaceµÄË½ÓĞÊı¾İÎªË½ÓĞusb_device
+					usb_set_infata(interface,xx_dev);//ÉèÖÃinterfaceË½ÓĞÊı¾İ
+					//×¢²áusb_device
+					usb_register_dev(interface,&xx_class);//×¢²á×Ö·ûĞÍusbÉè±¸£¬Õâ¸öÉè±¸¸ù¾İxx classÖĞµÄminor baseÀ´È·¶¨×ÓÉè±¸ºÅ£¬ÔÚºóÃæµÄ´ò¿ªÉè±¸Ê±ÒªÓÃµ½¡£
 				}
-				xx_disconnectï¼ˆstruct usb_interface *intf){
+				xx_disconnect£¨struct usb_interface *intf){
 					...
 				}
-				static usb_device_id xx_table={//å®šä¹‰åŒ¹é…çš„usb deviceï¼Œå®æœ‰USB_DEVICE(vendorï¼Œprodï¼‰ USB_DEVICE_VER,USB_DEVICE_INTERFACE_PROTOCOL,USB_DEVICE_INFOç­‰
-					USB_DEVICE(vendorï¼Œprodï¼‰,
-					ã€‚ã€‚ã€‚
+				static usb_device_id xx_table={//¶¨ÒåÆ¥ÅäµÄusb device£¬ºêÓĞUSB_DEVICE(vendor£¬prod£© USB_DEVICE_VER,USB_DEVICE_INTERFACE_PROTOCOL,USB_DEVICE_INFOµÈ
+					USB_DEVICE(vendor£¬prod£©,
+					¡£¡£¡£
 				}
 				MODULE_DEVICE_TABLE(usb, xx_table);
 				struct usb_driver xx_driver={
@@ -2648,9 +2649,9 @@ usbé©±åŠ¨
 				
 				module_usb_driver(xx_driver);
 				
-					æ‰©å±•ï¼š
-						åœ¨sys fileä¸­è¦å®šä¹‰attrï¼Œå¯ä»¥ç”¨ç®€å•çš„æ–¹æ³•
-						DEVICE_ATTR(name,flags,show_fn,set_fn),å¯ä»¥å®šä¹‰dev_attr_nameçš„å±æ€§
+					À©Õ¹£º
+						ÔÚsys fileÖĞÒª¶¨Òåattr£¬¿ÉÒÔÓÃ¼òµ¥µÄ·½·¨
+						DEVICE_ATTR(name,flags,show_fn,set_fn),¿ÉÒÔ¶¨Òådev_attr_nameµÄÊôĞÔ
 				
 	 			
 
