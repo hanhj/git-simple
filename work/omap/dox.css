@@ -1,0 +1,124 @@
+/* BODY
+=============================================================================*/
+
+body {
+  font-family: Helvetica, arial, freesans, clean, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+  background-color: #fff;
+  padding: 20px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+}
+H5 {
+    text-align: center;
+	font-size: 36px;
+}
+H1 {
+	font-weight:bold
+}
+H2 {
+	font-weight: bold;
+}
+H3 {
+	font-weight: bold;
+}
+
+/* TABLE
+=============================================================================*/
+table {
+    border-spacing: 0;
+    border-collapse: collapse;
+    empty-cells: show;
+    background: #F7F7F7;
+    border: 1px solid #000000;
+ 		font-size: 12px;
+  	font-family: Consolas, "Liberation Mono", Courier, monospace;    
+}
+
+table td {
+
+    border: 1px solid #000000;
+}
+
+table tr {
+
+    border: 1px solid #000000;
+}
+
+table th {
+		background-color: #d6c5bc;
+    border: 1px solid #000000;
+}
+
+.odd{
+	  background-color: #f8f8f8;
+	
+}
+
+.even{
+	  background-color: #d6c5bc;
+}
+
+/* CODE
+=============================================================================*/
+
+pre, code, tt {
+  font-size: 12px;
+  font-family: Consolas, "Liberation Mono", Courier, monospace;
+}
+
+code, tt {
+  margin: 0 0px;
+  padding: 0px 0px;
+  white-space: nowrap;
+  border: 1px solid #eaeaea;
+  background-color: #f8f8f8;
+  border-radius: 3px;
+}
+
+pre>code {
+  margin: 0;
+  padding: 0;
+  white-space: pre;
+  border: none;
+  background: transparent;
+}
+
+pre {
+  background-color: #f8f8f8;
+  border: 1px solid #ccc;
+  font-size: 13px;
+  line-height: 19px;
+  overflow: auto;
+  padding: 6px 10px;
+  border-radius: 3px;
+}
+
+pre code, pre tt {
+  background-color: transparent;
+  border: none;
+}
+
+/*
+ * 1. Address odd `em`-unit font size rendering in all browsers.
+ * 2. Consolas has a better baseline in running text compared to `Courier`
+ */
+:not(pre) > code,
+:not(pre) > kbd,
+:not(pre) > samp {
+  /* 1 */
+  font-size: 12px;
+  /* 2 */
+  font-family: Consolas, monospace, serif;
+  /* 3 */
+  color: #008080;
+  white-space: nowrap;
+  padding: 0 4px;
+  border: 1px solid #dddddd;
+  border-radius: 3px;
+  background: #fafafa;
+}
