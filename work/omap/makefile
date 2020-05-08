@@ -1,4 +1,4 @@
-target=kernel_code.html code.html
+target=code.html
 all:$(target)
 %.html:%.md
 	pandoc $< -o $@ -c dox.css
