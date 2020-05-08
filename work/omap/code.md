@@ -21,4 +21,8 @@ in board_omapl138_lcdk.c:
 |step 10|omapl138_lcdk_spi_init|config and request spi pins,register spi master as a platform device,register spi device|call da8xx_register_spi in devices-da8xx.c,spi_register_board_info in driver/spi/spi.c|spi master pin in da850.c,spi master device define in devices-da8xx.c \  spi device other pin define in board,spi device define in board|
 |step 11|omapl138_lcdk_gpio_init|config and request gpio pins,register gpio device as  platform device||pins and device define in board|
 
+![](1.png)
 
+![](2.png)
+	
+![](3.png)
