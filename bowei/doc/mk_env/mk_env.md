@@ -1,5 +1,6 @@
 # 建立omap开发环境
 
+## Linux部分
 1. 安装Linux操作系统；  
 	本次开发安装的是Ubuntu16.04 安装好后,假设用户目录为/home/user.
 2. 建立开发环境所在目录；   
@@ -50,11 +51,11 @@
 			cd ~/opt  
 			tar zxvf libxml2_2.7.8.dfsg.orig.tar.gz -C ~/opt/ti-sdk-omapl138-lcdk-01.00.00/board-support   
 			ln ~/opt/ti-sdk-omapl138-lcdk-01.00.00/board-support/libxml2-2.7.8/ ~/opt/ti-sdk-omapl138-lcdk-01.00.00/board-support/libxml2 -s    
-		- 安装u-boot
+		- 安装u-boot  
 			tar jxvf ~/opt/u-boot_omapl138.tar.gz2 -C ~/opt/ti-sdk-omapl138-lcdk-01.00.00/board-support/ 
-		- 安装Linux内核
+		- 安装Linux内核  
 			unzip ~/opt/linux-2.6.zip -d ~/opt/ti-sdk-omapl138-lcdk-01.00.00/board-support
-		- 安装rootfs
+		- 安装rootfs  
 			tar zxvf ~/opt/filesystem.tar.gz -C ~/opt/ti-sdk-omapl138-lcdk-01.00.00/board-support/   
 			cd ~/opt/ti-sdk-omapl138-lcdk-01.00.00/board-support/rootfs/ 
 			sudo tar zxvf rootfs_omapl138.tar.gz  
@@ -64,27 +65,43 @@
 7. 编译应用程序
 	将应用程序拷贝到合适位置,其目录结构为:  
 	![](11.png)  
-	进入arm目录,编辑makefile文件,将其中的xxx替换成用户的目录  
-	![](9.png)   
-	执行make命令   
-	![](12.png)  
-	结果文件为arm    
-	进入dsp目录,编辑product.mak文件,将其中的xxx替换成用户的目录  
-	![](9.png)  
-	执行make命令   
-	![](13.png)  
-	结果文件为dsp.xe674
+	- 编译arm程序  
+		进入arm目录,编辑makefile文件,将其中的xxx替换成用户的目录  
+		![](9.png)   
+		执行make命令   
+		![](12.png)  
+		结果文件为arm    
+	- 编译dsp程序  	
+		进入dsp目录,编辑product.mak文件,将其中的xxx替换成用户的目录  
+		![](9.png)  
+		执行make命令   
+		![](13.png)  
+		结果文件为dsp.xe674
 8. 编译系统程序
-	- linux系统  
-		cd ~/opt/ti-sdk-omapl138-lcdk-01.00.00/board-support/linux-2.6/   
-		./build_sh   
-		结果文件为uImage_omapl138
+	- ubl
+		
 	- u-boot  
 		cd ~/opt/ti-sdk-omapl138-lcdk-01.00.00/board-support/u-boot_omapl138/   
 		./build.sh   
 		结果文件为:u-boot-head.bin
+	- linux系统  
+		cd ~/opt/ti-sdk-omapl138-lcdk-01.00.00/board-support/linux-2.6/   
+		./build_sh   
+		结果文件为uImage_omapl138
 	- rootfs  
 		cd ~/opt/ti-sdk-omapl138-lcdk-01.00.00/board-support/rootfs/   
 		./rootfs.sh  
 		结果文件为rootfs_omapl138 
+9. 下载程序
+	- 烧写ubl,u-boot文件  
+	- 烧写Linux内核文件  
+	- 烧写rootfs文件系统文件  
+	- 下载应用程序  
+
+## Windows下调试DSP程序
+1. 安装ccsv5.3编译环境 
+2. 安装seed100v2,seed510驱动.
+3. 设置工程编译参数
+4. 调试程序
+5. 其他问题
 
