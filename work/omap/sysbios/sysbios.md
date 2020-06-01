@@ -475,8 +475,97 @@ Queue用来传输一组信息,是一个双向队列
 
 
 ## 5. Timing 服务
+### 5.1 overview
+Timing模块在sysbios中包括Clock,Timer,Seconds,Timestamp.
+ti.sysbios.knl.Clock提供一个周期性工具,其底层采用Hal Timer来实现ClockTick,用户也可以提供ClockTick来替代.  
+ti.sysbios.hal.Timer提供了外设Timer标准接口,对用户屏蔽了定时器的细节.sysbios也提供特定设备的定时器接口.当定时器时间到了的时候,通过调用tickFxn来使用Timer.  
+ti.sysbios.hal.Seconds提供了实现从1970年以来秒数的功能,以实现标准的time函数功能.  
+xdc.runtime.Timestamp提供一个简单的时间戳功能.
+
+### 5.2 Clock 
+Clock模块使用一个系统tick来跟踪时间.默认的使用ti.sysbios.hal.Timer模块来创建一个系统tick,通过周期性调用Clock_tick来实现Clock.
+
+Clock的tick源可以配置成Clock.TickSource_TIMER(默认),Clock.TickSource_User,Clock.TickSource_NULL;  
+
+- 当配置成TickSource_TIMER时,Clock使用Clock.tickPeriod来创建一个Timer,并周期性调用Clock_tick().  
+- 当配置成TickSource_User时,用户需要自己通过某种中断来周期性调用Clock_tick()  
+- 当配置成TickSource_NULL时,用户将不能调用任何使用超时的函数,比如Task_sleep
+
+Clock可以只执行一次,也可周期性执行.
+
+
+Clock函数:
+
+- Clock_tickStop	will call Timer_stop,停止timer
+- Clock_tickStart	will call Tiemr_start,启动timer
+- Clock_tickReconfig()	will adjust timer period by call Timer_setPeriodMicroseconds()
+- Clock_create()	
+- Clock_stop()		仅停止当前clock
+- Clock_start()		仅启动当前clock
+
+		#include <ti/sysbios/knl/Clock.h>
+		void clock_fun(UArg arg0){
+			...
+		}
+	
+		Clock_Params clock_para;
+		Clock_Handle clock_handle;
+		Error_Block eb;
+	
+		...
+		Error_init(&eb);
+		Clock_Params_init(&clock_para);
+		clock_para.period=100;//us 
+		...
+		clock_handle=Clock_create(clock_fun,timeout,&clock_para,&eb);
+
+
+
+### 5.3 Timer 
+Timer代表一个定时器外设的标准接口.Timer可以只执行一次,也可周期性执行.
+具体参见第八节Hal模块描述.
+
+### 5.4 Seconds
+Seconds模块提供子1970年以来的秒,需要cpu有秒代表支持.
+
+### 5.5 Timestamp 
+
+	#include <xdc/runtime/Timestamp.h>
+	Timestamp_get32()
+	Timestamp_get64()
 
 ## 6. 支持模块
+支持模块包括:BIOS,System,Program,Memory,Text,Reset,Startup,Error 
+
+- BIOS :support bios start and global Paramseter
+	
+		#include <ti/sysbios/BIOS.h>
+		BIOS_start()
+		BIOS_getCpuFreq()
+		BIOS_setCpuFreq()
+		BIOS_exit()
+- System :support character output,printf-like function 
+
+		#include <xdc/runtime/System.h>
+		System_printf()
+		System_abort();
+		System_flush();	flush output characters to the output device.
+- Program 
+Program模块,作为程序的root命名空间,通常用来作为配置,但是不提供C的API.
+- Startup :配置在main程序执行前执行的函数
+		
+		var Bios=xdc.useModule('xdc.runtime.Startup');
+- Reset	:配置在Reset时,执行的函数.
+
+		var Bios=xdc.useMoudle('xdc.runtime.Reset');
+- Error	:提供处理错误产生,检查,处理的函数
+
+	- Error_init
+	- Error_check	reutrn if error is raised
+	- Error_getData	get an error's argument list
+	- Error_getMsg() get an error's "printf" format string;
+	- Error_raise()	raise a error.
+
 
 ## 7. 内存模块
 
