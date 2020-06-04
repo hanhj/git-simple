@@ -568,8 +568,279 @@ Program模块,作为程序的root命名空间,通常用来作为配置,但是不
 
 
 ## 7. 内存模块
+### 7.1 Memeory Map and platform	
+TI的dsp处理器通常需要一个cmd文件来进行程序链接.cmd文件中主要包括两个部分:1.memory map;2memory section;前者用来指明内存的地址,长度,读写属性.后者用来将数据块(包括代码块)分配到内存中.比如.text,.data,.stack,.bss等.
 
-## 8. 硬件抽象模块HAL
+在编译一个sysbios程序的时候,通常需要指定一个platform,该platform实际上完成类似的cmd文件功能,只不过通常我们指定一个已经存在的platform(该platform通常代表一个评估板),或者我们可以自己创建一个platform.
+
+![](23.png)
+
+![](24.png)
+
+创建新工程时,选择一个platform 
+
+菜单:File->New->Other
+
+![](25.png)
+
+创建一个新platform 
+
+对于一个用户创建的platform,可以在debug模式下Tools->Rtsc Tools->platform->Edit/view来查看配置情况
+
+![](26.png)
+
+根据platform,ccs会自动创建一个cmd文件,位于Debug/configPkg/linker.cmd 
+
+用户也可编辑自己的cmd文件,注意不要与默认的cmd文件重复,用户可以定义自己的memory map和memeory section 
+
+### 7.2 Stacks 
+sysbios中有两个堆栈:1-System stacks;2-Task stacks.
+
+系统堆栈只有一个,用于Hwi和Swi.通过cfg文件可以指定stack大小和所在内存.
+
+	Program.stack=0x1000;
+	Program.sectMap[".stack"']="IRAM"
+
+Task堆栈对于每一个任务都有一个堆栈,可以从cfg文件进行配置.
+
+	配置栈大小
+	var Task=xdc.useModule('ti.sysbios.knl.Task');
+	Task.defaultStackSize=1000;
+	var TaskPara = new Task.Params;
+	TaskPara.stackSize=1000;
+	var task0=Task.create('task0fun',taskPara);
+	配置栈地址
+	Program.sectMap[".taskStackSection"]="IRAM";
+
+### 7.3 Cache
+Cache 在platform中配置.对于用户可以在程序中进行的操作包括:
+
+	Cache_enable();
+	Cache_disable();
+	Cache_wb();
+	Cache_inv();
+
+### 7.4 动态内存
+动态内存通过堆来实现.堆操作是通过xdc.runtime模块来实现.堆操作策略有三种:
+
+- 可删除:DELETE_POLICY(默认)
+	用户可在运行时使用MODULE_create,MODULE_delete()来操作.
+- 创建策略:CREATE_POLICY
+	用户仅可使用MODULE_create
+- 静态策略:STATIC_POLICY
+	用户仅仅通过配置文件创建,用户不可使用MODULE_create,MODULE_delete.
+
+	var Defaults=xdc.useModule('xdc.runtime.Defaults');
+	var Types=xdc.useModule('xdc.runtime.Types');
+	Defaults.memoryPolicy=Types.STATIC_POLICY;
+
+#### 7.4.1 缺省的系统堆
+缺省的系统堆是当用户用NULL参数来调用Memeory_alloc()是所使用的堆.
+
+可以使用下面的语句来配置系统堆:
+
+	var BIOS=xdc.useModule('ti.sysbios.knl.BIOS');
+	BIOS.heapSize=1000;					//指定Heap大小
+	BIOS.heapSection="systemHeap";		//指定heapSection名
+	Program.sectMap['systemHeap']="DDR";//指定systemHeap内存地址
+
+创建一个系统堆
+
+	var HeapBuf = xdc.useModule('ti.sysbios.heaps.HeapBuf');
+	var Memory = xdc.useModule('ti.runtime.Memory');
+
+	var heapBufPara=new HeapBuf.Params;
+	heapBufPara.blockSize=128;
+	heapBufPara.numBlocks=2;
+	heapBufPara.align=8;
+	heapBufPara.sectionName="myHeap";
+	Program.global.myHeap=HeapBuf.create(heapBufPara);
+	Program.sectMap['myHeap']="DDR";
+	Memory.defaultHeapInstance=Program.global.myHeap;//如果使用这个,则Bios.heapSize将被覆盖.
+
+	注意:这里使用HeapBuf来创建一个系统堆,实际上sysbios可以使用:
+	HeapMem,HeapMin,heapMultiBuf,HeapTrack来创建一个堆.
+
+#### 7.4.2使用堆
+
+	#include <xdc/std.h>
+	#include <xdc/runtime/Memory.h>
+	#include <xdc/runtime/IHeap.h>
+
+	extern IHeap_Handle systemHeap,otherHeap;//define it in config file 
+
+	Prt buf1,buf2;
+	buf1=Memory_alloc(NULL,128,0,NULL);//使用默认堆
+	buf2=Memeory_alloc(otherHeap,128,0,NULL);//使用指定堆
+
+标准c函数中的malloc,free使用的是默认堆.
+
+#### 7.4.3 堆实现
+
+- HeapMin	:
+	最少代码,只支持allocation,不支持free
+- HeapMem:
+	支持动态大小;
+		
+		config :
+		var HeapMem = xdc.useModule('ti.sysbios.heaps.HeapMem');
+		var heapMemPara = new HeapMem.Params;
+		heapMemPara.size=1000;
+		Program.global.myHeap=HeapMem.create(heapMemPara);
+		Program.sectMap['myHeap']="DDR";
+
+		Runtime code:
+		static char buff[1024];
+		HeapMemParams heapMemPara;
+		HeapMem_Params_init(&heapMemPara);
+		heapMemPara.size=1024;
+		haapMemPara.buf=(Ptr)buf;
+		myHeap=HeapMem_create(&heapMemPara,NULL);
+		if(myHeap==NULL){
+			System_abort("HeapMem create fail");
+		}
+
+- HeapBuf:
+	只支持固定大小;
+- HeapMultiBuf
+	支持动态大小,但是内部是使用固定大小;
+- HeapTrack
+	用来监视内存分配回收.
+	
+## 8. 硬件抽象模块HAL(hardware abstract layer)
+硬件抽象模块代表cpu的硬件外设包括中断,定时器,Cache.
+
+### 8.1 Hwi模块
+### 8.1.1 创建Hwi 
+
+- 使用配置文件
+
+		var Hwi = xdc.useModule('ti/sysbios/hal/Hwi');
+		Hwi.create(5,'&myIsr');
+- c Runtime
+
+		#include <ti/sysbios/hal/Hwi.h>
+		#include <xdc/runtime/Error.h>
+		#include <xdc/runtime/System.h>
+		
+		Hwi HwiHandle;
+		HwiParams HwiPara;
+		Error_Block eb;
+	
+		Error_init(&eb);
+		HwiHandle=Hwi_create(5,myIsr,NULL,&eb);//5 是中断号,myIsr是中断调用函数,NULL代替HwiPara表示使用默认的Hwi参数.
+
+### 8.1.2 默认的Hwi参数包括:
+
+- MaskingOption maskSetting = MaskingOption_SELF
+	表示如何处理嵌套中断
+- Uarg arg 
+	参数 
+- Bool enableInt = true
+- Int eventId =-1
+	对于C6000机器,允许动态的将eventId连接到中断号中,-1表示将eventid连接到复位时状态.
+- Int priority = -1;
+	提供给允许配置中断优先级的设备.-1代表设置默认的优先级.
+
+### 8.1.3 创建用户的Hwi参数
+
+- Config 
+
+		var Hwi = xdc.useModule('ti/sysbios/hal/Hwi')
+		var HwiPara = new Hwi.Params;
+		HwiPara.enableInt= false;
+		Hwi.create(5,'&myIsr',HwiPara);
+- C runtime
+
+		#include <ti/sysbios/hal/Hwi.h>
+		#include <xdc/runtime/System.h>
+		#incldue <xdc/runtime/Error.h>
+		HwiParams hwi_para;
+		HwiHandle hwi_handle;
+		Error_Block eb;
+	
+		Error_init(&eb);
+		Hwi_Params_init(&hwi_para);
+		hwi_para.enableInt = false;
+		hwi_para.arg=12;
+		hwi_handle=Hwi_create(5,myIsr,&hwi_para,&eb);
+	
+		Hwi_enableInterrupt(5);
+		...
+	
+		Bios_start();
+
+#### 8.1.4 enable and disable Hwi 
+
+- Hwi_enable()
+	enable all Interrupt 
+- Hwi_disable()
+	disable all Interrupt 
+- Hwi_enabelInterrupt(Uint intNum);
+- Hwi_disableInterrupt(Uint intNum);
+- Hwi_clearInterrupt(Uint intNum);
+	clear intNum from the set of currently peding Interrupt.
+
+#### 8.1.5 Interrupt 处理过程
+
+- 关断 swi,task调度
+- 自动处理嵌套中断
+- 调用Hwi Hook的begin
+- 调用Hwi函数
+- 调用Hwi Hook的end
+- 调用被调度的swi和task 
+
+### 8.2 定时器Timer 
+sysbios中的Timer用来屏蔽外设Timer的细节.
+
+#### 8.2.1 创建 
+
+- config file 
+
+		var Timer = xdc.useModule('ti/sysbios/hal/Timer');
+		var timerPara = new Timer.Params;
+		timerPara.priod=100;
+		timerPara.periodType=Timer.PeriodType_MICROSECS;
+		Timer.create(Timer_ANY,'timer_fun',timerPara);
+- C runtime 
+
+		#include <ti/sysbios/hal/Timer.h>
+		TimerParams timer_para ;
+		TimerHandle timer_handle;
+		Timer_Params_init(&time_para);
+		timer_para.period=1000;
+		timer_para.periodType=Timer_PriodType_MICROSECS;
+		timer_hadle=Tiemr_create(Timer_ANY,timer_fun,&timer_para);
+
+#### 8.2.2 使用 
+
+常见的Timer参数包括:
+
+- period	
+	周期,可以是ticks或us 
+- periodType 
+	周期类型,可以是PeriodType_MICROSECS(default),PeriodType_COUNTS
+- runMode
+	RunMode_CONTINOUS(default),RunMode_ONESHOT
+- startMode
+	StartMode_AUTO(defult)
+	StartMode_USER,(need start by Timer_start)
+
+常见的Timer函数包括:
+
+- Timer_setPeriod(handle,period)
+- Timer_setPeriodMicroseconds(handle,mcirosecs);
+- Timer_start(handle);
+	handle of a previously-created Timer instance objct;
+- Timer_stop(handle)
+- Timer_getCount(handle)
+	read timer counter register
+- Timer.ANY 
+	cause use any timer 
+	
+
+
+	
 
 ## 9. 测试模块
 
