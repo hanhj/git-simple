@@ -472,8 +472,64 @@ Queue用来传输一组信息,是一个双向队列
 			...
 		}
 
+### 4.5 GateMutex
+GateMutex使用Samapore来锁定资源.
 
+#### 4.5.1 创建 
 
+- config file 
+		
+		var GateMutex = xdc.useModule('ti.sysbios.gates.GateMutex');
+		var GateMutex_Params mutex_para=new GateMutex.Params;
+		Program.global.mutex_handle=GateMutex.create(mutex_para);
+- C runtime 
+		
+		#include <ti/sysbios/gates/GateMutex.h>
+		#include <xdc/runtime/Error.h>
+
+		GateMutex_Params mutex_para;
+		Error_Block eb;
+
+		Error_init(&eb);
+		GateMutex_Params_init(&mutex_para);
+		mutex_handle=GateMutex_create(&mutex_para,&eb);
+		...
+		GateMutex_enter(mutex_handle);
+		GateMutex_leave(mutex_handle);
+
+#### 4.5.2 使用
+
+在程序中使用GateMutex情况
+
+|GateMutex Function|Hwi|Swi|Task|Main|Startup|
+|----|----|----|-----|-----|-----|
+|Params_init|Y|Y|Y|Y|Y|
+|query|Y|Y|Y|Y|Y|
+|construct|N|N|Y|Y|N|
+|create|N\*|N\*|Y|Y|N|
+|delete|N\*|N\*|Y|Y|N|
+|destruct|N|N|Y|Y|N|
+|enter|N|N|Y|N|N|
+|leave|N|N|Y|N|N|
+
+Definitions: 
+
+	Hwi: API is callable from a Hwi thread. 
+	Swi: API is callable from a Swi thread. 
+	Task: API is callable from a Task thread. 
+	Main: API is callable during any of these phases: 
+	In your module startup after this module is started (e.g. GateMutex_Module_startupDone() returns TRUE). 
+	During xdc.runtime.Startup.lastFxns. 
+	During main(). 
+	During BIOS.startupFxns. 
+	Startup: API is callable during any of these phases: 
+	During xdc.runtime.Startup.firstFxns. 
+	In your module startup before this module is started (e.g. GateMutex_Module_startupDone() returns FALSE). 
+	*: Assuming blocking Heap is used for creation. 
+	**: Must be used in enter/leave pairs. 
+ 
+
+			
 ## 5. Timing 服务
 ### 5.1 overview
 Timing模块在sysbios中包括Clock,Timer,Seconds,Timestamp.
@@ -715,8 +771,8 @@ Cache 在platform中配置.对于用户可以在程序中进行的操作包括:
 
 - 使用配置文件
 
-		var Hwi = xdc.useModule('ti/sysbios/hal/Hwi');
-		Hwi.create(5,'&myIsr');
+		var Hwi = xdc.useModule('ti.sysbios.hal.Hwi');
+		Program.global.HwiHandle=Hwi.create(5,'&myIsr');
 - c Runtime
 
 		#include <ti/sysbios/hal/Hwi.h>
@@ -746,7 +802,7 @@ Cache 在platform中配置.对于用户可以在程序中进行的操作包括:
 
 - Config 
 
-		var Hwi = xdc.useModule('ti/sysbios/hal/Hwi')
+		var Hwi = xdc.useModule('ti.sysbios.hal.Hwi')
 		var HwiPara = new Hwi.Params;
 		HwiPara.enableInt= false;
 		Hwi.create(5,'&myIsr',HwiPara);
@@ -797,7 +853,7 @@ sysbios中的Timer用来屏蔽外设Timer的细节.
 
 - config file 
 
-		var Timer = xdc.useModule('ti/sysbios/hal/Timer');
+		var Timer = xdc.useModule('ti.sysbios.hal.Timer');
 		var timerPara = new Timer.Params;
 		timerPara.priod=100;
 		timerPara.periodType=Timer.PeriodType_MICROSECS;
@@ -837,22 +893,86 @@ sysbios中的Timer用来屏蔽外设Timer的细节.
 	read timer counter register
 - Timer.ANY 
 	cause use any timer 
-	
-
-
-	
 
 ## 9. 测试模块
+xdcTool提供模块和工具用来测试模块用来测试系统性能,包括运行时间,负载率,错误等.
+
+### 9.1 负载模块 
+系统负载率的计算是通过计算idle程序运行时间来计算,除了idle消耗的时间之外就是负载的消耗. 
+	
+	global CPU Load= 100*(1-((x*t)/w))
+	x是idle运行次数
+	t是最小idle运行时间
+	w是统计窗口,默认500ms
+
+#### 9.1.1 负载模块配置 
+
+计算负载需要一个LoggerBuff和Load模块
+
+	//config file 
+	var LoggerBuf= xdc.useModule('xdc.runtime.LoggerBuff');
+	var Load = xdc.useModule('ti.sysbios.utils.Load');
+	var Diags = xdc.useModule('xdc.runtime.Diags');
+
+	var log_buff=LoggerBuff.create();//create default logbuff
+	//or
+	var log_buff_para=new LoggerBuff.Params;//create a parameter logbuff
+	log_buff_para.numEntris= 16;
+	var log_buff=LoggerBuff.create(log_buff_para);
+
+	Load.common$.logger=log_buff;			//link Load to Logbuff 
+	Load.common$.Diags_USER4=ALWAYS_ON;		//you should use diags.User4
+
+#### 9.1.2 使用 
+
+可以通过界面来使用:进入Debug模式,Tool->RTSC Analyer,Tool->System Analyer来查看.
+
+也可以通过API来查看:
+
+	Load_getTaskLoad();
+	Load_getGlobalSwiLoad();
+	Load_getGlobalHwiLoad();
+
+	#include <ti/sysbios/utils/Load.h>
+	Load_Stat stat;
+	Load_getGlobalSwiLoad(&stat);
+	int load=Load_calculateLoad(&stat);
+
+### 9.2 性能配置
+
+#### 9.2.1 Diags Setting
+
+Diags Setting有四种:RUNTIME_ON,RUNTIME_OFF,ALWAYS_OFF,ALWAYS_ON
+
+	var Diags=xdc.useModule('xdc.runtime.Diags');
+
+	Defaults.common$.diags_USER1=Diags.RUNTIME_ON;
+	Defaults.common$.diags_USER2=Diags.RUNTIME_ON;
+	Defaults.common$.diags_USER3=Diags.ALWAYS_ON;
+	Defaults.common$.diags_USER4=Diags.ALWAYS_OFF;
+
+#### 9.2.2 Diags Level
+
+仅支持USER1,USER2.
+
 
 ## A. 构建SysBios
 
 ## B. Timing Benchmarks
+基准测试.
+
+基准测试位于bios_install/packages/ti/sysbios/Benchmarks/doc-files
+可以看见一些性能参数
+
+![](27.png)
 
 ## C. Size Benchmarks
 
+![](28.png)
+
 ## D. 最小化应用代码
 
-## E. 反对的I/O 模块
+## E. 废弃的I/O 模块
 
 ## F. IOM 接口
 
