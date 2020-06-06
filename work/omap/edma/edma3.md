@@ -204,6 +204,8 @@ EDMA3的中断包括
 ### 2.9.1 完成中断 
 
 ![](18.png)
+	
+![](24.png)
 
 当完成中断时,会置位IPR(Interrupt Peding Requester),通道置位哪个IPR可以通过OPT中TCC(Transmit Complete Code)来配置.比如当TCC置位为0时,则该channel完成时将置位IPR[0].
 
