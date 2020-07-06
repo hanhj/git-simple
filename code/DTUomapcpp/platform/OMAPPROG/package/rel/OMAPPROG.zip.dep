@@ -1,0 +1,34 @@
+OMAPPROG.zip: Platform.xdc
+Platform.xdc:
+OMAPPROG.zip: Platform.xs
+Platform.xs:
+OMAPPROG.zip: config.bld
+config.bld:
+OMAPPROG.zip: package/.vers_b150
+package/.vers_b150:
+OMAPPROG.zip: package/.vers_g180
+package/.vers_g180:
+OMAPPROG.zip: package/.vers_r170
+package/.vers_r170:
+OMAPPROG.zip: package/.xdc-y44
+package/.xdc-y44:
+OMAPPROG.zip: package/OMAPPROG.ccs
+package/OMAPPROG.ccs:
+OMAPPROG.zip: package/OMAPPROG.class
+package/OMAPPROG.class:
+OMAPPROG.zip: package/OMAPPROG.java
+package/OMAPPROG.java:
+OMAPPROG.zip: package/OMAPPROG.sch
+package/OMAPPROG.sch:
+OMAPPROG.zip: package/build.cfg
+package/build.cfg:
+OMAPPROG.zip: package/package.bld.xml
+package/package.bld.xml:
+OMAPPROG.zip: package/package.defs.h
+package/package.defs.h:
+OMAPPROG.zip: package/package_OMAPPROG.c
+package/package_OMAPPROG.c:
+OMAPPROG.zip: package.bld
+package.bld:
+OMAPPROG.zip: package.xdc
+package.xdc:

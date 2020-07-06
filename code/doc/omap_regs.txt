@@ -1,0 +1,359 @@
+硬件的寄存器地址与端口的对应关系
+遥信遥控板1:
+	遥信信号:
+	无信号为1,有信号为0
+	遥信地址:0x6000,0100
+	bit:
+	15	14	13	12	11	10	9	8	7	6	5	4	3	2	1	0
+	Y	Y	Y	Y	Y	Y	Y	Y	Y	Y	Y	Y	Y	Y	Y	Y	
+	X	X	X	X	X	X	X	X	X	X	X	X	X	X	X	X	
+	09	10	11	12	13	14	15	16	01	02	03	04	05	06	07	08	
+	遥信地址:0x6000,0102
+	bit:
+	15	14	13	12	11	10	9	8	7	6	5	4	3	2	1	0
+									Y	Y	Y	Y	Y	Y	Y	Y	
+									X	X	X	X	X	X	X	X	
+									24	23	22	21	20	19	18	17	
+	信号	数值	地址
+	YX_1	0xff7f  0x6000,0100
+    YX_2    0xffbf  0x6000,0100
+    YX_3    0xffdf  0x6000,0100
+    YX_4    0xffef  0x6000,0100
+    YX_5    0xfff7  0x6000,0100
+    YX_6    0xfffb  0x6000,0100
+    YX_7    0xfffd  0x6000,0100
+    YX_8    0xfffe  0x6000,0100
+    YX_9    0x7fff  0x6000,0100
+    YX_10   0xbfff  0x6000,0100
+    YX_11   0xdfff  0x6000,0100
+    YX_12   0xefff  0x6000,0100
+    YX_13   0xf7ff  0x6000,0100
+    YX_14   0xfbff  0x6000,0100
+    YX_15   0xfdff  0x6000,0100
+    YX_16   0xfeff  0x6000,0100
+    YX_17	0xfffe  0x6000,0l02
+    YX_18 	0xfffd  0x6000,0l02
+    YX_19 	0xfffb  0x6000,0l02
+    YX_20 	0xfff7  0x6000,0l02
+    YX_21 	0xffef  0x6000,0l02
+    YX_22 	0xffdf  0x6000,0l02
+    YX_23 	0xffbf  0x6000,0l02
+    YX_24 	0xff7f  0x6000,0l02
+
+	端子定义:
+	YX端子号	信号
+	1			YX_1 		
+	2 			YX_2 		
+	3 			YX_3 		
+	4 			YX_4 		
+	5 			YX_5 		
+	6 			YX_6 		
+	7 			YX_7 		
+	8 			YX_8 		
+	9 			YX_9 		
+	10			YX_10		
+	11			YX_11		
+	12			YX_12		
+	13			com
+	14  		YX_13
+	15  		YX_14
+	16  		YX_15
+	17			YX_16		
+	18			YX_17		
+	19			YX_18		
+	20			YX_19		
+	21			YX_20		
+	22			YX_21		
+	23			YX_22		
+	24			YX_23		
+	25			YX_24		
+    26  		com
+
+	遥控信号:
+	1:驱动动作	0:关闭
+	启动继电器为GPIO(813)低电平,GPIO(603)高电平.(813是指bank8的13口)
+	启动时启动继电器都是高电平.
+	遥控地址:0x6000,0200
+	bit:
+	7	6	5	4	3	2	1	0
+	T	H	T	H	T	H	T	H	
+	Z	Z	Z	Z	Z	Z	Z	Z	
+	1	1	2	2	3	3	4	4	
+
+	端子定义:
+	YK端子号	信号
+	1			TZ1 		
+	2 			KZ1 		
+	3 			KM1+		
+	4 			TZ2 		
+	5 			KZ2 		
+	6 			KM2+		
+	7 			TZ3 		
+	8 			KZ3 		
+	9 			KM3+		
+	10			TZ4 		
+	11			KZ4 		
+	12			KM4+		
+
+遥信遥控板2:
+	遥信地址:0x6000,0104,0x6000,0106
+	遥控地址:0x6000,0202
+遥信遥控板3:
+	遥信地址:0x6000,0108,0x6000,010a
+	遥控地址:0x6000,0204
+遥信遥控板4:
+	遥信地址:0x6000,010c,0x6000,010e
+	遥控地址:0x6000,0206
+
+电源板:
+	遥信地址:0x6000,0110,0x6000,0112
+	遥控地址:0x6000,0208
+	YK bit
+	7	6	5	4	3	2	1	0
+		H	H	B	Y	Y	Y	Y	
+		K	G	G	L	L	L	L	
+					1	2	3	4	
+	YL:预留
+	BG:电池关
+	HG:活化关
+	HK:活化开
+	YL4 接YK1_TZ
+	YL3 接YK1_HZ
+	YL2 接YK2_TZ
+	YL1 接YK2_HZ
+	YK 端子定义:
+	端子号		信号
+	1			VCom	电池控制公共 		
+	2 			HK 		
+	3 			HG		
+	4 			BG 		
+	5 			YK2_HZ 		
+	6 			YK2_Com		
+	7 			YK2_TZ 		
+	8 			YK1_HZ 		
+	9 			YK1_Com		
+	10			YK1_TZ 		
+	11			24V+ 		
+	12			24V-
+
+	YX bit
+	默认为1,有信号为0
+	15	14	13	12	11	10	9	8	7	6	5	4	3	2	1	0
+								A	Y	Y	Y	Y	V	V	H	P	
+								C	L	L	L	L	H	L	O	O	
+								C	Y	Y	Y	Y			K	K
+								H	X	X	X	X					
+								K	1	2	3	4
+	POK:交流失电告警
+	HOK:活化状态
+	VL:	电池欠压
+	VH	电源故障
+	ACCHK:交流电检测
+
+	YX端子定义:
+	端子号		信号		端子号		信号
+	1			POK			2 			YLYX_1 		
+	3 			HOK			4 			YLYX_2 		
+	5 			VL 			6 			YLYX_3		
+	7 			VH 			8 			YLYX_4 		
+	9 			X_24V+		10			Com1 		
+	11			X_24V- 		12			ACCHK
+	13						14			ComCH	
+	15			DC2+		16			DC1+
+	17			DC2-		18			DC1-
+	Com1是预留Yx的公共端,负端
+	ComCH是交流检测负端.
+	电池YX公共端是X_24V-
+
+遥测板1:
+	遥测地址:
+		0x6000,0300	第一片AD
+		0x6000,0310	第二片AD
+遥测板2:
+	遥测地址:
+		0x6000,0320	第一片AD
+		0x6000,0330	第二片AD
+遥测板3:
+	遥测地址:
+		0x6000,0340	第一片AD
+		0x6000,0350	第二片AD
+遥测板4:
+	遥测地址:
+		0x6000,0360	第一片AD
+		0x6000,0370	第二片AD
+遥测板5:
+	遥测地址:
+		0x6000,0380	第一片AD
+		0x6000,0390	第二片AD
+
+在应用程序中,对于遥信定义了结构体
+typedef struct _YX_REG{
+	union{
+		unsigned long long all;
+		typedef struct _bit{
+			uchar ch0;
+			uchar ch1;
+			uchar ch2;
+			uchar ch3;
+			uchar ch4;
+			uchar ch5;
+			uchar ch6;
+			uchar ch7;
+		}bit;
+	};
+}YX_REG;
+共64位,对应2块板子的遥信.其中ch3和ch7无效.
+YX_REG yx_reg[3];
+其中yx_reg[0] 对应第一二块遥信板
+yx_reg[1]对应第三四遥信板
+YX_REG[2]对应电源板遥信.
+第一块遥信板
+yx_reg[0]
+channel		bit		signal
+ch0			
+			7		Yx1	
+			6		Yx2
+			5		Yx3
+			4		Yx4
+			3		Yx5
+			2		Yx6
+			1		Yx7
+			0		Yx8
+ch1			
+			7		Yx8	
+			6		Yx9
+			5		Yx10
+			4		Yx11
+			3		Yx12
+			2		Yx13
+			1		Yx14
+			0		Yx15
+ch2			
+			7		Yx23	
+			6		Yx22
+			5		Yx21
+			4		Yx20
+			3		Yx19
+			2		Yx18
+			1		Yx17
+			0		Yx16
+ch3			xx		xx
+第二块板
+ch4			
+			7		Yx1	
+			6		Yx2
+			5		Yx3
+			4		Yx4
+			3		Yx5
+			2		Yx6
+			1		Yx7
+			0		Yx8
+ch5			
+			7		Yx8	
+			6		Yx9
+			5		Yx10
+			4		Yx11
+			3		Yx12
+			2		Yx13
+			1		Yx14
+			0		Yx15
+ch6			
+			7		Yx23	
+			6		Yx22
+			5		Yx21
+			4		Yx20
+			3		Yx19
+			2		Yx18
+			1		Yx17
+			0		Yx16
+ch7			xx		xx
+
+第三块遥信板
+yx_reg[1]
+channel		bit		signal
+ch0			
+			7		Yx1	
+			6		Yx2
+			5		Yx3
+			4		Yx4
+			3		Yx5
+			2		Yx6
+			1		Yx7
+			0		Yx8
+ch1			
+			7		Yx9 	
+			6		Yx10
+			5		Yx11
+			4		Yx12
+			3		Yx13
+			2		Yx14
+			1		Yx15
+			0		Yx16
+ch2			
+			7		Yx24	
+			6		Yx23
+			5		Yx22
+			4		Yx21
+			3		Yx20
+			2		Yx19
+			1		Yx18
+			0		Yx17
+ch3			xx		xx
+第四块板
+ch4			
+			7		Yx1	
+			6		Yx2
+			5		Yx3
+			4		Yx4
+			3		Yx5
+			2		Yx6
+			1		Yx7
+			0		Yx8
+ch5			
+			7		Yx9 	
+			6		Yx10
+			5		Yx11
+			4		Yx12
+			3		Yx13
+			2		Yx14
+			1		Yx15
+			0		Yx16
+ch6			
+			7		Yx24	
+			6		Yx23
+			5		Yx22
+			4		Yx21
+			3		Yx20
+			2		Yx19
+			1		Yx18
+			0		Yx17
+ch7			xx		xx
+
+电源板
+yx_reg[2]
+channel		bit		signal
+ch0			
+			7		Yx1	
+			6		Yx2
+			5		Yx3
+			4		Yx4
+			3		Yx5
+			2		Yx6
+			1		Yx7
+			0		Yx8
+ch1			
+			7		Yx9 	
+			6		Yx10
+			5		Yx11
+			4		Yx12
+			3		Yx13
+			2		Yx14
+			1		Yx15
+			0		Yx16
+
+15	14	13	12	11	10	9	8	7	6	5	4	3	2	1	0
+							A	Y	Y	Y	Y	V	V	H	P	
+							C	L	L	L	L	H	L	O	O	
+							C	Y	Y	Y	Y			K	K
+							H	X	X	X	X					
+							K	1	2	3	4

@@ -1,0 +1,8 @@
+*.svn
+*.o
+*.xe674
+*.oe674
+*.obj
+Debug
+cscope.out
+tags

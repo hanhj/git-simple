@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configurations XML_version="1.2" id="configurations_0">
+<configuration XML_version="1.2" id="SEED XDS510PLUS Emulator_0">
+        <instance XML_version="1.2" desc="SEED XDS510PLUS Emulator_0" href="connections/SEED-XDS510PLUS_Connection.xml" id="SEED XDS510PLUS Emulator_0" xml="SEED-XDS510PLUS_Connection.xml" xmlpath="connections"/>
+        <connection XML_version="1.2" id="SEED XDS510PLUS Emulator_0">
+            <instance XML_version="1.2" href="drivers/seedxds510plusicepick_c.xml" id="drivers" xml="seedxds510plusicepick_c.xml" xmlpath="drivers"/>
+            <instance XML_version="1.2" href="drivers/seedxds510plusc674x.xml" id="drivers" xml="seedxds510plusc674x.xml" xmlpath="drivers"/>
+            <instance XML_version="1.2" href="drivers/seedxds510pluspru.xml" id="drivers" xml="seedxds510pluspru.xml" xmlpath="drivers"/>
+            <instance XML_version="1.2" href="drivers/seedxds510plusarm9.xml" id="drivers" xml="seedxds510plusarm9.xml" xmlpath="drivers"/>
+            <instance XML_version="1.2" href="drivers/seedxds510plusetb11.xml" id="drivers" xml="seedxds510plusetb11.xml" xmlpath="drivers"/>
+            <platform XML_version="1.2" id="platform_0">
+                <instance XML_version="1.2" desc="OMAPL138_0" href="devices/OMAPL138.xml" id="OMAPL138_0" xml="OMAPL138.xml" xmlpath="devices"/>
+            </platform>
+        </connection>
+    </configuration>
+</configurations>

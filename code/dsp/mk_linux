@@ -1,0 +1,35 @@
+TRG =  	dsp 
+SRC	=	./app/dsp.cpp ./app/message.cpp ./app/scada.cpp ./app/fa.cpp ./app/baseapp.cpp ./app/timer.cpp ./app/varm.cpp \
+./common/stack.cpp ./common/data.cpp  ./common/debug.cpp ./common/task.cpp ./common/thread.cpp  ./common/delay.cpp
+#CC	=	arm-arago-linux-gnueabi-g++
+CC	=	g++
+INCDIR	=	./include
+#LIB		=	/opt/ti-sdk-omapl138-lcdk-01.00.00/linux-devkit/arm-arago-linux-gnueabi/usr/lib -lrt -lpthread 
+LIB		= ./ -lrt -lpthread 
+RM    =rm -f
+
+OBJS	= 	$(SRC:%.cpp=%.o)
+#OBJS	= 	$(patsubst %.cpp,$(OBJDIR)/%.o,$(SRC)) 
+#OBJS	= 	$(OBJDIR)/dsp.o $(OBJDIR)/stack.o $(OBJDIR)/data.o $(OBJDIR)/message.o $(OBJDIR)/timer.o  $(OBJDIR)/debug.o $(OBJDIR)/scada.o $(OBJDIR)/fa.o $(OBJDIR)/task.o $(OBJDIR)/baseapp.o $(OBJDIR)/thread.o
+all: $(OBJS)  $(TRG)
+
+#CPFLAGS = -O2 -Wall -fno-strict-aliasing
+CPFLAGS =  -Wall -O2
+%.o : %.c
+	$(CC) -c $(CPFLAGS) -I$(INCDIR) $< -o $@
+	
+%.o : %.cpp
+	$(CC) -c $(CPFLAGS) -I$(INCDIR) $< -o $@
+	
+$(TRG)	:	$(OBJS)
+	$(CC) $(OBJS)  $(LDFLAGS) -L$(LIB)  -o  $@
+
+#-------------------
+clean:
+	$(RM) $(OBJS)
+	$(RM) $(PROGDIR)/$(TRG)		
+	@echo "Errors: none"	
+#-------------------
+# Create object files directory
+#$(shell mkdir $(OBJDIR) 2>/dev/null)
+#$(shell mkdir $(PROGDIR) 2>/dev/null)	

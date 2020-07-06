@@ -1,0 +1,8 @@
+/* THIS IS A GENERATED FILE -- DO NOT EDIT */
+/* configuro was passed a config.bld file */
+xdc.includeFile("/home/hanhj/share/share_doc/omap/dtu/code/shared/config.bld");
+/* configuro was passed the target's name explicitly */
+var target  = xdc.module('ti.targets.elf.C674');
+Build.targets = [target];
+/* configuro was passed the target's rootDir explicitly */
+Build.targets[0].rootDir = '/home/hanhj/opt/ti-sdk-omapl138-lcdk-01.00.00/ti/TI_CGT_C6000_7.3.3';

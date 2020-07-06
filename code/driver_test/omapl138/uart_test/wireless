@@ -1,0 +1,18 @@
+/dev/ttyS1
+115200
+maxfail 0
+persist
+lcp-echo-interval 30
+lcp-echo-failure 2
+nocrtscts
+nodetach
+noauth
+usepeerdns
+noipdefault
+ipcp-accept-local
+ipcp-accept-remote
+defaultroute
+user card
+connect 'chat -s -v -f /etc/ppp/chat-evdo'
+
+
