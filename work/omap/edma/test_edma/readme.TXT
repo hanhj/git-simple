@@ -3,6 +3,7 @@
 2. 将edma3的例子放入edma目录中
 3. 将edma的main程序替换成do_emda,包括初始化,中断设置,调用原程序的edma3Test 
 4. 替换了edma3Test程序为do_test,测试是否能成功
+5. 添加了edma_interface.c文件,封装了接口,去掉原程序中不必要的文件.
 
 经过试验:
 1. 初始化时要enable PSC.

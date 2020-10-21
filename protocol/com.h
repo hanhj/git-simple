@@ -13,6 +13,14 @@
 #define TYPE_SERIAL 1
 #define TYPE_ETHERNET 2
 #define TYPE_WIRELESS 3
+typedef struct __com_buff{
+		int read_produce;
+		int read_consume;
+		int send_produce;
+		int send_consume;
+		unsigned char read_buff[COM_RECV_BUFFER_SIZE];
+		unsigned char send_buff[COM_SEND_BUFFER_SIZE];
+}_com_buff;
 
 class com_port{
 	protected:
@@ -22,9 +30,11 @@ class com_port{
 		int send_consume;
 	public:
 		int port_no;//port number
+		int pro_id;
 		int com_type;//1:serial,2:enthtnet,3:wireless net(gprs or cdma)
 		unsigned char read_buff[COM_RECV_BUFFER_SIZE];
 		int state;
+		_com_buff com_buff;
 	public:
 		com_port(){
 			read_produce=0;
@@ -34,6 +44,7 @@ class com_port{
 			state=0;
 			port_no=0;
 			com_type=0;
+			pro_id=1;
 			memset(&read_buff,0,sizeof(read_buff));
 		};
 		com_port(int port){

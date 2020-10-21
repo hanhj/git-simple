@@ -1,0 +1,321 @@
+1. gp7_8作为scl,gp7_10 作为sda信号有问题,同样的程序用在2015板子上可以读写24c02,而在2016就不行,现象是有信号但是读出来都是0,后来改为与时钟同样i2c总线
+
+2.电源板不插会导致遥信信号不停变位,导致yx占用大量时间
+
+[root@(none) /home]# ./arm
+gpio open success!
+open: No such file or directory
+open: No such file or directory
+open: No such file or directory
+common/gb104.cpp[ParaConfig:5757]member.InerPara.W=8
+common/gb104.cpp[InitIdMapTable:8379]total yx num 682 syx num:666,dyx_num:16
+common/gb104.cpp[InitIdMapTable:8415]total yc num 300
+common/gb104.cpp[InitIdMapTable:8442]total yk num 19
+common/gb104.cpp[InitIdMapTable:8456]total pro_user_para_num num 279
+common/gb104.cpp[InitIdMapTable:8465]total 32 bit num 16
+Stopped slave procId 0.
+Unloaded slave procId 0.
+Detached from slave procId 0.
+stop module
+Attached to slave procId 0.
+Loading procId 0.
+Loaded file /usr/sbin/dsp.xe674 on slave procId 0.
+Started slave procId 0.
+../driver/fpga.cpp[CheckBoardGpio:397]Yc slot 0 state:0
+../driver/fpga.cpp[CheckBoardGpio:397]Yc slot 1 state:1
+../driver/fpga.cpp[CheckBoardGpio:397]Yc slot 2 state:1
+../driver/fpga.cpp[CheckBoardGpio:397]Yc slot 3 state:1
+../driver/fpga.cpp[CheckBoardGpio:397]Yc slot 4 state:1
+../driver/fpga.cpp[CheckBoardGpio:412]IO slot 0 state:1
+../driver/fpga.cpp[CheckBoardGpio:412]IO slot 1 state:1
+../driver/fpga.cpp[CheckBoardGpio:412]IO slot 2 state:1
+../driver/fpga.cpp[CheckBoardGpio:412]IO slot 3 state:1
+../driver/fpga.cpp[CheckBoardGpio:412]IO slot 4 state:1
+../driver/fpga.cpp[YcRatioRead:325]rd slot 0
+                                            ../driver/at24c02.cpp[RW_FlashData:5
+1]r addr:0,len:68
+dump:68
+00 00 00 00 00 00 00 00
+08:00 00 00 00 00 00 00 00
+10:00 00 00 00 00 00 00 00
+18:00 00 00 00 00 00 00 00
+20:00 00 00 00 00 00 00 00
+28:00 00 00 00 00 00 00 00
+30:01 00 00 00 01 00 00 00
+38:00 00 00 00 00 00 00 00
+40:55 00 CA A0 ../driver/fpga.cpp[check_yc_ratio:298]0,0.000000
+../driver/fpga.cpp[check_yc_ratio:298]1,0.000000
+../driver/fpga.cpp[check_yc_ratio:298]2,0.000000
+../driver/fpga.cpp[check_yc_ratio:298]3,0.000000
+../driver/fpga.cpp[check_yc_ratio:298]4,0.000000
+../driver/fpga.cpp[check_yc_ratio:298]5,0.000000
+../driver/fpga.cpp[check_yc_ratio:298]6,0.000000
+../driver/fpga.cpp[check_yc_ratio:298]7,0.000000
+../driver/fpga.cpp[check_yc_ratio:298]8,0.000000
+../driver/fpga.cpp[check_yc_ratio:298]9,0.000000
+../driver/fpga.cpp[check_yc_ratio:298]10,0.000000
+../driver/fpga.cpp[check_yc_ratio:298]11,0.000000
+../driver/fpga.cpp[check_yc_ratio:298]12,0.000000
+../driver/fpga.cpp[check_yc_ratio:298]13,0.000000
+../driver/fpga.cpp[check_yc_ratio:298]14,0.000000
+../driver/fpga.cpp[check_yc_ratio:298]15,0.000000
+../driver/fpga.cpp[ChangeRatioToLine:154]line:0 ratio p:4,Ia:0.000000   p:5,Ib:0
+.000000 p:6,Ic0.000000
+../driver/fpga.cpp[ChangeRatioToLine:154]line:1 ratio p:7,Ia:0.000000   p:8,Ib:0
+.000000 p:9,Ic0.000000
+../driver/fpga.cpp[ChangeRatioToLine:154]line:2 ratio p:10,Ia:0.000000  p:11,Ib:
+0.000000        p:12,Ic0.000000
+../driver/fpga.cpp[ChangeRatioToLine:154]line:3 ratio p:16,Ia:0.000000  p:17,Ib:
+0.000000        p:18,Ic0.000000
+../driver/fpga.cpp[ChangeRatioToLine:154]line:4 ratio p:19,Ia:0.000000  p:20,Ib:
+0.000000        p:21,Ic0.000000
+../driver/fpga.cpp[ChangeRatioToLine:154]line:5 ratio p:22,Ia:0.000000  p:23,Ib:
+0.000000        p:24,Ic0.000000
+../driver/fpga.cpp[ChangeRatioToLine:154]line:6 ratio p:25,Ia:0.000000  p:26,Ib:
+0.000000        p:27,Ic0.000000
+../driver/fpga.cpp[ChangeRatioToLine:154]line:7 ratio p:32app/protoc,Ia:0.0ol.cp
+p[ClearBufR00000        p:33,Ib:0.000000        p:34,Ic0.000000
+egistTable:966]b../driveruf_addr_regist_t/fpga.cpp[ChangeRatioToLine:154]line:8a
+ble all clear
+ ratio app/prp:35,Ia:0.000000   p:36,Ib:0.000000        p:37,Ic0otocol.cpp[Run:1
+.00000088]i am in the t
+hread protocol_m../driver/fpga.cpp[Changain
+eRatioToLine:154]line:9 ratio p:38,Ia:0.000000  p:39,Ib:0.000000        p:40,Ic0
+.000000
+../driver/fpga.cpp[ChangeRatioToLine:154]line:10 ratio p:41,Ia:0.000000 p:42,Ib:
+0.000000        p:43,Ic0.000000
+../driver/fpga.cpp[ChangeRatioToLine:154]line:11 ratio p:48,Ia:0.000000 p:49,Ib:
+0.000000        p:50,Ic0.000000
+../driver/fpga.cpp[ChangeRatioToLine:154]line:12 ratio p:51,Ia:0.000000 p:52,Ib:
+0.000000        p:53,Ic0.000000
+../driver/fpga.cpp[ChangeRatioToLine:154]line:13 ratio p:54,Ia:0.000000 p:55,Ib:
+0.000000        p:56,Ic0.000000
+../driver/fpga.cpp[ChangeRatioToLine:154]line:14 ratio p:57,Ia:0.000000 p:58,Ib:
+0.000000        p:59,Ic0.000000
+../driver/fpga.cpp[ChangeRatioToLine:154]line:15 ratio p:64,Ia:0.000000 p:65,Ib:
+0.000000        p:66,Ic0.000000
+../driver/at24c02.cpp[RW_FlashData:51]r addr:68,len:34
+dump:34
+53 BA EA 3C 66 FF 66 FF
+08:53 FF EA 3C 66 66 66 BF
+10:53 BA EA 3C 66 66 66 BF
+18:53 BA EA 3C 66 66 66 BF
+20:00 00 ../driver/fpga.cpp[YcRatioRead:350]No dc ratio set Board 1
+../driver/at24c02.cpp[RW_FlashData:66]w addr:68,len:34
+dump:34
+53 BA EA 3C 66 66 66 BF
+08:53 BA EA 3C 66 66 66 BF
+10:53 BA EA 3C 66 66 66 BF
+18:53 BA EA 3C 66 66 66 BF
+20:55 00 ../app/fa.cpp[FixTimeProtect:787]34
+../app/fa.cpp[FixTimeProtect:787]34
+app/protocol.cpp[AddBufRegistTable:950]add regist table-> buf:b5799,port:1,pro:1
+,
+app/protocol.cpp[AddBufRegistTable:950]add regist table-> buf:b63c6,port:2,pro:1
+,
+app/protocol.cpp[AddBufRegistTable:950]add regist table-> buf:b6ff3,port:3,pro:1
+,
+app/protocol.cpp[AddBufRegistTable:950]add regist table-> buf:b7c20,port:4,pro:1
+,
+app/protocol.cpp[AddBufRegistTable:950]add regist table-> buf:b884d,port:5,pro:1
+,
+app/protocol.cpp[AddBufRegistTable:950]add regist table-> buf:b947a,port:6,pro:1
+,
+app/protocol.cpp[AddBufRegistTable:950]add regist table-> buf:ba0a7,port:7,pro:1
+,
+../app/fa.cpp[FixTimeProtect:787]33
+../app/fa.cpp[FixTimeProtect:787]33
+../driver/fpga.cpp[YcRatioRead:325]rd slot 0
+                                            ../app/fa.cpp[FixTimeProtect:787]37
+../driver/at24c02.cpp[RW_FlashData:51]r addr:0,len:68
+dump:68
+00 00 00 00 00 00 00 00
+08:00 00 00 00 00 00 00 00
+10:00 00 00 00 00 00 00 00
+18:00 00 00 00 00 00 00 00
+20:00 00 00 00 00 00 00 00
+28:00 00 00 00 00 00 00 00
+30:01 00 00 00 01 00 00 00
+38:00 00 00 00 00 00 00 00
+40:55 00 CA A0 ../driver/fpga.cpp[check_yc_ratio:298]0,0.000000
+../driver/fpga.cpp[check_yc_ratio:298]1,0.000000
+../driver/fpga.cpp[check_yc_ratio:298]2,0.000000
+../driver/fpga.cpp[check_yc_ratio:298]3,0.000000
+../driver/fpga.cpp[check_yc_ratio:298]4,0.000000
+../dr../app/fa.cpp[FixTimeProtect:787]35
+iver/fpga.cpp[check_yc_ratio:298]5,0.000000
+../driver/fpga.cpp[check_yc_ratio:298]6,0.000000
+../driver/fpga.cpp[check_yc_ratio:298]7,0.000000
+../driver/fpga.cpp[check_yc_ratio:298]8,0.000000
+../driver/fpga.cpp[check_yc_ratio:298]9,0.000000
+../driver/fpga.cpp[check_yc_ratio:298]10,0.000000
+../driver/fpga.cpp[check_yc_ratio:298]11,0.000000
+../driver/fpga.cpp[check_yc_ratio:298]12,0.000000
+../driver/fpga.cpp[check_yc_ratio:298]13,0.000000
+../driver/fpga.cpp[check_yc_ratio:298]14,0.000000
+../driver/fpga.cpp[check_yc_ratio:298]15,0.000000
+../driver/fpga.cpp[ChangeRatioToLine:154]line:0 ratio p:4,Ia:0.000000   p:5,Ib:0
+.000000 p:6,Ic0.000000
+../driver/fpga.cpp[ChangeRatioToLine:154]line:1 ratio p:7,Ia:0.000000   p:8,Ib:0
+.000000 p:9,Ic0.000000
+../driver/fpga.cpp[ChangeRatioToLine:154]line:2 ratio p:10,Ia:0.000000  p:11,Ib:
+0.000000        p:12,Ic0.000000
+../driver/fpga.cpp[ChangeRatioToLine:154]line:3 ratio p:16,Ia:0.000000  p:17,Ib:
+0.000000        p:18,Ic0.000000
+../driver/fpga.cpp[ChangeRatioToLine:154]line:4 ratio p:19,Ia:0.000000  p:20,Ib:
+0.000000        p:21,Ic0.000000
+../driver/fpga.cpp[ChangeRatioToLine:154]line:5 ratio p:22,Ia:0.000000  p:23,Ib:
+0.000000        p:24,Ic0.000000
+../driver/fpga.cpp[ChangeRatioToLine:154]line:6 ratio p:25,Ia:0.000000  p:26,Ib:
+0.000000        p:27,Ic0.000000
+../driver/fpga.cpp[ChangeRatioToLine:154]line:7 ratio p:32,Ia:0.000000  p:33,Ib:
+0.000000        p:34,Ic0.000000
+../driver/fpga.cpp[ChangeRatioToLine:154]line:8 ratio p:35,Ia:0.000000  p:36,Ib:
+0.000000        p:37,Ic0.000000
+../driver/fpga.cpp[ChangeRatioToLine:154]line:9 ratio p:-1,Ia:0.000000  p:39,Ib:
+0.000000        p:-1,Ic0.000000
+../driver/fpga.cpp[ChangeRatioToLine:154]line:10 ratio p:-1,Ia:0.000000 p:-1,Ib:
+0.000000        p:-1,Ic0.000000
+../driver/fpga.cpp[ChangeRatioToLine:154]line:11 ratio p:48,Ia:0.000000 p:49,Ib:
+0.000000        p:50,Ic0.000000
+../driver/fpga.cpp[ChangeRatioToLine:154]line:12 ratio p:51,Ia:0.000000 p:52,Ib:
+0.000000        p:53,Ic0.000000
+../driver/fpga.cpp[ChangeRatioToLine:154]line:13 ratio p:54,Ia:0.000000 p:55,Ib:
+0.000000        p:56,Ic0.000000
+../driver/fpga.cpp[ChangeRatioToLine:154]line:14 ratio p:57,Ia:0.000000 p:58,Ib:
+0.000000        p:59,Ic0.000000
+../driver/fpga.cpp[ChangeRatioToLine:154]line:15 ratio p:64,Ia:0.000000 p:65,Ib:
+0.000000        p:66,Ic0.000000
+../app/fa.cpp[FixTimeProtect:787]35
+../driver/at24c02.cpp[RW_FlashData:51]r addr:68,len:34
+dump:34
+53 BA EA 3C 66 FF 66 FF
+08:53 FF EA 3C 66 66 66 BF
+10:53 BA EA 3C 66 66 66 BF
+18:53 BA EA 3C 66 66 66 BF
+20:55 00 ../app/scada.cpp[Run:3993]1 :0
+../app/fa.cpp[FixTimeProtect:787]35
+../app/fa.cpp[FixTimeProtect:787]34
+../app/fa.cpp[FixTimeProtect:787]34
+../app/fa.cpp[FixTimeProtect:787]34
+../app/scada.cpp[Run:3998]2 :3493
+../app/scada.cpp[Run:4003]3 :0
+../app/scada.cpp[Run:4006]int run,time 0:20174 1:13075
+../app/scada.cpp[Run:3993]1 :0
+../app/scada.cpp[Run:3998]2 :482
+../app/scada.cpp[Run:4003]3 :0
+../app/scada.cpp[Run:3993]1 :0
+../app/fa.cpp[FixTimeProtect:787]34
+../app/fa.cpp[FixTimeProtect:787]34
+../app/scada.cpp[Run:3998]2 :1991
+../app/scada.cpp[Run:4003]3 :0
+../app/scada.cpp[Run:4006]int run,time 0:12195 1:15480
+../app/scada.cpp[Run:4032]5 :0
+../app/scada.cpp[Run:4037]6 :5
+../app/scada.cpp[Run:4042]7 :90
+../app/scada.cpp[do_test:3912]20 10 20 23 18 27
+../app/fa.cpp[FixTimeProtect:787]34
+../driver/at24c02.cpp[RW_FlashData:66]w addr:100,len:68
+dump:68
+00 00 80 3F 00 00 00 40
+08:00 00 40 40 00 00 80 40
+10:00 00 00 00 00 00 00 00
+18:00 00 00 00 00 00 00 00
+20:00 00 00 00 00 00 00 00
+28:00 00 00 00 00 00 00 00
+30:00 00 00 00 00 00 00 00
+38:00 00 00 00 00 00 00 00
+40:45 00 00 00 ../app/scada.cpp[do_test:3923]ret:0
+../app/fa.cpp[FixTimeProtect:787]34
+../app/fa.cpp[FixTimeProtect:787]34
+../driver/at24c02.cpp[RW_FlashData:51]r addr:100,len:68
+dump:68
+00 00 80 3F FF FF FF FF
+08:FF FF FF FF 00 00 80 40
+10:00 00 00 00 FF FF FF FF
+18:FF FF FF FF 00 00 00 00
+20:00 00 00 00 01 00 00 00
+28:FC 91 00 80 00 00 00 00
+30:00 00 00 00 FF FF FF FF
+38:FF FF FF FF 00 00 00 00
+40:45 00 00 00 ../app/scada.cpp[do_test:3930]ret:1,flag:45,1.000000,nan,nan
+../app/scada.cpp[Run:3993]1 :0
+../app/fa.cpp[FixTimeProtect:787]34
+../app/fa.cpp[FixTimeProtect:787]34
+../app/fa.cpp[FixTimeProtect:787]34
+../app/fa.cpp[FixTimeProtect:787]34
+../app/scada.cpp[Run:3998]2 :3474
+../app/scada.cpp[Run:4003]3 :0
+../app/scada.cpp[Run:4006]int run,time 0:19823 1:13597
+../app/scada.cpp[Run:4014]4 :149
+../app/scada.cpp[Run:3993]1 :0
+../app/scada.cpp[Run:3998]2 :364
+../app/scada.cpp[Run:4003]3 :0
+../app/scada.cpp[Run:3993]1 :0
+../app/fa.cpp[FixTimeProtect:787]34
+../app/scada.cpp[Run:3998]2 :582
+../app/scada.cpp[Run:4003]3 :0
+../app/scada.cpp[Run:4006]int run,time 0:12056 1:17696
+../app/scada.cpp[Run:4032]5 :1
+../app/scada.cpp[Run:4037]6 :17
+../app/scada.cpp[Run:4042]7 :87
+../app/scada.cpp[Run:3993]1 :0
+../app/fa.cpp[FixTimeProtect:787]34
+../app/fa.cpp[FixTimeProtect:787]34
+../app/fa.cpp[FixTimeProtect:787]34
+../app/scada.cpp[Run:3998]2 :3443
+../app/scada.cpp[Run:4003]3 :0
+../app/scada.cpp[Run:4006]int run,time 0:11323 1:13060
+../app/scada.cpp[Run:3993]1 :0
+../app/fa.cpp[FixTimeProtect:787]34
+../app/scada.cpp[Run:3998]2 :516
+../app/scada.cpp[Run:4003]3 :0
+../app/scada.cpp[Run:4006]int run,time 0:19640 1:13256
+../app/scada.cpp[Run:4014]4 :152
+../app/scada.cpp[Run:3993]1 :0
+../app/fa.cpp[FixTimeProtect:787]34
+../app/scada.cpp[Run:3998]2 :945
+../app/scada.cpp[Run:4003]3 :0
+../app/scada.cpp[Run:4006]int run,time 0:9930 1:18771
+../app/scada.cpp[Run:4032]5 :2
+../app/scada.cpp[Run:4037]6 :18
+../app/scada.cpp[Run:4042]7 :86
+../app/scada.cpp[Run:3993]1 :2
+../app/fa.cpp[FixTimeProtect:787]34
+../app/fa.cpp[FixTimeProtect:787]34
+../app/fa.cpp[FixTimeProtect:787]34
+../app/fa.cpp[FixTimeProtect:787]34
+../app/fa.cpp[FixTimeProtect:787]34
+../app/fa.cpp[FixTimeProtect:787]34
+../app/scada.cpp[Run:3998]2 :6262
+../app/scada.cpp[Run:4003]3 :0
+../app/scada.cpp[Run:4006]int run,time 0:9342 1:7452
+../app/fa.cpp[FixTimeProtect:787]34
+../app/scada.cpp[Run:4014]4 :156
+../app/scada.cpp[Run:3993]1 :0
+../app/fa.cpp[FixTimeProtect:787]34
+../app/fa.cpp[FixTimeProtect:787]34
+../app/fa.cpp[FixTimeProtect:787]34
+../app/scada.cpp[Run:3998]2 :2975
+../app/scada.cpp[Run:4003]3 :0
+../app/scada.cpp[Run:4006]int run,time 0:4576737 1:13043
+../app/scada.cpp[Run:4032]5 :2
+../app/scada.cpp[Run:4037]6 :5
+../app/scada.cpp[Run:4042]7 :89
+../app/scada.cpp[Run:3993]1 :0
+../app/fa.cpp[FixTimeProtect:787]34
+../app/fa.cpp[FixTimeProtect:787]34
+../app/fa.cpp[FixTimeProtect:787]34
+../app/fa.cpp[FixTimeProtect:787]34
+^CDevice gpio released
+../app/../app/fa.cpp[FixTimeProtect:787]34
+scada.cpp[Run:3998]2 :4912
+../app/scada.cpp[Run:4003]3 :0
+../app/scada.cpp[Run:4006]int run,time 0:4556500 1:14452
+../app/scada.cpp[Run:4014]4 :90
+../app/scada.cpp[Run:3993]1 :0
+
+
+这个记录了scada程序run函数中各个函数运行时间
+1s内进入fixtimeprotect 34次,约29ms进入一次
+
