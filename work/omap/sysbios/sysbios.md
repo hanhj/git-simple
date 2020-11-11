@@ -249,15 +249,21 @@ Swi软中断类似于Hwi硬中断.软中断被程序触发,例如Swi_post().软�
 sysbios中触发软中断的API有:  
 
 - Swi_andn(Swi_Handle handle,uint mask)  
-将Triger与mask相与,clear 相应位,只有当triger为0时post  
+	用于需要满足多个条件的触发.  
+	将TrigerValue与mask相与,clear 相应位,只有当triger为0时post    
+	比如开始时将TriggerValue配置成3  
+	只有调用Swi_andn(&swi,0x1),Swi_andn(&swi,0x2)后才能post
 - Swi_dec(Swi_Handle)  
-将Triger--,只有当triger为0时post.   
+	将TrigerValue--,只有当triger为0时post.    
 - Swi_inc(Swi_Handle)    
-Triger++,and post  
+	Triger++,and post    
+	在swi中可以通过Swi_getTrigger获得在执行前有多少个post.  
+	多个post只执行一次
 - Swi_or(Swi_Handle,mask)     
-Triger or mask and post  
+	用于只需要满足一个条件就可以触发的情况  
+	Triger or mask and post  
 - Swi_post(Swi_Handle )   
-Not change Triger, post  
+	Not change Triger, post  
 
 
 #### 3.5.2 创建swi 
